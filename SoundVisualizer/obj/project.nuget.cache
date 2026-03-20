@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "Di2Bid+RJ9s=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\drago\\OneDrive\\바탕 화면\\SoundVisualizer\\SoundVisualizer\\SoundVisualizer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\drago\\.nuget\\packages\\microsoft.ml.onnxruntime\\1.24.3\\microsoft.ml.onnxruntime.1.24.3.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\microsoft.ml.onnxruntime.managed\\1.24.3\\microsoft.ml.onnxruntime.managed.1.24.3.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio\\2.3.0\\naudio.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.asio\\2.3.0\\naudio.asio.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.core\\2.3.0\\naudio.core.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.midi\\2.3.0\\naudio.midi.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.wasapi\\2.3.0\\naudio.wasapi.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.winforms\\2.3.0\\naudio.winforms.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\naudio.winmm\\2.3.0\\naudio.winmm.2.3.0.nupkg.sha512",
+    "C:\\Users\\drago\\.nuget\\packages\\system.numerics.tensors\\9.0.0\\system.numerics.tensors.9.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

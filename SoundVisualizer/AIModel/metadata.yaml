@@ -1,0 +1,15 @@
+runtime: onnx
+precision: float
+tool_versions:
+  qairt: 2.42.0.251225135753_193295
+  onnx_runtime: 1.24.1
+model_files:
+  yamnet.onnx:
+    inputs:
+      audio:
+        shape: [1, 1, 96, 64]
+        dtype: float32
+    outputs:
+      class_scores:
+        shape: [1, 521]
+        dtype: float32
