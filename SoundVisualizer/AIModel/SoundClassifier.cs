@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Microsoft.ML.OnnxRuntime;
@@ -66,53 +68,84 @@ namespace SoundVisualizer.AIModel
             // 가장 대사와 효과음이 선명한 '센터 채널(Index 2)'만 쏙 빼서 1채널(Mono)로 만듭니다.
             float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded);
 
-            // 3. YAMNet 입력 텐서 [1, 1, 96, 64] 만들기
-            // 최소 버전: mono audio -> (윈도우/호핑/FFT) -> log-mel spectrogram -> 고정 shape로 패딩/트렁케이션
+            InferenceResult r = PredictFromMono16k(monoAudio, 0.3f);
+            if (r.YamnetClassIndex < 0)
+                return "AI 에러";
+            if (r.Confidence < 0.3f)
+                return "배경음";
+
+            return $"{r.YamnetDisplayName} ({r.Confidence * 100f:F1}%)";
+        }
+
+        /// <summary>
+        /// 모노 PCM(float)을 16kHz로 맞춘 뒤 전처리·추론합니다. WAV 파일 테스트 등에 사용합니다.
+        /// </summary>
+        /// <param name="confidenceThreshold">상위 클래스 확률이 이 값 미만이면 MeetsThreshold=false.</param>
+        public InferenceResult PredictFromMono16k(float[] monoAudio, float confidenceThreshold)
+        {
+            if (_session == null)
+                return new InferenceResult(-1, "AI 꺼짐", 0f, "ambient", false, 0);
+
             float[] logMel = ComputeLogMelSpectrogram(monoAudio);
             var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, MelBins, Frames });
             var inputs = new[] { NamedOnnxValue.CreateFromTensor("audio", inputTensor) };
 
-            // 4. 추론 직전 검증/로깅 (YAMNet 기대 입력과 일치 확인)
-            try
-            {
-                var dims = inputTensor.Dimensions;
-                string dimsStr = string.Join(", ", dims.Select(d => d.ToString()));
-                Console.WriteLine($"[YAMNet] inputTensor shape=[{dimsStr}] rank={inputTensor.Rank}");
-
-                bool hasAudioInput = _session.InputMetadata.Keys.Contains("audio");
-                Console.WriteLine($"[YAMNet] model has input named 'audio': {hasAudioInput}");
-
-                // 기대 shape: [1,1,96,64]
-                bool shapeOk = dims.Length == 4 && dims[0] == 1 && dims[1] == 1 && dims[2] == MelBins && dims[3] == Frames;
-                if (!shapeOk)
-                    Console.WriteLine($"[YAMNet] WARNING: expected [1,1,{MelBins},{Frames}] but got [{dimsStr}]");
-            }
-            catch (Exception logEx)
-            {
-                Console.WriteLine($"[YAMNet] input logging failed: {logEx.Message}");
-            }
-
-            // 5. 추론 (Inference) 시작!
+            float[] logits;
+            double inferMs;
+            var sw = Stopwatch.StartNew();
             try
             {
                 using var results = _session.Run(inputs);
-
-                // 6. 결과 분석: 521개의 소리 중 가장 확률이 높은(Max) 인덱스 찾기
-                var output = results.First().AsEnumerable<float>().ToArray();
-                int maxIndex = Array.IndexOf(output, output.Max());
-                float probability = output[maxIndex] * 100;
-
-                // 너무 확신이 없는(확률이 낮은) 소리는 무시
-                if (probability < 30.0f) return "배경음";
-
-                return $"{_classNames[maxIndex]} ({probability:F1}%)";
+                logits = results.First().AsEnumerable<float>().ToArray();
             }
             catch (Exception ex)
             {
-                // shape/runtime 오류가 나면 여기로 떨어집니다(검증 목적).
                 Console.WriteLine($"🚨 [YAMNet] Inference failed: {ex}");
-                return "AI 에러";
+                return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
+            finally
+            {
+                sw.Stop();
+            }
+
+            inferMs = sw.Elapsed.TotalMilliseconds;
+
+            float[] probs = Softmax(logits);
+            int maxIndex = Array.IndexOf(probs, probs.Max());
+            float conf = probs[maxIndex];
+            string display = _classNames[maxIndex];
+            string coarse = YamnetThreeClassMapper.MapDisplayNameToCoarse(display);
+            bool ok = conf >= confidenceThreshold;
+
+            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs);
+        }
+
+        private static float[] Softmax(float[] logits)
+        {
+            if (logits.Length == 0)
+                return Array.Empty<float>();
+
+            float max = logits.Max();
+            var exp = new float[logits.Length];
+            double sum = 0;
+            for (int i = 0; i < logits.Length; i++)
+            {
+                exp[i] = MathF.Exp(logits[i] - max);
+                sum += exp[i];
+            }
+
+            if (sum <= 0 || double.IsNaN(sum))
+            {
+                float inv = 1f / logits.Length;
+                for (int i = 0; i < logits.Length; i++)
+                    exp[i] = inv;
+                return exp;
+            }
+
+            for (int i = 0; i < logits.Length; i++)
+                exp[i] = (float)(exp[i] / sum);
+
+            return exp;
         }
 
         private float[] ExtractCenterChannel(byte[] rawAudioData, int bytesRecorded)
@@ -304,12 +337,36 @@ namespace SoundVisualizer.AIModel
 
         private void LoadClassNames()
         {
-            // 프로토타입용 가짜 데이터 (실제로는 YAMNet class map CSV를 읽어야 함)
             _classNames = new string[521];
-            for (int i = 0; i < 521; i++) _classNames[i] = "알 수 없는 소리";
-            _classNames[426] = "💥 폭발음";
-            _classNames[427] = "🔫 총소리";
-            _classNames[322] = "👣 발소리";
+            for (int i = 0; i < 521; i++)
+                _classNames[i] = $"class_{i}";
+
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet_class_map.csv");
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"⚠️ yamnet_class_map.csv 없음: {path}");
+                return;
+            }
+
+            foreach (var line in File.ReadLines(path))
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("index,", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                int c1 = line.IndexOf(',');
+                if (c1 < 0) continue;
+                int c2 = line.IndexOf(',', c1 + 1);
+                if (c2 < 0) continue;
+
+                if (!int.TryParse(line.AsSpan(0, c1), out int index) || index < 0 || index >= 521)
+                    continue;
+
+                string name = line.Substring(c2 + 1).Trim();
+                if (name.Length >= 2 && name[0] == '"' && name[^1] == '"')
+                    name = name.Substring(1, name.Length - 2).Replace("\"\"", "\"", StringComparison.Ordinal);
+
+                _classNames[index] = name;
+            }
         }
 
         // 메모리 누수 방지용
