@@ -5,7 +5,6 @@ using NAudio.CoreAudioApi;
 
 namespace SoundVisualizer.CoreAudio
 {
-    // 수정됨: 오디오 데이터와 채널 정보를 함께 담을 이벤트 인수 클래스 추가
     public class AudioDataAvailableEventArgs : EventArgs
     {
         public byte[] Buffer { get; set; }
@@ -22,7 +21,6 @@ namespace SoundVisualizer.CoreAudio
     {
         private WasapiLoopbackCapture _captureDevice;
 
-        // 수정됨: 이벤트 타입을 새로 만든 AudioDataAvailableEventArgs 로 변경
         public event EventHandler<AudioDataAvailableEventArgs> OnAudioDataAvailable;
 
         public void StartCapture()
@@ -44,8 +42,10 @@ namespace SoundVisualizer.CoreAudio
             {
                 if (args.BytesRecorded == 0) return;
 
-                // 수정됨: 바이트 배열과 채널 수를 묶어서 이벤트 발생
-                var eventArgs = new AudioDataAvailableEventArgs(args.Buffer, _captureDevice.WaveFormat.Channels);
+                byte[] validData = new byte[args.BytesRecorded];
+                Array.Copy(args.Buffer, validData, args.BytesRecorded);
+
+                var eventArgs = new AudioDataAvailableEventArgs(validData, _captureDevice.WaveFormat.Channels);
                 OnAudioDataAvailable?.Invoke(this, eventArgs);
             };
 
