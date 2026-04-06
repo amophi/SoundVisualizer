@@ -12,99 +12,21 @@
             <TextBlock x:Name="StatusText" Foreground="White" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료"/>
         </Border>
 
-        <!-- 7.1 방향별 파도 (Ellipse) -->
-        <!-- Front Left (빨강) -->
-        <Ellipse x:Name="WaveFL" Width="0" Height="0" Opacity="0.7" IsHitTestVisible="False"
-                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-100,-100,0,0">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FFFF0000" Offset="0"/>
-                    <GradientStop Color="#00FF0000" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Front Right (파랑) -->
-        <Ellipse x:Name="WaveFR" Width="0" Height="0" Opacity="0.7" IsHitTestVisible="False"
-                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-100,-100,0">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FF0000FF" Offset="0"/>
-                    <GradientStop Color="#000000FF" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Front Center (흰색) -->
-        <Ellipse x:Name="WaveFC" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
-                 HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-50,0,0">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FFFFFFFF" Offset="0"/>
-                    <GradientStop Color="#00FFFFFF" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Back Left (초록) -->
-        <Ellipse x:Name="WaveBL" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
-                 HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-100,0,0,-100">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FF00FF00" Offset="0"/>
-                    <GradientStop Color="#0000FF00" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Back Right (노랑) -->
-        <Ellipse x:Name="WaveBR" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
-                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-100,-100">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FFFFFF00" Offset="0"/>
-                    <GradientStop Color="#00FFFF00" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Side Left (주황) -->
-        <Ellipse x:Name="WaveSL" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
-                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-80,0,0,0">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FFFFA500" Offset="0"/>
-                    <GradientStop Color="#00FFA500" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- Side Right (보라) -->
-        <Ellipse x:Name="WaveSR" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
-                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-80,0">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FF800080" Offset="0"/>
-                    <GradientStop Color="#00800080" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
-
-        <!-- LFE Subwoofer (어두운 회색/심해색) -->
-        <Ellipse x:Name="WaveLFE" Width="0" Height="0" Opacity="0.5" IsHitTestVisible="False"
-                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-80">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FF404040" Offset="0"/>
-                    <GradientStop Color="#00404040" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-        </Ellipse>
+        <!-- 7.1 방향별 파도 (화면 전체 고정 앵커링) -->
+        <Path x:Name="WaveFC" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.5"/>
+        <Path x:Name="WaveLFE" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.5"/>
+        <Path x:Name="WaveSL" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.5"/>
+        <Path x:Name="WaveSR" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.5"/>
+        
+        <Path x:Name="WaveFL" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6"/>
+        <Path x:Name="WaveFR" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6"/>
+        <Path x:Name="WaveBL" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6"/>
+        <Path x:Name="WaveBR" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6"/>
 
         <!-- AI 라벨 (화면 정중앙) -->
         <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
                 Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False">
-            <TextBlock x:Name="AILabelText" Foreground="LimeGreen" FontSize="24" 
+            <TextBlock x:Name="AILabelText" Foreground="White" FontSize="26" 
                        FontWeight="Bold" Text="WaveSight 7.1 대기 중..."/>
         </Border>
     </Grid>

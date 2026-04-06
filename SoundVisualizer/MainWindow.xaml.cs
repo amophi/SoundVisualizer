@@ -20,6 +20,7 @@ namespace SoundVisualizer
         private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
         private string _currentLabel = "WaveSight 7.1 대기 중...";
+        private double _animationTime = 0;
         
         // 클래스별 색상 정의 (1: White, 2: Yellow, 3: Red)
         private readonly System.Windows.Media.Color COLOR_CLASS1 = System.Windows.Media.Colors.White;
@@ -100,8 +101,9 @@ namespace SoundVisualizer
 
         private void OnRendering(object? sender, EventArgs e)
         {
+            _animationTime += 0.05;
+
             // 부드러운 애니메이션을 위한 보간 (Interpolation)
-            // 60FPS 기준 smoothFactor 조절
             float smoothFactor = 0.15f; 
             _smoothFL += (_targetFL - _smoothFL) * smoothFactor;
             _smoothFR += (_targetFR - _smoothFR) * smoothFactor;
@@ -120,29 +122,105 @@ namespace SoundVisualizer
             AILabelText.Text = _currentLabel;
             AILabelText.Foreground = new System.Windows.Media.SolidColorBrush(activeColor);
 
-            // 파도 크기 계산
-            double maxScale = 1000.0;
-            double lfeScale = 1200.0; // 우퍼는 좀 더 웅장하게 표현
+            // 화면 가장자리에서 피어오르는 유기적인 파동 지오메트리 생성
+            double baseDepth = 450.0;
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
 
-            // UI 요소 업데이트
-            WaveFL.Width = WaveFL.Height = _smoothFL * maxScale;
-            WaveFR.Width = WaveFR.Height = _smoothFR * maxScale;
-            WaveFC.Width = WaveFC.Height = _smoothFC * maxScale;
-            WaveBL.Width = WaveBL.Height = _smoothBL * maxScale;
-            WaveBR.Width = WaveBR.Height = _smoothBR * maxScale;
-            WaveSL.Width = WaveSL.Height = _smoothSL * maxScale;
-            WaveSR.Width = WaveSR.Height = _smoothSR * maxScale;
-            WaveLFE.Width = WaveLFE.Height = _smoothLFE * lfeScale;
+            if (w == 0 || h == 0) return; // 아직 렌더링 준비 안됨
 
-            // 데이터가 없으면 서서히 사라지게 함 (감쇠)
-            _targetFL *= 0.9f;
-            _targetFR *= 0.9f;
-            _targetFC *= 0.9f;
-            _targetBL *= 0.9f;
-            _targetBR *= 0.9f;
-            _targetSL *= 0.9f;
-            _targetSR *= 0.9f;
-            _targetLFE *= 0.9f;
+            // 상단
+            WaveFC.Data = GenerateEdgeWave(baseDepth * _smoothFC, _animationTime, "Top", w / 2, 0);
+            WaveFL.Data = GenerateCornerWave(baseDepth * _smoothFL, _animationTime, "TopLeft", 0, 0);
+            WaveFR.Data = GenerateCornerWave(baseDepth * _smoothFR, _animationTime, "TopRight", w, 0);
+            
+            // 하단
+            WaveLFE.Data = GenerateEdgeWave(baseDepth * _smoothLFE * 1.3, _animationTime, "Bottom", w / 2, h);
+            WaveBL.Data = GenerateCornerWave(baseDepth * _smoothBL, _animationTime, "BottomLeft", 0, h);
+            WaveBR.Data = GenerateCornerWave(baseDepth * _smoothBR, _animationTime, "BottomRight", w, h);
+            
+            // 측면
+            WaveSL.Data = GenerateEdgeWave(baseDepth * _smoothSL, _animationTime, "Left", 0, h / 2);
+            WaveSR.Data = GenerateEdgeWave(baseDepth * _smoothSR, _animationTime, "Right", w, h / 2);
+
+            // 데이터 감쇠
+            _targetFL *= 0.85f;
+            _targetFR *= 0.85f;
+            _targetFC *= 0.85f;
+            _targetBL *= 0.85f;
+            _targetBR *= 0.85f;
+            _targetSL *= 0.85f;
+            _targetSR *= 0.85f;
+            _targetLFE *= 0.85f;
+        }
+
+        private System.Windows.Media.Geometry GenerateEdgeWave(double depth, double time, string edge, double centerX, double centerY)
+        {
+            if (depth < 5) return System.Windows.Media.Geometry.Empty;
+
+            var geometry = new System.Windows.Media.StreamGeometry();
+            using (var context = geometry.Open())
+            {
+                int points = 40; 
+                double size = 800;
+                
+                double startX, startY;
+                if (edge == "Top" || edge == "Bottom") { startX = centerX - size / 2; startY = centerY; }
+                else { startX = centerX; startY = centerY - size / 2; }
+
+                context.BeginFigure(new System.Windows.Point(startX, startY), true, true);
+
+                for (int i = 1; i <= points; i++)
+                {
+                    double t = (double)i / points;
+                    double bell = 0.5 - 0.5 * Math.Cos(t * 2 * Math.PI);
+                    double wave = Math.Sin(t * 12 + time * 3) * 8 + Math.Sin(t * 24 - time * 5) * 4;
+                    double d = (depth * bell) + (wave * (bell + 0.1));
+
+                    double px, py;
+                    if (edge == "Top") { px = centerX - size / 2 + size * t; py = centerY + d; }
+                    else if (edge == "Bottom") { px = centerX - size / 2 + size * t; py = centerY - d; }
+                    else if (edge == "Left") { py = centerY - size / 2 + size * t; px = centerX + d; }
+                    else { py = centerY - size / 2 + size * t; px = centerX - d; }
+
+                    context.LineTo(new System.Windows.Point(px, py), true, true);
+                }
+            }
+            geometry.Freeze();
+            return geometry;
+        }
+
+        private System.Windows.Media.Geometry GenerateCornerWave(double depth, double time, string corner, double cornerX, double cornerY)
+        {
+            if (depth < 5) return System.Windows.Media.Geometry.Empty;
+
+            var geometry = new System.Windows.Media.StreamGeometry();
+            using (var context = geometry.Open())
+            {
+                int points = 20;
+                context.BeginFigure(new System.Windows.Point(cornerX, cornerY), true, true);
+                
+                for (int i = 0; i <= points; i++)
+                {
+                    double angle = (double)i / points * (Math.PI / 2);
+                    double bell = Math.Sin(angle * 2); 
+                    double wave = Math.Sin(angle * 10 + time * 3.5) * 6;
+                    double r = depth * (0.8 + 0.2 * bell) + wave;
+
+                    double dx = Math.Cos(angle) * r;
+                    double dy = Math.Sin(angle) * r;
+
+                    double px = cornerX, py = cornerY;
+                    if (corner == "TopLeft") { px += dx; py += dy; }
+                    else if (corner == "TopRight") { px -= dx; py += dy; }
+                    else if (corner == "BottomRight") { px -= dx; py -= dy; }
+                    else if (corner == "BottomLeft") { px += dx; py -= dy; }
+
+                    context.LineTo(new System.Windows.Point(px, py), true, true);
+                }
+            }
+            geometry.Freeze();
+            return geometry;
         }
 
         // ==========================================
@@ -162,23 +240,37 @@ namespace SoundVisualizer
 
         private void UpdateWaveColors(System.Windows.Media.Color color)
         {
-            var brush = new System.Windows.Media.RadialGradientBrush();
-            brush.GradientStops.Add(new System.Windows.Media.GradientStop(color, 0));
-            
-            // 끝부분은 투명하게 (파도 효과 유지)
             var transparent = color;
             transparent.A = 0;
-            brush.GradientStops.Add(new System.Windows.Media.GradientStop(transparent, 1));
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            if (w == 0 || h == 0) return;
 
-            // 모든 파도 요소의 색상 업데이트
-            WaveFL.Fill = brush;
-            WaveFR.Fill = brush;
-            WaveFC.Fill = brush;
-            WaveBL.Fill = brush;
-            WaveBR.Fill = brush;
-            WaveSL.Fill = brush;
-            WaveSR.Fill = brush;
-            WaveLFE.Fill = brush;
+            // 절대 좌표 모드로 그라데이션 브러시 생성
+            System.Windows.Media.RadialGradientBrush CreateBrush(double ax, double ay)
+            {
+                var brush = new System.Windows.Media.RadialGradientBrush();
+                brush.MappingMode = System.Windows.Media.BrushMappingMode.Absolute;
+                brush.GradientOrigin = new System.Windows.Point(ax, ay);
+                brush.Center = new System.Windows.Point(ax, ay);
+                brush.RadiusX = 400; // 파동 너비에 맞춘 절대 반경
+                brush.RadiusY = 400; 
+                
+                brush.GradientStops.Add(new System.Windows.Media.GradientStop(color, 0));
+                brush.GradientStops.Add(new System.Windows.Media.GradientStop(transparent, 1));
+                return brush;
+            }
+
+            // 각 요소에 대해 화면 절대 좌표로 색상 중심점 고정
+            WaveFC.Fill = CreateBrush(w / 2, 0); 
+            WaveLFE.Fill = CreateBrush(w / 2, h); 
+            WaveSL.Fill = CreateBrush(0, h / 2); 
+            WaveSR.Fill = CreateBrush(w, h / 2); 
+            
+            WaveFL.Fill = CreateBrush(0, 0); 
+            WaveFR.Fill = CreateBrush(w, 0); 
+            WaveBL.Fill = CreateBrush(0, h); 
+            WaveBR.Fill = CreateBrush(w, h); 
         }
 
         // ==========================================
