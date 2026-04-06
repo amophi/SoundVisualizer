@@ -9,76 +9,92 @@ namespace SoundVisualizer.DSP
         // 0: FL (앞-좌), 1: FR (앞-우), 2: FC (센터), 3: LFE (우퍼)
         // 4: BL (뒤-좌), 5: BR (뒤-우), 6: SL (옆-좌), 7: SR (옆-우)
 
-        public (double L, double R, double F, double B, bool IsActive) CalculateDirection(byte[] rawAudioData, int bytesRecorded)
+        public (double L, double R, double F, double B, bool IsActive) CalculateDirection(byte[] rawAudioData, int bytesRecorded, int channelCount = 8)
         {
-            // 1. byte 배열을 계산하기 쉬운 float(32bit 소수점) 배열로 변환
-            // WASAPI Loopback은 기본적으로 32-bit IEEE Float 형태로 데이터를 줍니다.
             int floatCount = bytesRecorded / 4;
             float[] samples = new float[floatCount];
             Buffer.BlockCopy(rawAudioData, 0, samples, 0, bytesRecorded);
 
-            // 각 방향별 최대 볼륨(Peak)을 저장할 변수들
             float frontLeft = 0, frontRight = 0, center = 0;
             float backLeft = 0, backRight = 0;
             float sideLeft = 0, sideRight = 0;
 
-            // 2. 버퍼를 8칸씩 건너뛰며(8채널이니까) 각 방향의 가장 큰 소리(진폭)를 찾습니다.
-            for (int i = 0; i < samples.Length - 7; i += 8)
+            // 채널 수에 따른 다이내믹 루프
+            for (int i = 0; i < samples.Length - (channelCount - 1); i += channelCount)
             {
-                frontLeft = Math.Max(frontLeft, Math.Abs(samples[i + 0]));
-                frontRight = Math.Max(frontRight, Math.Abs(samples[i + 1]));
-                center = Math.Max(center, Math.Abs(samples[i + 2]));
-                // 우퍼(3번)는 방향성이 없으므로 버립니다.
-                backLeft = Math.Max(backLeft, Math.Abs(samples[i + 4]));
-                backRight = Math.Max(backRight, Math.Abs(samples[i + 5]));
-                sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 6]));
-                sideRight = Math.Max(sideRight, Math.Abs(samples[i + 7]));
+                if (channelCount >= 2)
+                {
+                    frontLeft = Math.Max(frontLeft, Math.Abs(samples[i + 0]));
+                    frontRight = Math.Max(frontRight, Math.Abs(samples[i + 1]));
+                }
+                
+                if (channelCount >= 8)
+                {
+                    center = Math.Max(center, Math.Abs(samples[i + 2]));
+                    // 인덱스 4,5: 사이드(Side) / 6,7: 백(Back)으로 매핑 순서 조정 (일반적인 7.1 가상화 엔진 기준)
+                    sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 4]));
+                    sideRight = Math.Max(sideRight, Math.Abs(samples[i + 5]));
+                    backLeft = Math.Max(backLeft, Math.Abs(samples[i + 6]));
+                    backRight = Math.Max(backRight, Math.Abs(samples[i + 7]));
+                }
+                else if (channelCount == 2)
+                {
+                    // 스테레오일 경우 인위적으로 센터 채널(L+R) 생성
+                    center = Math.Max(center, (Math.Abs(samples[i + 0]) + Math.Abs(samples[i + 1])) / 2.0f);
+                }
             }
 
-            // 3. 임계값(Threshold) 처리: 너무 작은 노이즈(배경음)는 무시!
             float maxVolume = new[] { frontLeft, frontRight, center, backLeft, backRight, sideLeft, sideRight }.Max();
-            if (maxVolume < 0.05f)
-            {
-                // 소리가 너무 작으면 레이더 반응 안 함 (IsActive = false)
-                return (0, 0, 0, 0, false);
-            }
-
-            // [보완] 스테레오 소스(유튜브 등 2채널) 방어 로직
-            float surroundMax = new[] { center, backLeft, backRight, sideLeft, sideRight }.Max();
-            bool isStereoOnly = (surroundMax < 0.001f);
+            if (maxVolume < 0.01f) return (0, 0, 0, 0, false);
 
             double L = frontLeft + sideLeft + backLeft;
             double R = frontRight + sideRight + backRight;
             double F = frontLeft + center + frontRight;
             double B = backLeft + backRight;
 
-            double percentL = 0, percentR = 0, percentF = 0, percentB = 0;
+            double percentL = (L + R > 0) ? (L / (L + R)) * 100.0 : 0;
+            double percentR = (L + R > 0) ? (R / (L + R)) * 100.0 : 0;
+            double percentF = (F + B > 0) ? (F / (F + B)) * 100.0 : 0;
+            double percentB = (F + B > 0) ? (B / (F + B)) * 100.0 : 0;
 
-            // 좌우 계산 (L, R 비율)
-            double sumLR = L + R;
-            if (sumLR > 0)
-            {
-                percentL = (L / sumLR) * 100.0;
-                percentR = (R / sumLR) * 100.0;
-            }
+            return (percentL, percentR, percentF, percentB, true);
+        }
 
-            // 앞뒤 계산 (F, B 비율)
-            if (isStereoOnly)
+        public (float FL, float FR, float FC, float BL, float BR, float SL, float SR, float LFE) CalculateVolumes(byte[] rawAudioData, int bytesRecorded, int channelCount = 8)
+        {
+            int floatCount = bytesRecorded / 4;
+            float[] samples = new float[floatCount];
+            Buffer.BlockCopy(rawAudioData, 0, samples, 0, bytesRecorded);
+
+            float fl = 0, fr = 0, fc = 0, lfe = 0;
+            float bl = 0, br = 0, sl = 0, sr = 0;
+
+            for (int i = 0; i < samples.Length - (channelCount - 1); i += channelCount)
             {
-                percentF = 0;
-                percentB = 0;
-            }
-            else
-            {
-                double sumFB = F + B;
-                if (sumFB > 0)
+                if (channelCount >= 2)
                 {
-                    percentF = (F / sumFB) * 100.0;
-                    percentB = (B / sumFB) * 100.0;
+                    fl = Math.Max(fl, Math.Abs(samples[i + 0]));
+                    fr = Math.Max(fr, Math.Abs(samples[i + 1]));
+                }
+
+                if (channelCount >= 8)
+                {
+                    fc = Math.Max(fc, Math.Abs(samples[i + 2]));
+                    lfe = Math.Max(lfe, Math.Abs(samples[i + 3]));
+                    // 매핑 순서: 4,5(Side) / 6,7(Back)
+                    sl = Math.Max(sl, Math.Abs(samples[i + 4]));
+                    sr = Math.Max(sr, Math.Abs(samples[i + 5]));
+                    bl = Math.Max(bl, Math.Abs(samples[i + 6]));
+                    br = Math.Max(br, Math.Abs(samples[i + 7]));
+                }
+                else if (channelCount == 2)
+                {
+                    // 스테레오 모드: L/R을 FL/FR에 매핑하고, 센터는 합성
+                    fc = (fl + fr) / 2.0f;
                 }
             }
 
-            return (percentL, percentR, percentF, percentB, true);
+            return (fl, fr, fc, bl, br, sl, sr, lfe);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
@@ -19,9 +19,11 @@ namespace SoundVisualizer.CoreAudio
 
     public class AudioCaptureEngine
     {
-        private WasapiLoopbackCapture _captureDevice;
+        private WasapiLoopbackCapture? _captureDevice;
 
-        public event EventHandler<AudioDataAvailableEventArgs> OnAudioDataAvailable;
+        public WaveFormat? CaptureFormat => _captureDevice?.WaveFormat;
+
+        public event EventHandler<AudioDataAvailableEventArgs>? OnAudioDataAvailable;
 
         public void StartCapture()
         {

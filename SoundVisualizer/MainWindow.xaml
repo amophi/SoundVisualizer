@@ -1,25 +1,111 @@
 <Window x:Class="SoundVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WaveSight Overlay" Height="720" Width="1280"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent" 
-        Topmost="True" ShowInTaskbar="False" WindowState="Maximized">
-    <Grid>
-        <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#90000000" CornerRadius="15" Padding="20">
-            <TextBlock x:Name="AILabelText" Foreground="LimeGreen" FontSize="24" FontWeight="Bold" Text="WaveSight 7.1 대기 중..."/>
+        Title="WaveSight 7.1" Height="1080" Width="1920"
+        WindowStyle="None" Background="Transparent" AllowsTransparency="True"
+        Topmost="True" WindowState="Maximized" ShowInTaskbar="False">
+    
+    <Grid x:Name="MainGrid">
+        <!-- 시스템 상태 메시지 (상단 고정) -->
+        <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,50,0,0" 
+                Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False">
+            <TextBlock x:Name="StatusText" Foreground="White" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료"/>
         </Border>
 
-        <Border x:Name="RadarFront" Height="80" VerticalAlignment="Top" Background="#A0FF3333" Opacity="0.8">
-            <TextBlock x:Name="FrontText" Text="↑ 0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="20"/>
-        </Border>
-        <Border x:Name="RadarRear" Height="80" VerticalAlignment="Bottom" Background="#A0FF3333" Opacity="0.8">
-            <TextBlock x:Name="RearText" Text="↓ 0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="20"/>
-        </Border>
-        <Border x:Name="RadarLeft" Width="80" HorizontalAlignment="Left" Background="#A03333FF" Opacity="0.8">
-            <TextBlock x:Name="LeftText" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" Foreground="White"/>
-        </Border>
-        <Border x:Name="RadarRight" Width="80" HorizontalAlignment="Right" Background="#A03333FF" Opacity="0.8">
-            <TextBlock x:Name="RightText" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" Foreground="White"/>
+        <!-- 7.1 방향별 파도 (Ellipse) -->
+        <!-- Front Left (빨강) -->
+        <Ellipse x:Name="WaveFL" Width="0" Height="0" Opacity="0.7" IsHitTestVisible="False"
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-100,-100,0,0">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FFFF0000" Offset="0"/>
+                    <GradientStop Color="#00FF0000" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Front Right (파랑) -->
+        <Ellipse x:Name="WaveFR" Width="0" Height="0" Opacity="0.7" IsHitTestVisible="False"
+                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-100,-100,0">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF0000FF" Offset="0"/>
+                    <GradientStop Color="#000000FF" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Front Center (흰색) -->
+        <Ellipse x:Name="WaveFC" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
+                 HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-50,0,0">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FFFFFFFF" Offset="0"/>
+                    <GradientStop Color="#00FFFFFF" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Back Left (초록) -->
+        <Ellipse x:Name="WaveBL" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
+                 HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-100,0,0,-100">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF00FF00" Offset="0"/>
+                    <GradientStop Color="#0000FF00" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Back Right (노랑) -->
+        <Ellipse x:Name="WaveBR" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
+                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-100,-100">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FFFFFF00" Offset="0"/>
+                    <GradientStop Color="#00FFFF00" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Side Left (주황) -->
+        <Ellipse x:Name="WaveSL" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
+                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-80,0,0,0">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FFFFA500" Offset="0"/>
+                    <GradientStop Color="#00FFA500" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- Side Right (보라) -->
+        <Ellipse x:Name="WaveSR" Width="0" Height="0" Opacity="0.6" IsHitTestVisible="False"
+                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-80,0">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF800080" Offset="0"/>
+                    <GradientStop Color="#00800080" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- LFE Subwoofer (어두운 회색/심해색) -->
+        <Ellipse x:Name="WaveLFE" Width="0" Height="0" Opacity="0.5" IsHitTestVisible="False"
+                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-80">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF404040" Offset="0"/>
+                    <GradientStop Color="#00404040" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <!-- AI 라벨 (화면 정중앙) -->
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
+                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False">
+            <TextBlock x:Name="AILabelText" Foreground="LimeGreen" FontSize="24" 
+                       FontWeight="Bold" Text="WaveSight 7.1 대기 중..."/>
         </Border>
     </Grid>
 </Window>

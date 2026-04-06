@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 
@@ -6,8 +6,8 @@ namespace SoundVisualizer.CoreAudio
 {
     public class AudioRouter
     {
-        private WasapiOut _realSpeakerOut;
-        private BufferedWaveProvider _bufferedWaveProvider;
+        private WasapiOut? _realSpeakerOut;
+        private BufferedWaveProvider? _bufferedWaveProvider;
 
         public void StartRouting(WaveFormat captureFormat)
         {
@@ -35,16 +35,16 @@ namespace SoundVisualizer.CoreAudio
             _realSpeakerOut.Init(_bufferedWaveProvider);
             _realSpeakerOut.Play();
 
-            Console.WriteLine($"🔊 라우팅 시작: 훔친 소리를 [{realSpeaker.FriendlyName}]로 쏴줍니다!");
+            Console.WriteLine($"🔊 라우팅 시작: 오디오 데이터를 [{realSpeaker.FriendlyName}]로 출력합니다.");
         }
 
-        // 🚀 AudioCaptureEngine에서 소리가 쏟아질 때마다 이 함수가 호출됨
+        // 오디오 데이터가 수신될 때마다 호출되는 이벤트 핸들러
         public void OnDataReceived(object sender, byte[] rawAudioData)
         {
             if (_bufferedWaveProvider != null)
             {
-                // [도전 과제] 사실 여기서 8채널(rawAudioData)을 2채널로 섞어주는(Downmix) 수학적 작업이 필요합니다.
-                // 일단은 물탱크에 냅다 부어버려서 소리가 이어폰으로 나가는지부터 테스트!
+                // [참고] 다채널 데이터를 스테레오 환경에 맞게 다운믹싱하는 로직이 향후 필요할 수 있습니다.
+                // 현재는 수신된 데이터를 버퍼에 직접 추가하여 출력을 테스트합니다.
                 _bufferedWaveProvider.AddSamples(rawAudioData, 0, rawAudioData.Length);
             }
         }
@@ -56,7 +56,7 @@ namespace SoundVisualizer.CoreAudio
                 _realSpeakerOut.Stop();
                 _realSpeakerOut.Dispose();
                 _bufferedWaveProvider = null;
-                Console.WriteLine("🛑 라우팅 중지됨.");
+                Console.WriteLine("🛑 오디오 출력 라우팅 중지.");
             }
         }
     }

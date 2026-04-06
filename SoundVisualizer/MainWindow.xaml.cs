@@ -3,80 +3,186 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using SoundVisualizer.CoreAudio; // 수현
-using SoundVisualizer.DSP;       // 가람
-using SoundVisualizer.AIModel;   // 성진
+using SoundVisualizer.CoreAudio; 
+using SoundVisualizer.DSP;       
+using SoundVisualizer.AIModel;   
 
 namespace SoundVisualizer
 {
     public partial class MainWindow : Window
     {
-        // 3명의 팀원이 만든 엔진 장착
-        private AudioCaptureEngine _captureEngine;
-        private AudioRouter _audioRouter;
-        private VectorCalculator _vectorCalc;
-        private SoundClassifier _soundAI;
+        private AudioCaptureEngine? _captureEngine;
+        private AudioRouter? _audioRouter;
+        private VectorCalculator? _vectorCalc;
+        private SoundClassifier? _soundAI;
+
+        // 시각화 스무딩을 위한 변수
+        private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
+        private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
+        private string _currentLabel = "WaveSight 7.1 대기 중...";
+        
+        // 클래스별 색상 정의 (1: White, 2: Yellow, 3: Red)
+        private readonly System.Windows.Media.Color COLOR_CLASS1 = System.Windows.Media.Colors.White;
+        private readonly System.Windows.Media.Color COLOR_CLASS2 = System.Windows.Media.Colors.Yellow;
+        private readonly System.Windows.Media.Color COLOR_CLASS3 = System.Windows.Media.Colors.Red;
 
         public MainWindow()
         {
             InitializeComponent();
-            ApplyClickThroughMagic(); // 1. 마우스 클릭 관통 세팅
-            BootSequence();           // 2. 통합 엔진 가동
+            ApplyClickThroughMagic(); // 윈도우 클릭 관통 설정
+            BootSequence();           // 엔진 초기화 및 가동
+            
+            // 고프레임 애니메이션을 위한 렌더링 루프 연결 (60FPS+)
+            System.Windows.Media.CompositionTarget.Rendering += OnRendering;
         }
 
         private void BootSequence()
         {
-            // 각 모듈 초기화
             _vectorCalc = new VectorCalculator();
             _soundAI = new SoundClassifier();
             _captureEngine = new AudioCaptureEngine();
             _audioRouter = new AudioRouter();
 
-            // 🌟 [핵심] 수현이가 퍼온 오디오 데이터를 가람, 성진, 메인 UI로 분배!
+            // 오디오 데이터 이벤트 연결
             _captureEngine.OnAudioDataAvailable += HandleAudioDataAsync;
 
-            // 엔진 스타트!
+            // 캡처 시작
             _captureEngine.StartCapture();
-            // _audioRouter.StartRouting(_captureEngine.WaveFormat); // 라우팅 엔진 동시 가동
+
+            // 채널 수 확인 및 경고 표시 (7.1채널 필수)
+            if (_captureEngine.CaptureFormat != null)
+            {
+                int channels = _captureEngine.CaptureFormat.Channels;
+                if (channels != 8)
+                {
+                    StatusText.Text = $"⚠ 경고: 현재 {channels}채널(스테레오) 모드입니다. 레이더 기능을 위해 7.1채널 설정이 필요합니다.";
+                    StatusText.Foreground = System.Windows.Media.Brushes.Orange;
+                }
+                else
+                {
+                    StatusText.Text = "✅ 8채널(7.1) 사운드 엔진 정상 가동 중";
+                    StatusText.Foreground = System.Windows.Media.Brushes.LimeGreen;
+                }
+
+                _audioRouter.StartRouting(_captureEngine.CaptureFormat);
+            }
         }
 
-        // 0.01초 단위로 미친듯이 호출되는 통합 이벤트 핸들러
-        private async void HandleAudioDataAsync(object sender, byte[] rawData)
+        private async void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
         {
-            // 🚨 UI 스레드가 멈추지 않도록 Task.Run으로 무거운 연산들을 백그라운드로 던져버립니다!
+            if (_audioRouter == null || _vectorCalc == null || _soundAI == null) return;
+
+            byte[] rawData = e.Buffer;
+            int bytesRecorded = rawData.Length;
+
             await Task.Run(() =>
             {
-                // [Path A] 라우팅 (수현): 훔친 소리 유저 이어폰으로 쏴주기
+                // 오디오 데이터 라우팅
                 _audioRouter.OnDataReceived(this, rawData);
 
-                // [Path B] 수학 (가람): 각 방향 퍼센트 뽑기
-                var (l, r, f, b, isActive) = _vectorCalc.CalculateDirection(rawData, rawData.Length);
-                if (!isActive) return; // 노이즈면 여기서 컷! AI 돌릴 필요도 없음.
+                // DSP: 각 채널별 볼륨 추출
+                var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, e.Channels);
+                
+                // 타겟 볼륨 업데이트 (렌더링 루프에서 사용)
+                _targetFL = fl;
+                _targetFR = fr;
+                _targetFC = fc;
+                _targetBL = bl;
+                _targetBR = br;
+                _targetSL = sl;
+                _targetSR = sr;
+                _targetLFE = lfe;
 
-                // [Path C] AI 추론 (성진): 센터 채널만 뽑아서 라벨링
-                string soundLabel = _soundAI.PredictSoundType(rawData, rawData.Length);
-
-                // [Path D] UI 렌더링 (도환): 계산 다 끝났으니 화면에 그려라!
-                // 백그라운드 스레드에서 화면을 건드리면 앱이 터지므로, Dispatcher를 써서 UI 스레드에 안전하게 명령을 하달함.
-                Dispatcher.InvokeAsync(() => RenderRadarUI(l, r, f, b, soundLabel));
+                // AI 가공 데이터 추출
+                _currentLabel = _soundAI.PredictSoundType(rawData, bytesRecorded, e.Channels);
             });
         }
 
-        private void RenderRadarUI(double l, double r, double f, double b, string label)
+        private void OnRendering(object? sender, EventArgs e)
         {
-            // 1. AI 텍스트 업데이트
-            AILabelText.Text = label;
+            // 부드러운 애니메이션을 위한 보간 (Interpolation)
+            // 60FPS 기준 smoothFactor 조절
+            float smoothFactor = 0.15f; 
+            _smoothFL += (_targetFL - _smoothFL) * smoothFactor;
+            _smoothFR += (_targetFR - _smoothFR) * smoothFactor;
+            _smoothFC += (_targetFC - _smoothFC) * smoothFactor;
+            _smoothBL += (_targetBL - _smoothBL) * smoothFactor;
+            _smoothBR += (_targetBR - _smoothBR) * smoothFactor;
+            _smoothSL += (_targetSL - _smoothSL) * smoothFactor;
+            _smoothSR += (_targetSR - _smoothSR) * smoothFactor;
+            _smoothLFE += (_targetLFE - _smoothLFE) * smoothFactor;
 
-            // 2. 가람이가 뽑아준 퍼센트 수치를 기반으로 UI에 직접 숫자를 띄웁니다.
-            FrontText.Text = $"↑ {f:F0}%";
-            RearText.Text = $"↓ {b:F0}%";
-            LeftText.Text = $"← L {l:F0}%";
-            RightText.Text = $"R {r:F0}% →";
+            // 사운드 클래스 기반 색상 업데이트
+            var activeColor = GetColorForLabel(_currentLabel);
+            UpdateWaveColors(activeColor);
+
+            // AI 라벨 업데이트
+            AILabelText.Text = _currentLabel;
+            AILabelText.Foreground = new System.Windows.Media.SolidColorBrush(activeColor);
+
+            // 파도 크기 계산
+            double maxScale = 1000.0;
+            double lfeScale = 1200.0; // 우퍼는 좀 더 웅장하게 표현
+
+            // UI 요소 업데이트
+            WaveFL.Width = WaveFL.Height = _smoothFL * maxScale;
+            WaveFR.Width = WaveFR.Height = _smoothFR * maxScale;
+            WaveFC.Width = WaveFC.Height = _smoothFC * maxScale;
+            WaveBL.Width = WaveBL.Height = _smoothBL * maxScale;
+            WaveBR.Width = WaveBR.Height = _smoothBR * maxScale;
+            WaveSL.Width = WaveSL.Height = _smoothSL * maxScale;
+            WaveSR.Width = WaveSR.Height = _smoothSR * maxScale;
+            WaveLFE.Width = WaveLFE.Height = _smoothLFE * lfeScale;
+
+            // 데이터가 없으면 서서히 사라지게 함 (감쇠)
+            _targetFL *= 0.9f;
+            _targetFR *= 0.9f;
+            _targetFC *= 0.9f;
+            _targetBL *= 0.9f;
+            _targetBR *= 0.9f;
+            _targetSL *= 0.9f;
+            _targetSR *= 0.9f;
+            _targetLFE *= 0.9f;
         }
 
         // ==========================================
-        // 👻 [팀장의 흑마법] 클릭 관통 (Win32 API)
-        // 화면을 덮고 있어도 넷플릭스 일시정지, 게임 총 쏘기 클릭이 다 통과됨!
+        // 사운드 라벨에 따른 클래스 색상 결정
+        // ==========================================
+        private System.Windows.Media.Color GetColorForLabel(string label)
+        {
+            if (label.Contains("총소리") || label.Contains("폭발음") || label.Contains("기관총"))
+                return COLOR_CLASS3; // 위험 (Red)
+            
+            if (label.Contains("발소리") || label.Contains("사이렌") || label.Contains("경적") || 
+                label.Contains("자동차") || label.Contains("헬리콥터") || label.Contains("엔진소리"))
+                return COLOR_CLASS2; // 주의 (Yellow)
+
+            return COLOR_CLASS1; // 일반 (White)
+        }
+
+        private void UpdateWaveColors(System.Windows.Media.Color color)
+        {
+            var brush = new System.Windows.Media.RadialGradientBrush();
+            brush.GradientStops.Add(new System.Windows.Media.GradientStop(color, 0));
+            
+            // 끝부분은 투명하게 (파도 효과 유지)
+            var transparent = color;
+            transparent.A = 0;
+            brush.GradientStops.Add(new System.Windows.Media.GradientStop(transparent, 1));
+
+            // 모든 파도 요소의 색상 업데이트
+            WaveFL.Fill = brush;
+            WaveFR.Fill = brush;
+            WaveFC.Fill = brush;
+            WaveBL.Fill = brush;
+            WaveBR.Fill = brush;
+            WaveSL.Fill = brush;
+            WaveSR.Fill = brush;
+            WaveLFE.Fill = brush;
+        }
+
+        // ==========================================
+        // 윈도우 클릭 관통 구현 (Win32 API 연동)
         // ==========================================
         private void ApplyClickThroughMagic()
         {
@@ -89,8 +195,8 @@ namespace SoundVisualizer
         }
 
         const int GWL_EXSTYLE = -20;
-        const int WS_EX_TRANSPARENT = 0x00000020; // 클릭 관통
-        const int WS_EX_TOOLWINDOW = 0x00000080;  // Alt+Tab 목록에서 숨기기
+        const int WS_EX_TRANSPARENT = 0x00000020;
+        const int WS_EX_TOOLWINDOW = 0x00000080;
 
         [DllImport("user32.dll")] static extern int GetWindowLong(IntPtr hwnd, int index);
         [DllImport("user32.dll")] static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
