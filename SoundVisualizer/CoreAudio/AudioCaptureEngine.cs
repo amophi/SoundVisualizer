@@ -23,6 +23,8 @@ namespace SoundVisualizer.CoreAudio
 
         public event EventHandler<AudioDataAvailableEventArgs> OnAudioDataAvailable;
 
+        public WaveFormat? CaptureFormat => _captureDevice?.WaveFormat;
+
         public void StartCapture()
         {
             var enumerator = new MMDeviceEnumerator();
