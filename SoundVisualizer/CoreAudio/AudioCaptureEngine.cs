@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
@@ -22,11 +23,19 @@ namespace SoundVisualizer.CoreAudio
         private WasapiLoopbackCapture? _captureDevice;
         private bool _isCapturing;
 
+        // Latency 측정용
+        private readonly Stopwatch _latencyWatch = new();
+        private double _totalLatencyMs;
+        private long _latencySampleCount;
+        private int _logInterval = 100; // N회마다 콘솔 출력
+
         public event EventHandler<AudioDataAvailableEventArgs>? OnAudioDataAvailable;
         public event EventHandler<string>? OnCaptureError;
 
         public WaveFormat? CaptureFormat => _captureDevice?.WaveFormat;
         public bool IsCapturing => _isCapturing;
+        public double AverageLatencyMs => _latencySampleCount > 0 ? _totalLatencyMs / _latencySampleCount : 0;
+        public double LastLatencyMs { get; private set; }
 
         public void StartCapture()
         {
@@ -57,11 +66,23 @@ namespace SoundVisualizer.CoreAudio
                 {
                     if (args.BytesRecorded == 0) return;
 
+                    _latencyWatch.Restart();
+
                     byte[] validData = new byte[args.BytesRecorded];
                     Array.Copy(args.Buffer, validData, args.BytesRecorded);
 
                     var eventArgs = new AudioDataAvailableEventArgs(validData, _captureDevice.WaveFormat.Channels);
                     OnAudioDataAvailable?.Invoke(this, eventArgs);
+
+                    _latencyWatch.Stop();
+                    LastLatencyMs = _latencyWatch.Elapsed.TotalMilliseconds;
+                    _totalLatencyMs += LastLatencyMs;
+                    _latencySampleCount++;
+
+                    if (_latencySampleCount % _logInterval == 0)
+                    {
+                        Console.WriteLine($"⏱ Latency: {LastLatencyMs:F3}ms (평균: {AverageLatencyMs:F3}ms, 샘플: {_latencySampleCount})");
+                    }
                 };
 
                 _captureDevice.RecordingStopped += (sender, args) =>
