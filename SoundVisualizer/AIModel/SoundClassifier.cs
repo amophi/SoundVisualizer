@@ -13,11 +13,11 @@ namespace SoundVisualizer.AIModel
         private InferenceSession _session;
         private string[] _classNames; // YAMNet의 521개 소리 이름 목록
 
-        // YAMNet ONNX 입력 규격(metadata.yaml 기준)
-        // input: [1, 1, 96, 64]
+        // YAMNet: 16kHz mono → log-mel, 일반적으로 time × mel = 96 × 64
+        // ONNX 입력 shape [1, 1, 96, 64] = [batch, ch, time_frames, mel_bins]
         private const int SampleRate = 16000;
-        private const int MelBins = 96;
-        private const int Frames = 64;
+        private const int MelBins = 64;
+        private const int TimeFrames = 96;
         private const int WindowLength = 400; // 25ms @ 16kHz
         private const int HopLength = 160;    // 10ms  @ 16kHz
         private const int FftSize = 512;       // TF YAMNet 계열과 맞추기 위한 실험 (>= WindowLength, 2의 거듭제곱)
@@ -89,7 +89,8 @@ namespace SoundVisualizer.AIModel
             float[] logMel = ComputeLogMelSpectrogram(monoAudio);
             LogLogMelTensorStats(logMel);
 
-            var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, MelBins, Frames });
+            // [1,1,96,64] = time(96) × mel(64), row-major에서 mel이 마지막 축
+            var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, TimeFrames, MelBins });
             var inputs = new[] { NamedOnnxValue.CreateFromTensor("audio", inputTensor) };
 
             float[] logits;
@@ -146,7 +147,7 @@ namespace SoundVisualizer.AIModel
 
             float std = (float)Math.Sqrt(varAcc / logMel.Length);
             Debug.WriteLine(
-                $"[YAMNet logMel] n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
+                $"[YAMNet logMel] shape=[1,1,{TimeFrames},{MelBins}] (time×mel) n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
         }
 
         private static float[] Softmax(float[] logits)
@@ -193,9 +194,12 @@ namespace SoundVisualizer.AIModel
             return centerChannel;
         }
 
+        /// <summary>
+        /// log-mel을 [time, mel] 순으로 평탄화: 인덱스 time * MelBins + mel → DenseTensor [1,1,TimeFrames,MelBins].
+        /// </summary>
         private float[] ComputeLogMelSpectrogram(float[] monoAudio)
         {
-            int requiredSamples = WindowLength + HopLength * (Frames - 1);
+            int requiredSamples = WindowLength + HopLength * (TimeFrames - 1);
 
             // 고정 길이로 패딩/트렁케이션(실시간 입력 길이가 매번 달라질 수 있으므로)
             float[] audio = new float[requiredSamples];
@@ -205,14 +209,14 @@ namespace SoundVisualizer.AIModel
 
             int freqBins = (FftSize / 2) + 1;
             float[] power = new float[freqBins];
-            float[] logMel = new float[MelBins * Frames]; // [melBin, frame] (frame이 마지막 차원)
+            float[] logMel = new float[TimeFrames * MelBins];
 
             // FFT 버퍼(복사 최소화 목적)
             Complex[] fftBuffer = new Complex[FftSize];
 
-            for (int frame = 0; frame < Frames; frame++)
+            for (int t = 0; t < TimeFrames; t++)
             {
-                int start = frame * HopLength;
+                int start = t * HopLength;
 
                 // 1) windowing + zero-padding -> complex buffer 준비
                 for (int i = 0; i < FftSize; i++)
@@ -242,7 +246,7 @@ namespace SoundVisualizer.AIModel
                     }
 
                     float value = (float)Math.Log(melSum + LogEps);
-                    logMel[mel * Frames + frame] = value; // mel major, frame minor
+                    logMel[t * MelBins + mel] = value;
                 }
             }
 

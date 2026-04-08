@@ -120,24 +120,18 @@ namespace SoundVisualizer
                     return;
                 }
 
-                // test1.wav / test2.wav 각각 테스트
+                // test1.wav / test2.wav 각각 테스트 ([1,1,96,64] time×mel 입력)
                 var r1 = await Task.Run(() => RunSingleTest(test1, threshold: 0.2f));
                 var r2 = await Task.Run(() => RunSingleTest(test2, threshold: 0.2f));
 
                 string summary =
                     $"file: {Path.GetFileName(test1)}\n" +
-                    $"yamnet: {r1.YamnetDisplayName}\n" +
-                    $"coarse: {r1.CoarseClass}\n" +
-                    $"confidence: {r1.Confidence:F3}\n" +
-                    $"time(ms): {r1.InferenceTimeMs:F1}\n\n" +
+                    $"yamnet: {r1.YamnetDisplayName}, coarse: {r1.CoarseClass}, conf: {r1.Confidence:F3}, t(ms): {r1.InferenceTimeMs:F1}\n\n" +
                     $"file: {Path.GetFileName(test2)}\n" +
-                    $"yamnet: {r2.YamnetDisplayName}\n" +
-                    $"coarse: {r2.CoarseClass}\n" +
-                    $"confidence: {r2.Confidence:F3}\n" +
-                    $"time(ms): {r2.InferenceTimeMs:F1}\n";
+                    $"yamnet: {r2.YamnetDisplayName}, coarse: {r2.CoarseClass}, conf: {r2.Confidence:F3}, t(ms): {r2.InferenceTimeMs:F1}\n";
 
                 Debug.WriteLine(summary);
-                AILabelText.Text = $"WAV 테스트 완료: {r1.CoarseClass} / {r2.CoarseClass}";
+                AILabelText.Text = $"WAV 테스트 완료: [{r1.CoarseClass}/{r2.CoarseClass}]";
                 MessageBox.Show(summary, "AI WAV Test Results", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -152,32 +146,7 @@ namespace SoundVisualizer
             float[] trimmed = TrimSilence(mono, thresholdAbs: 0.01f, minKeepSamples: 1600);
             float[] normalized = NormalizePeak(trimmed, targetPeak: 0.95f);
 
-            // [C안] 오프셋 다중 추론: 시작점을 조금씩 이동해 3회 추론 후 최고 confidence 채택
-            int[] offsets = new[] { 0, 800, 1600 }; // 16kHz 기준 약 0ms, 50ms, 100ms
-            InferenceResult best = _soundAI.PredictFromMono16k(normalized, threshold);
-            foreach (int offset in offsets)
-            {
-                float[] shifted = SliceFromOffset(normalized, offset);
-                if (shifted.Length == 0) continue;
-
-                InferenceResult candidate = _soundAI.PredictFromMono16k(shifted, threshold);
-                if (candidate.Confidence > best.Confidence)
-                    best = candidate;
-            }
-
-            return best;
-        }
-
-        private static float[] SliceFromOffset(float[] samples, int offset)
-        {
-            if (samples == null || samples.Length == 0) return Array.Empty<float>();
-            if (offset <= 0) return samples;
-            if (offset >= samples.Length) return Array.Empty<float>();
-
-            int len = samples.Length - offset;
-            var sliced = new float[len];
-            Array.Copy(samples, offset, sliced, 0, len);
-            return sliced;
+            return _soundAI.PredictFromMono16k(normalized, threshold);
         }
 
         private static string FindExistingPath(params string[] candidates)
