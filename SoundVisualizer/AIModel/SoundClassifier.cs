@@ -20,7 +20,7 @@ namespace SoundVisualizer.AIModel
         private const int Frames = 64;
         private const int WindowLength = 400; // 25ms @ 16kHz
         private const int HopLength = 160;    // 10ms  @ 16kHz
-        private const int FftSize = 1024;      // FFT size (>= WindowLength)
+        private const int FftSize = 512;       // TF YAMNet 계열과 맞추기 위한 실험 (>= WindowLength, 2의 거듭제곱)
         private const float MelFMin = 125f;
         private const float MelFMax = 7500f;
         private const float LogEps = 1e-6f;
@@ -87,6 +87,8 @@ namespace SoundVisualizer.AIModel
                 return new InferenceResult(-1, "AI 꺼짐", 0f, "ambient", false, 0);
 
             float[] logMel = ComputeLogMelSpectrogram(monoAudio);
+            LogLogMelTensorStats(logMel);
+
             var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, MelBins, Frames });
             var inputs = new[] { NamedOnnxValue.CreateFromTensor("audio", inputTensor) };
 
@@ -118,6 +120,33 @@ namespace SoundVisualizer.AIModel
             bool ok = conf >= confidenceThreshold;
 
             return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs);
+        }
+
+        /// <summary>log-mel 텐서 통계(FFT/멜 실험 시 비교용). Visual Studio 출력 창에서 확인.</summary>
+        private static void LogLogMelTensorStats(float[] logMel)
+        {
+            if (logMel.Length == 0) return;
+
+            float min = logMel[0], max = logMel[0];
+            double sum = 0;
+            foreach (var v in logMel)
+            {
+                if (v < min) min = v;
+                if (v > max) max = v;
+                sum += v;
+            }
+
+            float mean = (float)(sum / logMel.Length);
+            double varAcc = 0;
+            foreach (var v in logMel)
+            {
+                double d = v - mean;
+                varAcc += d * d;
+            }
+
+            float std = (float)Math.Sqrt(varAcc / logMel.Length);
+            Debug.WriteLine(
+                $"[YAMNet logMel] n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
         }
 
         private static float[] Softmax(float[] logits)
