@@ -33,7 +33,7 @@ namespace SoundVisualizer.AIModel
                 sampleProvider = new WdlResamplingSampleProvider(sampleProvider, TargetSampleRate);
 
             var buffer = new float[4096];
-            var samples = new List<float>(reader.Length / 2);
+            var samples = new List<float>();
             int read;
             while ((read = sampleProvider.Read(buffer, 0, buffer.Length)) > 0)
             {
