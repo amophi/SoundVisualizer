@@ -149,10 +149,35 @@ namespace SoundVisualizer
         private InferenceResult RunSingleTest(string wavPath, float threshold)
         {
             float[] mono = WavAudioLoader.LoadMono16kHz(wavPath);
-            //float[] trimmed = TrimSilence(mono, thresholdAbs: 0.01f, minKeepSamples: 1600);
-            float[] normalized = NormalizePeak(mono, targetPeak: 0.6f);
+            float[] trimmed = TrimSilence(mono, thresholdAbs: 0.01f, minKeepSamples: 1600);
+            float[] normalized = NormalizePeak(trimmed, targetPeak: 0.95f);
 
-            return _soundAI.PredictFromMono16k(normalized, threshold);
+            // [C안] 오프셋 다중 추론: 시작점을 조금씩 이동해 3회 추론 후 최고 confidence 채택
+            int[] offsets = new[] { 0, 800, 1600 }; // 16kHz 기준 약 0ms, 50ms, 100ms
+            InferenceResult best = _soundAI.PredictFromMono16k(normalized, threshold);
+            foreach (int offset in offsets)
+            {
+                float[] shifted = SliceFromOffset(normalized, offset);
+                if (shifted.Length == 0) continue;
+
+                InferenceResult candidate = _soundAI.PredictFromMono16k(shifted, threshold);
+                if (candidate.Confidence > best.Confidence)
+                    best = candidate;
+            }
+
+            return best;
+        }
+
+        private static float[] SliceFromOffset(float[] samples, int offset)
+        {
+            if (samples == null || samples.Length == 0) return Array.Empty<float>();
+            if (offset <= 0) return samples;
+            if (offset >= samples.Length) return Array.Empty<float>();
+
+            int len = samples.Length - offset;
+            var sliced = new float[len];
+            Array.Copy(samples, offset, sliced, 0, len);
+            return sliced;
         }
 
         private static string FindExistingPath(params string[] candidates)
