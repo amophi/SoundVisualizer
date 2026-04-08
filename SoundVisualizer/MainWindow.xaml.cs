@@ -149,8 +149,8 @@ namespace SoundVisualizer
         private InferenceResult RunSingleTest(string wavPath, float threshold)
         {
             float[] mono = WavAudioLoader.LoadMono16kHz(wavPath);
-            float[] trimmed = TrimSilence(mono, thresholdAbs: 0.01f, minKeepSamples: 1600);
-            float[] normalized = NormalizePeak(trimmed, targetPeak: 0.95f);
+            //float[] trimmed = TrimSilence(mono, thresholdAbs: 0.01f, minKeepSamples: 1600);
+            float[] normalized = NormalizePeak(mono, targetPeak: 0.6f);
 
             return _soundAI.PredictFromMono16k(normalized, threshold);
         }
