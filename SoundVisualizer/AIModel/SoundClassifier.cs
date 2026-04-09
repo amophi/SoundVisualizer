@@ -67,13 +67,15 @@ namespace SoundVisualizer.AIModel
             // 센터 채널을 뽑아오도록 수정
             float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded, channels);
 
-            InferenceResult r = PredictFromMono16k(monoAudio, 0.3f);
+            const float threshold = 0.3f;
+            InferenceResult r = PredictFromMono16k(monoAudio, threshold);
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
-            if (r.Confidence < 0.3f)
-                return "배경음";
+            if (r.Confidence < threshold)
+                return $"배경음 | ambient | {r.Confidence * 100f:F1}%";
 
-            return $"{r.YamnetDisplayName} ({r.Confidence * 100f:F1}%)";
+            // UI는 문자열만 소비하므로, 클래스/3분류/신뢰도를 한 번에 전달합니다.
+            return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
         }
 
         /// <summary>
