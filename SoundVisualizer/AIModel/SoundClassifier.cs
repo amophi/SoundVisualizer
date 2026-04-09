@@ -384,20 +384,25 @@ namespace SoundVisualizer.AIModel
 
             foreach (var line in File.ReadLines(path))
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("index,", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                int c1 = line.IndexOf(',');
-                if (c1 < 0) continue;
-                int c2 = line.IndexOf(',', c1 + 1);
-                if (c2 < 0) continue;
-
-                if (!int.TryParse(line.AsSpan(0, c1), out int index) || index < 0 || index >= 521)
+                // yamnet_class_map.csv 형식 차이(2열/3열)를 모두 수용:
+                // - 2열: index,display_name
+                // - 3열: index,mid,display_name
+                var parts = line.Split(',', 3);
+                if (parts.Length < 2)
                     continue;
 
-                string name = line.Substring(c2 + 1).Trim();
+                if (!int.TryParse(parts[0].Trim(), out int index) || index < 0 || index >= 521)
+                    continue;
+
+                string name = (parts.Length == 2 ? parts[1] : parts[2]).Trim();
                 if (name.Length >= 2 && name[0] == '"' && name[^1] == '"')
                     name = name.Substring(1, name.Length - 2).Replace("\"\"", "\"", StringComparison.Ordinal);
+
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
 
                 _classNames[index] = name;
             }
