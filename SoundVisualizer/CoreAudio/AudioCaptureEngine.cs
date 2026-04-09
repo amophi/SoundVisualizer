@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 
 namespace SoundVisualizer.CoreAudio
 {
@@ -18,10 +21,13 @@ namespace SoundVisualizer.CoreAudio
         }
     }
 
-    public class AudioCaptureEngine
+    public class AudioCaptureEngine : IMMNotificationClient
     {
         private WasapiLoopbackCapture? _captureDevice;
+        private MMDeviceEnumerator? _notificationEnumerator;
+        private CancellationTokenSource? _restartCts;
         private bool _isCapturing;
+        private bool _firstDataLogged;
 
         // Latency 측정용
         private readonly Stopwatch _latencyWatch = new();
@@ -39,6 +45,17 @@ namespace SoundVisualizer.CoreAudio
 
         public void StartCapture()
         {
+            // 장치 변경 알림 등록 (최초 1회)
+            if (_notificationEnumerator == null)
+            {
+                _notificationEnumerator = new MMDeviceEnumerator();
+                _notificationEnumerator.RegisterEndpointNotificationCallback(this);
+            }
+            StartCaptureDevice();
+        }
+
+        private void StartCaptureDevice()
+        {
             try
             {
                 var enumerator = new MMDeviceEnumerator();
@@ -52,19 +69,23 @@ namespace SoundVisualizer.CoreAudio
                     return;
                 }
 
-                var targetDevice = devices.FirstOrDefault(d => d.FriendlyName.Contains("CABLE Input"));
+                // 실제 소리가 나오는 기본 출력 장치에서 캡처
+                // CABLE Input 등 가상 장치를 우선하면 해당 장치가 기본 출력이 아닐 때 소리가 안 잡힘
+                var targetDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-                if (targetDevice == null)
-                {
-                    Console.WriteLine("⚠ 가상 케이블이 없습니다. 기본 출력 장치로 대체합니다.");
-                    targetDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-                }
+                Console.WriteLine($"🎯 캡처 대상: {targetDevice.FriendlyName}");
 
                 _captureDevice = new WasapiLoopbackCapture(targetDevice);
 
                 _captureDevice.DataAvailable += (sender, args) =>
                 {
                     if (args.BytesRecorded == 0) return;
+
+                    if (!_firstDataLogged)
+                    {
+                        Console.WriteLine($"✅ 오디오 데이터 수신 확인 — bytes: {args.BytesRecorded}, 채널: {_captureDevice.WaveFormat.Channels}");
+                        _firstDataLogged = true;
+                    }
 
                     _latencyWatch.Restart();
 
@@ -117,6 +138,17 @@ namespace SoundVisualizer.CoreAudio
 
         public void StopCapture()
         {
+            _restartCts?.Cancel();
+            if (_notificationEnumerator != null)
+            {
+                try { _notificationEnumerator.UnregisterEndpointNotificationCallback(this); }
+                catch { }
+            }
+            StopCaptureDevice();
+        }
+
+        private void StopCaptureDevice()
+        {
             try
             {
                 if (_captureDevice != null)
@@ -136,5 +168,41 @@ namespace SoundVisualizer.CoreAudio
                 _isCapturing = false;
             }
         }
+
+        // 기본 출력 장치 변경 감지 → 300ms 디바운스 후 캡처 장치 자동 재시작
+        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+        {
+            if (flow != DataFlow.Render || role != Role.Multimedia) return;
+
+            Console.WriteLine("🔄 기본 출력 장치 변경 감지 — 캡처 재시작 예약...");
+
+            _restartCts?.Cancel();
+            _restartCts = new CancellationTokenSource();
+            var token = _restartCts.Token;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(300, token); // 장치 초기화 안정화 대기
+                    if (token.IsCancellationRequested) return;
+
+                    Console.WriteLine("🔄 새 기본 출력 장치로 캡처 재시작...");
+                    StopCaptureDevice();
+                    _firstDataLogged = false;
+                    StartCaptureDevice();
+                }
+                catch (OperationCanceledException) { }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"🚨 캡처 재시작 실패: {ex.Message}");
+                }
+            });
+        }
+
+        void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId) { }
+        void IMMNotificationClient.OnDeviceRemoved(string pwstrDeviceId) { }
+        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) { }
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
     }
 }

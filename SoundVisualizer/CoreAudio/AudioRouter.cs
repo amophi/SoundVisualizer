@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 
@@ -8,45 +9,111 @@ namespace SoundVisualizer.CoreAudio
     {
         private WasapiOut? _realSpeakerOut;
         private BufferedWaveProvider? _bufferedWaveProvider;
+        private int _captureChannels;
+        private int _captureBytesPerSample;
+        private int _outputChannels;
 
         public void StartRouting(WaveFormat captureFormat)
         {
-            // 1. 유저가 진짜로 듣고 있는 '기본 스피커/이어폰' 찾기
             var enumerator = new MMDeviceEnumerator();
-            var realSpeaker = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-            // ⚠️ 여기서 주의! 만약 가상 케이블과 진짜 스피커가 같으면 무한 루프(하울링) 돕니다.
-            if (realSpeaker.FriendlyName.Contains("CABLE Input"))
+            // 기본 출력이 실제 장치(Realtek, Voicemeeter 등)이면 오디오가 이미 그쪽으로 재생됩니다.
+            // 같은 장치에 WasapiOut까지 열면 WasapiLoopbackCapture와 충돌해 캡처 데이터가 막힙니다.
+            // → 라우팅 불필요, 즉시 리턴
+            if (!defaultDevice.FriendlyName.Contains("CABLE"))
             {
-                Console.WriteLine("🚨 에러: 진짜 스피커를 찾아야 하는데 가상 케이블이 잡혔습니다!");
+                Console.WriteLine($"ℹ [{defaultDevice.FriendlyName}] 직접 재생 중 — 라우팅 생략");
                 return;
             }
 
-            // 2. 소리를 담아둘 '물탱크(Buffer)' 만들기
-            // 캡처한 원본(7.1채널) 포맷을 그대로 받아올 수 있게 세팅합니다.
-            _bufferedWaveProvider = new BufferedWaveProvider(captureFormat)
+            // 기본 출력이 가상 케이블(CABLE Input 등)인 경우:
+            // CABLE 자체는 스피커로 소리가 안 나오므로, CABLE 제외 첫 번째 활성 장치에 라우팅합니다.
+            var allDevices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            var realSpeaker = allDevices.FirstOrDefault(d => !d.FriendlyName.Contains("CABLE"));
+            if (realSpeaker == null)
             {
-                DiscardOnBufferOverflow = true // 물탱크가 넘치면 옛날 소리는 버림 (딜레이 방지 핵심!)
+                Console.WriteLine("⚠ CABLE 외 출력 장치를 찾을 수 없습니다 — 라우팅 비활성");
+                Console.WriteLine("⚠ 라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
+                return;
+            }
+
+            // 캡처 포맷 정보 저장 (채널 변환용)
+            _captureChannels = captureFormat.Channels;
+            _captureBytesPerSample = captureFormat.BitsPerSample / 8;
+
+            // 출력 장치의 Shared 모드 지원 포맷(MixFormat)을 사용
+            // captureFormat을 그대로 쓰면 장치가 지원하지 않을 때 Init에서 예외 발생
+            var outputFormat = realSpeaker.AudioClient.MixFormat;
+            _outputChannels = outputFormat.Channels;
+
+            _bufferedWaveProvider = new BufferedWaveProvider(outputFormat)
+            {
+                DiscardOnBufferOverflow = true
             };
 
-            // 3. 진짜 스피커로 출력할 WasapiOut 엔진 가동
-            // Latency 파라미터(예: 50ms)를 최대한 짧게 줘야 총 쏘자마자 소리가 들립니다.
-            _realSpeakerOut = new WasapiOut(realSpeaker, AudioClientShareMode.Shared, false, 50);
-            _realSpeakerOut.Init(_bufferedWaveProvider);
-            _realSpeakerOut.Play();
+            // 장치/드라이버마다 허용 latency가 달라 Init 실패가 발생할 수 있어 fallback으로 재시도
+            int[] latencies = [50, 100, 200, 500];
+            Exception? lastError = null;
 
-            Console.WriteLine($"🔊 라우팅 시작: 오디오 데이터를 [{realSpeaker.FriendlyName}]로 출력합니다.");
+            foreach (int latency in latencies)
+            {
+                try
+                {
+                    _realSpeakerOut = new WasapiOut(realSpeaker, AudioClientShareMode.Shared, false, latency);
+                    _realSpeakerOut.Init(_bufferedWaveProvider);
+                    _realSpeakerOut.Play();
+                    Console.WriteLine($"🔊 라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch, latency: {latency}ms)");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastError = ex;
+                    _realSpeakerOut?.Dispose();
+                    _realSpeakerOut = null;
+                }
+            }
+
+            Console.WriteLine($"⚠ 오디오 라우팅 초기화 실패: {lastError?.Message}");
+            Console.WriteLine("⚠ 라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
         }
 
-        // 오디오 데이터가 수신될 때마다 호출되는 이벤트 핸들러
         public void OnDataReceived(object sender, byte[] rawAudioData)
         {
-            if (_bufferedWaveProvider != null)
+            if (_bufferedWaveProvider == null) return;
+
+            // 캡처-출력 채널 수가 다르면 변환
+            if (_captureChannels != _outputChannels)
             {
-                // [참고] 다채널 데이터를 스테레오 환경에 맞게 다운믹싱하는 로직이 향후 필요할 수 있습니다.
-                // 현재는 수신된 데이터를 버퍼에 직접 추가하여 출력을 테스트합니다.
+                byte[] converted = ConvertChannels(rawAudioData, _captureChannels, _captureBytesPerSample, _outputChannels);
+                _bufferedWaveProvider.AddSamples(converted, 0, converted.Length);
+            }
+            else
+            {
                 _bufferedWaveProvider.AddSamples(rawAudioData, 0, rawAudioData.Length);
             }
+        }
+
+        /// <summary>
+        /// 채널 수 변환. 입력 채널이 더 많으면 앞쪽 채널 추출, 적으면 첫 채널 복제.
+        /// </summary>
+        private static byte[] ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh)
+        {
+            int frames = input.Length / (inCh * bytesPerSample);
+            byte[] output = new byte[frames * outCh * bytesPerSample];
+
+            for (int i = 0; i < frames; i++)
+            {
+                for (int ch = 0; ch < outCh; ch++)
+                {
+                    int srcCh = ch < inCh ? ch : 0;
+                    Buffer.BlockCopy(
+                        input, (i * inCh + srcCh) * bytesPerSample,
+                        output, (i * outCh + ch) * bytesPerSample,
+                        bytesPerSample);
+                }
+            }
+            return output;
         }
 
         public void StopRouting()
