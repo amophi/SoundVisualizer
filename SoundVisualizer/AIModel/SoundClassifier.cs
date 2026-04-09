@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Microsoft.ML.OnnxRuntime;
@@ -8,34 +10,47 @@ namespace SoundVisualizer.AIModel
 {
     public class SoundClassifier : IDisposable
     {
-        private InferenceSession? _session;
-        private string[]? _classNames;
-        private float[][]? _melFilterbank;
+        private InferenceSession _session;
+        private string[] _classNames; // YAMNet의 521개 소리 이름 목록
 
-        // YAMNet 전처리 파라미터 (metadata.yaml 기준: [1, 1, 96, 64])
-        private const int TargetSampleRate = 16000;
-        private const int WindowSize = 400;    // 25ms @ 16kHz
-        private const int HopSize = 160;       // 10ms @ 16kHz
-        private const int MelBands = 64;       // 멜 밴드 수
-        private const int PatchFrames = 96;    // 한 패치당 프레임 수
-        private const int FftSize = 512;       // FFT 윈도우 크기 (2의 거듭제곱)
+        // YAMNet: 16kHz mono → log-mel, 일반적으로 time × mel = 96 × 64
+        // ONNX 입력 shape [1, 1, 96, 64] = [batch, ch, time_frames, mel_bins]
+        private const int SampleRate = 16000;
+        private const int MelBins = 64;
+        private const int TimeFrames = 96;
+        private const int WindowLength = 400; // 25ms @ 16kHz
+        private const int HopLength = 160;    // 10ms  @ 16kHz
+        private const int FftSize = 512;       // TF YAMNet 계열과 맞추기 위한 실험 (>= WindowLength, 2의 거듭제곱)
+        private const float MelFMin = 125f;
+        private const float MelFMax = 7500f;
+        private const float LogEps = 1e-6f;
+
+        // Precomputed preprocessing artifacts
+        private readonly float[] _hannWindow;
+        private readonly float[,] _melFilterBank; // [MelBins, FftSize/2+1]
+        private readonly int[] _bitReversed;       // [FftSize]
 
         public SoundClassifier()
         {
+            // 최소 전처리(로그-멜 생성)에 필요한 파라미터를 항상 초기화
+            _hannWindow = CreateHannWindow(WindowLength);
+            _melFilterBank = CreateMelFilterBank(MelBins, FftSize, SampleRate, MelFMin, MelFMax);
+            _bitReversed = CreateBitReversedIndices(FftSize);
+
+            // 1. AI 뇌(ONNX 모델) 로드
+            // (주의: yamnet.onnx 파일이 실행 파일과 같은 폴더에 있어야 합니다!)
             try
             {
-                string modelPath = System.IO.Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
+                // csproj에서 AIModel 폴더 안의 yamnet.onnx가 그대로 출력 디렉터리의 AIModel 하위 폴더로 복사되도록 설정되었으므로 경로를 수정합니다.
+                string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
                 _session = new InferenceSession(modelPath);
-                LoadClassNames();
-                BuildMelFilterbank();
+                LoadClassNames(); // 실제로는 csv 파일에서 "총소리", "폭발음" 목록을 불러옴
 
-                // 디버그 로그
-                foreach (var input in _session.InputMetadata)
-                    Console.WriteLine($"  📥 입력: {input.Key} -> [{string.Join(", ", input.Value.Dimensions)}]");
-                foreach (var output in _session.OutputMetadata)
-                    Console.WriteLine($"  📤 출력: {output.Key} -> [{string.Join(", ", output.Value.Dimensions)}]");
-
+                // 입력명 확인(디버깅용). metadata.yaml이 말하는 input name이 실제로도 같은지 체크합니다.
+                foreach (var kv in _session.InputMetadata)
+                {
+                    Console.WriteLine($"[YAMNet] Input: {kv.Key} | {kv.Value}");
+                }
                 Console.WriteLine("🧠 AI 모델(YAMNet) 로딩 완료!");
             }
             catch (Exception ex)
@@ -44,317 +59,350 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        /// <summary>
-        /// 오디오 데이터에서 소리 종류를 추론합니다.
-        /// raw 7.1 PCM → 센터채널 추출 → 다운샘플 → 멜 스펙트로그램 → ONNX 추론
-        /// </summary>
-        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channelCount = 8)
+        // 🚀 가람 님이 분석할 때, 성진 님은 이 함수를 동시에 실행합니다.
+        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded)
         {
-            if (_session == null || _classNames == null || _melFilterbank == null)
-                return "AI 비활성";
+            if (_session == null) return "AI 꺼짐";
 
+            // 2. 전처리 (Pre-processing): AI는 8채널을 못 먹습니다. 
+            // 가장 대사와 효과음이 선명한 '센터 채널(Index 2)'만 쏙 빼서 1채널(Mono)로 만듭니다.
+            float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded);
+
+            InferenceResult r = PredictFromMono16k(monoAudio, 0.3f);
+            if (r.YamnetClassIndex < 0)
+                return "AI 에러";
+            if (r.Confidence < 0.3f)
+                return "배경음";
+
+            return $"{r.YamnetDisplayName} ({r.Confidence * 100f:F1}%)";
+        }
+
+        /// <summary>
+        /// 모노 PCM(float)을 16kHz로 맞춘 뒤 전처리·추론합니다. WAV 파일 테스트 등에 사용합니다.
+        /// </summary>
+        /// <param name="confidenceThreshold">상위 클래스 확률이 이 값 미만이면 MeetsThreshold=false.</param>
+        public InferenceResult PredictFromMono16k(float[] monoAudio, float confidenceThreshold)
+        {
+            if (_session == null)
+                return new InferenceResult(-1, "AI 꺼짐", 0f, "ambient", false, 0);
+
+            float[] logMel = ComputeLogMelSpectrogram(monoAudio);
+            LogLogMelTensorStats(logMel);
+
+            // [1,1,96,64] = time(96) × mel(64), row-major에서 mel이 마지막 축
+            var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, TimeFrames, MelBins });
+            var inputs = new[] { NamedOnnxValue.CreateFromTensor("audio", inputTensor) };
+
+            float[] logits;
+            double inferMs;
+            var sw = Stopwatch.StartNew();
             try
             {
-                // 1. 모노 오디오 추출 (7.1이면 센터, 스테레오면 L+R 믹스)
-                float[] monoAudio = ExtractMonoChannel(rawAudioData, bytesRecorded, channelCount);
-                if (monoAudio.Length < WindowSize) return "데이터 부족";
-
-                // 2. 다운샘플링 (48kHz → 16kHz)
-                float[] resampled = Downsample(monoAudio, 48000, TargetSampleRate);
-                if (resampled.Length < WindowSize) return "데이터 부족";
-
-                // 3. 멜 스펙트로그램 계산 → [totalFrames, 64]
-                float[,] melSpec = ComputeMelSpectrogram(resampled);
-                int totalFrames = melSpec.GetLength(0);
-
-                // 프레임이 96개 미만이면 zero-padding
-                if (totalFrames < PatchFrames)
-                {
-                    var padded = new float[PatchFrames, MelBands];
-                    for (int f = 0; f < totalFrames; f++)
-                        for (int m = 0; m < MelBands; m++)
-                            padded[f, m] = melSpec[f, m];
-                    melSpec = padded;
-                }
-
-                // 4. [1, 1, 96, 64] 텐서 생성 (첫 번째 패치만 사용)
-                var inputData = new float[1 * 1 * PatchFrames * MelBands];
-                int idx = 0;
-                for (int f = 0; f < PatchFrames; f++)
-                    for (int m = 0; m < MelBands; m++)
-                        inputData[idx++] = melSpec[f, m];
-
-                var inputTensor = new DenseTensor<float>(inputData, new[] { 1, 1, PatchFrames, MelBands });
-
-                string inputName = _session.InputMetadata.Keys.FirstOrDefault() ?? "audio";
-                var inputs = new[] { NamedOnnxValue.CreateFromTensor(inputName, inputTensor) };
-
-                // 5. 추론 실행
                 using var results = _session.Run(inputs);
-                var output = results.First().AsEnumerable<float>().ToArray();
-                int maxIndex = Array.IndexOf(output, output.Max());
-                float probability = output[maxIndex] * 100;
-
-                if (probability < 30.0f) return "배경음";
-                if (maxIndex >= _classNames.Length) return $"알 수 없음 ({probability:F1}%)";
-                return $"{_classNames[maxIndex]} ({probability:F1}%)";
+                logits = results.First().AsEnumerable<float>().ToArray();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"⚠ AI 추론 오류: {ex.Message}");
-                return "AI 오류";
+                Console.WriteLine($"🚨 [YAMNet] Inference failed: {ex}");
+                return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
+            finally
+            {
+                sw.Stop();
+            }
+
+            inferMs = sw.Elapsed.TotalMilliseconds;
+
+            float[] probs = Softmax(logits);
+            int maxIndex = Array.IndexOf(probs, probs.Max());
+            float conf = probs[maxIndex];
+            string display = _classNames[maxIndex];
+            string coarse = YamnetThreeClassMapper.MapDisplayNameToCoarse(display);
+            bool ok = conf >= confidenceThreshold;
+
+            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs);
         }
 
-        // =============================================
-        //  전처리 파이프라인 구현
-        // =============================================
+        /// <summary>log-mel 텐서 통계(FFT/멜 실험 시 비교용). Visual Studio 출력 창에서 확인.</summary>
+        private static void LogLogMelTensorStats(float[] logMel)
+        {
+            if (logMel.Length == 0) return;
 
-        /// <summary>
-        /// 다채널 PCM에서 AI 추론에 사용할 단일(모노) 채널을 추출합니다.
-        /// 7.1채널이면 센터(2번)를, 스테레오면 L+R을 섞어서 반환합니다.
-        /// </summary>
-        private float[] ExtractMonoChannel(byte[] rawAudioData, int bytesRecorded, int channelCount)
+            float min = logMel[0], max = logMel[0];
+            double sum = 0;
+            foreach (var v in logMel)
+            {
+                if (v < min) min = v;
+                if (v > max) max = v;
+                sum += v;
+            }
+
+            float mean = (float)(sum / logMel.Length);
+            double varAcc = 0;
+            foreach (var v in logMel)
+            {
+                double d = v - mean;
+                varAcc += d * d;
+            }
+
+            float std = (float)Math.Sqrt(varAcc / logMel.Length);
+            Debug.WriteLine(
+                $"[YAMNet logMel] shape=[1,1,{TimeFrames},{MelBins}] (time×mel) n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
+        }
+
+        private static float[] Softmax(float[] logits)
+        {
+            if (logits.Length == 0)
+                return Array.Empty<float>();
+
+            float max = logits.Max();
+            var exp = new float[logits.Length];
+            double sum = 0;
+            for (int i = 0; i < logits.Length; i++)
+            {
+                exp[i] = MathF.Exp(logits[i] - max);
+                sum += exp[i];
+            }
+
+            if (sum <= 0 || double.IsNaN(sum))
+            {
+                float inv = 1f / logits.Length;
+                for (int i = 0; i < logits.Length; i++)
+                    exp[i] = inv;
+                return exp;
+            }
+
+            for (int i = 0; i < logits.Length; i++)
+                exp[i] = (float)(exp[i] / sum);
+
+            return exp;
+        }
+
+        private float[] ExtractCenterChannel(byte[] rawAudioData, int bytesRecorded)
         {
             int floatCount = bytesRecorded / 4;
-            int samplesPerChannel = floatCount / channelCount;
-            float[] monoAudio = new float[samplesPerChannel];
+            // 8채널 중 센터(1가닥)만 뽑으니까 길이는 1/8
+            float[] centerChannel = new float[floatCount / 8];
 
-            for (int i = 0; i < samplesPerChannel; i++)
+            int centerIndex = 0;
+            for (int i = 0; i < floatCount - 7; i += 8)
             {
-                if (channelCount >= 8)
+                // 인덱스 2번이 센터(Center) 스피커 채널입니다.
+                // byte 배열을 float로 변환했다고 가정하고 값을 빼옵니다.
+                centerChannel[centerIndex++] = BitConverter.ToSingle(rawAudioData, (i + 2) * 4);
+            }
+            return centerChannel;
+        }
+
+        /// <summary>
+        /// log-mel을 [time, mel] 순으로 평탄화: 인덱스 time * MelBins + mel → DenseTensor [1,1,TimeFrames,MelBins].
+        /// </summary>
+        private float[] ComputeLogMelSpectrogram(float[] monoAudio)
+        {
+            int requiredSamples = WindowLength + HopLength * (TimeFrames - 1);
+
+            // 고정 길이로 패딩/트렁케이션(실시간 입력 길이가 매번 달라질 수 있으므로)
+            float[] audio = new float[requiredSamples];
+            int copyLen = Math.Min(monoAudio.Length, requiredSamples);
+            if (copyLen > 0)
+                Array.Copy(monoAudio, 0, audio, 0, copyLen);
+
+            int freqBins = (FftSize / 2) + 1;
+            float[] power = new float[freqBins];
+            float[] logMel = new float[TimeFrames * MelBins];
+
+            // FFT 버퍼(복사 최소화 목적)
+            Complex[] fftBuffer = new Complex[FftSize];
+
+            for (int t = 0; t < TimeFrames; t++)
+            {
+                int start = t * HopLength;
+
+                // 1) windowing + zero-padding -> complex buffer 준비
+                for (int i = 0; i < FftSize; i++)
                 {
-                    // 7.1채널: 센터(인덱스 2) 추출
-                    int byteOffset = (i * channelCount + 2) * 4;
-                    if (byteOffset + 4 <= bytesRecorded)
-                        monoAudio[i] = BitConverter.ToSingle(rawAudioData, byteOffset);
+                    float sample = (i < WindowLength) ? audio[start + i] * _hannWindow[i] : 0f;
+                    fftBuffer[i] = new Complex(sample, 0f);
                 }
-                else if (channelCount == 2)
+
+                // 2) FFT
+                FFTInPlace(fftBuffer, _bitReversed);
+
+                // 3) power spectrum (magnitude^2)
+                for (int k = 0; k < freqBins; k++)
                 {
-                    // 스테레오: L(0) + R(1) 믹운드
-                    int offsetL = (i * channelCount + 0) * 4;
-                    int offsetR = (i * channelCount + 1) * 4;
-                    if (offsetR + 4 <= bytesRecorded)
+                    var c = fftBuffer[k];
+                    power[k] = (float)(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                }
+
+                // 4) mel filterbank -> log
+                for (int mel = 0; mel < MelBins; mel++)
+                {
+                    double melSum = 0.0;
+                    for (int k = 0; k < freqBins; k++)
                     {
-                        float L = BitConverter.ToSingle(rawAudioData, offsetL);
-                        float R = BitConverter.ToSingle(rawAudioData, offsetR);
-                        monoAudio[i] = (L + R) / 2.0f;
+                        float w = _melFilterBank[mel, k];
+                        if (w != 0f) melSum += w * power[k];
                     }
+
+                    float value = (float)Math.Log(melSum + LogEps);
+                    logMel[t * MelBins + mel] = value;
                 }
             }
-            return monoAudio;
+
+            return logMel;
         }
 
-        /// <summary>
-        /// 단순 정수비 다운샘플링 (예: 48kHz → 16kHz = 3배 간격으로 샘플 추출)
-        /// </summary>
-        private float[] Downsample(float[] audio, int sourceSampleRate, int targetSampleRate)
+        private static float[] CreateHannWindow(int length)
         {
-            if (sourceSampleRate <= targetSampleRate) return audio;
-
-            int ratio = sourceSampleRate / targetSampleRate; // 48000/16000 = 3
-            int newLength = audio.Length / ratio;
-            float[] result = new float[newLength];
-
-            for (int i = 0; i < newLength; i++)
-                result[i] = audio[i * ratio];
-
-            return result;
-        }
-
-        /// <summary>
-        /// 멜 스펙트로그램을 계산합니다.
-        /// STFT → 파워 스펙트럼 → 멜 필터뱅크 적용 → 로그 스케일
-        /// </summary>
-        private float[,] ComputeMelSpectrogram(float[] audio)
-        {
-            // 총 프레임 수 계산
-            int totalFrames = Math.Max(0, (audio.Length - WindowSize) / HopSize + 1);
-            if (totalFrames == 0) return new float[0, MelBands];
-
-            float[,] melSpec = new float[totalFrames, MelBands];
-            float[] window = MakeHannWindow(WindowSize);
-
-            for (int frame = 0; frame < totalFrames; frame++)
+            var window = new float[length];
+            if (length <= 1) return window;
+            for (int n = 0; n < length; n++)
             {
-                int offset = frame * HopSize;
-
-                // 윈도우 적용 + zero-padding to FftSize
-                var fftBuffer = new Complex[FftSize];
-                for (int i = 0; i < WindowSize && (offset + i) < audio.Length; i++)
-                    fftBuffer[i] = new Complex(audio[offset + i] * window[i], 0);
-
-                // FFT 수행
-                FFT(fftBuffer);
-
-                // 파워 스펙트럼 (앞쪽 절반만 사용)
-                int specLength = FftSize / 2 + 1;
-                float[] powerSpec = new float[specLength];
-                for (int i = 0; i < specLength; i++)
-                    powerSpec[i] = (float)(fftBuffer[i].Real * fftBuffer[i].Real +
-                                          fftBuffer[i].Imaginary * fftBuffer[i].Imaginary);
-
-                // 멜 필터뱅크 적용
-                for (int m = 0; m < MelBands; m++)
-                {
-                    float sum = 0;
-                    for (int k = 0; k < specLength && k < _melFilterbank![m].Length; k++)
-                        sum += _melFilterbank[m][k] * powerSpec[k];
-
-                    // 로그 스케일 (log(x + epsilon) 으로 -inf 방지)
-                    melSpec[frame, m] = (float)Math.Log(Math.Max(sum, 1e-10));
-                }
+                // Hann window: 0.5 - 0.5*cos(2*pi*n/(N-1))
+                window[n] = (float)(0.5 - 0.5 * Math.Cos(2 * Math.PI * n / (length - 1)));
             }
-
-            return melSpec;
-        }
-
-        /// <summary>
-        /// Hann 윈도우 생성
-        /// </summary>
-        private float[] MakeHannWindow(int size)
-        {
-            float[] window = new float[size];
-            for (int i = 0; i < size; i++)
-                window[i] = 0.5f * (1.0f - (float)Math.Cos(2.0 * Math.PI * i / (size - 1)));
             return window;
         }
 
-        // =============================================
-        //  FFT 구현 (Radix-2 Cooley-Tukey)
-        // =============================================
-
-        private void FFT(Complex[] buffer)
+        private static int[] CreateBitReversedIndices(int n)
         {
-            int n = buffer.Length;
-            if (n <= 1) return;
-
-            // 비트 반전 정렬
             int bits = (int)Math.Log2(n);
+            var arr = new int[n];
             for (int i = 0; i < n; i++)
             {
-                int j = BitReverse(i, bits);
+                int v = i;
+                int r = 0;
+                for (int b = 0; b < bits; b++)
+                {
+                    r = (r << 1) | (v & 1);
+                    v >>= 1;
+                }
+                arr[i] = r;
+            }
+            return arr;
+        }
+
+        private static void FFTInPlace(Complex[] buffer, int[] bitReversed)
+        {
+            int n = buffer.Length;
+
+            // Bit-reversal permutation
+            for (int i = 0; i < n; i++)
+            {
+                int j = bitReversed[i];
                 if (j > i)
+                {
                     (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
+                }
             }
 
-            // 버터플라이 연산
-            for (int len = 2; len <= n; len *= 2)
+            // Iterative Cooley-Tukey radix-2 FFT
+            for (int len = 2; len <= n; len <<= 1)
             {
-                double angle = -2.0 * Math.PI / len;
-                var wBase = new Complex(Math.Cos(angle), Math.Sin(angle));
+                double ang = -2 * Math.PI / len;
+                Complex wLen = new Complex(Math.Cos(ang), Math.Sin(ang));
+
                 for (int i = 0; i < n; i += len)
                 {
-                    var w = Complex.One;
-                    for (int j = 0; j < len / 2; j++)
+                    Complex w = Complex.One;
+                    int half = len >> 1;
+                    for (int j = 0; j < half; j++)
                     {
-                        var u = buffer[i + j];
-                        var v = buffer[i + j + len / 2] * w;
+                        Complex u = buffer[i + j];
+                        Complex v = buffer[i + j + half] * w;
                         buffer[i + j] = u + v;
-                        buffer[i + j + len / 2] = u - v;
-                        w *= wBase;
+                        buffer[i + j + half] = u - v;
+                        w *= wLen;
                     }
                 }
             }
         }
 
-        private int BitReverse(int x, int bits)
+        private static float[,] CreateMelFilterBank(int melBins, int fftSize, int sampleRate, float fMin, float fMax)
         {
-            int result = 0;
-            for (int i = 0; i < bits; i++)
+            int freqBins = (fftSize / 2) + 1;
+            var weights = new float[melBins, freqBins];
+
+            float hzToMel(float hz) => 2595f * (float)Math.Log10(1f + hz / 700f);
+            float melToHz(float mel) => 700f * (float)(Math.Pow(10d, mel / 2595f) - 1d);
+
+            float melMin = hzToMel(fMin);
+            float melMax = hzToMel(fMax);
+
+            // melBins + 2 points (edges)
+            float[] melPoints = new float[melBins + 2];
+            for (int i = 0; i < melPoints.Length; i++)
             {
-                result = (result << 1) | (x & 1);
-                x >>= 1;
-            }
-            return result;
-        }
-
-        // =============================================
-        //  멜 필터뱅크 생성
-        // =============================================
-
-        /// <summary>
-        /// 64개의 삼각형 멜 필터를 생성합니다. (125Hz ~ 7500Hz)
-        /// </summary>
-        private void BuildMelFilterbank()
-        {
-            int specLength = FftSize / 2 + 1;
-            _melFilterbank = new float[MelBands][];
-
-            float fMin = 125.0f;
-            float fMax = 7500.0f;
-            float melMin = HzToMel(fMin);
-            float melMax = HzToMel(fMax);
-
-            // 멜 스케일에서 균등하게 분포된 경계점 생성
-            float[] melPoints = new float[MelBands + 2];
-            for (int i = 0; i < MelBands + 2; i++)
-                melPoints[i] = melMin + i * (melMax - melMin) / (MelBands + 1);
-
-            // 주파수(Hz)로 변환 후, FFT bin 인덱스로 매핑
-            int[] binPoints = new int[MelBands + 2];
-            for (int i = 0; i < MelBands + 2; i++)
-            {
-                float freq = MelToHz(melPoints[i]);
-                binPoints[i] = (int)Math.Floor(freq * FftSize / TargetSampleRate);
-                binPoints[i] = Math.Min(binPoints[i], specLength - 1);
+                melPoints[i] = melMin + (melMax - melMin) * i / (melBins + 1);
             }
 
-            // 삼각형 필터 생성
-            for (int m = 0; m < MelBands; m++)
+            int[] bin = new int[melBins + 2];
+            for (int i = 0; i < melPoints.Length; i++)
             {
-                _melFilterbank[m] = new float[specLength];
-                int left = binPoints[m];
-                int center = binPoints[m + 1];
-                int right = binPoints[m + 2];
+                float hz = melToHz(melPoints[i]);
+                int b = (int)Math.Floor((fftSize + 1) * hz / sampleRate);
+                b = Math.Max(0, Math.Min(freqBins - 1, b));
+                bin[i] = b;
+            }
 
-                for (int k = left; k < center && k < specLength; k++)
+            // Triangular mel filters
+            for (int m = 0; m < melBins; m++)
+            {
+                int f0 = bin[m];
+                int f1 = bin[m + 1];
+                int f2 = bin[m + 2];
+
+                if (f1 <= f0 || f2 <= f1) continue;
+
+                for (int k = f0; k < f1; k++)
                 {
-                    if (center != left)
-                        _melFilterbank[m][k] = (float)(k - left) / (center - left);
+                    weights[m, k] = (float)(k - f0) / (f1 - f0);
                 }
-                for (int k = center; k <= right && k < specLength; k++)
+                for (int k = f1; k < f2; k++)
                 {
-                    if (right != center)
-                        _melFilterbank[m][k] = (float)(right - k) / (right - center);
+                    weights[m, k] = (float)(f2 - k) / (f2 - f1);
                 }
             }
+
+            return weights;
         }
-
-        private float HzToMel(float hz) => 2595.0f * (float)Math.Log10(1.0 + hz / 700.0);
-        private float MelToHz(float mel) => 700.0f * ((float)Math.Pow(10.0, mel / 2595.0) - 1.0f);
-
-        // =============================================
-        //  클래스 라벨 로딩 (YAMNet 521개 카테고리)
-        // =============================================
 
         private void LoadClassNames()
         {
-            // 프로토타입: 중요한 게임사운드만 매핑 (실제로는 yamnet_class_map.csv를 읽어야 함)
             _classNames = new string[521];
-            for (int i = 0; i < 521; i++) _classNames[i] = "알 수 없는 소리";
+            for (int i = 0; i < 521; i++)
+                _classNames[i] = $"class_{i}";
 
-            // 실제 YAMNet 클래스 인덱스 매핑
-            _classNames[0] = "🗣 말소리";
-            _classNames[1] = "🗣 말소리";
-            _classNames[132] = "🔫 총소리";
-            _classNames[133] = "🔫 기관총";
-            _classNames[134] = "🔫 기관총";
-            _classNames[420] = "💥 폭발음";
-            _classNames[421] = "💥 폭발음";
-            _classNames[288] = "🚗 자동차";
-            _classNames[300] = "🚁 헬리콥터";
-            _classNames[310] = "🏍 엔진소리";
-            _classNames[315] = "🚨 사이렌";
-            _classNames[394] = "👣 발소리";
-            _classNames[395] = "👣 발소리";
-            _classNames[399] = "🚪 문소리";
-            _classNames[316] = "🚨 경적";
-            _classNames[427] = "🔫 총소리";
-            _classNames[426] = "💥 폭발음";
-            _classNames[322] = "👣 발소리";
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet_class_map.csv");
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"⚠️ yamnet_class_map.csv 없음: {path}");
+                return;
+            }
+
+            foreach (var line in File.ReadLines(path))
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("index,", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                int c1 = line.IndexOf(',');
+                if (c1 < 0) continue;
+                int c2 = line.IndexOf(',', c1 + 1);
+                if (c2 < 0) continue;
+
+                if (!int.TryParse(line.AsSpan(0, c1), out int index) || index < 0 || index >= 521)
+                    continue;
+
+                string name = line.Substring(c2 + 1).Trim();
+                if (name.Length >= 2 && name[0] == '"' && name[^1] == '"')
+                    name = name.Substring(1, name.Length - 2).Replace("\"\"", "\"", StringComparison.Ordinal);
+
+                _classNames[index] = name;
+            }
         }
 
+        // 메모리 누수 방지용
         public void Dispose()
         {
             _session?.Dispose();
