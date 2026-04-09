@@ -352,9 +352,7 @@ namespace SoundVisualizer
         private double GetWaveDepth(double t, double time, double[] depths, double[] positions)
         {
             double depth = InterpolateDepthCatmullRom(t, depths, positions);
-            double waveDetail = ComputeWaveDetail(t, time);
-            double d = depth + waveDetail * Math.Max(depth / 450.0, 0.03);
-            return Math.Max(0, d); // 최소 0 보장
+            return Math.Max(0, depth); // 인위적인 출렁임 제거, 실제 볼륨만 반영
         }
 
         private double InterpolateDepthCatmullRom(double t, double[] depths, double[] positions)
@@ -394,12 +392,6 @@ namespace SoundVisualizer
             return Math.Max(0, result);
         }
 
-        private double ComputeWaveDetail(double t, double time)
-        {
-            return Math.Sin(t * 24 * Math.PI + time * 3.0) * 6.0
-                 + Math.Sin(t * 48 * Math.PI - time * 5.0) * 3.0
-                 + Math.Sin(t * 12 * Math.PI + time * 1.5) * 4.0;
-        }
 
         // ==========================================
         // 통합 웨이브 색상 업데이트
