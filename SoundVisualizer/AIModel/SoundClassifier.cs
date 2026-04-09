@@ -394,7 +394,8 @@ namespace SoundVisualizer.AIModel
                 if (parts.Length < 2)
                     continue;
 
-                if (!int.TryParse(parts[0].Trim(), out int index) || index < 0 || index >= 521)
+                string indexToken = parts[0].Trim().Trim('"');
+                if (!int.TryParse(indexToken, out int index) || index < 0 || index >= 521)
                     continue;
 
                 string name = (parts.Length == 2 ? parts[1] : parts[2]).Trim();

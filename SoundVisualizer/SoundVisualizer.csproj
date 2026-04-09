@@ -24,6 +24,9 @@
     <None Update="AIModel\yamnet.data">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="AIModel\yamnet_class_map.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
