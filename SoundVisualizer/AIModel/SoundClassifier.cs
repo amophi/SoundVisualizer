@@ -59,14 +59,13 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        // 🚀 가람 님이 분석할 때, 성진 님은 이 함수를 동시에 실행합니다.
-        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded)
+        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channels)
         {
             if (_session == null) return "AI 꺼짐";
 
-            // 2. 전처리 (Pre-processing): AI는 8채널을 못 먹습니다. 
-            // 가장 대사와 효과음이 선명한 '센터 채널(Index 2)'만 쏙 빼서 1채널(Mono)로 만듭니다.
-            float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded);
+            // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
+            // 센터 채널을 뽑아오도록 수정
+            float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded, channels);
 
             InferenceResult r = PredictFromMono16k(monoAudio, 0.3f);
             if (r.YamnetClassIndex < 0)
@@ -178,18 +177,18 @@ namespace SoundVisualizer.AIModel
             return exp;
         }
 
-        private float[] ExtractCenterChannel(byte[] rawAudioData, int bytesRecorded)
+        private float[] ExtractCenterChannel(byte[] rawAudioData, int bytesRecorded, int channels)
         {
             int floatCount = bytesRecorded / 4;
-            // 8채널 중 센터(1가닥)만 뽑으니까 길이는 1/8
-            float[] centerChannel = new float[floatCount / 8];
+            // 지정된 채널 수에 따라 분할
+            float[] centerChannel = new float[floatCount / channels];
 
             int centerIndex = 0;
-            for (int i = 0; i < floatCount - 7; i += 8)
+            for (int i = 0; i < floatCount - (channels - 1); i += channels)
             {
-                // 인덱스 2번이 센터(Center) 스피커 채널입니다.
-                // byte 배열을 float로 변환했다고 가정하고 값을 빼옵니다.
-                centerChannel[centerIndex++] = BitConverter.ToSingle(rawAudioData, (i + 2) * 4);
+                // 채널 2번이 센터 채널이라고 가정합니다. 최소 2개의 채널이 있어야 합니다.
+                int cIndex = channels > 2 ? 2 : 0;
+                centerChannel[centerIndex++] = BitConverter.ToSingle(rawAudioData, (i + cIndex) * 4);
             }
             return centerChannel;
         }
