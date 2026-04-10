@@ -67,13 +67,15 @@ namespace SoundVisualizer.AIModel
             // 센터 채널을 뽑아오도록 수정
             float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded, channels);
 
-            InferenceResult r = PredictFromMono16k(monoAudio, 0.3f);
+            const float threshold = 0.3f;
+            InferenceResult r = PredictFromMono16k(monoAudio, threshold);
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
-            if (r.Confidence < 0.3f)
-                return "배경음";
+            if (r.Confidence < threshold)
+                return $"배경음 | ambient | {r.Confidence * 100f:F1}%";
 
-            return $"{r.YamnetDisplayName} ({r.Confidence * 100f:F1}%)";
+            // UI는 문자열만 소비하므로, 클래스/3분류/신뢰도를 한 번에 전달합니다.
+            return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
         }
 
         /// <summary>
@@ -382,20 +384,26 @@ namespace SoundVisualizer.AIModel
 
             foreach (var line in File.ReadLines(path))
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("index,", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                int c1 = line.IndexOf(',');
-                if (c1 < 0) continue;
-                int c2 = line.IndexOf(',', c1 + 1);
-                if (c2 < 0) continue;
-
-                if (!int.TryParse(line.AsSpan(0, c1), out int index) || index < 0 || index >= 521)
+                // yamnet_class_map.csv 형식 차이(2열/3열)를 모두 수용:
+                // - 2열: index,display_name
+                // - 3열: index,mid,display_name
+                var parts = line.Split(',', 3);
+                if (parts.Length < 2)
                     continue;
 
-                string name = line.Substring(c2 + 1).Trim();
+                string indexToken = parts[0].Trim().Trim('"');
+                if (!int.TryParse(indexToken, out int index) || index < 0 || index >= 521)
+                    continue;
+
+                string name = (parts.Length == 2 ? parts[1] : parts[2]).Trim();
                 if (name.Length >= 2 && name[0] == '"' && name[^1] == '"')
                     name = name.Substring(1, name.Length - 2).Replace("\"\"", "\"", StringComparison.Ordinal);
+
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
 
                 _classNames[index] = name;
             }
