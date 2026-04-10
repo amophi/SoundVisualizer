@@ -144,10 +144,51 @@ namespace SoundVisualizer.AIModel
             int maxIndex = Array.IndexOf(probs, probs.Max());
             float conf = probs[maxIndex];
             string display = _classNames[maxIndex];
+
+            PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
+
             string coarse = YamnetThreeClassMapper.MapDisplayNameToCoarse(display);
             bool ok = conf >= confidenceThreshold;
 
             return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs);
+        }
+
+        /// <summary>
+        /// top-1이 “Sound effect”일 때, 총·폭발 등 danger 세부 클래스가 상위 softmax에 있으면 그쪽을 채택합니다.
+        /// (게임/영상 총소리가 Gunshot 대신 Sound effect로만 나오는 현상 완화)
+        /// </summary>
+        private void PreferDangerWhenTopIsGenericSoundEffect(float[] probs, ref int maxIndex, ref float conf, ref string display)
+        {
+            if (maxIndex < 0 || maxIndex >= _classNames.Length || probs.Length != _classNames.Length)
+                return;
+            if (!YamnetThreeClassMapper.IsGenericSoundEffectLabel(display))
+                return;
+
+            int bestDangerIdx = -1;
+            float bestDangerProb = 0f;
+            int n = Math.Min(probs.Length, _classNames.Length);
+            for (int i = 0; i < n; i++)
+            {
+                if (YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]) != "danger")
+                    continue;
+                if (probs[i] > bestDangerProb)
+                {
+                    bestDangerProb = probs[i];
+                    bestDangerIdx = i;
+                }
+            }
+
+            if (bestDangerIdx < 0)
+                return;
+
+            float topProb = probs[maxIndex];
+            float bar = Math.Max(0.06f, topProb * 0.22f);
+            if (bestDangerProb < bar)
+                return;
+
+            maxIndex = bestDangerIdx;
+            conf = bestDangerProb;
+            display = _classNames[bestDangerIdx];
         }
 
         /// <summary>log-mel 텐서 통계(FFT/멜 실험 시 비교용). Visual Studio 출력 창에서 확인.</summary>
@@ -205,24 +246,54 @@ namespace SoundVisualizer.AIModel
             return exp;
         }
 
-        private float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
+        /// <summary>
+        /// 7.1 루프백 채널 순서: FL,FR,FC,LFE,SL,SR,BL,BR (프로젝트 AudioRouter의 7.1 다운믹스와 동일).
+        /// 8채널 균등 평균은 LFE·서라운드가 센터(대사·총 등)를 희석할 수 있어, LFE 제외 ITU 가중 L/R의 평균으로 모노를 냅니다.
+        /// </summary>
+        private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
         {
             int floatCount = bytesRecorded / 4;
+            if (channels <= 0 || floatCount < channels)
+                return Array.Empty<float>();
+
             int frames = floatCount / channels;
             float[] monoAudio = new float[frames];
+
+            if (channels == 8)
+            {
+                const float kCenter = 0.707f;
+                const float kSide = 0.707f;
+                const float kBack = 0.500f;
+                int bytesPerFrame = channels * 4;
+
+                for (int f = 0; f < frames; f++)
+                {
+                    int o = f * bytesPerFrame;
+                    float fl = BitConverter.ToSingle(rawAudioData, o + 0);
+                    float fr = BitConverter.ToSingle(rawAudioData, o + 4);
+                    float fc = BitConverter.ToSingle(rawAudioData, o + 8);
+                    float sl = BitConverter.ToSingle(rawAudioData, o + 16);
+                    float sr = BitConverter.ToSingle(rawAudioData, o + 20);
+                    float bl = BitConverter.ToSingle(rawAudioData, o + 24);
+                    float br = BitConverter.ToSingle(rawAudioData, o + 28);
+
+                    float left = fl + kCenter * fc + kSide * sl + kBack * bl;
+                    float right = fr + kCenter * fc + kSide * sr + kBack * br;
+                    monoAudio[f] = Math.Clamp(0.5f * (left + right), -1f, 1f);
+                }
+
+                return monoAudio;
+            }
 
             int frameIndex = 0;
             for (int i = 0; i < floatCount - (channels - 1); i += channels)
             {
                 float sum = 0f;
-                // 모든 채널의 소리를 합산합니다.
                 for (int c = 0; c < channels; c++)
-                {
                     sum += BitConverter.ToSingle(rawAudioData, (i + c) * 4);
-                }
-                // 채널 수로 나누어 평균값을 구해 클리핑을 방지합니다.
                 monoAudio[frameIndex++] = sum / channels;
             }
+
             return monoAudio;
         }
 

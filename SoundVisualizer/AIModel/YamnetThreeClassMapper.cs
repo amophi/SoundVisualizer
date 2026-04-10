@@ -8,6 +8,16 @@ namespace SoundVisualizer.AIModel
     /// </summary>
     public static class YamnetThreeClassMapper
     {
+        /// <summary>
+        /// YAMNet 521 클래스 중 “Sound effect” 등. 게임/편집 총·폭발이 실제 총 클래스 대신 여기로 자주 붙습니다.
+        /// </summary>
+        public static bool IsGenericSoundEffectLabel(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName))
+                return false;
+            return displayName.ToLowerInvariant().Contains("sound effect");
+        }
+
         public static string MapDisplayNameToCoarse(string displayName)
         {
             if (string.IsNullOrEmpty(displayName))
