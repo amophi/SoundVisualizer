@@ -11,7 +11,8 @@ namespace SoundVisualizer.AIModel
             float confidence,
             string coarseClass,
             bool meetsThreshold,
-            double inferenceTimeMs)
+            double inferenceTimeMs,
+            string? topKSummary = null)
         {
             YamnetClassIndex = yamnetClassIndex;
             YamnetDisplayName = yamnetDisplayName;
@@ -19,6 +20,7 @@ namespace SoundVisualizer.AIModel
             CoarseClass = coarseClass;
             MeetsThreshold = meetsThreshold;
             InferenceTimeMs = inferenceTimeMs;
+            TopKSummary = topKSummary;
         }
 
         public int YamnetClassIndex { get; }
@@ -29,5 +31,7 @@ namespace SoundVisualizer.AIModel
         public string CoarseClass { get; }
         public bool MeetsThreshold { get; }
         public double InferenceTimeMs { get; }
+        /// <summary>디버그용 softmax 상위 k개 요약 문자열.</summary>
+        public string? TopKSummary { get; }
     }
 }

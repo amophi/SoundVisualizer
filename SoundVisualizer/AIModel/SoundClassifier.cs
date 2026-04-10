@@ -36,6 +36,19 @@ namespace SoundVisualizer.AIModel
         private readonly object _captureRingLock = new();
         private readonly List<float> _monoAtCaptureRateRing = new();
 
+#if DEBUG
+        private static long _lastClassifyDebugTickMs;
+        private const int ClassifyDebugMinIntervalMs = 200;
+#endif
+
+        // coarse 히스테리시스: 연속 N프레임 동일해야 전환
+        private const int CoarseHysteresisThreshold = 4;
+        private string _confirmedCoarse = "ambient";
+        private string _confirmedDisplay = "";
+        private float _confirmedConfidence;
+        private string _candidateCoarse = "";
+        private int _candidateStreak;
+
         /// <summary>
         /// WASAPI 루프백이 흔히 48kHz float이므로, 호출부에서 샘플레이트를 넘기지 않을 때의 기본값입니다.
         /// 44.1kHz 환경이면 <see cref="PredictSoundType(byte[], int, int, int)"/> 네 번째 인자로 44100을 넘기세요.
@@ -80,6 +93,9 @@ namespace SoundVisualizer.AIModel
         {
             if (_session == null) return "AI 꺼짐";
 
+            if (bytesRecorded <= 0)
+                return "오디오 대기… | ambient | —";
+
             // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
             // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
@@ -89,10 +105,12 @@ namespace SoundVisualizer.AIModel
             float[]? tail44 = null;
             float[]? tailSingle = null;
             int singleRate = captureSampleRate;
+            int ringCount;
 
             lock (_captureRingLock)
             {
                 AppendMonoCaptureRing(monoAudio, captureSampleRate);
+                ringCount = _monoAtCaptureRateRing.Count;
                 if (captureSampleRate == DefaultCaptureSampleRate)
                 {
                     int n48 = CaptureSamplesForOneYamnetWindow(48000);
@@ -107,6 +125,13 @@ namespace SoundVisualizer.AIModel
                 }
             }
 
+            int rateForMin = captureSampleRate > 0 ? captureSampleRate : DefaultCaptureSampleRate;
+            int minRingSamples = captureSampleRate == DefaultCaptureSampleRate
+                ? CaptureSamplesForOneYamnetWindow(48000)
+                : CaptureSamplesForOneYamnetWindow(rateForMin);
+            if (ringCount < minRingSamples)
+                return "오디오 축적 중… | ambient | —";
+
             InferenceResult r;
             if (tail48 != null && tail44 != null)
                 r = InferLoopbackPickBestFromTails(tail48, tail44, threshold);
@@ -115,12 +140,67 @@ namespace SoundVisualizer.AIModel
 
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
-            if (r.Confidence < threshold)
-                return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}% (저신뢰)";
 
-            // UI는 문자열만 소비하므로, 클래스/3분류/신뢰도를 한 번에 전달합니다.
-            return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
+#if DEBUG
+            LogClassificationDebugThrottled(in r, threshold);
+#endif
+
+            ApplyCoarseHysteresis(in r);
+
+            if (_confirmedConfidence < threshold)
+                return $"{_confirmedDisplay} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+
+            return $"{_confirmedDisplay} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
         }
+
+        private void ApplyCoarseHysteresis(in InferenceResult r)
+        {
+            string newCoarse = r.CoarseClass;
+
+            if (newCoarse == _confirmedCoarse)
+            {
+                _candidateStreak = 0;
+                _candidateCoarse = "";
+                _confirmedDisplay = r.YamnetDisplayName;
+                _confirmedConfidence = r.Confidence;
+                return;
+            }
+
+            if (newCoarse == _candidateCoarse)
+            {
+                _candidateStreak++;
+            }
+            else
+            {
+                _candidateCoarse = newCoarse;
+                _candidateStreak = 1;
+            }
+
+            if (_candidateStreak >= CoarseHysteresisThreshold)
+            {
+                _confirmedCoarse = newCoarse;
+                _confirmedDisplay = r.YamnetDisplayName;
+                _confirmedConfidence = r.Confidence;
+                _candidateStreak = 0;
+                _candidateCoarse = "";
+            }
+        }
+
+#if DEBUG
+        /// <summary>출력 창에서 UI보다 읽기 쉽게 분류 결과를 확인하기 위한 로그(스로틀).</summary>
+        private static void LogClassificationDebugThrottled(in InferenceResult r, float threshold)
+        {
+            long now = Environment.TickCount64;
+            if (now - _lastClassifyDebugTickMs < ClassifyDebugMinIntervalMs)
+                return;
+            _lastClassifyDebugTickMs = now;
+
+            string topK = string.IsNullOrEmpty(r.TopKSummary) ? "" : $" | top3: {r.TopKSummary}";
+            string lo = r.MeetsThreshold ? "OK" : "저신뢰";
+            Debug.WriteLine(
+                $"[YAMNet 분류] {r.YamnetDisplayName} | coarse={r.CoarseClass} | p={r.Confidence * 100f:F1}% (임계 {threshold * 100f:F0}% {lo}) | {r.InferenceTimeMs:F1}ms{topK}");
+        }
+#endif
 
         private static int CaptureSamplesForOneYamnetWindow(int captureSampleRate) =>
             (int)Math.Ceiling(RequiredMono16kSamples * (double)captureSampleRate / SampleRate);
@@ -165,8 +245,30 @@ namespace SoundVisualizer.AIModel
             static bool Ok(in InferenceResult x) => x.YamnetClassIndex >= 0;
             if (!Ok(a)) return Ok(b) ? b : a;
             if (!Ok(b)) return a;
+
+#if DEBUG
+            LogTailComparison(in a, in b);
+#endif
             return a.Confidence >= b.Confidence ? a : b;
         }
+
+#if DEBUG
+        private static long _lastTailLogTickMs;
+        private static void LogTailComparison(in InferenceResult a48, in InferenceResult a44)
+        {
+            long now = Environment.TickCount64;
+            if (now - _lastTailLogTickMs < ClassifyDebugMinIntervalMs)
+                return;
+            _lastTailLogTickMs = now;
+
+            bool match = a48.YamnetDisplayName == a44.YamnetDisplayName;
+            bool coarseMatch = a48.CoarseClass == a44.CoarseClass;
+            Debug.WriteLine(
+                $"[tail 비교] match={match} coarse_match={coarseMatch} | " +
+                $"48k: {a48.YamnetDisplayName} {a48.Confidence * 100f:F1}% | " +
+                $"44k: {a44.YamnetDisplayName} {a44.Confidence * 100f:F1}%");
+        }
+#endif
 
         /// <summary>
         /// 모노 PCM(float)을 16kHz로 맞춘 뒤 전처리·추론합니다. WAV 파일 테스트 등에 사용합니다.
@@ -178,7 +280,9 @@ namespace SoundVisualizer.AIModel
                 return new InferenceResult(-1, "AI 꺼짐", 0f, "ambient", false, 0);
 
             float[] logMel = ComputeLogMelSpectrogram(monoAudio);
+#if DEBUG
             LogLogMelTensorStats(logMel);
+#endif
 
             // [1,1,96,64] = time(96) × mel(64), row-major에서 mel이 마지막 축
             var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, TimeFrames, MelBins });
@@ -213,8 +317,19 @@ namespace SoundVisualizer.AIModel
 
             string coarse = YamnetThreeClassMapper.MapDisplayNameToCoarse(display);
             bool ok = conf >= confidenceThreshold;
+            string? topK = FormatTopKSoftmaxLabels(probs, 3);
 
-            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs);
+            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs, topK);
+        }
+
+        private string FormatTopKSoftmaxLabels(float[] probs, int k)
+        {
+            if (probs.Length == 0 || k <= 0 || _classNames.Length != probs.Length)
+                return string.Empty;
+
+            int n = Math.Min(probs.Length, _classNames.Length);
+            var order = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            return string.Join(" > ", order.Select(i => $"{_classNames[i]} {probs[i] * 100f:F1}%"));
         }
 
         /// <summary>
@@ -278,6 +393,9 @@ namespace SoundVisualizer.AIModel
             }
 
             float std = (float)Math.Sqrt(varAcc / logMel.Length);
+            if (std < 1e-4f)
+                return;
+
             Debug.WriteLine(
                 $"[YAMNet logMel] shape=[1,1,{TimeFrames},{MelBins}] (time×mel) n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
         }
