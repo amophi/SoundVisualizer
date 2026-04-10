@@ -75,17 +75,33 @@ namespace SoundVisualizer.AIModel
             // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
             // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
-            float[] mono16k = ResampleMonoFloatTo16k(monoAudio, captureSampleRate);
 
-            const float threshold = 0.3f;
-            InferenceResult r = PredictFromMono16k(mono16k, threshold);
+            const float threshold = 0.25f;
+            InferenceResult r = captureSampleRate == DefaultCaptureSampleRate
+                ? InferLoopbackPickBestCaptureRate(monoAudio, threshold)
+                : PredictFromMono16k(ResampleMonoFloatTo16k(monoAudio, captureSampleRate), threshold);
+
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
             if (r.Confidence < threshold)
-                return $"배경음 | ambient | {r.Confidence * 100f:F1}%";
+                return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}% (저신뢰)";
 
             // UI는 문자열만 소비하므로, 클래스/3분류/신뢰도를 한 번에 전달합니다.
             return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
+        }
+
+        /// <summary>
+        /// 호출부에서 샘플레이트를 모를 때: Windows 루프백이 48k 또는 44.1k인 경우가 많아 둘 다 시도하고 softmax 최댓값이 더 큰 결과를 씁니다.
+        /// </summary>
+        private InferenceResult InferLoopbackPickBestCaptureRate(float[] monoDownmixed, float confidenceThreshold)
+        {
+            InferenceResult a = PredictFromMono16k(ResampleMonoFloatTo16k(monoDownmixed, 48000), confidenceThreshold);
+            InferenceResult b = PredictFromMono16k(ResampleMonoFloatTo16k(monoDownmixed, 44100), confidenceThreshold);
+
+            static bool Ok(in InferenceResult x) => x.YamnetClassIndex >= 0;
+            if (!Ok(a)) return Ok(b) ? b : a;
+            if (!Ok(b)) return a;
+            return a.Confidence >= b.Confidence ? a : b;
         }
 
         /// <summary>
