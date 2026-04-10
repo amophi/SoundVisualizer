@@ -21,7 +21,7 @@ namespace SoundVisualizer.CoreAudio
             // 기본 출력이 실제 장치(Realtek, Voicemeeter 등)이면 오디오가 이미 그쪽으로 재생됩니다.
             // 같은 장치에 WasapiOut까지 열면 WasapiLoopbackCapture와 충돌해 캡처 데이터가 막힙니다.
             // → 라우팅 불필요, 즉시 리턴
-            if (!defaultDevice.FriendlyName.Contains("CABLE"))
+            if (!defaultDevice.FriendlyName.Contains("cable", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine($"ℹ [{defaultDevice.FriendlyName}] 직접 재생 중 — 라우팅 생략");
                 return;
@@ -30,7 +30,7 @@ namespace SoundVisualizer.CoreAudio
             // 기본 출력이 가상 케이블(CABLE Input 등)인 경우:
             // CABLE 자체는 스피커로 소리가 안 나오므로, CABLE 제외 첫 번째 활성 장치에 라우팅합니다.
             var allDevices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            var realSpeaker = allDevices.FirstOrDefault(d => !d.FriendlyName.Contains("CABLE"));
+            var realSpeaker = allDevices.FirstOrDefault(d => !d.FriendlyName.Contains("cable", StringComparison.OrdinalIgnoreCase));
             if (realSpeaker == null)
             {
                 Console.WriteLine("⚠ CABLE 외 출력 장치를 찾을 수 없습니다 — 라우팅 비활성");
