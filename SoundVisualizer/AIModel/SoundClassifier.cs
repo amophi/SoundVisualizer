@@ -101,42 +101,26 @@ namespace SoundVisualizer.AIModel
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
 
             const float threshold = 0.25f;
-            float[]? tail48 = null;
-            float[]? tail44 = null;
-            float[]? tailSingle = null;
-            int singleRate = captureSampleRate;
+            float[]? tail = null;
+            int tailRate = captureSampleRate;
             int ringCount;
 
             lock (_captureRingLock)
             {
                 AppendMonoCaptureRing(monoAudio, captureSampleRate);
                 ringCount = _monoAtCaptureRateRing.Count;
-                if (captureSampleRate == DefaultCaptureSampleRate)
-                {
-                    int n48 = CaptureSamplesForOneYamnetWindow(48000);
-                    int n44 = CaptureSamplesForOneYamnetWindow(44100);
-                    tail48 = CopyRingTailRightPadded(n48);
-                    tail44 = CopyRingTailRightPadded(n44);
-                }
-                else
-                {
-                    int n = CaptureSamplesForOneYamnetWindow(captureSampleRate);
-                    tailSingle = CopyRingTailRightPadded(n);
-                }
+                int resampleFrom = captureSampleRate == DefaultCaptureSampleRate ? 48000 : captureSampleRate;
+                int n = CaptureSamplesForOneYamnetWindow(resampleFrom);
+                tail = CopyRingTailRightPadded(n);
+                tailRate = resampleFrom;
             }
 
-            int rateForMin = captureSampleRate > 0 ? captureSampleRate : DefaultCaptureSampleRate;
-            int minRingSamples = captureSampleRate == DefaultCaptureSampleRate
-                ? CaptureSamplesForOneYamnetWindow(48000)
-                : CaptureSamplesForOneYamnetWindow(rateForMin);
+            int minRingSamples = CaptureSamplesForOneYamnetWindow(tailRate);
             if (ringCount < minRingSamples)
                 return "오디오 축적 중… | ambient | —";
 
-            InferenceResult r;
-            if (tail48 != null && tail44 != null)
-                r = InferLoopbackPickBestFromTails(tail48, tail44, threshold);
-            else
-                r = PredictFromMono16k(ResampleMonoFloatTo16k(tailSingle ?? Array.Empty<float>(), singleRate), threshold);
+            InferenceResult r = PredictFromMono16k(
+                ResampleMonoFloatTo16k(tail ?? Array.Empty<float>(), tailRate), threshold);
 
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
@@ -234,41 +218,7 @@ namespace SoundVisualizer.AIModel
             return buf;
         }
 
-        /// <summary>
-        /// 같은 시간 끝을 맞춘 꼬리를 48k/44.1k로 각각 리샘플해 더 나은 softmax를 고릅니다.
-        /// </summary>
-        private InferenceResult InferLoopbackPickBestFromTails(float[] tail48, float[] tail44, float confidenceThreshold)
-        {
-            InferenceResult a = PredictFromMono16k(ResampleMonoFloatTo16k(tail48, 48000), confidenceThreshold);
-            InferenceResult b = PredictFromMono16k(ResampleMonoFloatTo16k(tail44, 44100), confidenceThreshold);
-
-            static bool Ok(in InferenceResult x) => x.YamnetClassIndex >= 0;
-            if (!Ok(a)) return Ok(b) ? b : a;
-            if (!Ok(b)) return a;
-
-#if DEBUG
-            LogTailComparison(in a, in b);
-#endif
-            return a.Confidence >= b.Confidence ? a : b;
-        }
-
-#if DEBUG
-        private static long _lastTailLogTickMs;
-        private static void LogTailComparison(in InferenceResult a48, in InferenceResult a44)
-        {
-            long now = Environment.TickCount64;
-            if (now - _lastTailLogTickMs < ClassifyDebugMinIntervalMs)
-                return;
-            _lastTailLogTickMs = now;
-
-            bool match = a48.YamnetDisplayName == a44.YamnetDisplayName;
-            bool coarseMatch = a48.CoarseClass == a44.CoarseClass;
-            Debug.WriteLine(
-                $"[tail 비교] match={match} coarse_match={coarseMatch} | " +
-                $"48k: {a48.YamnetDisplayName} {a48.Confidence * 100f:F1}% | " +
-                $"44k: {a44.YamnetDisplayName} {a44.Confidence * 100f:F1}%");
-        }
-#endif
+        // InferLoopbackPickBestFromTails 제거됨 — 48k 단일 리샘플만 사용
 
         /// <summary>
         /// 모노 PCM(float)을 16kHz로 맞춘 뒤 전처리·추론합니다. WAV 파일 테스트 등에 사용합니다.
@@ -280,9 +230,6 @@ namespace SoundVisualizer.AIModel
                 return new InferenceResult(-1, "AI 꺼짐", 0f, "ambient", false, 0);
 
             float[] logMel = ComputeLogMelSpectrogram(monoAudio);
-#if DEBUG
-            LogLogMelTensorStats(logMel);
-#endif
 
             // [1,1,96,64] = time(96) × mel(64), row-major에서 mel이 마지막 축
             var inputTensor = new DenseTensor<float>(logMel, new[] { 1, 1, TimeFrames, MelBins });
