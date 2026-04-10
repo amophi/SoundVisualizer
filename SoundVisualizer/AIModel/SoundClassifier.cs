@@ -28,6 +28,14 @@ namespace SoundVisualizer.AIModel
         private const float MelFMax = 7500f;
         private const float LogEps = 1e-6f;
 
+        /// <summary>멜 스펙트럼 한 윈도우에 필요한 16kHz 모노 샘플 수(≈0.975s). 콜백 한 번 분량만 넣으면 대부분 0 패딩이라 신뢰도가 붕괴합니다.</summary>
+        private static readonly int RequiredMono16kSamples = WindowLength + HopLength * (TimeFrames - 1);
+
+        private const int RingSeconds = 2;
+
+        private readonly object _captureRingLock = new();
+        private readonly List<float> _monoAtCaptureRateRing = new();
+
         /// <summary>
         /// WASAPI 루프백이 흔히 48kHz float이므로, 호출부에서 샘플레이트를 넘기지 않을 때의 기본값입니다.
         /// 44.1kHz 환경이면 <see cref="PredictSoundType(byte[], int, int, int)"/> 네 번째 인자로 44100을 넘기세요.
@@ -77,9 +85,33 @@ namespace SoundVisualizer.AIModel
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
 
             const float threshold = 0.25f;
-            InferenceResult r = captureSampleRate == DefaultCaptureSampleRate
-                ? InferLoopbackPickBestCaptureRate(monoAudio, threshold)
-                : PredictFromMono16k(ResampleMonoFloatTo16k(monoAudio, captureSampleRate), threshold);
+            float[]? tail48 = null;
+            float[]? tail44 = null;
+            float[]? tailSingle = null;
+            int singleRate = captureSampleRate;
+
+            lock (_captureRingLock)
+            {
+                AppendMonoCaptureRing(monoAudio, captureSampleRate);
+                if (captureSampleRate == DefaultCaptureSampleRate)
+                {
+                    int n48 = CaptureSamplesForOneYamnetWindow(48000);
+                    int n44 = CaptureSamplesForOneYamnetWindow(44100);
+                    tail48 = CopyRingTailRightPadded(n48);
+                    tail44 = CopyRingTailRightPadded(n44);
+                }
+                else
+                {
+                    int n = CaptureSamplesForOneYamnetWindow(captureSampleRate);
+                    tailSingle = CopyRingTailRightPadded(n);
+                }
+            }
+
+            InferenceResult r;
+            if (tail48 != null && tail44 != null)
+                r = InferLoopbackPickBestFromTails(tail48, tail44, threshold);
+            else
+                r = PredictFromMono16k(ResampleMonoFloatTo16k(tailSingle ?? Array.Empty<float>(), singleRate), threshold);
 
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
@@ -90,13 +122,45 @@ namespace SoundVisualizer.AIModel
             return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
         }
 
-        /// <summary>
-        /// 호출부에서 샘플레이트를 모를 때: Windows 루프백이 48k 또는 44.1k인 경우가 많아 둘 다 시도하고 softmax 최댓값이 더 큰 결과를 씁니다.
-        /// </summary>
-        private InferenceResult InferLoopbackPickBestCaptureRate(float[] monoDownmixed, float confidenceThreshold)
+        private static int CaptureSamplesForOneYamnetWindow(int captureSampleRate) =>
+            (int)Math.Ceiling(RequiredMono16kSamples * (double)captureSampleRate / SampleRate);
+
+        private void AppendMonoCaptureRing(float[] monoChunk, int captureSampleRate)
         {
-            InferenceResult a = PredictFromMono16k(ResampleMonoFloatTo16k(monoDownmixed, 48000), confidenceThreshold);
-            InferenceResult b = PredictFromMono16k(ResampleMonoFloatTo16k(monoDownmixed, 44100), confidenceThreshold);
+            if (monoChunk.Length == 0)
+                return;
+            if (captureSampleRate <= 0)
+                captureSampleRate = DefaultCaptureSampleRate;
+
+            for (int i = 0; i < monoChunk.Length; i++)
+                _monoAtCaptureRateRing.Add(monoChunk[i]);
+
+            int cap = Math.Max(DefaultCaptureSampleRate * RingSeconds, captureSampleRate * RingSeconds);
+            while (_monoAtCaptureRateRing.Count > cap)
+                _monoAtCaptureRateRing.RemoveAt(0);
+        }
+
+        /// <summary>맨 끝(가장 최근) <paramref name="length"/>샘플. 부족하면 앞을 0으로 패딩.</summary>
+        private float[] CopyRingTailRightPadded(int length)
+        {
+            var buf = new float[length];
+            int n = _monoAtCaptureRateRing.Count;
+            int take = Math.Min(length, n);
+            if (take <= 0)
+                return buf;
+            int dst = length - take;
+            for (int i = 0; i < take; i++)
+                buf[dst + i] = _monoAtCaptureRateRing[n - take + i];
+            return buf;
+        }
+
+        /// <summary>
+        /// 같은 시간 끝을 맞춘 꼬리를 48k/44.1k로 각각 리샘플해 더 나은 softmax를 고릅니다.
+        /// </summary>
+        private InferenceResult InferLoopbackPickBestFromTails(float[] tail48, float[] tail44, float confidenceThreshold)
+        {
+            InferenceResult a = PredictFromMono16k(ResampleMonoFloatTo16k(tail48, 48000), confidenceThreshold);
+            InferenceResult b = PredictFromMono16k(ResampleMonoFloatTo16k(tail44, 44100), confidenceThreshold);
 
             static bool Ok(in InferenceResult x) => x.YamnetClassIndex >= 0;
             if (!Ok(a)) return Ok(b) ? b : a;
@@ -351,7 +415,7 @@ namespace SoundVisualizer.AIModel
         /// </summary>
         private float[] ComputeLogMelSpectrogram(float[] monoAudio)
         {
-            int requiredSamples = WindowLength + HopLength * (TimeFrames - 1);
+            int requiredSamples = RequiredMono16kSamples;
 
             // 고정 길이로 패딩/트렁케이션(실시간 입력 길이가 매번 달라질 수 있으므로)
             float[] audio = new float[requiredSamples];
@@ -563,6 +627,8 @@ namespace SoundVisualizer.AIModel
         // 메모리 누수 방지용
         public void Dispose()
         {
+            lock (_captureRingLock)
+                _monoAtCaptureRateRing.Clear();
             _session?.Dispose();
         }
     }
