@@ -74,8 +74,10 @@ namespace SoundVisualizer.AIModel
             if (r.Confidence < threshold)
                 return $"배경음 | ambient | {r.Confidence * 100f:F1}%";
 
+            string translatedName = YamnetThreeClassMapper.TranslateToKorean(r.YamnetDisplayName);
+
             // UI는 문자열만 소비하므로, 클래스/3분류/신뢰도를 한 번에 전달합니다.
-            return $"{r.YamnetDisplayName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
+            return $"{translatedName} | {r.CoarseClass} | {r.Confidence * 100f:F1}%";
         }
 
         /// <summary>
