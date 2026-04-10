@@ -63,7 +63,8 @@ namespace SoundVisualizer.CoreAudio
                     _realSpeakerOut = new WasapiOut(realSpeaker, AudioClientShareMode.Shared, false, latency);
                     _realSpeakerOut.Init(_bufferedWaveProvider);
                     _realSpeakerOut.Play();
-                    Console.WriteLine($"🔊 라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch, latency: {latency}ms)");
+                    string mixMode = (_captureChannels == 8 && _outputChannels == 2) ? " [다운믹스]" : "";
+                    Console.WriteLine($"🔊 라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch{mixMode}, latency: {latency}ms)");
                     return;
                 }
                 catch (Exception ex)
@@ -95,10 +96,13 @@ namespace SoundVisualizer.CoreAudio
         }
 
         /// <summary>
-        /// 채널 수 변환. 입력 채널이 더 많으면 앞쪽 채널 추출, 적으면 첫 채널 복제.
+        /// 채널 수 변환. 8ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제.
         /// </summary>
         private static byte[] ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh)
         {
+            if (inCh == 8 && outCh == 2 && bytesPerSample == 4)
+                return DownmixTo2ch(input);
+
             int frames = input.Length / (inCh * bytesPerSample);
             byte[] output = new byte[frames * outCh * bytesPerSample];
 
@@ -112,6 +116,44 @@ namespace SoundVisualizer.CoreAudio
                         output, (i * outCh + ch) * bytesPerSample,
                         bytesPerSample);
                 }
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// 7.1ch float32 → 2ch float32 다운믹스 (ITU-R BS.775 기반)
+        /// 채널 인덱스: 0=FL 1=FR 2=FC 3=LFE 4=SL 5=SR 6=BL 7=BR
+        /// L = FL + 0.707*FC + 0.707*SL + 0.5*BL
+        /// R = FR + 0.707*FC + 0.707*SR + 0.5*BR
+        /// LFE는 서브우퍼 전용 저음역이므로 일반 스피커 출력에서 제외
+        /// </summary>
+        private static byte[] DownmixTo2ch(byte[] input)
+        {
+            const float kCenter = 0.707f; // -3dB
+            const float kSide   = 0.707f; // -3dB
+            const float kBack   = 0.500f; // -6dB
+
+            int frames = input.Length / 32; // 8ch * 4bytes
+            byte[] output = new byte[frames * 8]; // 2ch * 4bytes
+
+            for (int i = 0; i < frames; i++)
+            {
+                int srcOffset = i * 32;
+                float fl = BitConverter.ToSingle(input, srcOffset +  0);
+                float fr = BitConverter.ToSingle(input, srcOffset +  4);
+                float fc = BitConverter.ToSingle(input, srcOffset +  8);
+                // srcOffset + 12 = LFE → 제외
+                float sl = BitConverter.ToSingle(input, srcOffset + 16);
+                float sr = BitConverter.ToSingle(input, srcOffset + 20);
+                float bl = BitConverter.ToSingle(input, srcOffset + 24);
+                float br = BitConverter.ToSingle(input, srcOffset + 28);
+
+                float left  = Math.Clamp(fl + kCenter * fc + kSide * sl + kBack * bl, -1f, 1f);
+                float right = Math.Clamp(fr + kCenter * fc + kSide * sr + kBack * br, -1f, 1f);
+
+                int dstOffset = i * 8;
+                Buffer.BlockCopy(BitConverter.GetBytes(left),  0, output, dstOffset,     4);
+                Buffer.BlockCopy(BitConverter.GetBytes(right), 0, output, dstOffset + 4, 4);
             }
             return output;
         }
