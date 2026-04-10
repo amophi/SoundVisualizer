@@ -248,7 +248,8 @@ namespace SoundVisualizer.AIModel
 
         /// <summary>
         /// UI 방향 표시는 다채널 그대로 두고, 분류용 모노만 냅니다.
-        /// 7.1에서는 대사·전방 효과가 실리는 FC(센터)만 사용합니다. 스테레오에는 FC가 없으므로 (L+R)/2로 둡니다.
+        /// 7.1에서 유튜브·스테레오 믹스는 FL/FR에만 실리고 FC가 거의 0인 경우가 많아, FC만 쓰면 침묵처럼 보입니다.
+        /// 샘플마다 FC와 (FL+FR)/2의 제곱 에너지 비율로 블렌딩합니다.
         /// 채널 순서: FL,FR,FC,LFE,SL,SR,BL,BR.
         /// </summary>
         private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
@@ -262,13 +263,20 @@ namespace SoundVisualizer.AIModel
 
             if (channels == 8)
             {
-                const int fcByteOffset = 2 * 4;
                 int bytesPerFrame = channels * 4;
+                const float eps = 1e-12f;
 
                 for (int f = 0; f < frames; f++)
                 {
-                    int o = f * bytesPerFrame + fcByteOffset;
-                    monoAudio[f] = BitConverter.ToSingle(rawAudioData, o);
+                    int o = f * bytesPerFrame;
+                    float fl = BitConverter.ToSingle(rawAudioData, o + 0);
+                    float fr = BitConverter.ToSingle(rawAudioData, o + 4);
+                    float fc = BitConverter.ToSingle(rawAudioData, o + 8);
+                    float lr = 0.5f * (fl + fr);
+                    float eFc = fc * fc;
+                    float eLr = lr * lr;
+                    float w = eFc / (eFc + eLr + eps);
+                    monoAudio[f] = w * fc + (1f - w) * lr;
                 }
 
                 return monoAudio;
