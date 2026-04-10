@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace SoundVisualizer.AIModel
 {
@@ -24,6 +27,12 @@ namespace SoundVisualizer.AIModel
         private const float MelFMin = 125f;
         private const float MelFMax = 7500f;
         private const float LogEps = 1e-6f;
+
+        /// <summary>
+        /// WASAPI 루프백이 흔히 48kHz float이므로, 호출부에서 샘플레이트를 넘기지 않을 때의 기본값입니다.
+        /// 44.1kHz 환경이면 <see cref="PredictSoundType(byte[], int, int, int)"/> 네 번째 인자로 44100을 넘기세요.
+        /// </summary>
+        public const int DefaultCaptureSampleRate = 48000;
 
         // Precomputed preprocessing artifacts
         private readonly float[] _hannWindow;
@@ -59,16 +68,17 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channels)
+        public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channels, int captureSampleRate = DefaultCaptureSampleRate)
         {
             if (_session == null) return "AI 꺼짐";
 
             // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
             // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
+            float[] mono16k = ResampleMonoFloatTo16k(monoAudio, captureSampleRate);
 
             const float threshold = 0.3f;
-            InferenceResult r = PredictFromMono16k(monoAudio, threshold);
+            InferenceResult r = PredictFromMono16k(mono16k, threshold);
             if (r.YamnetClassIndex < 0)
                 return "AI 에러";
             if (r.Confidence < threshold)
@@ -198,6 +208,58 @@ namespace SoundVisualizer.AIModel
                 monoAudio[frameIndex++] = sum / channels;
             }
             return monoAudio;
+        }
+
+        /// <summary>
+        /// 루프백 등 실시간 모노 float을 YAMNet이 기대하는 16kHz로 맞춥니다. (WAV 테스트 경로는 <see cref="WavAudioLoader"/>와 동일하게 WDL 리샘플)
+        /// </summary>
+        private static float[] ResampleMonoFloatTo16k(float[] mono, int sourceSampleRate)
+        {
+            if (mono.Length == 0)
+                return Array.Empty<float>();
+
+            if (sourceSampleRate <= 0)
+                sourceSampleRate = DefaultCaptureSampleRate;
+
+            if (sourceSampleRate == SampleRate)
+                return mono;
+
+            ISampleProvider provider = new FloatArraySampleProvider(mono, sourceSampleRate);
+            provider = new WdlResamplingSampleProvider(provider, SampleRate);
+
+            var chunk = new float[4096];
+            var list = new List<float>(mono.Length * SampleRate / sourceSampleRate + 64);
+            int read;
+            while ((read = provider.Read(chunk, 0, chunk.Length)) > 0)
+            {
+                for (int i = 0; i < read; i++)
+                    list.Add(chunk[i]);
+            }
+
+            return list.ToArray();
+        }
+
+        private sealed class FloatArraySampleProvider : ISampleProvider
+        {
+            private readonly float[] _data;
+            private int _position;
+
+            public FloatArraySampleProvider(float[] data, int sampleRate)
+            {
+                _data = data;
+                WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, 1);
+            }
+
+            public WaveFormat WaveFormat { get; }
+
+            public int Read(float[] buffer, int offset, int count)
+            {
+                int available = _data.Length - _position;
+                int toRead = Math.Min(count, available);
+                for (int i = 0; i < toRead; i++)
+                    buffer[offset + i] = _data[_position++];
+                return toRead;
+            }
         }
 
         /// <summary>
