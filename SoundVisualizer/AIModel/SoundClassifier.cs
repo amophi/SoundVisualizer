@@ -247,8 +247,9 @@ namespace SoundVisualizer.AIModel
         }
 
         /// <summary>
-        /// 7.1 루프백 채널 순서: FL,FR,FC,LFE,SL,SR,BL,BR (프로젝트 AudioRouter의 7.1 다운믹스와 동일).
-        /// 8채널 균등 평균은 LFE·서라운드가 센터(대사·총 등)를 희석할 수 있어, LFE 제외 ITU 가중 L/R의 평균으로 모노를 냅니다.
+        /// UI 방향 표시는 다채널 그대로 두고, 분류용 모노만 냅니다.
+        /// 7.1에서는 대사·전방 효과가 실리는 FC(센터)만 사용합니다. 스테레오에는 FC가 없으므로 (L+R)/2로 둡니다.
+        /// 채널 순서: FL,FR,FC,LFE,SL,SR,BL,BR.
         /// </summary>
         private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
         {
@@ -261,25 +262,13 @@ namespace SoundVisualizer.AIModel
 
             if (channels == 8)
             {
-                const float kCenter = 0.707f;
-                const float kSide = 0.707f;
-                const float kBack = 0.500f;
+                const int fcByteOffset = 2 * 4;
                 int bytesPerFrame = channels * 4;
 
                 for (int f = 0; f < frames; f++)
                 {
-                    int o = f * bytesPerFrame;
-                    float fl = BitConverter.ToSingle(rawAudioData, o + 0);
-                    float fr = BitConverter.ToSingle(rawAudioData, o + 4);
-                    float fc = BitConverter.ToSingle(rawAudioData, o + 8);
-                    float sl = BitConverter.ToSingle(rawAudioData, o + 16);
-                    float sr = BitConverter.ToSingle(rawAudioData, o + 20);
-                    float bl = BitConverter.ToSingle(rawAudioData, o + 24);
-                    float br = BitConverter.ToSingle(rawAudioData, o + 28);
-
-                    float left = fl + kCenter * fc + kSide * sl + kBack * bl;
-                    float right = fr + kCenter * fc + kSide * sr + kBack * br;
-                    monoAudio[f] = Math.Clamp(0.5f * (left + right), -1f, 1f);
+                    int o = f * bytesPerFrame + fcByteOffset;
+                    monoAudio[f] = BitConverter.ToSingle(rawAudioData, o);
                 }
 
                 return monoAudio;
