@@ -64,8 +64,8 @@ namespace SoundVisualizer.AIModel
             if (_session == null) return "AI 꺼짐";
 
             // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
-            // 센터 채널을 뽑아오도록 수정
-            float[] monoAudio = ExtractCenterChannel(rawAudioData, bytesRecorded, channels);
+            // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
+            float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
 
             const float threshold = 0.3f;
             InferenceResult r = PredictFromMono16k(monoAudio, threshold);
@@ -179,20 +179,25 @@ namespace SoundVisualizer.AIModel
             return exp;
         }
 
-        private float[] ExtractCenterChannel(byte[] rawAudioData, int bytesRecorded, int channels)
+        private float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
         {
             int floatCount = bytesRecorded / 4;
-            // 지정된 채널 수에 따라 분할
-            float[] centerChannel = new float[floatCount / channels];
+            int frames = floatCount / channels;
+            float[] monoAudio = new float[frames];
 
-            int centerIndex = 0;
+            int frameIndex = 0;
             for (int i = 0; i < floatCount - (channels - 1); i += channels)
             {
-                // 채널 2번이 센터 채널이라고 가정합니다. 최소 2개의 채널이 있어야 합니다.
-                int cIndex = channels > 2 ? 2 : 0;
-                centerChannel[centerIndex++] = BitConverter.ToSingle(rawAudioData, (i + cIndex) * 4);
+                float sum = 0f;
+                // 모든 채널의 소리를 합산합니다.
+                for (int c = 0; c < channels; c++)
+                {
+                    sum += BitConverter.ToSingle(rawAudioData, (i + c) * 4);
+                }
+                // 채널 수로 나누어 평균값을 구해 클리핑을 방지합니다.
+                monoAudio[frameIndex++] = sum / channels;
             }
-            return centerChannel;
+            return monoAudio;
         }
 
         /// <summary>
