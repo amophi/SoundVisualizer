@@ -586,13 +586,8 @@ namespace SoundVisualizer
 
         private Color GetColorForLabel(string label)
         {
-            if (label.Contains("총소리") || label.Contains("폭발음") || label.Contains("기관총"))
-                return COLOR_CLASS3;
-            
-            if (label.Contains("발소리") || label.Contains("사이렌") || label.Contains("경적") || 
-                label.Contains("자동차") || label.Contains("헬리콥터") || label.Contains("엔진소리"))
-                return COLOR_CLASS2;
-
+            if (label.Contains("danger")) return COLOR_CLASS3;
+            if (label.Contains("speech")) return COLOR_CLASS2;
             return COLOR_CLASS1;
         }
 
