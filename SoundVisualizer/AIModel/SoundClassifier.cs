@@ -37,6 +37,26 @@ namespace SoundVisualizer.AIModel
         private readonly List<float> _monoAtCaptureRateRing = new();
 
 #if DEBUG
+        private static long _lastMonoRangeLogTickMs;
+        private static void LogMonoRangeThrottled(float[] mono)
+        {
+            long now = Environment.TickCount64;
+            if (now - _lastMonoRangeLogTickMs < 500) return;
+            _lastMonoRangeLogTickMs = now;
+
+            if (mono.Length == 0) return;
+            float min = mono[0], max = mono[0];
+            foreach (var v in mono)
+            {
+                if (v < min) min = v;
+                if (v > max) max = v;
+            }
+            if (max > 1f || min < -1f)
+                Debug.WriteLine($"[모노 범위 초과!] min={min:F3} max={max:F3} samples={mono.Length}");
+            else
+                Debug.WriteLine($"[모노 범위] min={min:F3} max={max:F3}");
+        }
+
         private static long _lastClassifyDebugTickMs;
         private const int ClassifyDebugMinIntervalMs = 200;
 #endif
@@ -99,6 +119,10 @@ namespace SoundVisualizer.AIModel
             // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
             // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
+
+#if DEBUG
+            LogMonoRangeThrottled(monoAudio);
+#endif
 
             const float threshold = 0.25f;
             float[]? tail = null;
@@ -416,18 +440,34 @@ namespace SoundVisualizer.AIModel
             int frames = floatCount / channels;
             float[] monoAudio = new float[frames];
 
+            if (channels == 8)
+            {
+                int bytesPerFrame = channels * 4;
+                const float eps = 1e-12f;
+
+                for (int f = 0; f < frames; f++)
+                {
+                    int o = f * bytesPerFrame;
+                    float fl = BitConverter.ToSingle(rawAudioData, o + 0);
+                    float fr = BitConverter.ToSingle(rawAudioData, o + 4);
+                    float fc = BitConverter.ToSingle(rawAudioData, o + 8);
+                    float lr = 0.5f * (fl + fr);
+                    float eFc = fc * fc;
+                    float eLr = lr * lr;
+                    float w = eFc / (eFc + eLr + eps);
+                    monoAudio[f] = w * fc + (1f - w) * lr;
+                }
+
+                return monoAudio;
+            }
+
             int frameIndex = 0;
             for (int i = 0; i < floatCount - (channels - 1); i += channels)
             {
                 float sum = 0f;
-                // 전 채널(FL, FR, FC, LFE, SL, SR, BL, BR 등)의 모든 재생 소리를 모조리 끌어모읍니다.
                 for (int c = 0; c < channels; c++)
-                {
                     sum += BitConverter.ToSingle(rawAudioData, (i + c) * 4);
-                }
-                // 8개 채널로 단순 평균(sum/channels)을 내면 개별 방향음(예: 뒤쪽 발소리)의 진폭이 극도로 줄어들어 AI가 인식을 못할 수 있습니다.
-                // 파형의 크기를 보존하기 위해 일반적인 다운믹스 보정치(2.0f) 가량으로만 나눠줍니다. (Float 연산이라 넘어선다고 클리핑되지 않음)
-                monoAudio[frameIndex++] = sum / 2.0f;
+                monoAudio[frameIndex++] = sum / channels;
             }
 
             return monoAudio;
