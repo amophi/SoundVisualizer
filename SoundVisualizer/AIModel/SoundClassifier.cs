@@ -262,11 +262,37 @@ namespace SoundVisualizer.AIModel
 
             PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
 
-            string coarse = YamnetThreeClassMapper.MapDisplayNameToCoarse(display);
+            string coarse = VoteCoarseFromTopK(probs, 3);
             bool ok = conf >= confidenceThreshold;
             string? topK = FormatTopKSoftmaxLabels(probs, 3);
 
             return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs, topK);
+        }
+
+        /// <summary>
+        /// top-k 클래스의 확률을 coarse별로 합산하여 가장 높은 coarse를 반환합니다.
+        /// 예: top-3가 Plop 32% > Siren 30% > Alarm 25%이면 danger(55%) > ambient(32%) → danger.
+        /// </summary>
+        private string VoteCoarseFromTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0) return "ambient";
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+
+            float dangerSum = 0f, speechSum = 0f, ambientSum = 0f;
+            foreach (int i in topIndices)
+            {
+                string c = YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]);
+                float p = probs[i];
+                if (c == "danger") dangerSum += p;
+                else if (c == "speech") speechSum += p;
+                else ambientSum += p;
+            }
+
+            if (dangerSum >= speechSum && dangerSum >= ambientSum) return "danger";
+            if (speechSum >= ambientSum) return "speech";
+            return "ambient";
         }
 
         private string FormatTopKSoftmaxLabels(float[] probs, int k)
