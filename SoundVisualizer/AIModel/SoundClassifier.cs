@@ -26,7 +26,7 @@ namespace SoundVisualizer.AIModel
         private const int FftSize = 512;       // TF YAMNet 계열과 맞추기 위한 실험 (>= WindowLength, 2의 거듭제곱)
         private const float MelFMin = 125f;
         private const float MelFMax = 7500f;
-        private const float LogEps = 1e-6f;
+        private const float LogEps = 0.001f;
 
         /// <summary>멜 스펙트럼 한 윈도우에 필요한 16kHz 모노 샘플 수(≈0.975s). 콜백 한 번 분량만 넣으면 대부분 0 패딩이라 신뢰도가 붕괴합니다.</summary>
         private static readonly int RequiredMono16kSamples = WindowLength + HopLength * (TimeFrames - 1);
@@ -540,8 +540,8 @@ namespace SoundVisualizer.AIModel
             if (length <= 1) return window;
             for (int n = 0; n < length; n++)
             {
-                // Hann window: 0.5 - 0.5*cos(2*pi*n/(N-1))
-                window[n] = (float)(0.5 - 0.5 * Math.Cos(2 * Math.PI * n / (length - 1)));
+                // Periodic Hann window: 0.5 - 0.5*cos(2*pi*n/N)
+                window[n] = (float)(0.5 - 0.5 * Math.Cos(2 * Math.PI * n / length));
             }
             return window;
         }
