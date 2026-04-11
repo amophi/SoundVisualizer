@@ -57,6 +57,8 @@ namespace SoundVisualizer.AIModel
                 return true;
             if (s.Contains("smoke detector") || s.Contains("fire alarm"))
                 return true;
+            if (s == "alarm" || s.Contains("car alarm"))
+                return true;
             return false;
         }
 
