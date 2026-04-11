@@ -8,8 +8,38 @@ namespace SoundVisualizer.AIModel
     /// </summary>
     public static class YamnetThreeClassMapper
     {
+        public static string TranslateToKorean(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName)) return "알 수 없음";
+            var s = displayName.ToLowerInvariant();
+
+            if (s.Contains("gunshot") || s.Contains("gunfire")) return "총소리";
+            if (s.Contains("machine gun")) return "기관총";
+            if (s.Contains("explosion") || s.Contains("폭발")) return "폭발음";
+            if (s.Contains("artillery") || s.Contains("fusillade") || s.Contains("cap gun")) return "총소리";
+
+            if (s.Contains("footstep") || s.Contains("footsteps")) return "발소리";
+            if (s.Contains("siren") || s.Contains("civil defense")) return "사이렌";
+            if (s.Contains("horn")) return "경적";
+            if (s.Contains("car") || s.Contains("truck") || s.Contains("bus") || s.Contains("motorcycle")) return "자동차";
+            if (s.Contains("helicopter")) return "헬리콥터";
+            if (s.Contains("engine") || s.Contains("idling") || s.Contains("accelerating")) return "엔진소리";
+            if (s.Contains("alarm") || s.Contains("smoke detector")) return "사이렌";
+            if (s.Contains("police car") || s.Contains("ambulance") || s.Contains("fire engine") || s.Contains("fire truck")) return "사이렌";
+
+            if (s.Contains("speech") || s.Contains("conversation") || s.Contains("narration") || s.Contains("speaking") || s.Contains("babbling")) return "사람 목소리";
+            if (s.Contains("shout") || s.Contains("screaming") || s.Contains("yell") || s.Contains("laughter") || s.Contains("crying") || s.Contains("sobbing")) return "사람 소리";
+            if (s.Contains("music")) return "음악";
+            if (s.Contains("wind") || s.Contains("rustling leaves")) return "바람 소리";
+            if (s.Contains("rain") || s.Contains("water") || s.Contains("ocean") || s.Contains("waves")) return "비/물 소리";
+            if (s.Contains("animal") || s.Contains("dog") || s.Contains("cat") || s.Contains("bird") || s.Contains("bark") || s.Contains("meow")) return "동물 소리";
+            if (s.Contains("door") || s.Contains("knock") || s.Contains("slam")) return "문 소리";
+
+            return displayName;
+        }
+
         /// <summary>
-        /// YAMNet 521 클래스 중 “Sound effect” 등. 게임/편집 총·폭발이 실제 총 클래스 대신 여기로 자주 붙습니다.
+        /// YAMNet 521 클래스 중 "Sound effect" 등. 게임/편집 총·폭발이 실제 총 클래스 대신 여기로 자주 붙습니다.
         /// </summary>
         public static bool IsGenericSoundEffectLabel(string displayName)
         {

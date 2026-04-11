@@ -37,26 +37,6 @@ namespace SoundVisualizer.AIModel
         private readonly List<float> _monoAtCaptureRateRing = new();
 
 #if DEBUG
-        private static long _lastMonoRangeLogTickMs;
-        private static void LogMonoRangeThrottled(float[] mono)
-        {
-            long now = Environment.TickCount64;
-            if (now - _lastMonoRangeLogTickMs < 500) return;
-            _lastMonoRangeLogTickMs = now;
-
-            if (mono.Length == 0) return;
-            float min = mono[0], max = mono[0];
-            foreach (var v in mono)
-            {
-                if (v < min) min = v;
-                if (v > max) max = v;
-            }
-            if (max > 1f || min < -1f)
-                Debug.WriteLine($"[모노 범위 초과!] min={min:F3} max={max:F3} samples={mono.Length}");
-            else
-                Debug.WriteLine($"[모노 범위] min={min:F3} max={max:F3}");
-        }
-
         private static long _lastClassifyDebugTickMs;
         private const int ClassifyDebugMinIntervalMs = 200;
 #endif
@@ -120,10 +100,6 @@ namespace SoundVisualizer.AIModel
             // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
 
-#if DEBUG
-            LogMonoRangeThrottled(monoAudio);
-#endif
-
             const float threshold = 0.25f;
             float[]? tail = null;
             int tailRate = captureSampleRate;
@@ -155,10 +131,12 @@ namespace SoundVisualizer.AIModel
 
             ApplyCoarseHysteresis(in r);
 
-            if (_confirmedConfidence < threshold)
-                return $"{_confirmedDisplay} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+            string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
 
-            return $"{_confirmedDisplay} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
+            if (_confirmedConfidence < threshold)
+                return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+
+            return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
         }
 
         private void ApplyCoarseHysteresis(in InferenceResult r)
