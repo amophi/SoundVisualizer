@@ -27,5 +27,15 @@
                 Background="#60000000" CornerRadius="5" Padding="8,4" IsHitTestVisible="False">
             <TextBlock x:Name="FpsText" Foreground="#80FFFFFF" FontSize="11" Text="FPS: --"/>
         </Border>
+
+        <!-- 모드 설정 UI (우하단) -->
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,20,20" IsHitTestVisible="False">
+            <Border Background="#80000000" CornerRadius="5" Padding="12,8" Margin="0,0,0,8">
+                <TextBlock x:Name="VisualModeText" Foreground="White" FontSize="16" FontWeight="SemiBold" Text="🎨 시각화 모드: [F3] 패드 모드 (Pad)"/>
+            </Border>
+            <Border Background="#80000000" CornerRadius="5" Padding="12,8">
+                <TextBlock x:Name="StereoModeText" Foreground="White" FontSize="16" FontWeight="SemiBold" Text="🔊 채널 확장 모드: [F2] 7.1 서라운드"/>
+            </Border>
+        </StackPanel>
     </Grid>
 </Window>
