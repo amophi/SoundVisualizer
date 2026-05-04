@@ -41,8 +41,8 @@ namespace SoundVisualizer.AIModel
         private const int ClassifyDebugMinIntervalMs = 200;
 #endif
 
-        // coarse 히스테리시스: 연속 N프레임 동일해야 전환
-        private const int CoarseHysteresisThreshold = 4;
+        // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
+        private const int CoarseHysteresisThreshold = 6;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -141,6 +141,10 @@ namespace SoundVisualizer.AIModel
 
         private void ApplyCoarseHysteresis(in InferenceResult r)
         {
+            // 저신뢰 프레임은 확정 상태·후보 스트릭을 바꾸지 않음(오탐/깜빡임 억제)
+            if (!r.MeetsThreshold)
+                return;
+
             string newCoarse = r.CoarseClass;
 
             if (newCoarse == _confirmedCoarse)
