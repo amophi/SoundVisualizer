@@ -1,7 +1,7 @@
 <Window x:Class="SoundVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WaveSight 7.1" Height="1080" Width="1920"
+        Title="SoundVisualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
         Topmost="True" WindowState="Maximized" ShowInTaskbar="False">
     
@@ -19,7 +19,7 @@
         <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
                 Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False">
             <TextBlock x:Name="AILabelText" Foreground="White" FontSize="26" 
-                       FontWeight="Bold" Text="WaveSight 7.1 대기 중..."/>
+                       FontWeight="Bold" Text="SoundVisualizer 대기 중..."/>
         </Border>
 
         <!-- FPS 카운터 (디버그용, 우상단) -->

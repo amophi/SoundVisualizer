@@ -16,23 +16,6 @@ namespace SoundVisualizer
 {
     public partial class MainWindow : Window
     {
-        // 1. 파도의 크기 (최대 진폭 스케일)
-        public double WaveIntensity = 100.0;
-        // 2. 파도 위치 변화 속도 (화면상 파도의 위치 변화 속도)
-        public double WavePositionSpeed = 10.0;
-        // 3. 파도의 민감성/떨림 (소리 크기가 변할 때 얼마나 즉각적으로 출렁이는지)
-        public double WaveSensitivity = 10.0;
-
-        // 4. 시각화 모드 (0 = Wave 모드, 1 = Window 모드)
-        public int VisualMode = 0;
-
-        // 5. 스테레오 확장 모드 (2채널 소스를 좌/우 전용으로 표시할지 여부)
-        public bool IsStereoUpmixMode = false;
-        
-        // 6. 단축키 설정 (여기서 코드를 수정해 원하는 키로 바꿀 수 있습니다)
-        public int StereoUpmixHotkey = 0x71; // F2
-        public int VisualModeHotkey = 0x72;  // F3
-        
         private bool _wasStereoHotkeyPressed = false;
         private bool _wasVisualHotkeyPressed = false;
 
@@ -46,7 +29,7 @@ namespace SoundVisualizer
         private double _distFL = 0.125, _distFR = 0.125, _distFC = 0.125, _distBL = 0.125, _distBR = 0.125, _distSL = 0.125, _distSR = 0.125, _distLFE = 0.125;
         private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
-        private string _currentLabel = "WaveSight 7.1 대기 중...";
+        private string _currentLabel = "SoundVisualizer 대기 중...";
         private double _animationTime = 0;
         
         // 시각화 모듈 (Strategy Pattern)
@@ -157,25 +140,25 @@ namespace SoundVisualizer
         private void RenderFrame()
         {
             // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
-            bool isVisualHotkeyPressed = (GetAsyncKeyState(VisualModeHotkey) & 0x8000) != 0;
+            bool isVisualHotkeyPressed = (GetAsyncKeyState(AppSettings.VisualModeHotkey) & 0x8000) != 0;
             if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
             {
-                VisualMode = (VisualMode + 1) % _visualizers.Length;
-                VisualModeText.Text = VisualMode == 0 
+                AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
+                VisualModeText.Text = AppSettings.VisualMode == 0 
                     ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
                     : "🎨 시각화 모드: [F3] 패드 모드 (Pad)";
             }
             _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
             // F2 키: 스테레오 확장 모드 실시간 전환
-            bool isStereoHotkeyPressed = (GetAsyncKeyState(StereoUpmixHotkey) & 0x8000) != 0;
+            bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
             if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
             {
-                IsStereoUpmixMode = !IsStereoUpmixMode;
-                StereoModeText.Text = IsStereoUpmixMode 
+                AppSettings.IsStereoUpmixMode = !AppSettings.IsStereoUpmixMode;
+                StereoModeText.Text = AppSettings.IsStereoUpmixMode 
                     ? "🎧 채널 모드: [F2] 스테레오 전용 [L / R]" 
                     : "🔊 채널 모드: [F2] 7.1 서라운드";
-                StereoModeText.Foreground = IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
+                StereoModeText.Foreground = AppSettings.IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
 
@@ -194,12 +177,12 @@ namespace SoundVisualizer
             float totalTarget = _targetFL + _targetFR + _targetFC + _targetBL + _targetBR + _targetSL + _targetSR + _targetLFE;
 
             // 민감성(떨림): 전체 사운드 볼륨 크기를 따라가는 스무딩 팩터 (즉각적인 떨림)
-            float sfTremor = (float)(Math.Max(0.1, WaveSensitivity) / 100.0);
+            float sfTremor = (float)(Math.Max(0.1, AppSettings.WaveSensitivity) / 100.0);
             if (sfTremor > 1.0f) sfTremor = 1.0f;
             _smoothTotal += (totalTarget - _smoothTotal) * sfTremor;
 
             // 위치 변화 속도: 소리가 어디서 나는지 분포 채널 비율을 쫓아가는 팩터 (좌우 이동)
-            float sfPosition = (float)(Math.Max(0.1, WavePositionSpeed) / 100.0);
+            float sfPosition = (float)(Math.Max(0.1, AppSettings.WavePositionSpeed) / 100.0);
             if (sfPosition > 1.0f) sfPosition = 1.0f;
 
             if (totalTarget > 0.0001f)
@@ -232,11 +215,11 @@ namespace SoundVisualizer
             double h = this.ActualHeight;
             if (w == 0 || h == 0) return;
 
-            // VisualizerContext 설정
-            double baseDepth = 450.0 * (Math.Max(0.0, WaveIntensity) / 100.0);
+            // VisualizerContext 설정 (Intensity 100일때 기존 300효과를 주기 위해 * 3.0)
+            double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 3.0) / 100.0);
             double[] channelDepths;
             
-            if (IsStereoUpmixMode)
+            if (AppSettings.IsStereoUpmixMode)
             {
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
                 channelDepths = new double[]
@@ -266,11 +249,12 @@ namespace SoundVisualizer
             };
 
             // 선택된 렌더러(Wave 또는 Pad)에게 그리기 위임
-            int modeIndex = (VisualMode >= 0 && VisualMode < _visualizers.Length) ? VisualMode : 0;
+            int modeIndex = (AppSettings.VisualMode >= 0 && AppSettings.VisualMode < _visualizers.Length) ? AppSettings.VisualMode : 0;
             var currentVisualizer = _visualizers[modeIndex];
 
             UnifiedWave.Data = currentVisualizer.GenerateGeometry(context);
             UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+            UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
 
             _targetFL *= 0.87f;
             _targetFR *= 0.87f;
@@ -296,7 +280,7 @@ namespace SoundVisualizer
                 
                 // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
                 // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
-                if (IsStereoUpmixMode)
+                if (AppSettings.IsStereoUpmixMode)
                 {
                     sl = fl; bl = fl;
                     sr = fr; br = fr;
