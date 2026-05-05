@@ -14,6 +14,9 @@ namespace SoundVisualizer.AIModel
     public class SoundClassifier : IDisposable
     {
         private InferenceSession _session;
+        private InferenceSession? _coarseHeadSession;
+        private string? _coarseHeadInputName;
+        private string? _coarseHeadOutputName;
         private string[] _classNames; // YAMNet의 521개 소리 이름 목록
 
         // YAMNet: 16kHz mono → log-mel, 일반적으로 time × mel = 96 × 64
@@ -75,6 +78,7 @@ namespace SoundVisualizer.AIModel
                 string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
                 _session = new InferenceSession(modelPath);
                 LoadClassNames(); // 실제로는 csv 파일에서 "총소리", "폭발음" 목록을 불러옴
+                TryLoadDistilledCoarseHead();
 
                 // 입력명 확인(디버깅용). metadata.yaml이 말하는 input name이 실제로도 같은지 체크합니다.
                 foreach (var kv in _session.InputMetadata)
@@ -269,10 +273,86 @@ namespace SoundVisualizer.AIModel
             PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
 
             string coarse = VoteCoarseFromTopK(probs, 3);
-            bool ok = conf >= confidenceThreshold;
+            float coarseConf = conf;
+            if (TryPredictCoarseFromDistilledHead(probs, out string headCoarse, out float headConf))
+            {
+                coarse = headCoarse;
+                coarseConf = headConf;
+            }
+
+            bool ok = coarseConf >= confidenceThreshold;
             string? topK = FormatTopKSoftmaxLabels(probs, 3);
 
-            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs, topK);
+            return new InferenceResult(maxIndex, display, coarseConf, coarse, ok, inferMs, topK);
+        }
+
+        private void TryLoadDistilledCoarseHead()
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "three_class_score_head.onnx");
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"[3ClassHead] 파일 없음, 기존 규칙 경로 사용: {path}");
+                    return;
+                }
+
+                _coarseHeadSession = new InferenceSession(path);
+                _coarseHeadInputName = _coarseHeadSession.InputMetadata.Keys.FirstOrDefault();
+                _coarseHeadOutputName = _coarseHeadSession.OutputMetadata.Keys.FirstOrDefault();
+                Console.WriteLine($"[3ClassHead] 로드 완료: {path}");
+            }
+            catch (Exception ex)
+            {
+                _coarseHeadSession = null;
+                _coarseHeadInputName = null;
+                _coarseHeadOutputName = null;
+                Console.WriteLine($"[3ClassHead] 로드 실패, 기존 규칙 경로 사용: {ex.Message}");
+            }
+        }
+
+        private bool TryPredictCoarseFromDistilledHead(float[] yamnetProbs, out string coarse, out float confidence)
+        {
+            coarse = "ambient";
+            confidence = 0f;
+            if (_coarseHeadSession == null || string.IsNullOrEmpty(_coarseHeadInputName))
+                return false;
+            if (yamnetProbs.Length < 521)
+                return false;
+
+            try
+            {
+                var input = new DenseTensor<float>(new[] { 1, 521 });
+                for (int i = 0; i < 521; i++)
+                    input[0, i] = yamnetProbs[i];
+
+                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_coarseHeadInputName, input) };
+                using var results = _coarseHeadSession.Run(inputs);
+                var outTensor = string.IsNullOrEmpty(_coarseHeadOutputName)
+                    ? results.First().AsEnumerable<float>().ToArray()
+                    : results.First(r => r.Name == _coarseHeadOutputName).AsEnumerable<float>().ToArray();
+                if (outTensor.Length < 3)
+                    return false;
+
+                int maxIdx = 0;
+                float maxVal = outTensor[0];
+                for (int i = 1; i < 3; i++)
+                {
+                    if (outTensor[i] > maxVal)
+                    {
+                        maxVal = outTensor[i];
+                        maxIdx = i;
+                    }
+                }
+
+                coarse = maxIdx == 0 ? "danger" : maxIdx == 1 ? "speech" : "ambient";
+                confidence = maxVal;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -727,6 +807,7 @@ namespace SoundVisualizer.AIModel
             lock (_captureRingLock)
                 _monoAtCaptureRateRing.Clear();
             _session?.Dispose();
+            _coarseHeadSession?.Dispose();
         }
     }
 }

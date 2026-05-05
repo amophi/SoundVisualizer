@@ -21,6 +21,9 @@
     <None Update="AIModel\yamnet.onnx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="AIModel\three_class_score_head.onnx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="AIModel\yamnet.data">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
