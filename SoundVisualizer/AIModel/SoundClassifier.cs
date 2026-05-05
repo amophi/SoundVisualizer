@@ -274,11 +274,13 @@ namespace SoundVisualizer.AIModel
 
             string coarse = VoteCoarseFromTopK(probs, 3);
             float coarseConf = conf;
-            if (TryPredictCoarseFromDistilledHead(logits, out string headCoarse, out float headConf))
+            if (TryPredictCoarseFromDistilledHead(probs, out string headCoarse, out float headConf))
             {
-                // 헤드가 애매하면(저신뢰) 기존 규칙 기반 coarse를 유지해 회귀를 줄입니다.
-                const float HeadAdoptThreshold = 0.45f;
-                if (headConf >= HeadAdoptThreshold)
+                // 헤드가 비정상적으로 포화(1.0 근처 고정)되면 기존 규칙 기반으로 폴백
+                // 정상 범위에서만 헤드 결과를 채택하여 붕괴 리스크를 줄입니다.
+                const float HeadAdoptMin = 0.35f;
+                const float HeadAdoptMax = 0.99f;
+                if (headConf >= HeadAdoptMin && headConf <= HeadAdoptMax)
                 {
                     coarse = headCoarse;
                     coarseConf = headConf;
@@ -316,20 +318,20 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        private bool TryPredictCoarseFromDistilledHead(float[] yamnetScores, out string coarse, out float confidence)
+        private bool TryPredictCoarseFromDistilledHead(float[] yamnetProbs, out string coarse, out float confidence)
         {
             coarse = "ambient";
             confidence = 0f;
             if (_coarseHeadSession == null || string.IsNullOrEmpty(_coarseHeadInputName))
                 return false;
-            if (yamnetScores.Length < 521)
+            if (yamnetProbs.Length < 521)
                 return false;
 
             try
             {
                 var input = new DenseTensor<float>(new[] { 1, 521 });
                 for (int i = 0; i < 521; i++)
-                    input[0, i] = yamnetScores[i];
+                    input[0, i] = yamnetProbs[i];
 
                 var inputs = new[] { NamedOnnxValue.CreateFromTensor(_coarseHeadInputName, input) };
                 using var results = _coarseHeadSession.Run(inputs);
