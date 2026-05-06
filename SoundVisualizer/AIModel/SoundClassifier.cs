@@ -276,11 +276,28 @@ namespace SoundVisualizer.AIModel
             float coarseConf = conf;
             if (TryPredictCoarseFromDistilledHead(probs, out string headCoarse, out float headConf))
             {
-                // 헤드가 비정상적으로 포화(1.0 근처 고정)되면 기존 규칙 기반으로 폴백
-                // 정상 범위에서만 헤드 결과를 채택하여 붕괴 리스크를 줄입니다.
-                const float HeadAdoptMin = 0.35f;
-                const float HeadAdoptMax = 0.99f;
-                if (headConf >= HeadAdoptMin && headConf <= HeadAdoptMax)
+                // 헤드는 보조 신호로만 사용: 특히 danger는 강한 증거가 있을 때만 채택해 과민 반응을 줄입니다.
+                bool adopt = false;
+                if (headCoarse == coarse)
+                {
+                    adopt = headConf >= 0.35f && headConf <= 0.99f;
+                }
+                else if (headCoarse == "speech")
+                {
+                    adopt = headConf >= 0.55f;
+                }
+                else if (headCoarse == "ambient")
+                {
+                    // 위험 경보를 ambient로 뒤집는 경우는 더 보수적으로
+                    adopt = coarse == "danger" && headConf >= 0.60f;
+                }
+                else if (headCoarse == "danger")
+                {
+                    float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
+                    adopt = headConf >= 0.75f && dangerEvidence >= 0.40f;
+                }
+
+                if (adopt)
                 {
                     coarse = headCoarse;
                     coarseConf = headConf;
@@ -386,6 +403,22 @@ namespace SoundVisualizer.AIModel
             if (dangerSum >= speechSum && dangerSum >= ambientSum) return "danger";
             if (speechSum >= ambientSum) return "speech";
             return "ambient";
+        }
+
+        private float SumCoarseProbabilityFromTopK(float[] probs, int k, string targetCoarse)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return 0f;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            float sum = 0f;
+            foreach (int i in topIndices)
+            {
+                if (YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]) == targetCoarse)
+                    sum += probs[i];
+            }
+            return sum;
         }
 
         private string FormatTopKSoftmaxLabels(float[] probs, int k)
