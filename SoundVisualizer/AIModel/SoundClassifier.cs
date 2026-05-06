@@ -294,7 +294,22 @@ namespace SoundVisualizer.AIModel
                 else if (headCoarse == "danger")
                 {
                     float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
-                    adopt = headConf >= 0.75f && dangerEvidence >= 0.40f;
+                    bool hasStrongCue = HasStrongDangerCueInTopK(probs, 5);
+                    if (coarse == "danger")
+                    {
+                        // 기존 규칙도 danger라면 약간 완화해 위험 소리 미검출을 줄입니다.
+                        adopt = headConf >= 0.60f && dangerEvidence >= 0.25f;
+                    }
+                    else if (hasStrongCue)
+                    {
+                        // 총/폭발/사이렌/알람 단서가 상위에 보일 때만 완화 적용
+                        adopt = headConf >= 0.56f && dangerEvidence >= 0.20f;
+                    }
+                    else
+                    {
+                        // 평소에는 기존보다 조금만 완화
+                        adopt = headConf >= 0.70f && dangerEvidence >= 0.30f;
+                    }
                 }
 
                 if (adopt)
@@ -419,6 +434,28 @@ namespace SoundVisualizer.AIModel
                     sum += probs[i];
             }
             return sum;
+        }
+
+        private bool HasStrongDangerCueInTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return false;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
+                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker") ||
+                    name.Contains("siren") || name.Contains("alarm"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private string FormatTopKSoftmaxLabels(float[] probs, int k)
