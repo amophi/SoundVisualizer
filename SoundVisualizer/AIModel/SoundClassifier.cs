@@ -276,22 +276,11 @@ namespace SoundVisualizer.AIModel
             float coarseConf = conf;
             if (TryPredictCoarseFromDistilledHead(probs, out string headCoarse, out float headConf))
             {
-                // 헤드는 보조 신호로만 사용: 특히 danger는 강한 증거가 있을 때만 채택해 과민 반응을 줄입니다.
+                // 정책:
+                // - danger는 헤드를 적극 반영(조건부)
+                // - speech/ambient는 기본 규칙 경로를 우선하고, 헤드는 참고 신호로만 둡니다.
                 bool adopt = false;
-                if (headCoarse == coarse)
-                {
-                    adopt = headConf >= 0.35f && headConf <= 0.99f;
-                }
-                else if (headCoarse == "speech")
-                {
-                    adopt = headConf >= 0.55f;
-                }
-                else if (headCoarse == "ambient")
-                {
-                    // 위험 경보를 ambient로 뒤집는 경우는 더 보수적으로
-                    adopt = coarse == "danger" && headConf >= 0.60f;
-                }
-                else if (headCoarse == "danger")
+                if (headCoarse == "danger")
                 {
                     float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
                     bool hasStrongCue = HasStrongDangerCueInTopK(probs, 5);
