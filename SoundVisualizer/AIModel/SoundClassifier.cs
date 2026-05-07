@@ -284,10 +284,16 @@ namespace SoundVisualizer.AIModel
                 {
                     float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
                     bool hasStrongCue = HasStrongDangerCueInTopK(probs, 5);
+                    bool hasCriticalCue = HasCriticalDangerCueInTopK(probs, 5);
                     if (coarse == "danger")
                     {
                         // 기존 규칙도 danger라면 약간 완화해 위험 소리 미검출을 줄입니다.
                         adopt = headConf >= 0.60f && dangerEvidence >= 0.25f;
+                    }
+                    else if (hasCriticalCue)
+                    {
+                        // 총성/폭발 단서가 상위에 보이면 danger 미검출을 줄이기 위해 더 적극 채택
+                        adopt = headConf >= 0.45f && dangerEvidence >= 0.12f;
                     }
                     else if (hasStrongCue)
                     {
@@ -308,7 +314,19 @@ namespace SoundVisualizer.AIModel
                 }
             }
 
-            bool ok = coarseConf >= confidenceThreshold;
+            // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
+            // speech는 top-1이 명확한 speech일 때만 소폭 완화합니다.
+            float effectiveThreshold = confidenceThreshold;
+            if (coarse == "danger" && (HasStrongDangerCueInTopK(probs, 5) || HasCriticalDangerCueInTopK(probs, 5)))
+            {
+                effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
+            }
+            else if (coarse == "speech" && YamnetThreeClassMapper.MapDisplayNameToCoarse(display) == "speech")
+            {
+                effectiveThreshold = MathF.Min(effectiveThreshold, 0.22f);
+            }
+
+            bool ok = coarseConf >= effectiveThreshold;
             string? topK = FormatTopKSoftmaxLabels(probs, 3);
 
             return new InferenceResult(maxIndex, display, coarseConf, coarse, ok, inferMs, topK);
@@ -439,6 +457,27 @@ namespace SoundVisualizer.AIModel
                     name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
                     name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker") ||
                     name.Contains("siren") || name.Contains("alarm"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasCriticalDangerCueInTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return false;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
+                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker"))
                 {
                     return true;
                 }
