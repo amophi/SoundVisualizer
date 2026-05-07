@@ -274,56 +274,46 @@ namespace SoundVisualizer.AIModel
 
             string coarse = VoteCoarseFromTopK(probs, 3);
             float coarseConf = conf;
-            if (TryPredictCoarseFromDistilledHead(probs, out string headCoarse, out float headConf))
+            float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
+            bool hasStrongDangerCue = HasStrongDangerCueInTopK(probs, 5);
+            bool hasCriticalDangerCue = HasCriticalDangerCueInTopK(probs, 5);
+            if (TryPredictDangerScoreFromDistilledHead(probs, out float headDangerScore))
             {
                 // 정책:
-                // - danger는 헤드를 적극 반영(조건부)
-                // - speech/ambient는 기본 규칙 경로를 우선하고, 헤드는 참고 신호로만 둡니다.
+                // - speech/ambient는 기본 YAMNet 규칙 경로를 그대로 유지
+                // - danger만 별도 헤드 점수로 override
                 bool adopt = false;
-                if (headCoarse == "danger")
+                if (coarse == "danger")
                 {
-                    float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
-                    bool hasStrongCue = HasStrongDangerCueInTopK(probs, 5);
-                    bool hasCriticalCue = HasCriticalDangerCueInTopK(probs, 5);
-                    if (coarse == "danger")
-                    {
-                        // 기존 규칙도 danger라면 약간 완화해 위험 소리 미검출을 줄입니다.
-                        adopt = headConf >= 0.60f && dangerEvidence >= 0.25f;
-                    }
-                    else if (hasCriticalCue)
-                    {
-                        // 총성/폭발 단서가 상위에 보이면 danger 미검출을 줄이기 위해 더 적극 채택
-                        adopt = headConf >= 0.45f && dangerEvidence >= 0.12f;
-                    }
-                    else if (hasStrongCue)
-                    {
-                        // 총/폭발/사이렌/알람 단서가 상위에 보일 때만 완화 적용
-                        adopt = headConf >= 0.56f && dangerEvidence >= 0.20f;
-                    }
-                    else
-                    {
-                        // 평소에는 기존보다 조금만 완화
-                        adopt = headConf >= 0.70f && dangerEvidence >= 0.30f;
-                    }
+                    // 기본 규칙도 danger인 경우는 헤드가 명확히 낮지 않으면 유지
+                    adopt = headDangerScore >= 0.40f && dangerEvidence >= 0.20f;
+                }
+                else if (hasCriticalDangerCue)
+                {
+                    adopt = headDangerScore >= 0.35f && dangerEvidence >= 0.10f;
+                }
+                else if (hasStrongDangerCue)
+                {
+                    adopt = headDangerScore >= 0.48f && dangerEvidence >= 0.18f;
+                }
+                else
+                {
+                    adopt = headDangerScore >= 0.75f && dangerEvidence >= 0.30f;
                 }
 
                 if (adopt)
                 {
-                    coarse = headCoarse;
-                    coarseConf = headConf;
+                    coarse = "danger";
+                    coarseConf = MathF.Max(coarseConf, headDangerScore);
                 }
             }
 
             // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
-            // speech는 top-1이 명확한 speech일 때만 소폭 완화합니다.
+            // speech/ambient는 기본 임계를 그대로 유지합니다.
             float effectiveThreshold = confidenceThreshold;
-            if (coarse == "danger" && (HasStrongDangerCueInTopK(probs, 5) || HasCriticalDangerCueInTopK(probs, 5)))
+            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue))
             {
                 effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
-            }
-            else if (coarse == "speech" && YamnetThreeClassMapper.MapDisplayNameToCoarse(display) == "speech")
-            {
-                effectiveThreshold = MathF.Min(effectiveThreshold, 0.22f);
             }
 
             bool ok = coarseConf >= effectiveThreshold;
@@ -357,10 +347,9 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        private bool TryPredictCoarseFromDistilledHead(float[] yamnetProbs, out string coarse, out float confidence)
+        private bool TryPredictDangerScoreFromDistilledHead(float[] yamnetProbs, out float dangerScore)
         {
-            coarse = "ambient";
-            confidence = 0f;
+            dangerScore = 0f;
             if (_coarseHeadSession == null || string.IsNullOrEmpty(_coarseHeadInputName))
                 return false;
             if (yamnetProbs.Length < 521)
@@ -379,20 +368,7 @@ namespace SoundVisualizer.AIModel
                     : results.First(r => r.Name == _coarseHeadOutputName).AsEnumerable<float>().ToArray();
                 if (outTensor.Length < 3)
                     return false;
-
-                int maxIdx = 0;
-                float maxVal = outTensor[0];
-                for (int i = 1; i < 3; i++)
-                {
-                    if (outTensor[i] > maxVal)
-                    {
-                        maxVal = outTensor[i];
-                        maxIdx = i;
-                    }
-                }
-
-                coarse = maxIdx == 0 ? "danger" : maxIdx == 1 ? "speech" : "ambient";
-                confidence = maxVal;
+                dangerScore = outTensor[0];
                 return true;
             }
             catch
