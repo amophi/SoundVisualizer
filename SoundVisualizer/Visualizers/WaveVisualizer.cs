@@ -59,7 +59,7 @@ namespace SoundVisualizer.Visualizers
             // 모서리 바로 근처는 점을 아예 찍지 않는 범위
             double cornerSkipRadius = Math.Min(w, h) * 0.025;
             double cornerSparseRadius = Math.Min(w, h) * 0.5;
-            double cornerStepMultiplier = 5.0;
+            double cornerStepMultiplier = 50.0;
 
             // 고정 배열이 아니라, skip 가능한 List로 변경
             var inner = new List<Point>(WAVE_SAMPLE_COUNT);
