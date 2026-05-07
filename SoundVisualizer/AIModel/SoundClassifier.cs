@@ -48,7 +48,9 @@ namespace SoundVisualizer.AIModel
 #endif
 
         // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
-        private const int CoarseHysteresisThreshold = 6;
+        private const int CoarseHysteresisThreshold = 3;
+        private const int DangerHysteresisThreshold = 1;
+        private const float DangerImmediateSwitchConfidence = 0.28f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -164,6 +166,18 @@ namespace SoundVisualizer.AIModel
                 return;
             }
 
+            // 총성/폭발처럼 짧은 transient는 즉시 반영해 미검출을 줄입니다.
+            if (newCoarse == "danger" &&
+                (r.Confidence >= DangerImmediateSwitchConfidence || IsCriticalDangerEvent(in r)))
+            {
+                _confirmedCoarse = newCoarse;
+                _confirmedDisplay = r.YamnetDisplayName;
+                _confirmedConfidence = r.Confidence;
+                _candidateStreak = 0;
+                _candidateCoarse = "";
+                return;
+            }
+
             if (newCoarse == _candidateCoarse)
             {
                 _candidateStreak++;
@@ -174,7 +188,8 @@ namespace SoundVisualizer.AIModel
                 _candidateStreak = 1;
             }
 
-            if (_candidateStreak >= CoarseHysteresisThreshold)
+            int requiredStreak = newCoarse == "danger" ? DangerHysteresisThreshold : CoarseHysteresisThreshold;
+            if (_candidateStreak >= requiredStreak)
             {
                 _confirmedCoarse = newCoarse;
                 _confirmedDisplay = r.YamnetDisplayName;
@@ -583,6 +598,22 @@ namespace SoundVisualizer.AIModel
             }
 
             return false;
+        }
+
+        private static bool IsCriticalDangerEvent(in InferenceResult r)
+        {
+            string display = r.YamnetDisplayName?.ToLowerInvariant() ?? "";
+            string top = r.TopKSummary?.ToLowerInvariant() ?? "";
+            return ContainsCriticalDangerKeyword(display) || ContainsCriticalDangerKeyword(top);
+        }
+
+        private static bool ContainsCriticalDangerKeyword(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return false;
+            return s.Contains("gunshot") || s.Contains("gunfire") || s.Contains("machine gun") ||
+                   s.Contains("artillery") || s.Contains("fusillade") || s.Contains("cap gun") ||
+                   s.Contains("explosion") || s.Contains("fireworks") || s.Contains("firecracker");
         }
 
         private string FormatTopKSoftmaxLabels(float[] probs, int k)
