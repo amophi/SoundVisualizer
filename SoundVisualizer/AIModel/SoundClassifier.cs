@@ -48,7 +48,7 @@ namespace SoundVisualizer.AIModel
 #endif
 
         // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
-        private const int CoarseHysteresisThreshold = 3;
+        private const int CoarseHysteresisThreshold = 5;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
         private string _confirmedCoarse = "ambient";
@@ -357,6 +357,11 @@ namespace SoundVisualizer.AIModel
             if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue))
             {
                 effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
+            }
+            else if (coarse == "speech")
+            {
+                // speech 오탐을 줄이기 위해 최소 임계를 상향합니다.
+                effectiveThreshold = MathF.Max(effectiveThreshold, 0.30f);
             }
 
             bool ok = coarseConf >= effectiveThreshold;
