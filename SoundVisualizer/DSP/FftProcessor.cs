@@ -12,7 +12,7 @@ namespace SoundVisualizer.DSP
         // FFT 크기: 2의 거듭제곱이어야 함 (1024 = 약 23ms @44100Hz, 약 21ms @48000Hz)
         private readonly int _fftSize;
         private readonly int _fftExponent; // log2(_fftSize)
-
+        
         public int FftSize => _fftSize;
 
         public FftProcessor(int fftSize = 1024)

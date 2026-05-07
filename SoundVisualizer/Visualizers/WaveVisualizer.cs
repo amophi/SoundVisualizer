@@ -45,38 +45,86 @@ namespace SoundVisualizer.Visualizers
             double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, channelPos);
             double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, channelPos);
 
-            int N = WAVE_SAMPLE_COUNT;
-            var inner = new Point[N];
+            double activeCornerThreshold = 8.0;
 
-            for (int i = 0; i < N; i++)
+            var activeCorners = new List<double>();
+
+            if (d_tr > activeCornerThreshold) activeCorners.Add(dist_tr); // 우상단
+            if (d_br > activeCornerThreshold) activeCorners.Add(dist_br); // 우하단
+            if (d_bl > activeCornerThreshold) activeCorners.Add(dist_bl); // 좌하단
+            if (d_tl > activeCornerThreshold) activeCorners.Add(dist_tl); // 좌상단
+
+            double baseStep = P / WAVE_SAMPLE_COUNT;
+
+            // 모서리 바로 근처는 점을 아예 찍지 않는 범위
+            double cornerSkipRadius = Math.Min(w, h) * 0.025;
+            double cornerSparseRadius = Math.Min(w, h) * 0.5;
+            double cornerStepMultiplier = 5.0;
+
+            // 고정 배열이 아니라, skip 가능한 List로 변경
+            var inner = new List<Point>(WAVE_SAMPLE_COUNT);
+
+            for (double dist = 0; dist < P; )
             {
-                double dist = (P * i) / N; 
+                double distToCorner = activeCorners.Count > 0
+                                    ? GetMinDistanceToCorners(dist, P, activeCorners.ToArray())
+                                    : double.MaxValue;
+
+                // 모서리 정점에 너무 가까운 점은 아예 찍지 않음
+                if (distToCorner < cornerSkipRadius)
+                {
+                    dist += baseStep * cornerStepMultiplier;
+                    continue;
+                }
+
                 double t = dist / P;
-                
+
                 Point edgePos = GetEdgePosition(dist, w, h, P);
                 double d = GetWaveDepth(t, time, channelDepths, channelPos);
-                
-                if (dist <= dist_tr || dist > dist_tl) 
+
+                Point p;
+
+                if (dist <= dist_tr || dist > dist_tl)
                 {
+                    // 상단 직선 구간
                     double x = Math.Max(d_tl, Math.Min(w - d_tr, edgePos.X));
-                    inner[i] = new Point(x, d);
+                    p = new Point(x, d);
                 }
-                else if (dist <= dist_br) 
+                else if (dist <= dist_br)
                 {
+                    // 우측 직선 구간
                     double y = Math.Max(d_tr, Math.Min(h - d_br, edgePos.Y));
-                    inner[i] = new Point(w - d, y);
+                    p = new Point(w - d, y);
                 }
-                else if (dist <= dist_bl) 
+                else if (dist <= dist_bl)
                 {
+                    // 하단 직선 구간
                     double x = Math.Max(d_bl, Math.Min(w - d_br, edgePos.X));
-                    inner[i] = new Point(x, h - d);
+                    p = new Point(x, h - d);
                 }
-                else 
+                else
                 {
+                    // 좌측 직선 구간
                     double y = Math.Max(d_tl, Math.Min(h - d_bl, edgePos.Y));
-                    inner[i] = new Point(d, y);
+                    p = new Point(d, y);
+                }
+
+                inner.Add(p);
+
+                // 모서리 근처는 점 간격을 넓게,
+                // 상단/하단/좌측/우측 중앙부는 점 간격을 촘촘하게 유지
+                if (distToCorner < cornerSparseRadius)
+                {
+                    dist += baseStep * cornerStepMultiplier;
+                }
+                else
+                {
+                    dist += baseStep;
                 }
             }
+
+            if (inner.Count < 4)
+                return Geometry.Empty;
 
             var geometry = new StreamGeometry();
             geometry.FillRule = FillRule.EvenOdd;
@@ -90,16 +138,26 @@ namespace SoundVisualizer.Visualizers
 
                 ctx.BeginFigure(inner[0], true, true);
 
-                var bezierPts = new List<Point>(N * 3);
-                for (int i = 0; i < N; i++)
-                {
-                    Point p0 = inner[(i - 1 + N) % N];
-                    Point p1 = inner[i];
-                    Point p2 = inner[(i + 1) % N];
-                    Point p3 = inner[(i + 2) % N];
+                int M = inner.Count;
 
-                    Point cp1 = new Point(p1.X + (p2.X - p0.X) / 6.0, p1.Y + (p2.Y - p0.Y) / 6.0);
-                    Point cp2 = new Point(p2.X - (p3.X - p1.X) / 6.0, p2.Y - (p3.Y - p1.Y) / 6.0);
+                var bezierPts = new List<Point>(M * 3);
+
+                for (int i = 0; i < M; i++)
+                {
+                    Point p0 = inner[(i - 1 + M) % M];
+                    Point p1 = inner[i];
+                    Point p2 = inner[(i + 1) % M];
+                    Point p3 = inner[(i + 2) % M];
+
+                    Point cp1 = new Point(
+                        p1.X + (p2.X - p0.X) / 8.0,
+                        p1.Y + (p2.Y - p0.Y) / 8.0
+                    );
+
+                    Point cp2 = new Point(
+                        p2.X - (p3.X - p1.X) / 8.0,
+                        p2.Y - (p3.Y - p1.Y) / 8.0
+                    );
 
                     bezierPts.Add(cp1);
                     bezierPts.Add(cp2);
@@ -111,6 +169,26 @@ namespace SoundVisualizer.Visualizers
 
             geometry.Freeze();
             return geometry;
+        }
+
+        private double GetMinDistanceToCorners(double dist, double P, params double[] corners)
+        {
+            double min = double.MaxValue;
+
+            foreach (double corner in corners)
+            {
+                double d = GetCircularDistance(dist, corner, P);
+                if (d < min)
+                    min = d;
+            }
+
+            return min;
+        }
+
+        private double GetCircularDistance(double a, double b, double P)
+        {
+            double diff = Math.Abs(a - b);
+            return Math.Min(diff, P - diff);
         }
 
         private Point GetEdgePosition(double dist, double w, double h, double P)
