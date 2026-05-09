@@ -35,10 +35,7 @@ namespace SoundVisualizer
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[2];
         
-        // 색상
-        private readonly Color COLOR_CLASS1 = Colors.White;
-        private readonly Color COLOR_CLASS2 = Colors.Yellow;
-        private readonly Color COLOR_CLASS3 = Colors.Red;
+        public Action? OnSettingsChangedFromHotkey;
 
         private Thread? _renderThread;
         private volatile bool _renderRunning;
@@ -144,23 +141,29 @@ namespace SoundVisualizer
             if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
             {
                 AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
-                VisualModeText.Text = AppSettings.VisualMode == 0 
-                    ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
-                    : "🎨 시각화 모드: [F3] 패드 모드 (Pad)";
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
             }
             _wasVisualHotkeyPressed = isVisualHotkeyPressed;
+
+            VisualModeText.Text = AppSettings.VisualMode == 0 
+                ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
+                : "🎨 시각화 모드: [F3] 패드 모드 (Pad)";
 
             // F2 키: 스테레오 확장 모드 실시간 전환
             bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
             if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
             {
                 AppSettings.IsStereoUpmixMode = !AppSettings.IsStereoUpmixMode;
-                StereoModeText.Text = AppSettings.IsStereoUpmixMode 
-                    ? "🎧 채널 모드: [F2] 스테레오 전용 [L / R]" 
-                    : "🔊 채널 모드: [F2] 7.1 서라운드";
-                StereoModeText.Foreground = AppSettings.IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
+
+            StereoModeText.Text = AppSettings.IsStereoUpmixMode 
+                ? "🎧 채널 모드: [F2] 스테레오 전용 [L / R]" 
+                : "🔊 채널 모드: [F2] 7.1 서라운드";
+            StereoModeText.Foreground = AppSettings.IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
 
             _frameCount++;
             double fpsElapsed = _fpsStopwatch.Elapsed.TotalSeconds;
@@ -207,16 +210,28 @@ namespace SoundVisualizer
             _smoothSR = _smoothTotal * _distSR;
             _smoothLFE = _smoothTotal * _distLFE;
 
+            bool isVisible = IsLabelVisible(_currentLabel);
             var activeColor = GetColorForLabel(_currentLabel);
-            AILabelText.Text = _currentLabel;
-            AILabelText.Foreground = new SolidColorBrush(activeColor);
+
+            if (isVisible)
+            {
+                AILabelText.Text = _currentLabel;
+                AILabelText.Foreground = new SolidColorBrush(activeColor);
+                AILabelText.Visibility = Visibility.Visible;
+                UnifiedWave.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                AILabelText.Visibility = Visibility.Collapsed;
+                UnifiedWave.Visibility = Visibility.Collapsed;
+            }
 
             double w = this.ActualWidth;
             double h = this.ActualHeight;
             if (w == 0 || h == 0) return;
 
-            // VisualizerContext 설정 (Intensity 100일때 기존 300효과를 주기 위해 * 3.0)
-            double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 3.0) / 100.0);
+            // VisualizerContext 설정 (Intensity 100일때 기존 대비 2배 효과를 주기 위해 * 6.0)
+            double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 6.0) / 100.0);
             double[] channelDepths;
             
             if (AppSettings.IsStereoUpmixMode)
@@ -295,11 +310,30 @@ namespace SoundVisualizer
 
 
 
+        private Color ParseColor(string hex)
+        {
+            try
+            {
+                return (Color)ColorConverter.ConvertFromString(hex);
+            }
+            catch
+            {
+                return Colors.White;
+            }
+        }
+
         private Color GetColorForLabel(string label)
         {
-            if (label.Contains("danger")) return COLOR_CLASS3;
-            if (label.Contains("speech")) return COLOR_CLASS2;
-            return COLOR_CLASS1;
+            if (label.Contains("danger")) return ParseColor(AppSettings.ColorDanger);
+            if (label.Contains("speech")) return ParseColor(AppSettings.ColorSpeech);
+            return ParseColor(AppSettings.ColorAmbient);
+        }
+
+        private bool IsLabelVisible(string label)
+        {
+            if (label.Contains("danger")) return AppSettings.ShowDanger;
+            if (label.Contains("speech")) return AppSettings.ShowSpeech;
+            return AppSettings.ShowAmbient;
         }
 
         // ==========================================

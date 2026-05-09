@@ -31,10 +31,20 @@ namespace SoundVisualizer
                 CmbStereoHotkey.Items.Add(key);
             }
 
-            if (AppSettings.Language == "ENG")
+            if (AppSettings.Language == "English" || AppSettings.Language == "ENG")
                 CmbLanguage.SelectedIndex = 1;
+            else if (AppSettings.Language == "日本語")
+                CmbLanguage.SelectedIndex = 2;
+            else if (AppSettings.Language == "中文")
+                CmbLanguage.SelectedIndex = 3;
+            else if (AppSettings.Language == "Español")
+                CmbLanguage.SelectedIndex = 4;
+            else if (AppSettings.Language == "Français")
+                CmbLanguage.SelectedIndex = 5;
+            else if (AppSettings.Language == "Deutsch")
+                CmbLanguage.SelectedIndex = 6;
             else
-                CmbLanguage.SelectedIndex = 0;
+                CmbLanguage.SelectedIndex = 0; // KOR
 
             LoadSettingsToUI();
             _isInitializing = false;
@@ -43,21 +53,25 @@ namespace SoundVisualizer
         private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isInitializing) return;
-            if (CmbLanguage.SelectedIndex == 0)
-                SetLanguage("KOR");
-            else
-                SetLanguage("ENG");
+            if (CmbLanguage.SelectedItem is ComboBoxItem item)
+            {
+                SetLanguage(item.Content.ToString());
+            }
         }
 
         private void SetLanguage(string lang)
         {
+            if (lang == "한국어") lang = "KOR";
             AppSettings.Language = lang;
+
             if (lang == "KOR")
             {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "언어";
                 TabHome.Header = "홈";
                 TxtHomeTitle.Text = "SoundVisualizer";
-                TxtHomeDesc.Text = "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 음악 감상까지 새로운 경험을 시작하세요.";
-                if (_overlayWindow == null) BtnLaunch.Content = "시작하기";
+                TxtHomeDesc.Text = "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 영화 감상까지 새로운 경험을 시작하세요.";
+                if (BtnLaunch != null) BtnLaunch.Content = "실행";
+                if (BtnStop != null) BtnStop.Content = "실행 중단";
                 TabSettings.Header = "설정";
                 TxtScreenSettings.Text = "화면 설정";
                 TxtIntensityLabel.Text = "크기";
@@ -91,13 +105,24 @@ namespace SoundVisualizer
                 TxtHelp2Desc.Text = "오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 지정된 단축키(기본 F2, F3)를 누르면 실시간으로 형태와 모드가 즉시 전환됩니다.";
                 TxtHelp3Title.Text = "오버레이 종료 방법";
                 TxtHelp3Desc.Text = "실행된 그래픽은 마우스 클릭을 방해하지 않도록 뒤로 투과됩니다. 종료하시려면 윈도우 작업 표시줄의 아이콘을 우클릭하여 '창 닫기'를 누르시거나, 이 런처 창 상단의 ✕ 버튼을 클릭하시면 함께 종료됩니다.";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "AI 소리 분류 표시 설정";
+                    ChkShowAmbient.Content = "환경음 표시";
+                    ChkShowSpeech.Content = "말소리 표시";
+                    ChkShowDanger.Content = "강조음 표시";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
-            else
+            else if (lang == "English")
             {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Language";
                 TabHome.Header = "Home";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "Visualize the unseen sounds.\nStart a new experience from gaming to movies.";
-                if (_overlayWindow == null) BtnLaunch.Content = "Start";
+                if (BtnLaunch != null) BtnLaunch.Content = "Start";
+                if (BtnStop != null) BtnStop.Content = "Stop";
                 TabSettings.Header = "Settings";
                 TxtScreenSettings.Text = "Screen Settings";
                 TxtIntensityLabel.Text = "Intensity";
@@ -131,6 +156,296 @@ namespace SoundVisualizer
                 TxtHelp2Desc.Text = "Even while the overlay is on screen, you can press the designated hotkeys (Default F2, F3) in the background to switch shapes and modes in real-time.";
                 TxtHelp3Title.Text = "How to Close Overlay";
                 TxtHelp3Desc.Text = "The running graphics allow mouse clicks to pass through. To close it, right-click the icon on the Windows taskbar and select 'Close window', or click the ✕ button at the top of this launcher window.";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "AI Display Settings";
+                    ChkShowAmbient.Content = "Show Ambient Sounds";
+                    ChkShowSpeech.Content = "Show Speech Sounds";
+                    ChkShowDanger.Content = "Show Danger Sounds";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "日本語")
+            {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "言語";
+                TabHome.Header = "ホーム";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "見えない音を画面に描きます。\nゲームから映画鑑賞まで、新しい体験を始めましょう。";
+                if (BtnLaunch != null) BtnLaunch.Content = "開始";
+                if (BtnStop != null) BtnStop.Content = "停止";
+                TabSettings.Header = "設定";
+                TxtScreenSettings.Text = "画面設定";
+                TxtIntensityLabel.Text = "サイズ";
+                TxtIntensityDesc.Text = "画面を覆うグラフィックの全体的なサイズと長さを調整します。";
+                TxtSpeedLabel.Text = "速度";
+                TxtSpeedDesc.Text = "波が画面の端に向かって広がる速度を調整します。";
+                TxtSensitivityLabel.Text = "感度";
+                TxtSensitivityDesc.Text = "小さな音に対してグラフィックがどれだけ敏感に反応するかを決定します。";
+                TxtAdvSensitivityLabel.Text = "感度 (高度)";
+                TxtAdvSensitivityDesc.Text = "極限の応答性のために内部数値制限を解除します。";
+                TxtOpacityLabel.Text = "不透明度";
+                TxtOpacityDesc.Text = "グラフィックの透明度を調整して背景の透け具合を決定します。";
+                TxtModeSettings.Text = "モード設定";
+                TxtVisualModeLabel.Text = "表現モード";
+                TxtVisualModeDesc.Text = "画面に描画されるグラフィックの基本形状を選択します。";
+                CmbVisualModeWave.Content = "Wave (波)";
+                CmbVisualModePad.Content = "Pad (点)";
+                TxtStereoModeLabel.Text = "ステレオモード";
+                TxtStereoModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。";
+                ChkStereoUpmix.Content = "オン";
+                TxtHotkeySettings.Text = "ショートカットキー";
+                TxtVisualHotkeyLabel.Text = "表現モードの切り替え";
+                TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
+                TxtStereoHotkeyLabel.Text = "ステレオモードの切り替え";
+                TxtStereoHotkeyDesc.Text = "実行中にモードをリアルタイムで変更するショートカットです。";
+                BtnReset.Content = "デフォルトに戻す";
+                TabHelp.Header = "ヘルプ";
+                TxtHelp1Title.Text = "7.1 サラウンド環境";
+                TxtHelp1Desc.Text = "正常な方向性（レーダー）動作のためには、Windowsのサウンド設定で出力デバイスが「7.1 サラウンド」（8チャンネル）に構成されている必要があります。通常のステレオ（2チャンネル）環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「ステレオモード」機能をオンにしてください。";
+                TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
+                TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
+                TxtHelp3Title.Text = "オーバーレイの終了方法";
+                TxtHelp3Desc.Text = "実行されたグラフィックは、マウスクリックを妨げないように背後に透過されます。終了するには、Windowsタスクバーのアイコンを右クリックして「ウィンドウを閉じる」を押すか、このランチャーウィンドウ上部の ✕ ボタンをクリックすると一緒に終了します。";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "AI音声分類の表示設定";
+                    ChkShowAmbient.Content = "環境音の表示";
+                    ChkShowSpeech.Content = "音声の表示";
+                    ChkShowDanger.Content = "強調音の表示";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "中文")
+            {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "语言";
+                TabHome.Header = "主页";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "将看不见的声音描绘在屏幕上。\n从游戏到观影，开始全新的体验。";
+                if (BtnLaunch != null) BtnLaunch.Content = "开始";
+                if (BtnStop != null) BtnStop.Content = "停止";
+                TabSettings.Header = "设置";
+                TxtScreenSettings.Text = "画面设置";
+                TxtIntensityLabel.Text = "大小";
+                TxtIntensityDesc.Text = "调整覆盖屏幕的图形的整体大小和长度。";
+                TxtSpeedLabel.Text = "速度";
+                TxtSpeedDesc.Text = "调整波纹向屏幕边缘扩散的速度。";
+                TxtSensitivityLabel.Text = "灵敏度";
+                TxtSensitivityDesc.Text = "决定图形对微小声音的反应敏锐程度。";
+                TxtAdvSensitivityLabel.Text = "灵敏度 (高级)";
+                TxtAdvSensitivityDesc.Text = "为了达到极限响应，解除内部数值限制。";
+                TxtOpacityLabel.Text = "不透明度";
+                TxtOpacityDesc.Text = "调整图形的透明度以决定背景的可见程度。";
+                TxtModeSettings.Text = "模式设置";
+                TxtVisualModeLabel.Text = "表现模式";
+                TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的基本形状。";
+                CmbVisualModeWave.Content = "Wave (波浪)";
+                CmbVisualModePad.Content = "Pad (点)";
+                TxtStereoModeLabel.Text = "立体声模式";
+                TxtStereoModeDesc.Text = "基于双声道仅表现左右两侧的声音。";
+                ChkStereoUpmix.Content = "开启";
+                TxtHotkeySettings.Text = "快捷键";
+                TxtVisualHotkeyLabel.Text = "切换表现模式";
+                TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
+                TxtStereoHotkeyLabel.Text = "切换立体声模式";
+                TxtStereoHotkeyDesc.Text = "在运行中实时改变模式的快捷键。";
+                BtnReset.Content = "恢复默认值";
+                TabHelp.Header = "帮助";
+                TxtHelp1Title.Text = "7.1 环绕声环境";
+                TxtHelp1Desc.Text = "为了使方向性（雷达）正常工作，在Windows声音设置中，输出设备必须配置为“7.1 环绕声”（8声道）。在普通立体声（2声道）环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中开启“立体声模式”功能。";
+                TxtHelp2Title.Text = "实时快捷键控制";
+                TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
+                TxtHelp3Title.Text = "关闭悬浮窗的方法";
+                TxtHelp3Desc.Text = "运行的图形允许鼠标点击穿透。要关闭它，请右键单击Windows任务栏上的图标并按“关闭窗口”，或单击此启动器窗口顶部的 ✕ 按钮即可一并关闭。";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "AI声音分类显示设置";
+                    ChkShowAmbient.Content = "显示环境音";
+                    ChkShowSpeech.Content = "显示语音";
+                    ChkShowDanger.Content = "显示强调音";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "Español")
+            {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Idioma";
+                TabHome.Header = "Inicio";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "Visualiza los sonidos invisibles.\nComienza una nueva experiencia, desde los juegos hasta el cine.";
+                if (BtnLaunch != null) BtnLaunch.Content = "Iniciar";
+                if (BtnStop != null) BtnStop.Content = "Detener";
+                TabSettings.Header = "Ajustes";
+                TxtScreenSettings.Text = "Ajustes de pantalla";
+                TxtIntensityLabel.Text = "Tamaño";
+                TxtIntensityDesc.Text = "Ajusta el tamaño y longitud general de los gráficos en la pantalla.";
+                TxtSpeedLabel.Text = "Velocidad";
+                TxtSpeedDesc.Text = "Ajusta la velocidad a la que las ondas se propagan hacia el borde de la pantalla.";
+                TxtSensitivityLabel.Text = "Sensibilidad";
+                TxtSensitivityDesc.Text = "Determina la sensibilidad de los gráficos ante pequeños sonidos.";
+                TxtAdvSensitivityLabel.Text = "Sensibilidad (Avanzado)";
+                TxtAdvSensitivityDesc.Text = "Elimina los límites internos para una reactividad extrema.";
+                TxtOpacityLabel.Text = "Opacidad";
+                TxtOpacityDesc.Text = "Ajusta la transparencia de los gráficos para determinar la visibilidad del fondo.";
+                TxtModeSettings.Text = "Ajustes de modo";
+                TxtVisualModeLabel.Text = "Modo visual";
+                TxtVisualModeDesc.Text = "Selecciona la forma básica de los gráficos en pantalla.";
+                CmbVisualModeWave.Content = "Wave (Olas)";
+                CmbVisualModePad.Content = "Pad (Puntos)";
+                TxtStereoModeLabel.Text = "Modo Estéreo";
+                TxtStereoModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.";
+                ChkStereoUpmix.Content = "Activar";
+                TxtHotkeySettings.Text = "Atajos";
+                TxtVisualHotkeyLabel.Text = "Cambiar modo visual";
+                TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
+                TxtStereoHotkeyLabel.Text = "Cambiar modo estéreo";
+                TxtStereoHotkeyDesc.Text = "Atajo para cambiar de modo en tiempo real durante la ejecución.";
+                BtnReset.Content = "Restablecer por defecto";
+                TabHelp.Header = "Ayuda";
+                TxtHelp1Title.Text = "Entorno envolvente 7.1";
+                TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, activa la función 'Modo Estéreo' en los ajustes.";
+                TxtHelp2Title.Text = "Control de atajos en tiempo real";
+                TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
+                TxtHelp3Title.Text = "Cómo cerrar la superposición";
+                TxtHelp3Desc.Text = "Los gráficos en ejecución permiten que los clics del ratón pasen a través. Para cerrarlo, haz clic derecho en el icono de la barra de tareas de Windows y selecciona 'Cerrar ventana', o haz clic en el botón ✕ en la parte superior de esta ventana.";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "Configuración de pantalla AI";
+                    ChkShowAmbient.Content = "Mostrar sonido ambiental";
+                    ChkShowSpeech.Content = "Mostrar voz";
+                    ChkShowDanger.Content = "Mostrar sonido de peligro";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "Français")
+            {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Langue";
+                TabHome.Header = "Accueil";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "Visualisez les sons invisibles.\nCommencez une nouvelle expérience, des jeux aux films.";
+                if (BtnLaunch != null) BtnLaunch.Content = "Démarrer";
+                if (BtnStop != null) BtnStop.Content = "Arrêter";
+                TabSettings.Header = "Paramètres";
+                TxtScreenSettings.Text = "Paramètres d'écran";
+                TxtIntensityLabel.Text = "Taille";
+                TxtIntensityDesc.Text = "Ajuste la taille et la longueur globales des graphiques à l'écran.";
+                TxtSpeedLabel.Text = "Vitesse";
+                TxtSpeedDesc.Text = "Ajuste la vitesse à laquelle les ondes se propagent vers le bord de l'écran.";
+                TxtSensitivityLabel.Text = "Sensibilité";
+                TxtSensitivityDesc.Text = "Détermine la sensibilité de réaction des graphiques aux petits sons.";
+                TxtAdvSensitivityLabel.Text = "Sensibilité (Avancé)";
+                TxtAdvSensitivityDesc.Text = "Supprime les limites internes pour une réactivité extrême.";
+                TxtOpacityLabel.Text = "Opacité";
+                TxtOpacityDesc.Text = "Ajuste la transparence des graphiques pour déterminer la visibilité de l'arrière-plan.";
+                TxtModeSettings.Text = "Paramètres de mode";
+                TxtVisualModeLabel.Text = "Mode visuel";
+                TxtVisualModeDesc.Text = "Sélectionne la forme de base des graphiques dessinés à l'écran.";
+                CmbVisualModeWave.Content = "Wave (Vagues)";
+                CmbVisualModePad.Content = "Pad (Points)";
+                TxtStereoModeLabel.Text = "Mode Stéréo";
+                TxtStereoModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.";
+                ChkStereoUpmix.Content = "Activer";
+                TxtHotkeySettings.Text = "Raccourcis";
+                TxtVisualHotkeyLabel.Text = "Basculer le mode visuel";
+                TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
+                TxtStereoHotkeyLabel.Text = "Basculer le mode stéréo";
+                TxtStereoHotkeyDesc.Text = "Raccourci pour changer de mode en temps réel pendant l'exécution.";
+                BtnReset.Content = "Réinitialiser";
+                TabHelp.Header = "Aide";
+                TxtHelp1Title.Text = "Environnement Surround 7.1";
+                TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, activez la fonction 'Mode Stéréo' dans les paramètres.";
+                TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
+                TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
+                TxtHelp3Title.Text = "Comment fermer la superposition";
+                TxtHelp3Desc.Text = "Les graphiques en cours d'exécution laissent passer les clics de souris. Pour la fermer, faites un clic droit sur l'icône dans la barre des tâches de Windows et sélectionnez 'Fermer la fenêtre', ou cliquez sur le bouton ✕ en haut de cette fenêtre de lanceur.";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "Paramètres d'affichage IA";
+                    ChkShowAmbient.Content = "Afficher les sons ambiants";
+                    ChkShowSpeech.Content = "Afficher la voix";
+                    ChkShowDanger.Content = "Afficher les sons de danger";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "Deutsch")
+            {
+                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Sprache";
+                TabHome.Header = "Startseite";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "Machen Sie unsichtbare Klänge sichtbar.\nStarten Sie ein neues Erlebnis, von Spielen bis hin zu Filmen.";
+                if (BtnLaunch != null) BtnLaunch.Content = "Starten";
+                if (BtnStop != null) BtnStop.Content = "Stoppen";
+                TabSettings.Header = "Einstellungen";
+                TxtScreenSettings.Text = "Bildeinstellungen";
+                TxtIntensityLabel.Text = "Größe";
+                TxtIntensityDesc.Text = "Passt die Gesamtgröße und Länge der Grafiken auf dem Bildschirm an.";
+                TxtSpeedLabel.Text = "Geschwindigkeit";
+                TxtSpeedDesc.Text = "Passt die Geschwindigkeit an, mit der sich die Wellen zum Bildschirmrand ausbreiten.";
+                TxtSensitivityLabel.Text = "Empfindlichkeit";
+                TxtSensitivityDesc.Text = "Bestimmt, wie empfindlich die Grafiken auf leise Töne reagieren.";
+                TxtAdvSensitivityLabel.Text = "Empfindlichkeit (Erweitert)";
+                TxtAdvSensitivityDesc.Text = "Hebt interne Beschränkungen für extreme Reaktionsfähigkeit auf.";
+                TxtOpacityLabel.Text = "Deckkraft";
+                TxtOpacityDesc.Text = "Passt die Transparenz der Grafiken an, um die Sichtbarkeit des Hintergrunds zu bestimmen.";
+                TxtModeSettings.Text = "Moduseinstellungen";
+                TxtVisualModeLabel.Text = "Visueller Modus";
+                TxtVisualModeDesc.Text = "Wählt die Grundform der auf dem Bildschirm gezeichneten Grafiken aus.";
+                CmbVisualModeWave.Content = "Wave (Wellen)";
+                CmbVisualModePad.Content = "Pad (Punkte)";
+                TxtStereoModeLabel.Text = "Stereo-Modus";
+                TxtStereoModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.";
+                ChkStereoUpmix.Content = "Aktivieren";
+                TxtHotkeySettings.Text = "Tastenkombinationen";
+                TxtVisualHotkeyLabel.Text = "Visuellen Modus umschalten";
+                TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
+                TxtStereoHotkeyLabel.Text = "Stereo-Modus umschalten";
+                TxtStereoHotkeyDesc.Text = "Tastenkombination zum Ändern des Modus in Echtzeit während der Ausführung.";
+                BtnReset.Content = "Auf Standard zurücksetzen";
+                TabHelp.Header = "Hilfe";
+                TxtHelp1Title.Text = "7.1 Surround-Umgebung";
+                TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, aktivieren Sie in den Einstellungen die Funktion 'Stereo-Modus'.";
+                TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
+                TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
+                TxtHelp3Title.Text = "So schließen Sie das Overlay";
+                TxtHelp3Desc.Text = "Die laufenden Grafiken lassen Mausklicks durch. Um es zu schließen, klicken Sie mit der rechten Maustaste auf das Symbol in der Windows-Taskleiste und wählen Sie 'Fenster schließen', oder klicken Sie oben in diesem Launcher-Fenster auf die Schaltfläche ✕.";
+                
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "KI-Anzeigeeinstellungen";
+                    ChkShowAmbient.Content = "Umgebungsgeräusche anzeigen";
+                    ChkShowSpeech.Content = "Sprache anzeigen";
+                    ChkShowDanger.Content = "Gefahrentöne anzeigen";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+        }
+
+        private void SetStatusUI(bool isRunning)
+        {
+            string runningText = "상태: 실행 중";
+            string waitText = "상태: 실행 대기 중";
+
+            if (AppSettings.Language == "English") { runningText = "Status: Running"; waitText = "Status: Waiting to start"; }
+            else if (AppSettings.Language == "日本語") { runningText = "状態: 実行中"; waitText = "状態: 実行待機中"; }
+            else if (AppSettings.Language == "中文") { runningText = "状态: 运行中"; waitText = "状态: 等待启动"; }
+            else if (AppSettings.Language == "Español") { runningText = "Estado: En ejecución"; waitText = "Estado: Esperando inicio"; }
+            else if (AppSettings.Language == "Français") { runningText = "Statut: En cours"; waitText = "Statut: En attente de démarrage"; }
+            else if (AppSettings.Language == "Deutsch") { runningText = "Status: Wird ausgeführt"; waitText = "Status: Wartet auf Start"; }
+
+            if (isRunning)
+            {
+                TxtStatus.Text = runningText;
+                TxtStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(49, 130, 246)); // #3182F6
+                StatusDot.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(49, 130, 246));
+            }
+            else
+            {
+                TxtStatus.Text = waitText;
+                TxtStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(139, 149, 161)); // #8B95A1
+                StatusDot.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(139, 149, 161));
             }
         }
 
@@ -175,6 +490,27 @@ namespace SoundVisualizer
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
             CmbStereoHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
+
+            if (ChkShowAmbient != null)
+            {
+                ChkShowAmbient.IsChecked = AppSettings.ShowAmbient;
+                ChkShowSpeech.IsChecked = AppSettings.ShowSpeech;
+                ChkShowDanger.IsChecked = AppSettings.ShowDanger;
+
+                SetColorButton(BtnColorAmbient, AppSettings.ColorAmbient);
+                SetColorButton(BtnColorSpeech, AppSettings.ColorSpeech);
+                SetColorButton(BtnColorDanger, AppSettings.ColorDanger);
+            }
+        }
+
+        private void SetColorButton(Button btn, string hex)
+        {
+            try
+            {
+                var mediaColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+                btn.Background = new System.Windows.Media.SolidColorBrush(mediaColor);
+            }
+            catch { }
         }
 
         private string? GetKeyName(int code)
@@ -190,26 +526,57 @@ namespace SoundVisualizer
         {
             if (_isInitializing) return;
 
-            AppSettings.WaveIntensity = SldIntensity.Value;
-            AppSettings.WavePositionSpeed = SldSpeed.Value;
-            
-            if (AppSettings.IsAdvancedSensitivity)
-                AppSettings.WaveSensitivity = SldAdvSensitivity.Value;
-            else
-                AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0; // 0~100 화면 수치를 0~25로 축소
+            if (sender == SldIntensity) AppSettings.WaveIntensity = SldIntensity.Value;
+            else if (sender == SldSpeed) AppSettings.WavePositionSpeed = SldSpeed.Value;
+            else if (sender == SldAdvSensitivity && AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldAdvSensitivity.Value;
+            else if (sender == SldSensitivity && !AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
+            else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
+            else if (sender == CmbVisualMode) AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
+            else if (sender == ChkStereoUpmix) AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
+            else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
+            else if (sender == CmbStereoHotkey && CmbStereoHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
+            else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
+            else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
+            else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;
 
-            AppSettings.VisualOpacity = 100 - SldOpacity.Value; // 투명도 수치 반전 적용
-            AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
-            AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
+            AppSettings.Save();
+        }
 
-            if (CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode))
+        private void BtnColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
             {
-                AppSettings.VisualModeHotkey = vCode;
-            }
+                string type = btn.Tag?.ToString() ?? "";
+                string currentColorHex = "#FFFFFF";
 
-            if (CmbStereoHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode))
-            {
-                AppSettings.StereoUpmixHotkey = sCode;
+                if (type == "Ambient") currentColorHex = AppSettings.ColorAmbient;
+                else if (type == "Speech") currentColorHex = AppSettings.ColorSpeech;
+                else if (type == "Danger") currentColorHex = AppSettings.ColorDanger;
+
+                System.Windows.Media.Color currentMediaColor = System.Windows.Media.Colors.White;
+                try { currentMediaColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(currentColorHex); } catch { }
+
+                var currentDrawingColor = System.Drawing.Color.FromArgb(currentMediaColor.A, currentMediaColor.R, currentMediaColor.G, currentMediaColor.B);
+
+                using (var dialog = new System.Windows.Forms.ColorDialog())
+                {
+                    dialog.Color = currentDrawingColor;
+                    dialog.FullOpen = true;
+
+                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        var newDrawingColor = dialog.Color;
+                        var newMediaColor = System.Windows.Media.Color.FromArgb(newDrawingColor.A, newDrawingColor.R, newDrawingColor.G, newDrawingColor.B);
+                        string hex = newMediaColor.ToString();
+
+                        if (type == "Ambient") AppSettings.ColorAmbient = hex;
+                        else if (type == "Speech") AppSettings.ColorSpeech = hex;
+                        else if (type == "Danger") AppSettings.ColorDanger = hex;
+
+                        LoadSettingsToUI();
+                        AppSettings.Save();
+                    }
+                }
             }
         }
 
@@ -228,6 +595,7 @@ namespace SoundVisualizer
             }
             
             LoadSettingsToUI();
+            AppSettings.Save();
             _isInitializing = false;
         }
 
@@ -240,36 +608,71 @@ namespace SoundVisualizer
             }
 
             _overlayWindow = new MainWindow();
+            _overlayWindow.OnSettingsChangedFromHotkey = () =>
+            {
+                // UI 스레드에서 LoadSettingsToUI 호출 (MainWindow는 이미 UI 스레드에서 이벤트를 발생시킴)
+                LoadSettingsToUI();
+            };
             _overlayWindow.Closed += (s, args) => 
             {
                 _overlayWindow = null;
-                BtnLaunch.Content = AppSettings.Language == "KOR" ? "시작하기" : "Start";
                 BtnLaunch.IsEnabled = true;
+                BtnStop.IsEnabled = false;
+                SetStatusUI(false);
                 
                 // 오버레이 동작 중 핫키로 변경된 사항(모드 등)을 다시 UI에 반영
                 LoadSettingsToUI();
             };
             _overlayWindow.Show();
             
-            BtnLaunch.Content = AppSettings.Language == "KOR" ? "실행 중..." : "Running...";
             BtnLaunch.IsEnabled = false;
+            BtnStop.IsEnabled = true;
+            SetStatusUI(true);
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (_overlayWindow != null)
+            {
+                _overlayWindow.Close();
+            }
         }
 
         private void BtnReset_Click(object sender, RoutedEventArgs e)
         {
+            string message = "정말로 모든 설정을 기본값으로 되돌리시겠습니까?";
+            string title = "기본값 초기화";
+            if (AppSettings.Language == "English") { message = "Are you sure you want to reset all settings to defaults?"; title = "Reset Settings"; }
+            else if (AppSettings.Language == "日本語") { message = "すべての設定をデフォルトに戻してもよろしいですか？"; title = "設定のリセット"; }
+            else if (AppSettings.Language == "中文") { message = "您确定要将所有设置恢复为默认值吗？"; title = "重置设置"; }
+            else if (AppSettings.Language == "Español") { message = "¿Estás seguro de que deseas restablecer todas las configuraciones a los valores predeterminados?"; title = "Restablecer configuración"; }
+            else if (AppSettings.Language == "Français") { message = "Êtes-vous sûr de vouloir réinitialiser tous les paramètres aux valeurs par défaut ?"; title = "Réinitialiser les paramètres"; }
+            else if (AppSettings.Language == "Deutsch") { message = "Möchten Sie wirklich alle Einstellungen auf die Standardwerte zurücksetzen?"; title = "Einstellungen zurücksetzen"; }
+
+            MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
             _isInitializing = true;
 
-            AppSettings.WaveIntensity = 33.3;
-            AppSettings.WavePositionSpeed = 10.0;
-            AppSettings.WaveSensitivity = 10.0;
-            AppSettings.VisualOpacity = 60.0;
+            AppSettings.WaveIntensity = 50.0;
+            AppSettings.WavePositionSpeed = 20.0;
+            AppSettings.WaveSensitivity = 3.75;
+            AppSettings.VisualOpacity = 50.0;
             AppSettings.VisualMode = 0;
             AppSettings.IsStereoUpmixMode = false;
             AppSettings.IsAdvancedSensitivity = false;
             AppSettings.VisualModeHotkey = 0x72; // F3
             AppSettings.StereoUpmixHotkey = 0x71; // F2
 
+            AppSettings.ShowAmbient = true;
+            AppSettings.ShowSpeech = true;
+            AppSettings.ShowDanger = true;
+            AppSettings.ColorAmbient = "#FFFFFFFF";
+            AppSettings.ColorSpeech = "#FFFFFF00";
+            AppSettings.ColorDanger = "#FFFF0000";
+
             LoadSettingsToUI();
+            AppSettings.Save();
 
             _isInitializing = false;
         }
@@ -287,6 +690,11 @@ namespace SoundVisualizer
                 _overlayWindow.Close();
             }
             this.Close();
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
         }
     }
 }
