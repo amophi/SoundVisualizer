@@ -48,7 +48,7 @@ namespace SoundVisualizer.AIModel
 #endif
 
         // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
-        private const int CoarseHysteresisThreshold = 5;
+        private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
         private string _confirmedCoarse = "ambient";
@@ -83,7 +83,8 @@ namespace SoundVisualizer.AIModel
                 string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
                 _session = new InferenceSession(modelPath);
                 LoadClassNames(); // 실제로는 csv 파일에서 "총소리", "폭발음" 목록을 불러옴
-                TryLoadDistilledCoarseHead();
+                // A 모드: 521 기본 경로 + gunshot booster만 사용
+                // TryLoadDistilledCoarseHead();
                 TryLoadGunshotBooster();
 
                 // 입력명 확인(디버깅용). metadata.yaml이 말하는 input name이 실제로도 같은지 체크합니다.
@@ -320,36 +321,7 @@ namespace SoundVisualizer.AIModel
                 }
             }
 
-            if (!boostedDangerByGunshot && TryPredictDangerScoreFromDistilledHead(probs, out float headDangerScore))
-            {
-                // 정책:
-                // - speech/ambient는 기본 YAMNet 규칙 경로를 그대로 유지
-                // - danger만 별도 헤드 점수로 override
-                bool adopt = false;
-                if (coarse == "danger")
-                {
-                    // 기본 규칙도 danger인 경우는 헤드가 명확히 낮지 않으면 유지
-                    adopt = headDangerScore >= 0.40f && dangerEvidence >= 0.20f;
-                }
-                else if (hasCriticalDangerCue)
-                {
-                    adopt = headDangerScore >= 0.35f && dangerEvidence >= 0.10f;
-                }
-                else if (hasStrongDangerCue)
-                {
-                    adopt = headDangerScore >= 0.48f && dangerEvidence >= 0.18f;
-                }
-                else
-                {
-                    adopt = headDangerScore >= 0.75f && dangerEvidence >= 0.30f;
-                }
-
-                if (adopt)
-                {
-                    coarse = "danger";
-                    coarseConf = MathF.Max(coarseConf, headDangerScore);
-                }
-            }
+            // A 모드: 3클래스 헤드(danger 재판정) 경로 비활성
 
             // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
             // speech/ambient는 기본 임계를 그대로 유지합니다.
@@ -361,7 +333,7 @@ namespace SoundVisualizer.AIModel
             else if (coarse == "speech")
             {
                 // speech 오탐을 줄이기 위해 최소 임계를 상향합니다.
-                effectiveThreshold = MathF.Max(effectiveThreshold, 0.30f);
+                effectiveThreshold = MathF.Max(effectiveThreshold, 0.25f);
             }
 
             bool ok = coarseConf >= effectiveThreshold;
