@@ -279,33 +279,33 @@
                     </ComboBox>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button Content="—" Width="32" Height="32" Margin="0,0,4,0"
-                            FontSize="16" FontWeight="Bold" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnMinimize_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-24,-24,0">
+                    <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Width="46" Height="32" 
+                            FontSize="10" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnMinimize_Click">
                         <Button.Template>
                             <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="MinBg" Background="Transparent" CornerRadius="16">
+                                <Border x:Name="MinBg" Background="Transparent" CornerRadius="0">
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="MinBg" Property="Background" Value="#2A2B32"/>
+                                        <Setter TargetName="MinBg" Property="Background" Value="#3D3F45"/>
                                         <Setter Property="Foreground" Value="White"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                    <Button Content="✕" Width="32" Height="32" 
-                            FontSize="16" FontWeight="Bold" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnClose_Click">
+                    <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Width="46" Height="32" 
+                            FontSize="10" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnClose_Click">
                         <Button.Template>
                             <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="CloseBg" Background="Transparent" CornerRadius="16">
+                                <Border x:Name="CloseBg" Background="Transparent" CornerRadius="0,24,0,0">
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="CloseBg" Property="Background" Value="#2A2B32"/>
+                                        <Setter TargetName="CloseBg" Property="Background" Value="#E81123"/>
                                         <Setter Property="Foreground" Value="White"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
