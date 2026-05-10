@@ -2,6 +2,8 @@
 
 # 🎵 SoundVisualizer
 
+<img width="453" height="453" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/8ef0b0fa-6c74-4849-9ce4-93d52c39e9f6" />
+
 [![WPF](https://img.shields.io/badge/WPF-blue?style=for-the-badge&logo=windows)](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/)
 [![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 [![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
