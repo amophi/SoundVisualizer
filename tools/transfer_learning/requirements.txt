@@ -1,0 +1,14 @@
+# tensorflow: 상한 없음 → pip이 Python 버전에 맞는 휠만 고름
+#   (3.8 → ~2.13.x, 3.12 → 2.16+ 등). 상한을 두면 3.12에서 설치 실패할 수 있음.
+# macOS: soundfile 사용 시 `brew install libsndfile` 필요할 수 있음.
+# setuptools 82+ 는 pkg_resources 제거 → tensorflow-hub / tf2onnx 등이 깨짐. 81.x 로 고정.
+setuptools>=70.0.0,<82.0.0
+tensorflow>=2.12.0
+tensorflow-hub>=0.14.0
+numpy>=1.22.0,<2.0.0
+librosa>=0.10.1
+soundfile>=0.12.1
+# 이후 ONNX export 단계
+tf2onnx>=1.14.0
+onnx>=1.12.0
+onnxruntime>=1.18.0

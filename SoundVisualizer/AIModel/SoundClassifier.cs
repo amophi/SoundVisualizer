@@ -14,6 +14,12 @@ namespace SoundVisualizer.AIModel
     public class SoundClassifier : IDisposable
     {
         private InferenceSession _session;
+        private InferenceSession? _coarseHeadSession;
+        private string? _coarseHeadInputName;
+        private string? _coarseHeadOutputName;
+        private InferenceSession? _gunshotBoosterSession;
+        private string? _gunshotBoosterInputName;
+        private string? _gunshotBoosterOutputName;
         private string[] _classNames; // YAMNet의 521개 소리 이름 목록
 
         // YAMNet: 16kHz mono → log-mel, 일반적으로 time × mel = 96 × 64
@@ -41,8 +47,10 @@ namespace SoundVisualizer.AIModel
         private const int ClassifyDebugMinIntervalMs = 200;
 #endif
 
-        // coarse 히스테리시스: 연속 N프레임 동일해야 전환
-        private const int CoarseHysteresisThreshold = 4;
+        // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
+        private const int CoarseHysteresisThreshold = 2;
+        private const int DangerHysteresisThreshold = 1;
+        private const float DangerImmediateSwitchConfidence = 0.28f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -75,6 +83,9 @@ namespace SoundVisualizer.AIModel
                 string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
                 _session = new InferenceSession(modelPath);
                 LoadClassNames(); // 실제로는 csv 파일에서 "총소리", "폭발음" 목록을 불러옴
+                // A 모드: 521 기본 경로 + gunshot booster만 사용
+                // TryLoadDistilledCoarseHead();
+                TryLoadGunshotBooster();
 
                 // 입력명 확인(디버깅용). metadata.yaml이 말하는 input name이 실제로도 같은지 체크합니다.
                 foreach (var kv in _session.InputMetadata)
@@ -141,6 +152,10 @@ namespace SoundVisualizer.AIModel
 
         private void ApplyCoarseHysteresis(in InferenceResult r)
         {
+            // 저신뢰 프레임은 확정 상태·후보 스트릭을 바꾸지 않음(오탐/깜빡임 억제)
+            if (!r.MeetsThreshold)
+                return;
+
             string newCoarse = r.CoarseClass;
 
             if (newCoarse == _confirmedCoarse)
@@ -149,6 +164,18 @@ namespace SoundVisualizer.AIModel
                 _candidateCoarse = "";
                 _confirmedDisplay = r.YamnetDisplayName;
                 _confirmedConfidence = r.Confidence;
+                return;
+            }
+
+            // 총성/폭발처럼 짧은 transient는 즉시 반영해 미검출을 줄입니다.
+            if (newCoarse == "danger" &&
+                (r.Confidence >= DangerImmediateSwitchConfidence || IsCriticalDangerEvent(in r)))
+            {
+                _confirmedCoarse = newCoarse;
+                _confirmedDisplay = r.YamnetDisplayName;
+                _confirmedConfidence = r.Confidence;
+                _candidateStreak = 0;
+                _candidateCoarse = "";
                 return;
             }
 
@@ -162,7 +189,8 @@ namespace SoundVisualizer.AIModel
                 _candidateStreak = 1;
             }
 
-            if (_candidateStreak >= CoarseHysteresisThreshold)
+            int requiredStreak = newCoarse == "danger" ? DangerHysteresisThreshold : CoarseHysteresisThreshold;
+            if (_candidateStreak >= requiredStreak)
             {
                 _confirmedCoarse = newCoarse;
                 _confirmedDisplay = r.YamnetDisplayName;
@@ -265,10 +293,164 @@ namespace SoundVisualizer.AIModel
             PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
 
             string coarse = VoteCoarseFromTopK(probs, 3);
-            bool ok = conf >= confidenceThreshold;
+            float coarseConf = conf;
+            float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
+            bool hasStrongDangerCue = HasStrongDangerCueInTopK(probs, 5);
+            bool hasCriticalDangerCue = HasCriticalDangerCueInTopK(probs, 5);
+            bool boostedDangerByGunshot = false;
+            if (TryPredictGunshotBoosterScore(probs, out float gunshotScore))
+            {
+                float gunshotEvidence = SumGunshotProbabilityFromTopK(probs, 5);
+                bool hasGunshotCue = HasGunshotCueInTopK(probs, 5);
+
+                bool adoptGunshotDanger = false;
+                if (hasGunshotCue)
+                {
+                    adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
+                }
+                else
+                {
+                    adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                }
+
+                if (adoptGunshotDanger)
+                {
+                    coarse = "danger";
+                    coarseConf = MathF.Max(coarseConf, MathF.Max(gunshotScore, gunshotEvidence));
+                    boostedDangerByGunshot = true;
+                }
+            }
+
+            // A 모드: 3클래스 헤드(danger 재판정) 경로 비활성
+
+            // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
+            // speech/ambient는 기본 임계를 그대로 유지합니다.
+            float effectiveThreshold = confidenceThreshold;
+            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue))
+            {
+                effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
+            }
+            else if (coarse == "speech")
+            {
+                // speech 오탐을 줄이기 위해 최소 임계를 상향합니다.
+                effectiveThreshold = MathF.Max(effectiveThreshold, 0.25f);
+            }
+
+            bool ok = coarseConf >= effectiveThreshold;
             string? topK = FormatTopKSoftmaxLabels(probs, 3);
 
-            return new InferenceResult(maxIndex, display, conf, coarse, ok, inferMs, topK);
+            return new InferenceResult(maxIndex, display, coarseConf, coarse, ok, inferMs, topK);
+        }
+
+        private void TryLoadDistilledCoarseHead()
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "three_class_score_head.onnx");
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"[3ClassHead] 파일 없음, 기존 규칙 경로 사용: {path}");
+                    return;
+                }
+
+                _coarseHeadSession = new InferenceSession(path);
+                _coarseHeadInputName = _coarseHeadSession.InputMetadata.Keys.FirstOrDefault();
+                _coarseHeadOutputName = _coarseHeadSession.OutputMetadata.Keys.FirstOrDefault();
+                Console.WriteLine($"[3ClassHead] 로드 완료: {path}");
+            }
+            catch (Exception ex)
+            {
+                _coarseHeadSession = null;
+                _coarseHeadInputName = null;
+                _coarseHeadOutputName = null;
+                Console.WriteLine($"[3ClassHead] 로드 실패, 기존 규칙 경로 사용: {ex.Message}");
+            }
+        }
+
+        private void TryLoadGunshotBooster()
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "gunshot_booster.onnx");
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"[GunshotBooster] 파일 없음, 부스터 비활성: {path}");
+                    return;
+                }
+
+                _gunshotBoosterSession = new InferenceSession(path);
+                _gunshotBoosterInputName = _gunshotBoosterSession.InputMetadata.Keys.FirstOrDefault();
+                _gunshotBoosterOutputName = _gunshotBoosterSession.OutputMetadata.Keys.FirstOrDefault();
+                Console.WriteLine($"[GunshotBooster] 로드 완료: {path}");
+            }
+            catch (Exception ex)
+            {
+                _gunshotBoosterSession = null;
+                _gunshotBoosterInputName = null;
+                _gunshotBoosterOutputName = null;
+                Console.WriteLine($"[GunshotBooster] 로드 실패, 부스터 비활성: {ex.Message}");
+            }
+        }
+
+        private bool TryPredictGunshotBoosterScore(float[] yamnetProbs, out float gunshotScore)
+        {
+            gunshotScore = 0f;
+            if (_gunshotBoosterSession == null || string.IsNullOrEmpty(_gunshotBoosterInputName))
+                return false;
+            if (yamnetProbs.Length < 521)
+                return false;
+
+            try
+            {
+                var input = new DenseTensor<float>(new[] { 1, 521 });
+                for (int i = 0; i < 521; i++)
+                    input[0, i] = yamnetProbs[i];
+
+                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_gunshotBoosterInputName, input) };
+                using var results = _gunshotBoosterSession.Run(inputs);
+                var outTensor = string.IsNullOrEmpty(_gunshotBoosterOutputName)
+                    ? results.First().AsEnumerable<float>().ToArray()
+                    : results.First(r => r.Name == _gunshotBoosterOutputName).AsEnumerable<float>().ToArray();
+                if (outTensor.Length < 1)
+                    return false;
+
+                gunshotScore = outTensor[0];
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool TryPredictDangerScoreFromDistilledHead(float[] yamnetProbs, out float dangerScore)
+        {
+            dangerScore = 0f;
+            if (_coarseHeadSession == null || string.IsNullOrEmpty(_coarseHeadInputName))
+                return false;
+            if (yamnetProbs.Length < 521)
+                return false;
+
+            try
+            {
+                var input = new DenseTensor<float>(new[] { 1, 521 });
+                for (int i = 0; i < 521; i++)
+                    input[0, i] = yamnetProbs[i];
+
+                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_coarseHeadInputName, input) };
+                using var results = _coarseHeadSession.Run(inputs);
+                var outTensor = string.IsNullOrEmpty(_coarseHeadOutputName)
+                    ? results.First().AsEnumerable<float>().ToArray()
+                    : results.First(r => r.Name == _coarseHeadOutputName).AsEnumerable<float>().ToArray();
+                if (outTensor.Length < 3)
+                    return false;
+                dangerScore = outTensor[0];
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -295,6 +477,120 @@ namespace SoundVisualizer.AIModel
             if (dangerSum >= speechSum && dangerSum >= ambientSum) return "danger";
             if (speechSum >= ambientSum) return "speech";
             return "ambient";
+        }
+
+        private float SumCoarseProbabilityFromTopK(float[] probs, int k, string targetCoarse)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return 0f;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            float sum = 0f;
+            foreach (int i in topIndices)
+            {
+                if (YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]) == targetCoarse)
+                    sum += probs[i];
+            }
+            return sum;
+        }
+
+        private float SumGunshotProbabilityFromTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return 0f;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            float sum = 0f;
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun"))
+                {
+                    sum += probs[i];
+                }
+            }
+            return sum;
+        }
+
+        private bool HasGunshotCueInTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return false;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool HasStrongDangerCueInTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return false;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
+                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker") ||
+                    name.Contains("siren") || name.Contains("alarm"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasCriticalDangerCueInTopK(float[] probs, int k)
+        {
+            int n = Math.Min(probs.Length, _classNames.Length);
+            if (n == 0 || k <= 0)
+                return false;
+
+            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
+            foreach (int i in topIndices)
+            {
+                string name = _classNames[i].ToLowerInvariant();
+                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
+                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
+                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsCriticalDangerEvent(in InferenceResult r)
+        {
+            string display = r.YamnetDisplayName?.ToLowerInvariant() ?? "";
+            string top = r.TopKSummary?.ToLowerInvariant() ?? "";
+            return ContainsCriticalDangerKeyword(display) || ContainsCriticalDangerKeyword(top);
+        }
+
+        private static bool ContainsCriticalDangerKeyword(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return false;
+            return s.Contains("gunshot") || s.Contains("gunfire") || s.Contains("machine gun") ||
+                   s.Contains("artillery") || s.Contains("fusillade") || s.Contains("cap gun") ||
+                   s.Contains("explosion") || s.Contains("fireworks") || s.Contains("firecracker");
         }
 
         private string FormatTopKSoftmaxLabels(float[] probs, int k)
@@ -723,6 +1019,8 @@ namespace SoundVisualizer.AIModel
             lock (_captureRingLock)
                 _monoAtCaptureRateRing.Clear();
             _session?.Dispose();
+            _coarseHeadSession?.Dispose();
+            _gunshotBoosterSession?.Dispose();
         }
     }
 }
