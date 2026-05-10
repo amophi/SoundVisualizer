@@ -550,8 +550,16 @@ namespace SoundVisualizer
             }
 
             SldOpacity.Value = 100 - AppSettings.VisualOpacity; // 투명도 수치 반전 (100=완전 투명)
+            SldGlowIntensity.Value = AppSettings.GlowIntensity;
+            SldGlowIntensity.IsEnabled = AppSettings.IsGlowMode;
+            SldGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeLabel.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeDesc.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             ChkStereoUpmix.IsChecked = AppSettings.IsStereoUpmixMode;
+            ChkGlowMode.IsChecked = AppSettings.IsGlowMode;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
@@ -597,8 +605,18 @@ namespace SoundVisualizer
             else if (sender == SldAdvSensitivity && AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldAdvSensitivity.Value;
             else if (sender == SldSensitivity && !AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
             else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
+            else if (sender == SldGlowIntensity) AppSettings.GlowIntensity = SldGlowIntensity.Value;
             else if (sender == CmbVisualMode) AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
             else if (sender == ChkStereoUpmix) AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
+            else if (sender == ChkGlowMode) 
+            {
+                AppSettings.IsGlowMode = ChkGlowMode.IsChecked ?? false;
+                SldGlowIntensity.IsEnabled = AppSettings.IsGlowMode;
+                SldGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeLabel.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeDesc.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+            }
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
             else if (sender == CmbStereoHotkey && CmbStereoHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;

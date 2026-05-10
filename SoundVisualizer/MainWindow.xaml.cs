@@ -297,8 +297,20 @@ namespace SoundVisualizer
             var currentVisualizer = _visualizers[modeIndex];
 
             UnifiedWave.Data = currentVisualizer.GenerateGeometry(context);
-            UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+            var fillBrush = currentVisualizer.GetFillBrush(activeColor);
+            UnifiedWave.Fill = fillBrush;
             UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
+
+            if (AppSettings.IsGlowMode)
+            {
+                WaveGlowEffect.Color = activeColor;
+                WaveGlowEffect.Opacity = Math.Min(1.0, AppSettings.GlowIntensity / 100.0 * 1.6); 
+                WaveGlowEffect.BlurRadius = Math.Max(1.0, AppSettings.GlowIntensity * 0.5); 
+            }
+            else
+            {
+                WaveGlowEffect.Opacity = 0;
+            }
 
             _targetFL *= 0.87f;
             _targetFR *= 0.87f;

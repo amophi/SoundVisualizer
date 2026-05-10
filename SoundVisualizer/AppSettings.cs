@@ -18,6 +18,9 @@ namespace SoundVisualizer
         public static int VisualMode { get; set; } = 0;
         // 6. 스테레오 확장 모드 (2채널 소스를 좌/우 전용으로 표시할지 여부)
         public static bool IsStereoUpmixMode { get; set; } = false;
+        // 6.5. 광원(Glow) 효과 모드
+        public static bool IsGlowMode { get; set; } = false;
+        public static double GlowIntensity { get; set; } = 50.0;
         // 7. 단축키 설정
         public static int StereoUpmixHotkey { get; set; } = 0x71; // F2
         public static int VisualModeHotkey { get; set; } = 0x72;  // F3
@@ -56,6 +59,8 @@ namespace SoundVisualizer
                         VisualOpacity = data.VisualOpacity;
                         VisualMode = data.VisualMode;
                         IsStereoUpmixMode = data.IsStereoUpmixMode;
+                        IsGlowMode = data.IsGlowMode;
+                        GlowIntensity = data.GlowIntensity;
                         StereoUpmixHotkey = data.StereoUpmixHotkey;
                         VisualModeHotkey = data.VisualModeHotkey;
                         Language = data.Language ?? "KOR";
@@ -85,6 +90,8 @@ namespace SoundVisualizer
                     VisualOpacity = VisualOpacity,
                     VisualMode = VisualMode,
                     IsStereoUpmixMode = IsStereoUpmixMode,
+                    IsGlowMode = IsGlowMode,
+                    GlowIntensity = GlowIntensity,
                     StereoUpmixHotkey = StereoUpmixHotkey,
                     VisualModeHotkey = VisualModeHotkey,
                     Language = Language,
@@ -111,6 +118,8 @@ namespace SoundVisualizer
             public double VisualOpacity { get; set; } = 50.0;
             public int VisualMode { get; set; } = 0;
             public bool IsStereoUpmixMode { get; set; } = false;
+            public bool IsGlowMode { get; set; } = false;
+            public double GlowIntensity { get; set; } = 50.0;
             public int StereoUpmixHotkey { get; set; } = 0x71; 
             public int VisualModeHotkey { get; set; } = 0x72;  
             public string Language { get; set; } = "KOR";
