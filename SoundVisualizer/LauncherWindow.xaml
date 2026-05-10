@@ -388,7 +388,7 @@
                                                 <ColumnDefinition Width="50"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Name="TxtIntensityLabel" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="50" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensity" Text="{Binding Value, ElementName=SldIntensity, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
                                         <TextBlock x:Name="TxtIntensityDesc" Text="그래픽이 화면을 덮는 전체적인 크기와 길이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>

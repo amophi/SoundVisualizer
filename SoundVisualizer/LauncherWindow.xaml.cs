@@ -513,7 +513,8 @@ namespace SoundVisualizer
 
         private void LoadSettingsToUI()
         {
-            SldIntensity.Value = AppSettings.WaveIntensity;
+            SldIntensity.Maximum = AppSettings.WaveIntensityMax;
+            SldIntensity.Value = Math.Min(AppSettings.WaveIntensityMax, AppSettings.WaveIntensity);
             SldSpeed.Value = AppSettings.WavePositionSpeed;
             
             ChkAdvancedMode.IsChecked = AppSettings.IsAdvancedSensitivity;
@@ -589,7 +590,7 @@ namespace SoundVisualizer
         {
             if (_isInitializing) return;
 
-            if (sender == SldIntensity) AppSettings.WaveIntensity = SldIntensity.Value;
+            if (sender == SldIntensity) AppSettings.WaveIntensity = Math.Min(AppSettings.WaveIntensityMax, SldIntensity.Value);
             else if (sender == SldSpeed) AppSettings.WavePositionSpeed = SldSpeed.Value;
             else if (sender == SldAdvSensitivity && AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldAdvSensitivity.Value;
             else if (sender == SldSensitivity && !AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;

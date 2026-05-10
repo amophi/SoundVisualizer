@@ -24,27 +24,29 @@ namespace SoundVisualizer.Visualizers
             }
             if (!anyActive) return Geometry.Empty;
 
-            double P = 2 * (w + h);
+            double cornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.10);
+            cornerRadius = Math.Min(cornerRadius, Math.Min(w, h) * 0.5 - 1.0);
+            double P = GetRoundedPerimeter(w, h, cornerRadius);
 
-            double dist_tc = 0;
-            double dist_tr = w / 2.0;
-            double dist_rc = w / 2.0 + h / 2.0;
-            double dist_br = w / 2.0 + h;
-            double dist_bc = w / 2.0 + h + w / 2.0;
-            double dist_bl = w / 2.0 + h + w;
-            double dist_lc = w / 2.0 + h + w + h / 2.0;
-            double dist_tl = w / 2.0 + h + w + h;
+            double topHalf = (w * 0.5) - cornerRadius;
+            double rightLen = h - 2.0 * cornerRadius;
+            double bottomLen = w - 2.0 * cornerRadius;
+            double arcLen = Math.PI * 0.5 * cornerRadius;
+
+            double dist_tc = 0.0;
+            double dist_tr = topHalf;
+            double dist_rc = topHalf + arcLen + rightLen * 0.5;
+            double dist_br = topHalf + arcLen + rightLen;
+            double dist_bc = topHalf + arcLen + rightLen + arcLen + bottomLen * 0.5;
+            double dist_bl = topHalf + arcLen + rightLen + arcLen + bottomLen;
+            double dist_lc = topHalf + arcLen + rightLen + arcLen + bottomLen + arcLen + rightLen * 0.5;
+            double dist_tl = topHalf + arcLen + rightLen + arcLen + bottomLen + arcLen + rightLen;
 
             double[] channelPos = new double[]
             {
                 dist_tc / P, dist_tr / P, dist_rc / P, dist_br / P,
                 dist_bc / P, dist_bl / P, dist_lc / P, dist_tl / P
             };
-
-            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, channelPos);
-            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, channelPos);
-            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, channelPos);
-            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, channelPos);
 
             int N = WAVE_SAMPLE_COUNT;
             var inner = new Point[N];
@@ -53,31 +55,12 @@ namespace SoundVisualizer.Visualizers
             {
                 double dist = (P * i) / N; 
                 double t = dist / P;
-                
-                Point edgePos = GetEdgePosition(dist, w, h, P);
+
                 double d = GetWaveDepth(t, time, channelDepths, channelPos);
                 d = Math.Min(d, Math.Min(w, h) * MAX_WAVE_DEPTH_RATIO);
-                
-                if (dist <= dist_tr || dist > dist_tl) 
-                {
-                    double x = Math.Max(d_tl, Math.Min(w - d_tr, edgePos.X));
-                    inner[i] = new Point(x, d);
-                }
-                else if (dist <= dist_br) 
-                {
-                    double y = Math.Max(d_tr, Math.Min(h - d_br, edgePos.Y));
-                    inner[i] = new Point(w - d, y);
-                }
-                else if (dist <= dist_bl) 
-                {
-                    double x = Math.Max(d_bl, Math.Min(w - d_br, edgePos.X));
-                    inner[i] = new Point(x, h - d);
-                }
-                else 
-                {
-                    double y = Math.Max(d_tl, Math.Min(h - d_bl, edgePos.Y));
-                    inner[i] = new Point(d, y);
-                }
+
+                GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point edgePos, out Vector normal);
+                inner[i] = new Point(edgePos.X + normal.X * d, edgePos.Y + normal.Y * d);
             }
 
             var geometry = new StreamGeometry();
@@ -115,14 +98,141 @@ namespace SoundVisualizer.Visualizers
             return geometry;
         }
 
-        private Point GetEdgePosition(double dist, double w, double h, double P)
+        private static double GetRoundedPerimeter(double w, double h, double r)
+            => 2.0 * (w + h - 4.0 * r) + 2.0 * Math.PI * r;
+
+        private static void GetRoundedEdgePointAndNormal(
+            double dist, double w, double h, double r, double perimeter,
+            out Point point, out Vector normal)
         {
-            dist = ((dist % P) + P) % P;
-            if (dist <= w / 2) return new Point(w / 2 + dist, 0);
-            if (dist <= w / 2 + h) return new Point(w, dist - w / 2);
-            if (dist <= w / 2 + h + w) return new Point(w - (dist - (w / 2 + h)), h);
-            if (dist <= w / 2 + h + w + h) return new Point(0, h - (dist - (w / 2 + h + w)));
-            return new Point(dist - (w / 2 + h + w + h), 0);
+            if (r <= 1e-6)
+            {
+                GetRectEdgePointAndNormal(dist, w, h, out point, out normal);
+                return;
+            }
+
+            dist = ((dist % perimeter) + perimeter) % perimeter;
+
+            double topHalf = (w * 0.5) - r;
+            double rightLen = h - 2.0 * r;
+            double bottomLen = w - 2.0 * r;
+            double arcLen = Math.PI * 0.5 * r;
+
+            if (dist <= topHalf)
+            {
+                point = new Point(w * 0.5 + dist, 0);
+                normal = new Vector(0, 1);
+                return;
+            }
+            dist -= topHalf;
+
+            if (dist <= arcLen)
+            {
+                double a = -Math.PI * 0.5 + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point((w - r) + r * Math.Cos(a), r + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= rightLen)
+            {
+                point = new Point(w, r + dist);
+                normal = new Vector(-1, 0);
+                return;
+            }
+            dist -= rightLen;
+
+            if (dist <= arcLen)
+            {
+                double a = (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point((w - r) + r * Math.Cos(a), (h - r) + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= bottomLen)
+            {
+                point = new Point((w - r) - dist, h);
+                normal = new Vector(0, -1);
+                return;
+            }
+            dist -= bottomLen;
+
+            if (dist <= arcLen)
+            {
+                double a = Math.PI * 0.5 + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point(r + r * Math.Cos(a), (h - r) + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= rightLen)
+            {
+                point = new Point(0, (h - r) - dist);
+                normal = new Vector(1, 0);
+                return;
+            }
+            dist -= rightLen;
+
+            if (dist <= arcLen)
+            {
+                double a = Math.PI + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point(r + r * Math.Cos(a), r + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            point = new Point(r + dist, 0);
+            normal = new Vector(0, 1);
+        }
+
+        private static void GetRectEdgePointAndNormal(double dist, double w, double h, out Point point, out Vector normal)
+        {
+            double perimeter = 2.0 * (w + h);
+            dist = ((dist % perimeter) + perimeter) % perimeter;
+
+            if (dist <= w * 0.5)
+            {
+                point = new Point(w * 0.5 + dist, 0);
+                normal = new Vector(0, 1);
+                return;
+            }
+            dist -= (w * 0.5);
+
+            if (dist <= h)
+            {
+                point = new Point(w, dist);
+                normal = new Vector(-1, 0);
+                return;
+            }
+            dist -= h;
+
+            if (dist <= w)
+            {
+                point = new Point(w - dist, h);
+                normal = new Vector(0, -1);
+                return;
+            }
+            dist -= w;
+
+            if (dist <= h)
+            {
+                point = new Point(0, h - dist);
+                normal = new Vector(1, 0);
+                return;
+            }
+            dist -= h;
+
+            point = new Point(dist, 0);
+            normal = new Vector(0, 1);
         }
 
         private double GetWaveDepth(double t, double time, double[] depths, double[] positions)

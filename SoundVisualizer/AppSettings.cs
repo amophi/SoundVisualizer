@@ -6,7 +6,8 @@ namespace SoundVisualizer
 {
     public static class AppSettings
     {
-        // 1. 파도의 크기 (최대 진폭 스케일 0~100)
+        public const double WaveIntensityMax = 50.0;
+        // 1. 파도의 크기 (최대 진폭 스케일 0~50)
         public static double WaveIntensity { get; set; } = 50.0;
         // 2. 파도 위치 변화 속도 (화면상 파도의 위치 변화 속도)
         public static double WavePositionSpeed { get; set; } = 20.0;
@@ -50,7 +51,7 @@ namespace SoundVisualizer
                     var data = JsonSerializer.Deserialize<SettingsData>(json);
                     if (data != null)
                     {
-                        WaveIntensity = data.WaveIntensity;
+                        WaveIntensity = ClampWaveIntensity(data.WaveIntensity);
                         WavePositionSpeed = data.WavePositionSpeed;
                         WaveSensitivity = data.WaveSensitivity;
                         VisualOpacity = data.VisualOpacity;
@@ -79,7 +80,7 @@ namespace SoundVisualizer
             {
                 var data = new SettingsData
                 {
-                    WaveIntensity = WaveIntensity,
+                    WaveIntensity = ClampWaveIntensity(WaveIntensity),
                     WavePositionSpeed = WavePositionSpeed,
                     WaveSensitivity = WaveSensitivity,
                     VisualOpacity = VisualOpacity,
@@ -123,5 +124,8 @@ namespace SoundVisualizer
             public string ColorSpeech { get; set; } = "#FFFFFF00";
             public string ColorDanger { get; set; } = "#FFFF0000";
         }
+
+        private static double ClampWaveIntensity(double value)
+            => Math.Max(0.0, Math.Min(WaveIntensityMax, value));
     }
 }
