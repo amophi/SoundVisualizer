@@ -17,14 +17,19 @@ namespace SoundVisualizer.Visualizers
             double h = context.Height;
 
             bool anyActive = false;
+            double maxDepth = 0.0;
             for (int i = 0; i < channelDepths.Length; i++)
             {
+                if (channelDepths[i] > maxDepth) maxDepth = channelDepths[i];
                 if (channelDepths[i] > 3) { anyActive = true; break; }
             }
             if (!anyActive) return Geometry.Empty;
 
-            double cornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.12);
-            cornerRadius = Math.Min(cornerRadius, Math.Min(w, h) * 0.5 - 1.0);
+            double maxCornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.12);
+            maxCornerRadius = Math.Min(maxCornerRadius, Math.Min(w, h) * 0.5 - 1.0);
+            // 저레벨에서는 코너 라운드를 거의 0으로 줄여 "고정 코너 파형"을 방지합니다.
+            double activity = Clamp01((maxDepth - 6.0) / 24.0);
+            double cornerRadius = maxCornerRadius * activity * activity;
             double P = GetRoundedPerimeter(w, h, cornerRadius);
 
             double topHalf = (w * 0.5) - cornerRadius;
@@ -49,13 +54,29 @@ namespace SoundVisualizer.Visualizers
 
             int N = WAVE_SAMPLE_COUNT;
             var inner = new Point[N];
+            double[] cornerDists = new[]
+            {
+                dist_tr, dist_br, dist_bl, dist_tl
+            };
+            double cornerFade = Math.Max(12.0, Math.Min(w, h) * 0.09);
+            double baseCap = Math.Min(w, h) * 0.42;
+            double noiseGate = 2.0;
 
             for (int i = 0; i < N; i++)
             {
                 double dist = (P * i) / N; 
                 double t = dist / P;
-                double d = GetWaveDepth(t, time, channelDepths, channelPos);
-                d = Math.Min(d, Math.Min(w, h) * 0.45);
+                double rawDepth = GetWaveDepth(t, time, channelDepths, channelPos);
+                double d = Math.Max(0.0, rawDepth - noiseGate);
+
+                // 큰 진폭을 부드럽게 누르는 전역 soft-cap
+                d = SoftCap(d, baseCap);
+
+                // 코너 근처에서는 허용 상한을 더 낮춰 말려 올라가는 현상을 줄입니다.
+                double nearestCornerDist = GetNearestCornerDistance(dist, P, cornerDists);
+                double cornerBlend = SmoothStep01(nearestCornerDist / cornerFade);
+                double cornerCapScale = 0.72 + 0.28 * cornerBlend;
+                d = Math.Min(d, baseCap * cornerCapScale);
 
                 GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point edgePos, out Vector normal);
                 inner[i] = new Point(edgePos.X + normal.X * d, edgePos.Y + normal.Y * d);
@@ -103,6 +124,12 @@ namespace SoundVisualizer.Visualizers
             double dist, double w, double h, double r, double perimeter,
             out Point point, out Vector normal)
         {
+            if (r <= 1e-6)
+            {
+                GetRectEdgePointAndNormal(dist, w, h, out point, out normal);
+                return;
+            }
+
             dist = ((dist % perimeter) + perimeter) % perimeter;
 
             double topHalf = (w * 0.5) - r;
@@ -185,6 +212,71 @@ namespace SoundVisualizer.Visualizers
             point = new Point(r + dist, 0);
             normal = new Vector(0, 1);
         }
+
+        private static void GetRectEdgePointAndNormal(double dist, double w, double h, out Point point, out Vector normal)
+        {
+            double perimeter = 2.0 * (w + h);
+            dist = ((dist % perimeter) + perimeter) % perimeter;
+
+            if (dist <= w)
+            {
+                point = new Point(dist, 0);
+                normal = new Vector(0, 1);
+                return;
+            }
+            dist -= w;
+
+            if (dist <= h)
+            {
+                point = new Point(w, dist);
+                normal = new Vector(-1, 0);
+                return;
+            }
+            dist -= h;
+
+            if (dist <= w)
+            {
+                point = new Point(w - dist, h);
+                normal = new Vector(0, -1);
+                return;
+            }
+            dist -= w;
+
+            point = new Point(0, h - dist);
+            normal = new Vector(1, 0);
+        }
+
+        private static double GetNearestCornerDistance(double dist, double perimeter, double[] cornerDists)
+        {
+            double min = double.MaxValue;
+            for (int i = 0; i < cornerDists.Length; i++)
+            {
+                double d = CircularDistance(dist, cornerDists[i], perimeter);
+                if (d < min) min = d;
+            }
+            return min;
+        }
+
+        private static double CircularDistance(double a, double b, double period)
+        {
+            double diff = Math.Abs(a - b);
+            return Math.Min(diff, period - diff);
+        }
+
+        private static double SoftCap(double x, double cap)
+        {
+            if (cap <= 1e-6 || x <= 0.0)
+                return 0.0;
+            return cap * (1.0 - Math.Exp(-x / cap));
+        }
+
+        private static double SmoothStep01(double t)
+        {
+            t = Clamp01(t);
+            return t * t * (3.0 - 2.0 * t);
+        }
+
+        private static double Clamp01(double v) => Math.Max(0.0, Math.Min(1.0, v));
 
         private double GetWaveDepth(double t, double time, double[] depths, double[] positions)
         {
