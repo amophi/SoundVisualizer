@@ -15,8 +15,11 @@ namespace SoundVisualizer.Visualizers
             double cx = w / 2.0;
             double cy = h / 2.0;
             
-            // 화면 크기에 비례하는 중앙의 일정한 크기의 투명 원
-            double baseRadius = Math.Min(w, h) * 0.18; 
+            // 화면 크기에 비례하며 설정값을 반영하는 중앙의 빈 공간
+            // AppSettings.CircleRadius 범위: 10 ~ 100
+            // 이를 0.05 ~ 0.40 비율 정도로 매핑
+            double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
+            double baseRadius = Math.Min(w, h) * radiusRatio; 
 
             var geometry = new StreamGeometry();
             // FillRule.EvenOdd를 활용해서 바깥쪽 영역과 안쪽 원의 겹치는 부분을 뚫리게 만듭니다.

@@ -494,6 +494,21 @@
                                         </Grid>
                                     </StackPanel>
 
+                                    <!-- 원 크기 셋팅 (원형 모드일 때만 활성화) -->
+                                    <StackPanel x:Name="PanelCircleRadius" Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtCircleRadiusLabel" Text="원 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldCircleRadius" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="40" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtCircleRadius" Text="{Binding Value, ElementName=SldCircleRadius, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtCircleRadiusDesc" Text="원형 모드에서 가운데 빈 공간의 크기(반지름)를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
                                     <StackPanel>
                                         <Grid>
                                             <Grid.ColumnDefinitions>

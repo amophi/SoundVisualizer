@@ -14,8 +14,10 @@ namespace SoundVisualizer
         public static double WaveSensitivity { get; set; } = 3.75; // UI에서 15로 보이도록 설정 (15 / 4)
         // 4. 파도/그래픽 투명도 (0 ~ 100)
         public static double VisualOpacity { get; set; } = 50.0;
-        // 5. 시각화 모드 (0 = Wave 모드, 1 = Pad 모드)
+        // 5. 시각화 모드 (0 = Wave 모드, 1 = Pad 모드, 2 = Circle 모드)
         public static int VisualMode { get; set; } = 0;
+        // 5.5. 원형 모드 반지름 (10 ~ 100)
+        public static double CircleRadius { get; set; } = 40.0;
         // 6. 스테레오 확장 모드 (2채널 소스를 좌/우 전용으로 표시할지 여부)
         public static bool IsStereoUpmixMode { get; set; } = false;
         // 6.5. 광원(Glow) 효과 모드
@@ -58,6 +60,7 @@ namespace SoundVisualizer
                         WaveSensitivity = data.WaveSensitivity;
                         VisualOpacity = data.VisualOpacity;
                         VisualMode = data.VisualMode;
+                        CircleRadius = data.CircleRadius;
                         IsStereoUpmixMode = data.IsStereoUpmixMode;
                         IsGlowMode = data.IsGlowMode;
                         GlowIntensity = data.GlowIntensity;
@@ -89,6 +92,7 @@ namespace SoundVisualizer
                     WaveSensitivity = WaveSensitivity,
                     VisualOpacity = VisualOpacity,
                     VisualMode = VisualMode,
+                    CircleRadius = CircleRadius,
                     IsStereoUpmixMode = IsStereoUpmixMode,
                     IsGlowMode = IsGlowMode,
                     GlowIntensity = GlowIntensity,
@@ -117,6 +121,7 @@ namespace SoundVisualizer
             public double WaveSensitivity { get; set; } = 3.75;
             public double VisualOpacity { get; set; } = 50.0;
             public int VisualMode { get; set; } = 0;
+            public double CircleRadius { get; set; } = 40.0;
             public bool IsStereoUpmixMode { get; set; } = false;
             public bool IsGlowMode { get; set; } = false;
             public double GlowIntensity { get; set; } = 50.0;

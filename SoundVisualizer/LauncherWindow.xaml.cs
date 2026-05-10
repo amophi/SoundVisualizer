@@ -558,6 +558,14 @@ namespace SoundVisualizer
             TxtGlowModeDesc.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
 
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
+            if (SldCircleRadius != null && PanelCircleRadius != null)
+            {
+                SldCircleRadius.Value = AppSettings.CircleRadius;
+                bool isCircle = AppSettings.VisualMode == 2;
+                PanelCircleRadius.IsEnabled = isCircle;
+                PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
+            }
+
             ChkStereoUpmix.IsChecked = AppSettings.IsStereoUpmixMode;
             ChkGlowMode.IsChecked = AppSettings.IsGlowMode;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
@@ -606,7 +614,17 @@ namespace SoundVisualizer
             else if (sender == SldSensitivity && !AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
             else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
             else if (sender == SldGlowIntensity) AppSettings.GlowIntensity = SldGlowIntensity.Value;
-            else if (sender == CmbVisualMode) AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
+            else if (sender == SldCircleRadius) AppSettings.CircleRadius = SldCircleRadius.Value;
+            else if (sender == CmbVisualMode) 
+            {
+                AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
+                if (PanelCircleRadius != null)
+                {
+                    bool isCircle = AppSettings.VisualMode == 2;
+                    PanelCircleRadius.IsEnabled = isCircle;
+                    PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
+                }
+            }
             else if (sender == ChkStereoUpmix) AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
             else if (sender == ChkGlowMode) 
             {
