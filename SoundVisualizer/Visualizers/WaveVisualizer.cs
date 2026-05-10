@@ -9,6 +9,8 @@ namespace SoundVisualizer.Visualizers
     {
         private const int WAVE_SAMPLE_COUNT = 400;
         private const double MAX_WAVE_DEPTH_RATIO = 0.22;
+        private const double ROUND_CORNER_RATIO = 0.14;
+        private const double BASE_INSET_RATIO = 0.015;
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
@@ -24,8 +26,10 @@ namespace SoundVisualizer.Visualizers
             }
             if (!anyActive) return Geometry.Empty;
 
-            double cornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.10);
+            double minSize = Math.Min(w, h);
+            double cornerRadius = Math.Max(8.0, minSize * ROUND_CORNER_RATIO);
             cornerRadius = Math.Min(cornerRadius, Math.Min(w, h) * 0.5 - 1.0);
+            double baseInset = minSize * BASE_INSET_RATIO;
             double P = GetRoundedPerimeter(w, h, cornerRadius);
 
             double topHalf = (w * 0.5) - cornerRadius;
@@ -60,7 +64,8 @@ namespace SoundVisualizer.Visualizers
                 d = Math.Min(d, Math.Min(w, h) * MAX_WAVE_DEPTH_RATIO);
 
                 GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point edgePos, out Vector normal);
-                inner[i] = new Point(edgePos.X + normal.X * d, edgePos.Y + normal.Y * d);
+                double finalOffset = baseInset + d;
+                inner[i] = new Point(edgePos.X + normal.X * finalOffset, edgePos.Y + normal.Y * finalOffset);
             }
 
             var geometry = new StreamGeometry();
