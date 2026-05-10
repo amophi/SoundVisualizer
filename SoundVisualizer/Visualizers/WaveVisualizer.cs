@@ -78,6 +78,18 @@ namespace SoundVisualizer.Visualizers
                 }
             }
 
+            // 코너 전환부(상/우/하/좌 모서리)만 국소적으로 부드럽게 이어
+            // 직선 구간의 형태는 유지하면서 각진 느낌을 완화합니다.
+            int[] cornerIndices = new[]
+            {
+                ((int)Math.Round(N * (dist_tr / P))) % N,
+                ((int)Math.Round(N * (dist_br / P))) % N,
+                ((int)Math.Round(N * (dist_bl / P))) % N,
+                ((int)Math.Round(N * (dist_tl / P))) % N
+            };
+            int cornerRadius = Math.Max(3, N / 70);
+            ApplyCornerSmoothing(inner, cornerIndices, cornerRadius, passes: 2);
+
             var geometry = new StreamGeometry();
             geometry.FillRule = FillRule.EvenOdd;
 
@@ -98,8 +110,8 @@ namespace SoundVisualizer.Visualizers
                     Point p2 = inner[(i + 1) % N];
                     Point p3 = inner[(i + 2) % N];
 
-                    Point cp1 = new Point(p1.X + (p2.X - p0.X) / 8.0, p1.Y + (p2.Y - p0.Y) / 8.0);
-                    Point cp2 = new Point(p2.X - (p3.X - p1.X) / 8.0, p2.Y - (p3.Y - p1.Y) / 8.0);
+                    Point cp1 = new Point(p1.X + (p2.X - p0.X) / 6.0, p1.Y + (p2.Y - p0.Y) / 6.0);
+                    Point cp2 = new Point(p2.X - (p3.X - p1.X) / 6.0, p2.Y - (p3.Y - p1.Y) / 6.0);
 
                     bezierPts.Add(cp1);
                     bezierPts.Add(cp2);
@@ -162,6 +174,54 @@ namespace SoundVisualizer.Visualizers
             double dv = d1;
 
             return Math.Max(0, a * lt * lt * lt + b * lt * lt + c * lt + dv);
+        }
+
+        private static void ApplyCornerSmoothing(Point[] points, int[] cornerIndices, int radius, int passes)
+        {
+            int n = points.Length;
+            if (n < 8 || radius <= 0 || passes <= 0)
+                return;
+
+            for (int pass = 0; pass < passes; pass++)
+            {
+                var next = (Point[])points.Clone();
+
+                foreach (int corner in cornerIndices)
+                {
+                    for (int off = -radius; off <= radius; off++)
+                    {
+                        int idx = Mod(corner + off, n);
+                        int prevIdx = Mod(idx - 1, n);
+                        int nextIdx = Mod(idx + 1, n);
+
+                        double proximity = 1.0 - Math.Abs(off) / (double)(radius + 1);
+                        double alpha = 0.55 * proximity;
+
+                        Point cur = points[idx];
+                        Point smooth = new Point(
+                            (points[prevIdx].X + 2.0 * cur.X + points[nextIdx].X) * 0.25,
+                            (points[prevIdx].Y + 2.0 * cur.Y + points[nextIdx].Y) * 0.25);
+
+                        next[idx] = Lerp(cur, smooth, alpha);
+                    }
+                }
+
+                Array.Copy(next, points, n);
+            }
+        }
+
+        private static Point Lerp(Point a, Point b, double t)
+        {
+            t = Math.Max(0.0, Math.Min(1.0, t));
+            return new Point(
+                a.X + (b.X - a.X) * t,
+                a.Y + (b.Y - a.Y) * t);
+        }
+
+        private static int Mod(int value, int modulo)
+        {
+            int r = value % modulo;
+            return r < 0 ? r + modulo : r;
         }
 
         public Brush GetFillBrush(Color activeColor)
