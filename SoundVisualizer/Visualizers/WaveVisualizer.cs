@@ -21,17 +21,16 @@ namespace SoundVisualizer.Visualizers
             for (int i = 0; i < channelDepths.Length; i++)
             {
                 if (channelDepths[i] > maxDepth) maxDepth = channelDepths[i];
-                if (channelDepths[i] > 3) anyActive = true;
+                if (channelDepths[i] > 3) { anyActive = true; break; }
             }
             if (!anyActive) return Geometry.Empty;
 
-            double maxCornerRadius = Math.Max(5.0, Math.Min(w, h) * 0.08);
+            double maxCornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.12);
             maxCornerRadius = Math.Min(maxCornerRadius, Math.Min(w, h) * 0.5 - 1.0);
             // 저레벨에서는 코너 라운드를 거의 0으로 줄여 "고정 코너 파형"을 방지합니다.
-            double activity = Clamp01((maxDepth - 10.0) / 20.0);
-            double cornerRadius = maxCornerRadius * activity;
+            double activity = Clamp01((maxDepth - 6.0) / 24.0);
+            double cornerRadius = maxCornerRadius * activity * activity;
             double P = GetRoundedPerimeter(w, h, cornerRadius);
-            double rectPerimeter = 2.0 * (w + h);
 
             double topHalf = (w * 0.5) - cornerRadius;
             double rightLen = h - 2.0 * cornerRadius;
@@ -60,37 +59,26 @@ namespace SoundVisualizer.Visualizers
                 dist_tr, dist_br, dist_bl, dist_tl
             };
             double cornerFade = Math.Max(12.0, Math.Min(w, h) * 0.09);
-            double softCap = Math.Min(w, h) * 0.20;
-            double hardCap = Math.Min(w, h) * 0.24;
+            double baseCap = Math.Min(w, h) * 0.42;
             double noiseGate = 2.0;
 
             for (int i = 0; i < N; i++)
             {
-                double t = (double)i / N;
-                double dist = t * P;
-                double rectDist = t * rectPerimeter;
-                double dirActivity = GetDirectionalActivity(t, channelPos, channelDepths);
-                double dirGate = SmoothStep01((dirActivity - 2.5) / 6.0);
+                double dist = (P * i) / N; 
+                double t = dist / P;
                 double rawDepth = GetWaveDepth(t, time, channelDepths, channelPos);
-                double d = Math.Max(0.0, rawDepth - noiseGate) * dirGate;
+                double d = Math.Max(0.0, rawDepth - noiseGate);
 
                 // 큰 진폭을 부드럽게 누르는 전역 soft-cap
-                d = SoftCap(d, softCap);
+                d = SoftCap(d, baseCap);
 
                 // 코너 근처에서는 허용 상한을 더 낮춰 말려 올라가는 현상을 줄입니다.
                 double nearestCornerDist = GetNearestCornerDistance(dist, P, cornerDists);
                 double cornerBlend = SmoothStep01(nearestCornerDist / cornerFade);
-                double cornerCapScale = 0.60 + 0.40 * cornerBlend;
-                d = Math.Min(d, hardCap * cornerCapScale);
+                double cornerCapScale = 0.72 + 0.28 * cornerBlend;
+                d = Math.Min(d, baseCap * cornerCapScale);
 
-                GetRectEdgePointAndNormal(rectDist, w, h, out Point rectEdgePos, out Vector rectNormal);
-                GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point roundedEdgePos, out Vector roundedNormal);
-                Point edgePos = Lerp(rectEdgePos, roundedEdgePos, dirGate);
-                Vector normal = Lerp(rectNormal, roundedNormal, dirGate);
-                if (normal.LengthSquared < 1e-8)
-                    normal = rectNormal;
-                else
-                    normal.Normalize();
+                GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point edgePos, out Vector normal);
                 inner[i] = new Point(edgePos.X + normal.X * d, edgePos.Y + normal.Y * d);
             }
 
@@ -230,13 +218,13 @@ namespace SoundVisualizer.Visualizers
             double perimeter = 2.0 * (w + h);
             dist = ((dist % perimeter) + perimeter) % perimeter;
 
-            if (dist <= w * 0.5)
+            if (dist <= w)
             {
-                point = new Point((w * 0.5) + dist, 0);
+                point = new Point(dist, 0);
                 normal = new Vector(0, 1);
                 return;
             }
-            dist -= (w * 0.5);
+            dist -= w;
 
             if (dist <= h)
             {
@@ -254,16 +242,8 @@ namespace SoundVisualizer.Visualizers
             }
             dist -= w;
 
-            if (dist <= h)
-            {
-                point = new Point(0, h - dist);
-                normal = new Vector(1, 0);
-                return;
-            }
-            dist -= h;
-
-            point = new Point(dist, 0);
-            normal = new Vector(0, 1);
+            point = new Point(0, h - dist);
+            normal = new Vector(1, 0);
         }
 
         private static double GetNearestCornerDistance(double dist, double perimeter, double[] cornerDists)
@@ -288,43 +268,6 @@ namespace SoundVisualizer.Visualizers
             if (cap <= 1e-6 || x <= 0.0)
                 return 0.0;
             return cap * (1.0 - Math.Exp(-x / cap));
-        }
-
-        private static double GetDirectionalActivity(double t, double[] channelPos, double[] channelDepths)
-        {
-            int n = Math.Min(channelPos.Length, channelDepths.Length);
-            if (n == 0)
-                return 0.0;
-
-            int nearest = 0;
-            double minDist = double.MaxValue;
-            for (int i = 0; i < n; i++)
-            {
-                double d = CircularDistance(t, channelPos[i], 1.0);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    nearest = i;
-                }
-            }
-
-            return Math.Max(0.0, channelDepths[nearest]);
-        }
-
-        private static Point Lerp(Point a, Point b, double t)
-        {
-            t = Clamp01(t);
-            return new Point(
-                a.X + (b.X - a.X) * t,
-                a.Y + (b.Y - a.Y) * t);
-        }
-
-        private static Vector Lerp(Vector a, Vector b, double t)
-        {
-            t = Clamp01(t);
-            return new Vector(
-                a.X + (b.X - a.X) * t,
-                a.Y + (b.Y - a.Y) * t);
         }
 
         private static double SmoothStep01(double t)
