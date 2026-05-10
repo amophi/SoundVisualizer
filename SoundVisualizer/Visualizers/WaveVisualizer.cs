@@ -44,8 +44,6 @@ namespace SoundVisualizer.Visualizers
             double d_br = GetWaveDepth(dist_br / P, time, channelDepths, channelPos);
             double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, channelPos);
             double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, channelPos);
-            double[] corners = new[] { dist_tr, dist_br, dist_bl, dist_tl };
-            double cornerBlendRadius = Math.Max(8.0, Math.Min(w, h) * 0.08);
 
             int N = WAVE_SAMPLE_COUNT;
             var inner = new Point[N];
@@ -57,8 +55,6 @@ namespace SoundVisualizer.Visualizers
                 
                 Point edgePos = GetEdgePosition(dist, w, h, P);
                 double d = GetWaveDepth(t, time, channelDepths, channelPos);
-                double cornerFactor = GetCornerDepthFactor(dist, P, corners, cornerBlendRadius);
-                d *= cornerFactor;
                 
                 if (dist <= dist_tr || dist > dist_tl) 
                 {
@@ -104,9 +100,6 @@ namespace SoundVisualizer.Visualizers
 
                     Point cp1 = new Point(p1.X + (p2.X - p0.X) / 8.0, p1.Y + (p2.Y - p0.Y) / 8.0);
                     Point cp2 = new Point(p2.X - (p3.X - p1.X) / 8.0, p2.Y - (p3.Y - p1.Y) / 8.0);
-
-                    // 코너 인근의 급격한 방향 변화에서 Catmull-Rom 오버슈트를 억제합니다.
-                    ClampControlPoints(ref cp1, ref cp2, p1, p2);
 
                     bezierPts.Add(cp1);
                     bezierPts.Add(cp2);
@@ -169,51 +162,6 @@ namespace SoundVisualizer.Visualizers
             double dv = d1;
 
             return Math.Max(0, a * lt * lt * lt + b * lt * lt + c * lt + dv);
-        }
-
-        private double GetCornerDepthFactor(double dist, double perimeter, double[] corners, double blendRadius)
-        {
-            if (corners.Length == 0 || blendRadius <= 0)
-                return 1.0;
-
-            double minDist = double.MaxValue;
-            for (int i = 0; i < corners.Length; i++)
-            {
-                double d = GetCircularDistance(dist, corners[i], perimeter);
-                if (d < minDist) minDist = d;
-            }
-
-            if (minDist >= blendRadius)
-                return 1.0;
-
-            double t = Math.Max(0.0, Math.Min(1.0, minDist / blendRadius));
-            // 코너에서는 0.35까지 눌러 급격한 돌출을 줄이고, 변 중앙으로 갈수록 1.0 복원.
-            return 0.35 + 0.65 * (t * t * (3.0 - 2.0 * t));
-        }
-
-        private static double GetCircularDistance(double a, double b, double period)
-        {
-            double diff = Math.Abs(a - b);
-            return Math.Min(diff, period - diff);
-        }
-
-        private static void ClampControlPoints(ref Point cp1, ref Point cp2, Point p1, Point p2)
-        {
-            double dx = p2.X - p1.X;
-            double dy = p2.Y - p1.Y;
-            double margin = Math.Max(2.0, Math.Sqrt(dx * dx + dy * dy) * 0.35);
-
-            double minX = Math.Min(p1.X, p2.X) - margin;
-            double maxX = Math.Max(p1.X, p2.X) + margin;
-            double minY = Math.Min(p1.Y, p2.Y) - margin;
-            double maxY = Math.Max(p1.Y, p2.Y) + margin;
-
-            cp1 = new Point(
-                Math.Max(minX, Math.Min(maxX, cp1.X)),
-                Math.Max(minY, Math.Min(maxY, cp1.Y)));
-            cp2 = new Point(
-                Math.Max(minX, Math.Min(maxX, cp2.X)),
-                Math.Max(minY, Math.Min(maxY, cp2.Y)));
         }
 
         public Brush GetFillBrush(Color activeColor)
