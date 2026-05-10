@@ -23,27 +23,29 @@ namespace SoundVisualizer.Visualizers
             }
             if (!anyActive) return Geometry.Empty;
 
-            double P = 2 * (w + h);
+            double cornerRadius = Math.Max(6.0, Math.Min(w, h) * 0.12);
+            cornerRadius = Math.Min(cornerRadius, Math.Min(w, h) * 0.5 - 1.0);
+            double P = GetRoundedPerimeter(w, h, cornerRadius);
 
-            double dist_tc = 0;
-            double dist_tr = w / 2.0;
-            double dist_rc = w / 2.0 + h / 2.0;
-            double dist_br = w / 2.0 + h;
-            double dist_bc = w / 2.0 + h + w / 2.0;
-            double dist_bl = w / 2.0 + h + w;
-            double dist_lc = w / 2.0 + h + w + h / 2.0;
-            double dist_tl = w / 2.0 + h + w + h;
+            double topHalf = (w * 0.5) - cornerRadius;
+            double rightLen = h - 2.0 * cornerRadius;
+            double bottomLen = w - 2.0 * cornerRadius;
+            double arcLen = Math.PI * 0.5 * cornerRadius;
+
+            double dist_tc = 0.0;
+            double dist_tr = topHalf;
+            double dist_rc = topHalf + arcLen + rightLen * 0.5;
+            double dist_br = topHalf + arcLen + rightLen;
+            double dist_bc = topHalf + arcLen + rightLen + arcLen + bottomLen * 0.5;
+            double dist_bl = topHalf + arcLen + rightLen + arcLen + bottomLen;
+            double dist_lc = topHalf + arcLen + rightLen + arcLen + bottomLen + arcLen + rightLen * 0.5;
+            double dist_tl = topHalf + arcLen + rightLen + arcLen + bottomLen + arcLen + rightLen;
 
             double[] channelPos = new double[]
             {
                 dist_tc / P, dist_tr / P, dist_rc / P, dist_br / P,
                 dist_bc / P, dist_bl / P, dist_lc / P, dist_tl / P
             };
-
-            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, channelPos);
-            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, channelPos);
-            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, channelPos);
-            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, channelPos);
 
             int N = WAVE_SAMPLE_COUNT;
             var inner = new Point[N];
@@ -52,43 +54,12 @@ namespace SoundVisualizer.Visualizers
             {
                 double dist = (P * i) / N; 
                 double t = dist / P;
-                
-                Point edgePos = GetEdgePosition(dist, w, h, P);
                 double d = GetWaveDepth(t, time, channelDepths, channelPos);
-                
-                if (dist <= dist_tr || dist > dist_tl) 
-                {
-                    double x = Math.Max(d_tl, Math.Min(w - d_tr, edgePos.X));
-                    inner[i] = new Point(x, d);
-                }
-                else if (dist <= dist_br) 
-                {
-                    double y = Math.Max(d_tr, Math.Min(h - d_br, edgePos.Y));
-                    inner[i] = new Point(w - d, y);
-                }
-                else if (dist <= dist_bl) 
-                {
-                    double x = Math.Max(d_bl, Math.Min(w - d_br, edgePos.X));
-                    inner[i] = new Point(x, h - d);
-                }
-                else 
-                {
-                    double y = Math.Max(d_tl, Math.Min(h - d_bl, edgePos.Y));
-                    inner[i] = new Point(d, y);
-                }
-            }
+                d = Math.Min(d, Math.Min(w, h) * 0.45);
 
-            // 코너 전환부(상/우/하/좌 모서리)만 국소적으로 부드럽게 이어
-            // 직선 구간의 형태는 유지하면서 각진 느낌을 완화합니다.
-            int[] cornerIndices = new[]
-            {
-                ((int)Math.Round(N * (dist_tr / P))) % N,
-                ((int)Math.Round(N * (dist_br / P))) % N,
-                ((int)Math.Round(N * (dist_bl / P))) % N,
-                ((int)Math.Round(N * (dist_tl / P))) % N
-            };
-            int cornerRadius = Math.Max(3, N / 70);
-            ApplyCornerSmoothing(inner, cornerIndices, cornerRadius, passes: 2);
+                GetRoundedEdgePointAndNormal(dist, w, h, cornerRadius, P, out Point edgePos, out Vector normal);
+                inner[i] = new Point(edgePos.X + normal.X * d, edgePos.Y + normal.Y * d);
+            }
 
             var geometry = new StreamGeometry();
             geometry.FillRule = FillRule.EvenOdd;
@@ -125,14 +96,94 @@ namespace SoundVisualizer.Visualizers
             return geometry;
         }
 
-        private Point GetEdgePosition(double dist, double w, double h, double P)
+        private static double GetRoundedPerimeter(double w, double h, double r)
+            => 2.0 * (w + h - 4.0 * r) + 2.0 * Math.PI * r;
+
+        private static void GetRoundedEdgePointAndNormal(
+            double dist, double w, double h, double r, double perimeter,
+            out Point point, out Vector normal)
         {
-            dist = ((dist % P) + P) % P;
-            if (dist <= w / 2) return new Point(w / 2 + dist, 0);
-            if (dist <= w / 2 + h) return new Point(w, dist - w / 2);
-            if (dist <= w / 2 + h + w) return new Point(w - (dist - (w / 2 + h)), h);
-            if (dist <= w / 2 + h + w + h) return new Point(0, h - (dist - (w / 2 + h + w)));
-            return new Point(dist - (w / 2 + h + w + h), 0);
+            dist = ((dist % perimeter) + perimeter) % perimeter;
+
+            double topHalf = (w * 0.5) - r;
+            double rightLen = h - 2.0 * r;
+            double bottomLen = w - 2.0 * r;
+            double arcLen = Math.PI * 0.5 * r;
+
+            if (dist <= topHalf)
+            {
+                point = new Point(w * 0.5 + dist, 0);
+                normal = new Vector(0, 1);
+                return;
+            }
+            dist -= topHalf;
+
+            if (dist <= arcLen)
+            {
+                double a = -Math.PI * 0.5 + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point((w - r) + r * Math.Cos(a), r + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= rightLen)
+            {
+                point = new Point(w, r + dist);
+                normal = new Vector(-1, 0);
+                return;
+            }
+            dist -= rightLen;
+
+            if (dist <= arcLen)
+            {
+                double a = (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point((w - r) + r * Math.Cos(a), (h - r) + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= bottomLen)
+            {
+                point = new Point((w - r) - dist, h);
+                normal = new Vector(0, -1);
+                return;
+            }
+            dist -= bottomLen;
+
+            if (dist <= arcLen)
+            {
+                double a = Math.PI * 0.5 + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point(r + r * Math.Cos(a), (h - r) + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            if (dist <= rightLen)
+            {
+                point = new Point(0, (h - r) - dist);
+                normal = new Vector(1, 0);
+                return;
+            }
+            dist -= rightLen;
+
+            if (dist <= arcLen)
+            {
+                double a = Math.PI + (dist / arcLen) * (Math.PI * 0.5);
+                point = new Point(r + r * Math.Cos(a), r + r * Math.Sin(a));
+                normal = new Vector(-Math.Cos(a), -Math.Sin(a));
+                normal.Normalize();
+                return;
+            }
+            dist -= arcLen;
+
+            point = new Point(r + dist, 0);
+            normal = new Vector(0, 1);
         }
 
         private double GetWaveDepth(double t, double time, double[] depths, double[] positions)
@@ -174,54 +225,6 @@ namespace SoundVisualizer.Visualizers
             double dv = d1;
 
             return Math.Max(0, a * lt * lt * lt + b * lt * lt + c * lt + dv);
-        }
-
-        private static void ApplyCornerSmoothing(Point[] points, int[] cornerIndices, int radius, int passes)
-        {
-            int n = points.Length;
-            if (n < 8 || radius <= 0 || passes <= 0)
-                return;
-
-            for (int pass = 0; pass < passes; pass++)
-            {
-                var next = (Point[])points.Clone();
-
-                foreach (int corner in cornerIndices)
-                {
-                    for (int off = -radius; off <= radius; off++)
-                    {
-                        int idx = Mod(corner + off, n);
-                        int prevIdx = Mod(idx - 1, n);
-                        int nextIdx = Mod(idx + 1, n);
-
-                        double proximity = 1.0 - Math.Abs(off) / (double)(radius + 1);
-                        double alpha = 0.55 * proximity;
-
-                        Point cur = points[idx];
-                        Point smooth = new Point(
-                            (points[prevIdx].X + 2.0 * cur.X + points[nextIdx].X) * 0.25,
-                            (points[prevIdx].Y + 2.0 * cur.Y + points[nextIdx].Y) * 0.25);
-
-                        next[idx] = Lerp(cur, smooth, alpha);
-                    }
-                }
-
-                Array.Copy(next, points, n);
-            }
-        }
-
-        private static Point Lerp(Point a, Point b, double t)
-        {
-            t = Math.Max(0.0, Math.Min(1.0, t));
-            return new Point(
-                a.X + (b.X - a.X) * t,
-                a.Y + (b.Y - a.Y) * t);
-        }
-
-        private static int Mod(int value, int modulo)
-        {
-            int r = value % modulo;
-            return r < 0 ? r + modulo : r;
         }
 
         public Brush GetFillBrush(Color activeColor)
