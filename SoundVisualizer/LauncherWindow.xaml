@@ -472,6 +472,7 @@
                                             <ComboBox Grid.Column="1" x:Name="CmbVisualMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed">
                                                 <ComboBoxItem x:Name="CmbVisualModeWave" Content="파도"/>
                                                 <ComboBoxItem x:Name="CmbVisualModePad" Content="패드"/>
+                                                <ComboBoxItem x:Name="CmbVisualModeCircle" Content="원형"/>
                                             </ComboBox>
                                         </Grid>
                                     </StackPanel>

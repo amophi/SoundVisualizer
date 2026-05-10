@@ -95,6 +95,7 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 기본 형태를 선택합니다.";
                 CmbVisualModeWave.Content = "파도";
                 CmbVisualModePad.Content = "패드";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "원형";
                 TxtStereoModeLabel.Text = "스테레오 모드";
                 TxtStereoModeDesc.Text = "2채널을 기반으로 좌, 우측 소리만을 표현합니다.\n유튜브 영상, 음악 감상 등, 2채널 소스를 청취할 때 사용해 주세요.";
                 ChkStereoUpmix.Content = "켜기";
@@ -153,7 +154,7 @@ namespace SoundVisualizer
                 TxtVisualModeLabel.Text = "Visual Mode";
                 TxtVisualModeDesc.Text = "Selects the basic shape of the graphics drawn on the screen.";
                 CmbVisualModeWave.Content = "Wave";
-                CmbVisualModePad.Content = "Pad";
+                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Cercle";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Circle";
                 TxtStereoModeLabel.Text = "Stereo Mode";
                 TxtStereoModeDesc.Text = "Represents only left and right sounds based on 2 channels.\nPlease use this when listening to 2-channel sources such as YouTube videos or music.";
                 ChkStereoUpmix.Content = "Enable";
@@ -213,6 +214,7 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "画面に描画されるグラフィックの基本形状を選択します。";
                 CmbVisualModeWave.Content = "波";
                 CmbVisualModePad.Content = "パッド";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "円形 (Circle)";
                 TxtStereoModeLabel.Text = "ステレオモード";
                 TxtStereoModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。\nYouTube動画や音楽鑑賞など、2チャンネルソースを聴く際に使用してください。";
                 ChkStereoUpmix.Content = "オン";
@@ -272,6 +274,7 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的基本形状。";
                 CmbVisualModeWave.Content = "波浪";
                 CmbVisualModePad.Content = "面板";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "圆形 (Circle)";
                 TxtStereoModeLabel.Text = "立体声模式";
                 TxtStereoModeDesc.Text = "基于双声道仅表现左右两侧的声音。\n在观看 YouTube 视频、欣赏音乐等收听双声道音源时请使用。";
                 ChkStereoUpmix.Content = "开启";
@@ -330,8 +333,7 @@ namespace SoundVisualizer
                 TxtVisualModeLabel.Text = "Modo visual";
                 TxtVisualModeDesc.Text = "Selecciona la forma básica de los gráficos en pantalla.";
                 CmbVisualModeWave.Content = "Ola";
-                CmbVisualModePad.Content = "Pad";
-                TxtStereoModeLabel.Text = "Modo Estéreo";
+                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtStereoModeLabel.Text = "Modo Estéreo";
                 TxtStereoModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.\nÚselo al escuchar fuentes de 2 canales, como videos de YouTube o música.";
                 ChkStereoUpmix.Content = "Activar";
                 TxtHotkeySettings.Text = "Atajos";
@@ -449,6 +451,7 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "Wählt die Grundform der auf dem Bildschirm gezeichneten Grafiken aus.";
                 CmbVisualModeWave.Content = "Welle";
                 CmbVisualModePad.Content = "Pad";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Kreis";
                 TxtStereoModeLabel.Text = "Stereo-Modus";
                 TxtStereoModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.\nBitte verwenden Sie dies beim Hören von 2-Kanal-Quellen wie YouTube-Videos oder Musik.";
                 ChkStereoUpmix.Content = "Aktivieren";

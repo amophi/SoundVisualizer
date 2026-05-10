@@ -34,7 +34,7 @@ namespace SoundVisualizer
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
         
         // 시각화 모듈 (Strategy Pattern)
-        private IVisualizerMode[] _visualizers = new IVisualizerMode[2];
+        private IVisualizerMode[] _visualizers = new IVisualizerMode[3];
         
         public Action? OnSettingsChangedFromHotkey;
 
@@ -68,6 +68,7 @@ namespace SoundVisualizer
         {
             _visualizers[0] = new WaveVisualizer();
             _visualizers[1] = new PadVisualizer();
+            _visualizers[2] = new CircleRippleVisualizer();
 
             _vectorCalc = new VectorCalculator();
             _soundAI = new SoundClassifier();
@@ -150,7 +151,9 @@ namespace SoundVisualizer
 
             VisualModeText.Text = AppSettings.VisualMode == 0 
                 ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
-                : "🎨 시각화 모드: [F3] 패드 모드 (Pad)";
+                : AppSettings.VisualMode == 1
+                    ? "🎨 시각화 모드: [F3] 패드 모드 (Pad)"
+                    : "🎨 시각화 모드: [F3] 원형 모드 (Circle)";
 
             // F2 키: 스테레오 확장 모드 실시간 전환
             bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
