@@ -25,6 +25,8 @@ namespace SoundVisualizer
         public static string Language { get; set; } = "KOR";
         // 8. 설정 모드 (일반/고급)
         public static bool IsAdvancedSensitivity { get; set; } = false;
+        // 8.5. 관리자 모드
+        public static bool IsAdminMode { get; set; } = false;
 
         // 9. 화면 표시 여부 (환경음, 말소리, 강조음)
         public static bool ShowAmbient { get; set; } = true;
@@ -58,6 +60,7 @@ namespace SoundVisualizer
                         VisualModeHotkey = data.VisualModeHotkey;
                         Language = data.Language ?? "KOR";
                         IsAdvancedSensitivity = data.IsAdvancedSensitivity;
+                        IsAdminMode = data.IsAdminMode;
                         ShowAmbient = data.ShowAmbient;
                         ShowSpeech = data.ShowSpeech;
                         ShowDanger = data.ShowDanger;
@@ -86,6 +89,7 @@ namespace SoundVisualizer
                     VisualModeHotkey = VisualModeHotkey,
                     Language = Language,
                     IsAdvancedSensitivity = IsAdvancedSensitivity,
+                    IsAdminMode = IsAdminMode,
                     ShowAmbient = ShowAmbient,
                     ShowSpeech = ShowSpeech,
                     ShowDanger = ShowDanger,
@@ -111,6 +115,7 @@ namespace SoundVisualizer
             public int VisualModeHotkey { get; set; } = 0x72;  
             public string Language { get; set; } = "KOR";
             public bool IsAdvancedSensitivity { get; set; } = false;
+            public bool IsAdminMode { get; set; } = false;
             public bool ShowAmbient { get; set; } = true;
             public bool ShowSpeech { get; set; } = true;
             public bool ShowDanger { get; set; } = true;

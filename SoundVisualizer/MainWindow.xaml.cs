@@ -31,6 +31,7 @@ namespace SoundVisualizer
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
         private string _currentLabel = "SoundVisualizer 대기 중...";
         private double _animationTime = 0;
+        private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
         
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[2];
@@ -143,6 +144,7 @@ namespace SoundVisualizer
                 AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
                 AppSettings.Save();
                 OnSettingsChangedFromHotkey?.Invoke();
+                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
             }
             _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
@@ -157,6 +159,7 @@ namespace SoundVisualizer
                 AppSettings.IsStereoUpmixMode = !AppSettings.IsStereoUpmixMode;
                 AppSettings.Save();
                 OnSettingsChangedFromHotkey?.Invoke();
+                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
 
@@ -215,15 +218,38 @@ namespace SoundVisualizer
 
             if (isVisible)
             {
-                AILabelText.Text = _currentLabel;
-                AILabelText.Foreground = new SolidColorBrush(activeColor);
-                AILabelText.Visibility = Visibility.Visible;
+                if (AppSettings.IsAdminMode)
+                {
+                    AILabelBorder.Visibility = Visibility.Visible;
+                    AILabelText.Text = _currentLabel;
+                    AILabelText.Foreground = new SolidColorBrush(activeColor);
+                }
+                else
+                {
+                    AILabelBorder.Visibility = Visibility.Collapsed;
+                }
                 UnifiedWave.Visibility = Visibility.Visible;
             }
             else
             {
-                AILabelText.Visibility = Visibility.Collapsed;
+                AILabelBorder.Visibility = Visibility.Collapsed;
                 UnifiedWave.Visibility = Visibility.Collapsed;
+            }
+
+            if (DateTime.Now < _modeUIVisibleUntil)
+                ModeUIStack.Visibility = Visibility.Visible;
+            else
+                ModeUIStack.Visibility = Visibility.Collapsed;
+
+            if (AppSettings.IsAdminMode)
+            {
+                StatusBorder.Visibility = Visibility.Visible;
+                FpsBorder.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                StatusBorder.Visibility = Visibility.Collapsed;
+                FpsBorder.Visibility = Visibility.Collapsed;
             }
 
             double w = this.ActualWidth;

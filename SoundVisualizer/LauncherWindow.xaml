@@ -193,6 +193,33 @@
             </Setter>
         </Style>
 
+        <!-- Toss CheckBox (Right) -->
+        <Style x:Key="TossCheckBoxRight" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter VerticalAlignment="Center" Margin="0,0,14,0"/>
+                            <Grid Width="26" Height="26" VerticalAlignment="Center">
+                                <Border x:Name="CheckBg" Background="#333A44" CornerRadius="8" BorderThickness="0"/>
+                                <Path x:Name="CheckMark" Data="M 7 13 L 11 17 L 19 9" Stroke="White" StrokeThickness="3.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
+                            </Grid>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBg" Property="Background" Value="{StaticResource AccentColor}"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Toss ComboBox -->
         <Style x:Key="TossComboBox" TargetType="{x:Type ComboBox}">
             <Setter Property="Foreground" Value="#111111"/>
@@ -433,32 +460,34 @@
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtVisualModeLabel" Text="표현 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <ComboBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="CmbVisualMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" SelectionChanged="Setting_Changed">
-                                                <ComboBoxItem x:Name="CmbVisualModeWave" Content="Wave (물결)"/>
-                                                <ComboBoxItem x:Name="CmbVisualModePad" Content="Pad (점)"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtVisualModeLabel" Text="표현 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtVisualModeDesc" Text="화면에 그려질 그래픽의 기본 형태를 선택합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <ComboBox Grid.Column="1" x:Name="CmbVisualMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed">
+                                                <ComboBoxItem x:Name="CmbVisualModeWave" Content="파도"/>
+                                                <ComboBoxItem x:Name="CmbVisualModePad" Content="패드"/>
                                             </ComboBox>
                                         </Grid>
-                                        <TextBlock x:Name="TxtVisualModeDesc" Text="화면에 그려질 그래픽의 기본 형태를 선택합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtStereoModeLabel" Text="스테레오 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <CheckBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="ChkStereoUpmix" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtStereoModeLabel" Text="스테레오 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtStereoModeDesc" Text="2채널을 기반으로 좌, 우측 소리만을 표현합니다.&#x0a;유튜브 영상, 음악 감상 등, 2채널 소스를 청취할 때 사용해 주세요." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" x:Name="ChkStereoUpmix" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtStereoModeDesc" Text="2채널을 기반으로 좌, 우측 소리만을 표현합니다" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -473,7 +502,7 @@
                                                 <ColumnDefinition Width="200"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <Button Grid.Column="1" x:Name="BtnColorAmbient" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -490,7 +519,7 @@
                                                 <ColumnDefinition Width="200"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <Button Grid.Column="1" x:Name="BtnColorSpeech" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -507,7 +536,7 @@
                                                 <ColumnDefinition Width="200"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <Button Grid.Column="1" x:Name="BtnColorDanger" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -552,6 +581,23 @@
                                 </StackPanel>
                             </Border>
 
+                            <TextBlock x:Name="TxtAdminSettings" Text="고급 설정" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock x:Name="TxtAdminModeLabel" Text="관리자 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="TxtAdminModeDesc" Text="디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <CheckBox Grid.Column="1" x:Name="ChkAdminMode" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
                             <Button x:Name="BtnReset" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnReset_Click"/>
 
                         </StackPanel>
@@ -582,6 +628,22 @@
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp3Title" Text="오버레이 종료 방법" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
                                     <TextBlock x:Name="TxtHelp3Desc" Text="실행된 그래픽은 마우스 클릭을 방해하지 않도록 뒤로 투과됩니다. 종료하시려면 윈도우 작업 표시줄의 아이콘을 우클릭하여 '창 닫기'를 누르시거나, 이 런처 창 상단의 ✕ 버튼을 클릭하시면 함께 종료됩니다." 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel>
+                                    <TextBlock x:Name="TxtHelp4Title" Text="AI 소리 분석 및 색상" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="TxtHelp4Desc" Text="AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 말소리, 강조음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다." 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel>
+                                    <TextBlock x:Name="TxtHelp5Title" Text="관리자 모드와 디버깅" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="TxtHelp5Desc" Text="관리자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>

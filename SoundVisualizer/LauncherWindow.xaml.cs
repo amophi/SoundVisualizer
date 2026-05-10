@@ -48,6 +48,12 @@ namespace SoundVisualizer
 
             LoadSettingsToUI();
             _isInitializing = false;
+
+            // Ensure language-specific texts are applied on startup
+            if (CmbLanguage.SelectedItem is ComboBoxItem initialItem)
+            {
+                SetLanguage(initialItem.Content.ToString());
+            }
         }
 
         private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -87,16 +93,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "모드 설정";
                 TxtVisualModeLabel.Text = "표현 모드";
                 TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 기본 형태를 선택합니다.";
-                CmbVisualModeWave.Content = "Wave (물결)";
-                CmbVisualModePad.Content = "Pad (점)";
+                CmbVisualModeWave.Content = "파도";
+                CmbVisualModePad.Content = "패드";
                 TxtStereoModeLabel.Text = "스테레오 모드";
-                TxtStereoModeDesc.Text = "2채널을 기반으로 좌, 우측 소리만을 표현합니다";
+                TxtStereoModeDesc.Text = "2채널을 기반으로 좌, 우측 소리만을 표현합니다.\n유튜브 영상, 음악 감상 등, 2채널 소스를 청취할 때 사용해 주세요.";
                 ChkStereoUpmix.Content = "켜기";
                 TxtHotkeySettings.Text = "단축키";
                 TxtVisualHotkeyLabel.Text = "표현 모드 전환";
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
                 TxtStereoHotkeyLabel.Text = "스테레오 모드 전환";
                 TxtStereoHotkeyDesc.Text = "실행 중 모드를 실시간으로 변경할 단축키입니다.";
+                TxtAdminSettings.Text = "고급 설정";
+                TxtAdminModeLabel.Text = "관리자 모드";
+                TxtAdminModeDesc.Text = "디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다.";
+                ChkAdminMode.Content = "켜기";
                 BtnReset.Content = "기본값으로 되돌리기";
                 TabHelp.Header = "도움말";
                 TxtHelp1Title.Text = "7.1 서라운드 환경";
@@ -104,7 +114,11 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "실시간 단축키 제어";
                 TxtHelp2Desc.Text = "오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 지정된 단축키(기본 F2, F3)를 누르면 실시간으로 형태와 모드가 즉시 전환됩니다.";
                 TxtHelp3Title.Text = "오버레이 종료 방법";
-                TxtHelp3Desc.Text = "실행된 그래픽은 마우스 클릭을 방해하지 않도록 뒤로 투과됩니다. 종료하시려면 윈도우 작업 표시줄의 아이콘을 우클릭하여 '창 닫기'를 누르시거나, 이 런처 창 상단의 ✕ 버튼을 클릭하시면 함께 종료됩니다.";
+                TxtHelp3Desc.Text = "종료하려면 홈 탭의 '실행 중단' 버튼을 누르거나, 이 런처 창 상단의 ✕ 버튼을 클릭하세요.";
+                TxtHelp4Title.Text = "AI 소리 분석 및 색상";
+                TxtHelp4Desc.Text = "AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 말소리, 강조음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다.";
+                TxtHelp5Title.Text = "관리자 모드와 디버깅";
+                TxtHelp5Desc.Text = "관리자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.";
                 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -139,15 +153,19 @@ namespace SoundVisualizer
                 TxtVisualModeLabel.Text = "Visual Mode";
                 TxtVisualModeDesc.Text = "Selects the basic shape of the graphics drawn on the screen.";
                 CmbVisualModeWave.Content = "Wave";
-                CmbVisualModePad.Content = "Pad (Dots)";
+                CmbVisualModePad.Content = "Pad";
                 TxtStereoModeLabel.Text = "Stereo Mode";
-                TxtStereoModeDesc.Text = "Uses 2 channels to only represent left and right sounds.";
+                TxtStereoModeDesc.Text = "Represents only left and right sounds based on 2 channels.\nPlease use this when listening to 2-channel sources such as YouTube videos or music.";
                 ChkStereoUpmix.Content = "Enable";
                 TxtHotkeySettings.Text = "Hotkeys";
                 TxtVisualHotkeyLabel.Text = "Visual Mode Toggle";
                 TxtVisualHotkeyDesc.Text = "Hotkey to change the visual shape in real-time.";
                 TxtStereoHotkeyLabel.Text = "Stereo Mode Toggle";
                 TxtStereoHotkeyDesc.Text = "Hotkey to toggle stereo mode in real-time.";
+                TxtAdminSettings.Text = "Advanced Settings";
+                TxtAdminModeLabel.Text = "Admin Mode";
+                TxtAdminModeDesc.Text = "Displays debug information and audio engine status on screen.";
+                ChkAdminMode.Content = "Enable";
                 BtnReset.Content = "Reset to Defaults";
                 TabHelp.Header = "Help";
                 TxtHelp1Title.Text = "7.1 Surround Environment";
@@ -155,7 +173,11 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Real-time Hotkeys";
                 TxtHelp2Desc.Text = "Even while the overlay is on screen, you can press the designated hotkeys (Default F2, F3) in the background to switch shapes and modes in real-time.";
                 TxtHelp3Title.Text = "How to Close Overlay";
-                TxtHelp3Desc.Text = "The running graphics allow mouse clicks to pass through. To close it, right-click the icon on the Windows taskbar and select 'Close window', or click the ✕ button at the top of this launcher window.";
+                TxtHelp3Desc.Text = "To close, click 'Stop' on the Home tab, or click the ✕ button at the top of this launcher window.";
+                TxtHelp4Title.Text = "AI Sound Analysis & Colors";
+                TxtHelp4Desc.Text = "AI analyzes the type of sound in real-time and displays it with labels and colors. You can assign unique colors to each sound type (Ambient, Speech, Danger) in the settings for intuitive identification.";
+                TxtHelp5Title.Text = "Admin Mode & Debugging";
+                TxtHelp5Desc.Text = "Enabling Admin Mode displays technical information such as detailed AI labels, real-time audio engine channel status, and FPS on the overlay. Useful for checking system operation.";
                 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -189,16 +211,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "モード設定";
                 TxtVisualModeLabel.Text = "表現モード";
                 TxtVisualModeDesc.Text = "画面に描画されるグラフィックの基本形状を選択します。";
-                CmbVisualModeWave.Content = "Wave (波)";
-                CmbVisualModePad.Content = "Pad (点)";
+                CmbVisualModeWave.Content = "波";
+                CmbVisualModePad.Content = "パッド";
                 TxtStereoModeLabel.Text = "ステレオモード";
-                TxtStereoModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。";
+                TxtStereoModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。\nYouTube動画や音楽鑑賞など、2チャンネルソースを聴く際に使用してください。";
                 ChkStereoUpmix.Content = "オン";
                 TxtHotkeySettings.Text = "ショートカットキー";
                 TxtVisualHotkeyLabel.Text = "表現モードの切り替え";
                 TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
                 TxtStereoHotkeyLabel.Text = "ステレオモードの切り替え";
                 TxtStereoHotkeyDesc.Text = "実行中にモードをリアルタイムで変更するショートカットです。";
+                TxtAdminSettings.Text = "詳細設定";
+                TxtAdminModeLabel.Text = "管理者モード";
+                TxtAdminModeDesc.Text = "デバッグ情報とオーディオエンジンの状態を画面に表示します。";
+                ChkAdminMode.Content = "オン";
                 BtnReset.Content = "デフォルトに戻す";
                 TabHelp.Header = "ヘルプ";
                 TxtHelp1Title.Text = "7.1 サラウンド環境";
@@ -206,8 +232,12 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
-                TxtHelp3Desc.Text = "実行されたグラフィックは、マウスクリックを妨げないように背後に透過されます。終了するには、Windowsタスクバーのアイコンを右クリックして「ウィンドウを閉じる」を押すか、このランチャーウィンドウ上部の ✕ ボタンをクリックすると一緒に終了します。";
-                
+                TxtHelp3Desc.Text = "終了するには、ホームタブの「停止」ボタンを押すか、このランチャーウィンドウ上部の ✕ ボタンをクリックしてください。";
+                TxtHelp4Title.Text = "AI音声分析と色";
+                TxtHelp4Desc.Text = "AIがリアルタイムで音の種類を分析し、ラベルと色で表示します。設定で各音の種類（環境音、音声、強調音）ごとに固有の色を指定して、直感的に識別できます。";
+                TxtHelp5Title.Text = "管理者モードとデバッグ";
+                TxtHelp5Desc.Text = "管理者モードを有効にすると、詳細なAIラベル、オーディオエンジンのリアルタイムチャンネル状態、FPSなどの技術情報をオーバーレイに表示します。システムの動作確認に便利です。";
+
                 if (TxtAIDisplaySettings != null)
                 {
                     TxtAIDisplaySettings.Text = "AI音声分類の表示設定";
@@ -240,16 +270,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "模式设置";
                 TxtVisualModeLabel.Text = "表现模式";
                 TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的基本形状。";
-                CmbVisualModeWave.Content = "Wave (波浪)";
-                CmbVisualModePad.Content = "Pad (点)";
+                CmbVisualModeWave.Content = "波浪";
+                CmbVisualModePad.Content = "面板";
                 TxtStereoModeLabel.Text = "立体声模式";
-                TxtStereoModeDesc.Text = "基于双声道仅表现左右两侧的声音。";
+                TxtStereoModeDesc.Text = "基于双声道仅表现左右两侧的声音。\n在观看 YouTube 视频、欣赏音乐等收听双声道音源时请使用。";
                 ChkStereoUpmix.Content = "开启";
                 TxtHotkeySettings.Text = "快捷键";
                 TxtVisualHotkeyLabel.Text = "切换表现模式";
                 TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
                 TxtStereoHotkeyLabel.Text = "切换立体声模式";
                 TxtStereoHotkeyDesc.Text = "在运行中实时改变模式的快捷键。";
+                TxtAdminSettings.Text = "高级设置";
+                TxtAdminModeLabel.Text = "管理员模式";
+                TxtAdminModeDesc.Text = "在屏幕上显示调试信息和音频引擎状态。";
+                ChkAdminMode.Content = "开启";
                 BtnReset.Content = "恢复默认值";
                 TabHelp.Header = "帮助";
                 TxtHelp1Title.Text = "7.1 环绕声环境";
@@ -257,8 +291,12 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
-                TxtHelp3Desc.Text = "运行的图形允许鼠标点击穿透。要关闭它，请右键单击Windows任务栏上的图标并按“关闭窗口”，或单击此启动器窗口顶部的 ✕ 按钮即可一并关闭。";
-                
+                TxtHelp3Desc.Text = "要关闭，请点击“主页”选项卡中的“停止”，或点击此启动器窗口顶部的 ✕ 按钮即可一并关闭。";
+                TxtHelp4Title.Text = "AI 声音分析与颜色";
+                TxtHelp4Desc.Text = "AI 实时分析声音类型，并以标签和颜色显示。您可以在设置中为每种声音类型（环境音、语音、强调音）指定独特的颜色，以便直观区分。";
+                TxtHelp5Title.Text = "管理员模式与调试";
+                TxtHelp5Desc.Text = "启用管理员模式后，将在悬浮窗上显示详细的 AI 标签、音频引擎实时通道状态和 FPS 等技术信息。适用于检查系统运行状态。";
+
                 if (TxtAIDisplaySettings != null)
                 {
                     TxtAIDisplaySettings.Text = "AI声音分类显示设置";
@@ -291,16 +329,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "Ajustes de modo";
                 TxtVisualModeLabel.Text = "Modo visual";
                 TxtVisualModeDesc.Text = "Selecciona la forma básica de los gráficos en pantalla.";
-                CmbVisualModeWave.Content = "Wave (Olas)";
-                CmbVisualModePad.Content = "Pad (Puntos)";
+                CmbVisualModeWave.Content = "Ola";
+                CmbVisualModePad.Content = "Pad";
                 TxtStereoModeLabel.Text = "Modo Estéreo";
-                TxtStereoModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.";
+                TxtStereoModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.\nÚselo al escuchar fuentes de 2 canales, como videos de YouTube o música.";
                 ChkStereoUpmix.Content = "Activar";
                 TxtHotkeySettings.Text = "Atajos";
                 TxtVisualHotkeyLabel.Text = "Cambiar modo visual";
                 TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
                 TxtStereoHotkeyLabel.Text = "Cambiar modo estéreo";
                 TxtStereoHotkeyDesc.Text = "Atajo para cambiar de modo en tiempo real durante la ejecución.";
+                TxtAdminSettings.Text = "Configuración avanzada";
+                TxtAdminModeLabel.Text = "Modo administrador";
+                TxtAdminModeDesc.Text = "Muestra información de depuración y el estado del motor de audio en pantalla.";
+                ChkAdminMode.Content = "Activar";
                 BtnReset.Content = "Restablecer por defecto";
                 TabHelp.Header = "Ayuda";
                 TxtHelp1Title.Text = "Entorno envolvente 7.1";
@@ -308,8 +350,12 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
-                TxtHelp3Desc.Text = "Los gráficos en ejecución permiten que los clics del ratón pasen a través. Para cerrarlo, haz clic derecho en el icono de la barra de tareas de Windows y selecciona 'Cerrar ventana', o haz clic en el botón ✕ en la parte superior de esta ventana.";
-                
+                TxtHelp3Desc.Text = "Para cerrar, haga clic en 'Detener' en la pestaña Inicio, o haga clic en el botón ✕ en la parte superior de esta ventana.";
+                TxtHelp4Title.Text = "Análisis de Sonido AI y Colores";
+                TxtHelp4Desc.Text = "La IA analiza el tipo de sonido en tiempo real y lo muestra con etiquetas y colores. Puede asignar colores únicos a cada tipo de sonido (Ambiental, Voz, Peligro) en los ajustes para una identificación intuitiva.";
+                TxtHelp5Title.Text = "Modo Admin y Depuración";
+                TxtHelp5Desc.Text = "Al activar el Modo Admin, se muestra información técnica como etiquetas de IA detalladas, estado de los canales del motor de audio en tiempo real y FPS en la superposición. Útil para verificar el funcionamiento del sistema.";
+
                 if (TxtAIDisplaySettings != null)
                 {
                     TxtAIDisplaySettings.Text = "Configuración de pantalla AI";
@@ -342,16 +388,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "Paramètres de mode";
                 TxtVisualModeLabel.Text = "Mode visuel";
                 TxtVisualModeDesc.Text = "Sélectionne la forme de base des graphiques dessinés à l'écran.";
-                CmbVisualModeWave.Content = "Wave (Vagues)";
-                CmbVisualModePad.Content = "Pad (Points)";
+                CmbVisualModeWave.Content = "Vague";
+                CmbVisualModePad.Content = "Pad";
                 TxtStereoModeLabel.Text = "Mode Stéréo";
-                TxtStereoModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.";
+                TxtStereoModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.\nVeuillez l'utiliser lors de l'écoute de sources à 2 canaux telles que des vidéos YouTube ou de la musique.";
                 ChkStereoUpmix.Content = "Activer";
                 TxtHotkeySettings.Text = "Raccourcis";
                 TxtVisualHotkeyLabel.Text = "Basculer le mode visuel";
                 TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
                 TxtStereoHotkeyLabel.Text = "Basculer le mode stéréo";
                 TxtStereoHotkeyDesc.Text = "Raccourci pour changer de mode en temps réel pendant l'exécution.";
+                TxtAdminSettings.Text = "Paramètres avancés";
+                TxtAdminModeLabel.Text = "Mode Administrateur";
+                TxtAdminModeDesc.Text = "Affiche les informations de débogage et l'état du moteur audio à l'écran.";
+                ChkAdminMode.Content = "Activer";
                 BtnReset.Content = "Réinitialiser";
                 TabHelp.Header = "Aide";
                 TxtHelp1Title.Text = "Environnement Surround 7.1";
@@ -359,8 +409,12 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
-                TxtHelp3Desc.Text = "Les graphiques en cours d'exécution laissent passer les clics de souris. Pour la fermer, faites un clic droit sur l'icône dans la barre des tâches de Windows et sélectionnez 'Fermer la fenêtre', ou cliquez sur le bouton ✕ en haut de cette fenêtre de lanceur.";
-                
+                TxtHelp3Desc.Text = "Pour fermer, cliquez sur 'Arrêter' dans l'onglet Accueil, ou cliquez sur le bouton ✕ en haut de cette fenêtre.";
+                TxtHelp4Title.Text = "Analyse Sonore IA & Couleurs";
+                TxtHelp4Desc.Text = "L'IA analyse le type de son en temps réel et l'affiche avec des étiquettes et des couleurs. Vous pouvez attribuer des couleurs uniques à chaque type de son (Ambiance, Voix, Danger) dans les paramètres pour une identification intuitive.";
+                TxtHelp5Title.Text = "Mode Admin & Débogage";
+                TxtHelp5Desc.Text = "L'activation du mode Admin affiche des informations techniques telles que des étiquettes IA détaillées, l'état des canaux du moteur audio en temps réel et le FPS sur la superposition. Utile pour vérifier le fonctionnement du système.";
+
                 if (TxtAIDisplaySettings != null)
                 {
                     TxtAIDisplaySettings.Text = "Paramètres d'affichage IA";
@@ -393,16 +447,20 @@ namespace SoundVisualizer
                 TxtModeSettings.Text = "Moduseinstellungen";
                 TxtVisualModeLabel.Text = "Visueller Modus";
                 TxtVisualModeDesc.Text = "Wählt die Grundform der auf dem Bildschirm gezeichneten Grafiken aus.";
-                CmbVisualModeWave.Content = "Wave (Wellen)";
-                CmbVisualModePad.Content = "Pad (Punkte)";
+                CmbVisualModeWave.Content = "Welle";
+                CmbVisualModePad.Content = "Pad";
                 TxtStereoModeLabel.Text = "Stereo-Modus";
-                TxtStereoModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.";
+                TxtStereoModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.\nBitte verwenden Sie dies beim Hören von 2-Kanal-Quellen wie YouTube-Videos oder Musik.";
                 ChkStereoUpmix.Content = "Aktivieren";
                 TxtHotkeySettings.Text = "Tastenkombinationen";
                 TxtVisualHotkeyLabel.Text = "Visuellen Modus umschalten";
                 TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
                 TxtStereoHotkeyLabel.Text = "Stereo-Modus umschalten";
                 TxtStereoHotkeyDesc.Text = "Tastenkombination zum Ändern des Modus in Echtzeit während der Ausführung.";
+                TxtAdminSettings.Text = "Erweiterte Einstellungen";
+                TxtAdminModeLabel.Text = "Administratormodus";
+                TxtAdminModeDesc.Text = "Zeigt Debug-Informationen und den Status der Audio-Engine auf dem Bildschirm an.";
+                ChkAdminMode.Content = "Aktivieren";
                 BtnReset.Content = "Auf Standard zurücksetzen";
                 TabHelp.Header = "Hilfe";
                 TxtHelp1Title.Text = "7.1 Surround-Umgebung";
@@ -410,8 +468,12 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
-                TxtHelp3Desc.Text = "Die laufenden Grafiken lassen Mausklicks durch. Um es zu schließen, klicken Sie mit der rechten Maustaste auf das Symbol in der Windows-Taskleiste und wählen Sie 'Fenster schließen', oder klicken Sie oben in diesem Launcher-Fenster auf die Schaltfläche ✕.";
-                
+                TxtHelp3Desc.Text = "Zum Schließen klicken Sie auf der Registerkarte 'Startseite' auf 'Stoppen' oder klicken Sie auf die Schaltfläche ✕ oben in diesem Fenster.";
+                TxtHelp4Title.Text = "KI-Soundanalyse & Farben";
+                TxtHelp4Desc.Text = "Die KI analysiert die Art des Geräusches in Echtzeit und zeigt sie mit Beschriftungen und Farben an. Sie können jedem Geräuschtyp (Umgebung, Sprache, Gefahr) in den Einstellungen eindeutige Farben zur intuitiven Identifizierung zuweisen.";
+                TxtHelp5Title.Text = "Admin-Modus & Debugging";
+                TxtHelp5Desc.Text = "Das Aktivieren des Admin-Modus zeigt technische Informationen wie detaillierte KI-Labels, Echtzeit-Audiokanäle-Status und FPS auf dem Overlay an. Nützlich zur Überprüfung des Systembetriebs.";
+
                 if (TxtAIDisplaySettings != null)
                 {
                     TxtAIDisplaySettings.Text = "KI-Anzeigeeinstellungen";
@@ -487,6 +549,7 @@ namespace SoundVisualizer
             SldOpacity.Value = 100 - AppSettings.VisualOpacity; // 투명도 수치 반전 (100=완전 투명)
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             ChkStereoUpmix.IsChecked = AppSettings.IsStereoUpmixMode;
+            ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
             CmbStereoHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
@@ -533,6 +596,7 @@ namespace SoundVisualizer
             else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
             else if (sender == CmbVisualMode) AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
             else if (sender == ChkStereoUpmix) AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
+            else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
             else if (sender == CmbStereoHotkey && CmbStereoHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
@@ -661,6 +725,7 @@ namespace SoundVisualizer
             AppSettings.VisualMode = 0;
             AppSettings.IsStereoUpmixMode = false;
             AppSettings.IsAdvancedSensitivity = false;
+            AppSettings.IsAdminMode = false;
             AppSettings.VisualModeHotkey = 0x72; // F3
             AppSettings.StereoUpmixHotkey = 0x71; // F2
 
