@@ -31,11 +31,11 @@ namespace SoundVisualizer.DSP
                 if (channelCount >= 8)
                 {
                     center = Math.Max(center, Math.Abs(samples[i + 2]));
-                    // 인덱스 4,5: 사이드(Side) / 6,7: 백(Back)으로 매핑 순서 조정 (일반적인 7.1 가상화 엔진 기준)
-                    sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 4]));
-                    sideRight = Math.Max(sideRight, Math.Abs(samples[i + 5]));
-                    backLeft = Math.Max(backLeft, Math.Abs(samples[i + 6]));
-                    backRight = Math.Max(backRight, Math.Abs(samples[i + 7]));
+                    // 일반적인 7.1 채널 매핑: 4,5(Back) / 6,7(Side)
+                    backLeft = Math.Max(backLeft, Math.Abs(samples[i + 4]));
+                    backRight = Math.Max(backRight, Math.Abs(samples[i + 5]));
+                    sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 6]));
+                    sideRight = Math.Max(sideRight, Math.Abs(samples[i + 7]));
                 }
                 else if (channelCount == 2)
                 {
@@ -81,11 +81,11 @@ namespace SoundVisualizer.DSP
                 {
                     fc = Math.Max(fc, Math.Abs(samples[i + 2]));
                     lfe = Math.Max(lfe, Math.Abs(samples[i + 3]));
-                    // 매핑 순서: 4,5(Side) / 6,7(Back)
-                    sl = Math.Max(sl, Math.Abs(samples[i + 4]));
-                    sr = Math.Max(sr, Math.Abs(samples[i + 5]));
-                    bl = Math.Max(bl, Math.Abs(samples[i + 6]));
-                    br = Math.Max(br, Math.Abs(samples[i + 7]));
+                    // 일반적인 7.1 채널 매핑: 4,5(Back) / 6,7(Side)
+                    bl = Math.Max(bl, Math.Abs(samples[i + 4]));
+                    br = Math.Max(br, Math.Abs(samples[i + 5]));
+                    sl = Math.Max(sl, Math.Abs(samples[i + 6]));
+                    sr = Math.Max(sr, Math.Abs(samples[i + 7]));
                 }
                 else if (channelCount == 2)
                 {
