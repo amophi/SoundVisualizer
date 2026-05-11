@@ -1,0 +1,67 @@
+[2단계] Python 전이학습 환경
+============================
+
+0) Python 버전
+   - setup_venv.sh 는 python3.12 → 3.11 → … 순으로 잡습니다.
+   - tensorflow 버전은 requirements 에서 하한만 두었으므로, pip이 해당
+     Python 에 맞는 휠만 설치합니다(예: 3.8 → 2.13.x, 3.12 → 2.16+).
+   - 스크립트는 매번 .venv 를 지우고 새로 만듭니다.
+
+1) 위치
+   리포 루트의 tools/transfer_learning/
+
+2) macOS (soundfile)
+   필요 시: brew install libsndfile
+
+3) 가상환경 생성·패키지 설치
+   cd tools/transfer_learning
+   chmod +x setup_venv.sh   # 최초 1회
+   ./setup_venv.sh
+
+4) 검증
+   source .venv/bin/activate
+   python verify_env.py
+   # "No module named 'pkg_resources'" 이면 (setuptools 82+ 때문):
+   #   pip install "setuptools>=70,<82"
+   #   또는: pip install -r requirements.txt
+   # 선택: Hub에서 YAMNet 받기
+   python verify_env.py --hub
+
+5) 다음 단계(3~4번): 임베딩 + 3클래스 헤드 학습
+   python train_three_class_head.py
+   # 옵션 예시:
+   # python train_three_class_head.py --epochs 80 --batch-size 8 --val-ratio 0.2
+
+   결과물:
+   - out/three_class_head.keras   (헤드 모델)
+   - out/three_class_norm.npz     (입력 정규화 mean/std)
+   - out/metrics.json             (검증 정확도, confusion matrix)
+
+6) 안전 전략(권장): 2단계 학습 (기존 규칙 지식 보존 + 새 라벨 미세조정)
+   python train_two_stage_distill.py
+   # 옵션 예시:
+   # python train_two_stage_distill.py --stage1-epochs 30 --stage2-epochs 40 --batch-size 8
+
+   결과물:
+   - out_two_stage/three_class_head_two_stage.keras
+   - out_two_stage/three_class_norm.npz
+   - out_two_stage/metrics_two_stage.json
+
+7) 앱 연동용 ONNX 헤드 생성 (521 점수 -> 3클래스)
+   python train_score_head_onnx.py --stage1-epochs 20 --stage2-epochs 30 --batch-size 8
+
+   결과물:
+   - SoundVisualizer/AIModel/three_class_score_head.onnx
+   - out_score_head/metrics_score_head.json
+
+8) 521 유지 + 총성 보강(권장 실험)
+   # (1) 최소 전처리: 16k/mono + 약한 fade + DC offset 제거
+   python preprocess_audio_for_yamnet.py --fade-ms 8 --overwrite
+
+   # (2) gunshot 보강기 학습(521 점수 -> binary gunshot score)
+   python train_gunshot_booster_onnx.py --epochs 60 --batch-size 8
+
+   결과물:
+   - SoundVisualizer/AIModel/gunshot_booster.onnx
+   - out_gunshot/metrics_gunshot_booster.json
+   - out_gunshot/labels.csv
