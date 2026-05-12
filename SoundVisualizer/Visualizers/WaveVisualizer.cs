@@ -53,29 +53,9 @@ namespace SoundVisualizer.Visualizers
                 double dist = (P * i) / N; 
                 double t = dist / P;
                 
-                Point edgePos = GetEdgePosition(dist, w, h, P);
                 double d = GetWaveDepth(t, time, channelDepths, channelPos);
                 
-                if (dist <= dist_tr || dist > dist_tl) 
-                {
-                    double x = Math.Max(d_tl, Math.Min(w - d_tr, edgePos.X));
-                    inner[i] = new Point(x, d);
-                }
-                else if (dist <= dist_br) 
-                {
-                    double y = Math.Max(d_tr, Math.Min(h - d_br, edgePos.Y));
-                    inner[i] = new Point(w - d, y);
-                }
-                else if (dist <= dist_bl) 
-                {
-                    double x = Math.Max(d_bl, Math.Min(w - d_br, edgePos.X));
-                    inner[i] = new Point(x, h - d);
-                }
-                else 
-                {
-                    double y = Math.Max(d_tl, Math.Min(h - d_bl, edgePos.Y));
-                    inner[i] = new Point(d, y);
-                }
+                inner[i] = GetRoundedInnerPoint(dist, w, h, P, d, d_tr, d_br, d_bl, d_tl);
             }
 
             var geometry = new StreamGeometry();
@@ -111,6 +91,72 @@ namespace SoundVisualizer.Visualizers
 
             geometry.Freeze();
             return geometry;
+        }
+
+        private Point GetRoundedInnerPoint(double dist, double w, double h, double P, double d, double d_tr, double d_br, double d_bl, double d_tl)
+        {
+            double c_tr = w / 2.0;
+            double c_br = w / 2.0 + h;
+            double c_bl = c_br + w;
+            double c_tl = c_bl + h;
+
+            // 라운딩 반경 (파도 깊이에 비례하도록 설정하여 깊이가 0일 때는 깎이지 않도록 함)
+            double R_tr = Math.Min(d_tr * 2.0, Math.Min(w / 2.0, h / 2.0));
+            double R_br = Math.Min(d_br * 2.0, Math.Min(w / 2.0, h / 2.0));
+            double R_bl = Math.Min(d_bl * 2.0, Math.Min(w / 2.0, h / 2.0));
+            double R_tl = Math.Min(d_tl * 2.0, Math.Min(w / 2.0, h / 2.0));
+
+            double distToTL = dist - c_tl;
+            if (dist < w / 2.0) distToTL = dist + P - c_tl;
+
+            // 1) Top-Right 코너
+            if (Math.Abs(dist - c_tr) <= R_tr)
+            {
+                double t = (dist - c_tr + R_tr) / (2 * R_tr);
+                Point p0 = new Point(w - R_tr, d);        // 상단 가로선 끝
+                Point p1 = new Point(w - d, d);           // 구석의 날카로운 꺾임(Control)
+                Point p2 = new Point(w - d, R_tr);        // 우측 세로선 시작
+                // 2차 베지에 곡선으로 안쪽으로 부드럽게 감싸줌
+                return new Point((1 - t) * (1 - t) * p0.X + 2 * (1 - t) * t * p1.X + t * t * p2.X,
+                                 (1 - t) * (1 - t) * p0.Y + 2 * (1 - t) * t * p1.Y + t * t * p2.Y);
+            }
+            // 2) Bottom-Right 코너
+            if (Math.Abs(dist - c_br) <= R_br)
+            {
+                double t = (dist - c_br + R_br) / (2 * R_br);
+                Point p0 = new Point(w - d, h - R_br);
+                Point p1 = new Point(w - d, h - d);
+                Point p2 = new Point(w - R_br, h - d);
+                return new Point((1 - t) * (1 - t) * p0.X + 2 * (1 - t) * t * p1.X + t * t * p2.X,
+                                 (1 - t) * (1 - t) * p0.Y + 2 * (1 - t) * t * p1.Y + t * t * p2.Y);
+            }
+            // 3) Bottom-Left 코너
+            if (Math.Abs(dist - c_bl) <= R_bl)
+            {
+                double t = (dist - c_bl + R_bl) / (2 * R_bl);
+                Point p0 = new Point(R_bl, h - d);
+                Point p1 = new Point(d, h - d);
+                Point p2 = new Point(d, h - R_bl);
+                return new Point((1 - t) * (1 - t) * p0.X + 2 * (1 - t) * t * p1.X + t * t * p2.X,
+                                 (1 - t) * (1 - t) * p0.Y + 2 * (1 - t) * t * p1.Y + t * t * p2.Y);
+            }
+            // 4) Top-Left 코너
+            if (Math.Abs(distToTL) <= R_tl)
+            {
+                double t = (distToTL + R_tl) / (2 * R_tl);
+                Point p0 = new Point(d, R_tl);
+                Point p1 = new Point(d, d);
+                Point p2 = new Point(R_tl, d);
+                return new Point((1 - t) * (1 - t) * p0.X + 2 * (1 - t) * t * p1.X + t * t * p2.X,
+                                 (1 - t) * (1 - t) * p0.Y + 2 * (1 - t) * t * p1.Y + t * t * p2.Y);
+            }
+
+            // 모서리가 아닐 경우 (제한된 직선 구간)
+            Point edgePos = GetEdgePosition(dist, w, h, P);
+            if (dist <= c_tr || dist > c_tl) return new Point(Math.Max(d, Math.Min(w - d, edgePos.X)), d); // Top
+            if (dist <= c_br) return new Point(w - d, Math.Max(d, Math.Min(h - d, edgePos.Y))); // Right
+            if (dist <= c_bl) return new Point(Math.Max(d, Math.Min(w - d, edgePos.X)), h - d); // Bottom
+            return new Point(d, Math.Max(d, Math.Min(h - d, edgePos.Y))); // Left
         }
 
         private Point GetEdgePosition(double dist, double w, double h, double P)

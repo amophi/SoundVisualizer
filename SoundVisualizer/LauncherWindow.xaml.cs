@@ -83,11 +83,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "크기";
                 TxtIntensityDesc.Text = "그래픽이 화면을 덮는 전체적인 크기와 길이를 조절합니다.";
                 TxtSpeedLabel.Text = "속도";
-                TxtSpeedDesc.Text = "파동이 화면의 끝을 향해 퍼져나가는 속도를 조절합니다.";
+                TxtSpeedDesc.Text = "오버레이가 소리의 방향을 따라가는 속도를 조절합니다.";
                 TxtSensitivityLabel.Text = "민감도";
                 TxtSensitivityDesc.Text = "작은 소리에도 그래픽이 얼마나 민감하게 반응할지 결정합니다.";
-                TxtAdvSensitivityLabel.Text = "민감도 (고급)";
-                TxtAdvSensitivityDesc.Text = "극한의 반응성을 위해 내부 수치 제한을 해제합니다.";
                 TxtOpacityLabel.Text = "투명도";
                 TxtOpacityDesc.Text = "그래픽의 투명도를 조절하여 배경의 비침 정도를 결정합니다.";
                 TxtModeSettings.Text = "모드 설정";
@@ -143,11 +141,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "Intensity";
                 TxtIntensityDesc.Text = "Adjusts the overall size and length of the graphics on the screen.";
                 TxtSpeedLabel.Text = "Speed";
-                TxtSpeedDesc.Text = "Adjusts the speed at which the waves spread across the screen.";
+                TxtSpeedDesc.Text = "Controls the speed at which the overlay follows the direction of the sound.";
                 TxtSensitivityLabel.Text = "Sensitivity";
                 TxtSensitivityDesc.Text = "Determines how sensitively the graphics react to soft sounds.";
-                TxtAdvSensitivityLabel.Text = "Sensitivity (Adv)";
-                TxtAdvSensitivityDesc.Text = "Removes internal limits for extreme responsiveness.";
                 TxtOpacityLabel.Text = "Opacity";
                 TxtOpacityDesc.Text = "Adjusts the graphic transparency to reveal the background behind it.";
                 TxtModeSettings.Text = "Mode Settings";
@@ -202,11 +198,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "サイズ";
                 TxtIntensityDesc.Text = "画面を覆うグラフィックの全体的なサイズと長さを調整します。";
                 TxtSpeedLabel.Text = "速度";
-                TxtSpeedDesc.Text = "波が画面の端に向かって広がる速度を調整します。";
+                TxtSpeedDesc.Text = "オーバーレイが音の方向を追う速度を調整します。";
                 TxtSensitivityLabel.Text = "感度";
                 TxtSensitivityDesc.Text = "小さな音に対してグラフィックがどれだけ敏感に反応するかを決定します。";
-                TxtAdvSensitivityLabel.Text = "感度 (高度)";
-                TxtAdvSensitivityDesc.Text = "極限の応答性のために内部数値制限を解除します。";
                 TxtOpacityLabel.Text = "不透明度";
                 TxtOpacityDesc.Text = "グラフィックの透明度を調整して背景の透け具合を決定します。";
                 TxtModeSettings.Text = "モード設定";
@@ -262,11 +256,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "大小";
                 TxtIntensityDesc.Text = "调整覆盖屏幕的图形的整体大小和长度。";
                 TxtSpeedLabel.Text = "速度";
-                TxtSpeedDesc.Text = "调整波纹向屏幕边缘扩散的速度。";
+                TxtSpeedDesc.Text = "调整覆盖层跟随声音方向的速度。";
                 TxtSensitivityLabel.Text = "灵敏度";
                 TxtSensitivityDesc.Text = "决定图形对微小声音的反应敏锐程度。";
-                TxtAdvSensitivityLabel.Text = "灵敏度 (高级)";
-                TxtAdvSensitivityDesc.Text = "为了达到极限响应，解除内部数值限制。";
                 TxtOpacityLabel.Text = "不透明度";
                 TxtOpacityDesc.Text = "调整图形的透明度以决定背景的可见程度。";
                 TxtModeSettings.Text = "模式设置";
@@ -322,11 +314,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "Tamaño";
                 TxtIntensityDesc.Text = "Ajusta el tamaño y longitud general de los gráficos en la pantalla.";
                 TxtSpeedLabel.Text = "Velocidad";
-                TxtSpeedDesc.Text = "Ajusta la velocidad a la que las ondas se propagan hacia el borde de la pantalla.";
+                TxtSpeedDesc.Text = "Controla la velocidad a la que la superposición sigue la dirección del sonido.";
                 TxtSensitivityLabel.Text = "Sensibilidad";
                 TxtSensitivityDesc.Text = "Determina la sensibilidad de los gráficos ante pequeños sonidos.";
-                TxtAdvSensitivityLabel.Text = "Sensibilidad (Avanzado)";
-                TxtAdvSensitivityDesc.Text = "Elimina los límites internos para una reactividad extrema.";
                 TxtOpacityLabel.Text = "Opacidad";
                 TxtOpacityDesc.Text = "Ajusta la transparencia de los gráficos para determinar la visibilidad del fondo.";
                 TxtModeSettings.Text = "Ajustes de modo";
@@ -380,11 +370,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "Taille";
                 TxtIntensityDesc.Text = "Ajuste la taille et la longueur globales des graphiques à l'écran.";
                 TxtSpeedLabel.Text = "Vitesse";
-                TxtSpeedDesc.Text = "Ajuste la vitesse à laquelle les ondes se propagent vers le bord de l'écran.";
+                TxtSpeedDesc.Text = "Contrôle la vitesse à laquelle la superposition suit la direction du son.";
                 TxtSensitivityLabel.Text = "Sensibilité";
                 TxtSensitivityDesc.Text = "Détermine la sensibilité de réaction des graphiques aux petits sons.";
-                TxtAdvSensitivityLabel.Text = "Sensibilité (Avancé)";
-                TxtAdvSensitivityDesc.Text = "Supprime les limites internes pour une réactivité extrême.";
                 TxtOpacityLabel.Text = "Opacité";
                 TxtOpacityDesc.Text = "Ajuste la transparence des graphiques pour déterminer la visibilité de l'arrière-plan.";
                 TxtModeSettings.Text = "Paramètres de mode";
@@ -439,11 +427,9 @@ namespace SoundVisualizer
                 TxtIntensityLabel.Text = "Größe";
                 TxtIntensityDesc.Text = "Passt die Gesamtgröße und Länge der Grafiken auf dem Bildschirm an.";
                 TxtSpeedLabel.Text = "Geschwindigkeit";
-                TxtSpeedDesc.Text = "Passt die Geschwindigkeit an, mit der sich die Wellen zum Bildschirmrand ausbreiten.";
+                TxtSpeedDesc.Text = "Steuert die Geschwindigkeit, mit der das Overlay der Schallrichtung folgt.";
                 TxtSensitivityLabel.Text = "Empfindlichkeit";
                 TxtSensitivityDesc.Text = "Bestimmt, wie empfindlich die Grafiken auf leise Töne reagieren.";
-                TxtAdvSensitivityLabel.Text = "Empfindlichkeit (Erweitert)";
-                TxtAdvSensitivityDesc.Text = "Hebt interne Beschränkungen für extreme Reaktionsfähigkeit auf.";
                 TxtOpacityLabel.Text = "Deckkraft";
                 TxtOpacityDesc.Text = "Passt die Transparenz der Grafiken an, um die Sichtbarkeit des Hintergrunds zu bestimmen.";
                 TxtModeSettings.Text = "Moduseinstellungen";
@@ -518,37 +504,8 @@ namespace SoundVisualizer
         {
             SldIntensity.Value = AppSettings.WaveIntensity;
             SldSpeed.Value = AppSettings.WavePositionSpeed;
+            SldSensitivity.Value = AppSettings.WaveSensitivity * 4.0; // 0~25 범위를 0~100으로 확장
             
-            ChkAdvancedMode.IsChecked = AppSettings.IsAdvancedSensitivity;
-            if (AppSettings.IsAdvancedSensitivity)
-            {
-                SldAdvSensitivity.Value = AppSettings.WaveSensitivity;
-                SldSensitivity.Value = Math.Min(100.0, AppSettings.WaveSensitivity * 4.0);
-                
-                PanelNormalSensitivity.IsEnabled = false;
-                PanelNormalSensitivity.Opacity = 0.4;
-
-                SldAdvSensitivity.IsEnabled = true;
-                SldAdvSensitivity.Opacity = 1.0;
-                TxtAdvSensitivityLabel.Opacity = 1.0;
-                TxtAdvSensitivityDesc.Opacity = 1.0;
-                TxtAdvSensitivity.Opacity = 1.0;
-            }
-            else
-            {
-                SldSensitivity.Value = AppSettings.WaveSensitivity * 4.0; // 0~25 범위를 0~100으로 확장
-                SldAdvSensitivity.Value = AppSettings.WaveSensitivity;
-                
-                PanelNormalSensitivity.IsEnabled = true;
-                PanelNormalSensitivity.Opacity = 1.0;
-
-                SldAdvSensitivity.IsEnabled = false;
-                SldAdvSensitivity.Opacity = 0.4;
-                TxtAdvSensitivityLabel.Opacity = 0.4;
-                TxtAdvSensitivityDesc.Opacity = 0.4;
-                TxtAdvSensitivity.Opacity = 0.4;
-            }
-
             SldOpacity.Value = 100 - AppSettings.VisualOpacity; // 투명도 수치 반전 (100=완전 투명)
             SldGlowIntensity.Value = AppSettings.GlowIntensity;
             SldGlowIntensity.IsEnabled = AppSettings.IsGlowMode;
@@ -610,8 +567,7 @@ namespace SoundVisualizer
 
             if (sender == SldIntensity) AppSettings.WaveIntensity = SldIntensity.Value;
             else if (sender == SldSpeed) AppSettings.WavePositionSpeed = SldSpeed.Value;
-            else if (sender == SldAdvSensitivity && AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldAdvSensitivity.Value;
-            else if (sender == SldSensitivity && !AppSettings.IsAdvancedSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
+            else if (sender == SldSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
             else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
             else if (sender == SldGlowIntensity) AppSettings.GlowIntensity = SldGlowIntensity.Value;
             else if (sender == SldCircleRadius) AppSettings.CircleRadius = SldCircleRadius.Value;
@@ -683,25 +639,6 @@ namespace SoundVisualizer
             }
         }
 
-        private void ChkAdvancedMode_Changed(object sender, RoutedEventArgs e)
-        {
-            if (_isInitializing) return;
-            
-            bool isAdvanced = ChkAdvancedMode.IsChecked ?? false;
-            AppSettings.IsAdvancedSensitivity = isAdvanced;
-            
-            _isInitializing = true;
-            if (!isAdvanced && AppSettings.WaveSensitivity > 25.0)
-            {
-                // 고급 모드에서 일반 모드로 내려올 때, 값이 25를 초과하면 25로 제한
-                AppSettings.WaveSensitivity = 25.0;
-            }
-            
-            LoadSettingsToUI();
-            AppSettings.Save();
-            _isInitializing = false;
-        }
-
         private void BtnLaunch_Click(object sender, RoutedEventArgs e)
         {
             if (_overlayWindow != null)
@@ -763,7 +700,7 @@ namespace SoundVisualizer
             AppSettings.VisualOpacity = 50.0;
             AppSettings.VisualMode = 0;
             AppSettings.IsStereoUpmixMode = false;
-            AppSettings.IsAdvancedSensitivity = false;
+            
             AppSettings.IsAdminMode = false;
             AppSettings.VisualModeHotkey = 0x72; // F3
             AppSettings.StereoUpmixHotkey = 0x71; // F2

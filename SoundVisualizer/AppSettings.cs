@@ -22,14 +22,14 @@ namespace SoundVisualizer
         public static bool IsStereoUpmixMode { get; set; } = false;
         // 6.5. 광원(Glow) 효과 모드
         public static bool IsGlowMode { get; set; } = false;
-        public static double GlowIntensity { get; set; } = 50.0;
+        public static double GlowIntensity { get; set; } = 0.0;
         // 7. 단축키 설정
         public static int StereoUpmixHotkey { get; set; } = 0x71; // F2
         public static int VisualModeHotkey { get; set; } = 0x72;  // F3
         // 7. 현재 언어 설정
         public static string Language { get; set; } = "KOR";
         // 8. 설정 모드 (일반/고급)
-        public static bool IsAdvancedSensitivity { get; set; } = false;
+        
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
 
@@ -67,7 +67,7 @@ namespace SoundVisualizer
                         StereoUpmixHotkey = data.StereoUpmixHotkey;
                         VisualModeHotkey = data.VisualModeHotkey;
                         Language = data.Language ?? "KOR";
-                        IsAdvancedSensitivity = data.IsAdvancedSensitivity;
+                        
                         IsAdminMode = data.IsAdminMode;
                         ShowAmbient = data.ShowAmbient;
                         ShowSpeech = data.ShowSpeech;
@@ -99,7 +99,7 @@ namespace SoundVisualizer
                     StereoUpmixHotkey = StereoUpmixHotkey,
                     VisualModeHotkey = VisualModeHotkey,
                     Language = Language,
-                    IsAdvancedSensitivity = IsAdvancedSensitivity,
+                    
                     IsAdminMode = IsAdminMode,
                     ShowAmbient = ShowAmbient,
                     ShowSpeech = ShowSpeech,
@@ -124,11 +124,11 @@ namespace SoundVisualizer
             public double CircleRadius { get; set; } = 40.0;
             public bool IsStereoUpmixMode { get; set; } = false;
             public bool IsGlowMode { get; set; } = false;
-            public double GlowIntensity { get; set; } = 50.0;
+            public double GlowIntensity { get; set; } = 0.0;
             public int StereoUpmixHotkey { get; set; } = 0x71; 
             public int VisualModeHotkey { get; set; } = 0x72;  
             public string Language { get; set; } = "KOR";
-            public bool IsAdvancedSensitivity { get; set; } = false;
+            
             public bool IsAdminMode { get; set; } = false;
             public bool ShowAmbient { get; set; } = true;
             public bool ShowSpeech { get; set; } = true;
