@@ -159,17 +159,17 @@ namespace SoundVisualizer
             bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
             if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
             {
-                AppSettings.IsStereoUpmixMode = !AppSettings.IsStereoUpmixMode;
+                AppSettings.SoundMode = (AppSettings.SoundMode + 1) % 3;
                 AppSettings.Save();
                 OnSettingsChangedFromHotkey?.Invoke();
                 _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
 
-            StereoModeText.Text = AppSettings.IsStereoUpmixMode 
-                ? "🎧 채널 모드: [F2] 스테레오 전용 [L / R]" 
-                : "🔊 채널 모드: [F2] 7.1 서라운드";
-            StereoModeText.Foreground = AppSettings.IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
+            StereoModeText.Text = AppSettings.SoundMode == 0 
+                ? "🎧 사운드 모드: [F2] 2 채널" 
+                : (AppSettings.SoundMode == 1 ? "🔊 사운드 모드: [F2] 5.1 채널" : "🔊 사운드 모드: [F2] 7.1 채널");
+            StereoModeText.Foreground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
 
             _frameCount++;
             double fpsElapsed = _fpsStopwatch.Elapsed.TotalSeconds;
@@ -263,7 +263,7 @@ namespace SoundVisualizer
             double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 6.0) / 100.0);
             double[] channelDepths;
             
-            if (AppSettings.IsStereoUpmixMode)
+            if (AppSettings.SoundMode == 0)
             {
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
                 channelDepths = new double[]
@@ -336,7 +336,7 @@ namespace SoundVisualizer
                 
                 // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
                 // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
-                if (AppSettings.IsStereoUpmixMode)
+                if (AppSettings.SoundMode == 0)
                 {
                     sl = fl; bl = fl;
                     sr = fr; br = fr;

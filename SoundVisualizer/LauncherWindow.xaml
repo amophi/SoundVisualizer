@@ -499,10 +499,10 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtStereoModeLabel" Text="스테레오 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtStereoModeDesc" Text="2채널을 기반으로 좌, 우측 소리만을 표현합니다.&#x0a;유튜브 영상, 음악 감상 등, 2채널 소스를 청취할 때 사용해 주세요." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                                <TextBlock x:Name="TxtSoundModeLabel" Text="사운드 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtSoundModeDesc" Text="스피커 환경에 맞는 사운드 채널을 선택합니다.&#x0a;2채널 환경은 '2 채널', 서라운드 환경은 '5.1 채널' 또는 '7.1 채널'을 선택하세요." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
-                                            <CheckBox Grid.Column="1" x:Name="ChkStereoUpmix" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed"><ComboBoxItem x:Name="CmbSoundMode2" Content="2 채널"/><ComboBoxItem x:Name="CmbSoundMode51" Content="5.1 채널"/><ComboBoxItem x:Name="CmbSoundMode71" Content="7.1 채널"/></ComboBox>
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>
@@ -589,10 +589,10 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="50"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtStereoHotkeyLabel" Text="스테레오 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <ComboBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="CmbStereoHotkey" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource TossComboBox}" SelectionChanged="Setting_Changed"/>
+                                            <TextBlock x:Name="TxtSoundModeHotkeyLabel" Text="사운드 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <ComboBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="CmbSoundModeHotkey" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource TossComboBox}" SelectionChanged="Setting_Changed"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtStereoHotkeyDesc" Text="실행 중 모드를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtSoundModeHotkeyDesc" Text="실행 중 모드를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -627,7 +627,7 @@
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp1Title" Text="7.1 서라운드 환경" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp1Desc" Text="정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '스테레오 모드' 기능을 켜주세요." 
+                                    <TextBlock x:Name="TxtHelp1Desc" Text="정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 설정해 주세요." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>
@@ -670,3 +670,5 @@
         </Grid>
     </Border>
 </Window>
+
+

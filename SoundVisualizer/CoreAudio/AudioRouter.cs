@@ -96,12 +96,14 @@ namespace SoundVisualizer.CoreAudio
         }
 
         /// <summary>
-        /// 채널 수 변환. 8ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제.
+        /// 채널 수 변환. 8ch→2ch 및 6ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제.
         /// </summary>
         private static byte[] ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh)
         {
             if (inCh == 8 && outCh == 2 && bytesPerSample == 4)
-                return DownmixTo2ch(input);
+                return Downmix8chTo2ch(input);
+            if (inCh == 6 && outCh == 2 && bytesPerSample == 4)
+                return Downmix6chTo2ch(input);
 
             int frames = input.Length / (inCh * bytesPerSample);
             byte[] output = new byte[frames * outCh * bytesPerSample];
@@ -127,7 +129,7 @@ namespace SoundVisualizer.CoreAudio
         /// R = FR + 0.707*FC + 0.707*SR + 0.5*BR
         /// LFE는 서브우퍼 전용 저음역이므로 일반 스피커 출력에서 제외
         /// </summary>
-        private static byte[] DownmixTo2ch(byte[] input)
+        private static byte[] Downmix8chTo2ch(byte[] input)
         {
             const float kCenter = 0.707f; // -3dB
             const float kSide   = 0.707f; // -3dB
@@ -150,6 +152,38 @@ namespace SoundVisualizer.CoreAudio
 
                 float left  = Math.Clamp(fl + kCenter * fc + kSide * sl + kBack * bl, -1f, 1f);
                 float right = Math.Clamp(fr + kCenter * fc + kSide * sr + kBack * br, -1f, 1f);
+
+                int dstOffset = i * 8;
+                Buffer.BlockCopy(BitConverter.GetBytes(left),  0, output, dstOffset,     4);
+                Buffer.BlockCopy(BitConverter.GetBytes(right), 0, output, dstOffset + 4, 4);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// 5.1ch float32 → 2ch float32 다운믹스 
+        /// 채널 인덱스: 0=FL 1=FR 2=FC 3=LFE 4=BL/SL 5=BR/SR
+        /// </summary>
+        private static byte[] Downmix6chTo2ch(byte[] input)
+        {
+            const float kCenter = 0.707f; // -3dB
+            const float kSurround = 0.707f; // -3dB
+
+            int frames = input.Length / 24; // 6ch * 4bytes
+            byte[] output = new byte[frames * 8]; // 2ch * 4bytes
+
+            for (int i = 0; i < frames; i++)
+            {
+                int srcOffset = i * 24;
+                float fl = BitConverter.ToSingle(input, srcOffset +  0);
+                float fr = BitConverter.ToSingle(input, srcOffset +  4);
+                float fc = BitConverter.ToSingle(input, srcOffset +  8);
+                // LFE는 제외
+                float sl = BitConverter.ToSingle(input, srcOffset + 16);
+                float sr = BitConverter.ToSingle(input, srcOffset + 20);
+
+                float left  = Math.Clamp(fl + kCenter * fc + kSurround * sl, -1f, 1f);
+                float right = Math.Clamp(fr + kCenter * fc + kSurround * sr, -1f, 1f);
 
                 int dstOffset = i * 8;
                 Buffer.BlockCopy(BitConverter.GetBytes(left),  0, output, dstOffset,     4);

@@ -87,6 +87,17 @@ namespace SoundVisualizer.DSP
                     sl = Math.Max(sl, Math.Abs(samples[i + 6]));
                     sr = Math.Max(sr, Math.Abs(samples[i + 7]));
                 }
+                else if (channelCount == 6)
+                {
+                    // 5.1 채널 (FL, FR, FC, LFE, BL/SL, BR/SR)
+                    fc = Math.Max(fc, Math.Abs(samples[i + 2]));
+                    lfe = Math.Max(lfe, Math.Abs(samples[i + 3]));
+                    // 5.1에서는 서라운드 채널(4, 5번 인덱스)을 후면(측면 겸용)으로 매핑
+                    bl = Math.Max(bl, Math.Abs(samples[i + 4]));
+                    br = Math.Max(br, Math.Abs(samples[i + 5]));
+                    sl = Math.Max(sl, Math.Abs(samples[i + 4])); // 사이드쪽으로도 파형이 나오게 복사
+                    sr = Math.Max(sr, Math.Abs(samples[i + 5])); // 동일
+                }
                 else if (channelCount == 2)
                 {
                     // 스테레오 모드: L/R을 FL/FR에 매핑하고, 센터는 합성

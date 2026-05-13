@@ -19,7 +19,7 @@ namespace SoundVisualizer
         // 5.5. 원형 모드 반지름 (10 ~ 100)
         public static double CircleRadius { get; set; } = 40.0;
         // 6. 스테레오 확장 모드 (2채널 소스를 좌/우 전용으로 표시할지 여부)
-        public static bool IsStereoUpmixMode { get; set; } = false;
+        public static int SoundMode { get; set; } = 2;
         // 6.5. 광원(Glow) 효과 모드
         public static bool IsGlowMode { get; set; } = false;
         public static double GlowIntensity { get; set; } = 0.0;
@@ -61,7 +61,7 @@ namespace SoundVisualizer
                         VisualOpacity = data.VisualOpacity;
                         VisualMode = data.VisualMode;
                         CircleRadius = data.CircleRadius;
-                        IsStereoUpmixMode = data.IsStereoUpmixMode;
+                        SoundMode = data.SoundMode;
                         IsGlowMode = data.IsGlowMode;
                         GlowIntensity = data.GlowIntensity;
                         StereoUpmixHotkey = data.StereoUpmixHotkey;
@@ -93,7 +93,7 @@ namespace SoundVisualizer
                     VisualOpacity = VisualOpacity,
                     VisualMode = VisualMode,
                     CircleRadius = CircleRadius,
-                    IsStereoUpmixMode = IsStereoUpmixMode,
+                    SoundMode = SoundMode,
                     IsGlowMode = IsGlowMode,
                     GlowIntensity = GlowIntensity,
                     StereoUpmixHotkey = StereoUpmixHotkey,
@@ -122,7 +122,7 @@ namespace SoundVisualizer
             public double VisualOpacity { get; set; } = 50.0;
             public int VisualMode { get; set; } = 0;
             public double CircleRadius { get; set; } = 40.0;
-            public bool IsStereoUpmixMode { get; set; } = false;
+            public int SoundMode { get; set; } = 2;
             public bool IsGlowMode { get; set; } = false;
             public double GlowIntensity { get; set; } = 0.0;
             public int StereoUpmixHotkey { get; set; } = 0x71; 
@@ -139,3 +139,4 @@ namespace SoundVisualizer
         }
     }
 }
+

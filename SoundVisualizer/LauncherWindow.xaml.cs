@@ -28,7 +28,7 @@ namespace SoundVisualizer
             foreach (var key in _hotkeys.Keys)
             {
                 CmbVisualHotkey.Items.Add(key);
-                CmbStereoHotkey.Items.Add(key);
+                CmbSoundModeHotkey.Items.Add(key);
             }
 
             if (AppSettings.Language == "English" || AppSettings.Language == "ENG")
@@ -94,14 +94,14 @@ namespace SoundVisualizer
                 CmbVisualModeWave.Content = "파도";
                 CmbVisualModePad.Content = "패드";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "원형";
-                TxtStereoModeLabel.Text = "스테레오 모드";
-                TxtStereoModeDesc.Text = "2채널을 기반으로 좌, 우측 소리만을 표현합니다.\n유튜브 영상, 음악 감상 등, 2채널 소스를 청취할 때 사용해 주세요.";
-                ChkStereoUpmix.Content = "켜기";
+                TxtSoundModeLabel.Text = "사운드 모드";
+                TxtSoundModeDesc.Text = "스피커 환경에 맞는 사운드 채널을 선택합니다.\n2채널 환경은 '2 채널', 서라운드 환경은 '5.1 채널' 또는 '7.1 채널'을 선택하세요.";
+                // ChkStereoUpmix.Content = "켜기";
                 TxtHotkeySettings.Text = "단축키";
                 TxtVisualHotkeyLabel.Text = "표현 모드 전환";
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
-                TxtStereoHotkeyLabel.Text = "스테레오 모드 전환";
-                TxtStereoHotkeyDesc.Text = "실행 중 모드를 실시간으로 변경할 단축키입니다.";
+                TxtSoundModeHotkeyLabel.Text = "스테레오 모드 전환";
+                TxtSoundModeHotkeyDesc.Text = "실행 중 모드를 실시간으로 변경할 단축키입니다.";
                 TxtAdminSettings.Text = "고급 설정";
                 TxtAdminModeLabel.Text = "관리자 모드";
                 TxtAdminModeDesc.Text = "디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다.";
@@ -151,14 +151,14 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "Selects the basic shape of the graphics drawn on the screen.";
                 CmbVisualModeWave.Content = "Wave";
                 CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Cercle";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Circle";
-                TxtStereoModeLabel.Text = "Stereo Mode";
-                TxtStereoModeDesc.Text = "Represents only left and right sounds based on 2 channels.\nPlease use this when listening to 2-channel sources such as YouTube videos or music.";
-                ChkStereoUpmix.Content = "Enable";
+                TxtSoundModeLabel.Text = "Stereo Mode";
+                TxtSoundModeDesc.Text = "Represents only left and right sounds based on 2 channels.\nPlease use this when listening to 2-channel sources such as YouTube videos or music.";
+                // ChkStereoUpmix.Content = "Enable";
                 TxtHotkeySettings.Text = "Hotkeys";
                 TxtVisualHotkeyLabel.Text = "Visual Mode Toggle";
                 TxtVisualHotkeyDesc.Text = "Hotkey to change the visual shape in real-time.";
-                TxtStereoHotkeyLabel.Text = "Stereo Mode Toggle";
-                TxtStereoHotkeyDesc.Text = "Hotkey to toggle stereo mode in real-time.";
+                TxtSoundModeHotkeyLabel.Text = "Stereo Mode Toggle";
+                TxtSoundModeHotkeyDesc.Text = "Hotkey to toggle stereo mode in real-time.";
                 TxtAdminSettings.Text = "Advanced Settings";
                 TxtAdminModeLabel.Text = "Admin Mode";
                 TxtAdminModeDesc.Text = "Displays debug information and audio engine status on screen.";
@@ -209,14 +209,14 @@ namespace SoundVisualizer
                 CmbVisualModeWave.Content = "波";
                 CmbVisualModePad.Content = "パッド";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "円形 (Circle)";
-                TxtStereoModeLabel.Text = "ステレオモード";
-                TxtStereoModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。\nYouTube動画や音楽鑑賞など、2チャンネルソースを聴く際に使用してください。";
-                ChkStereoUpmix.Content = "オン";
+                TxtSoundModeLabel.Text = "ステレオモード";
+                TxtSoundModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。\nYouTube動画や音楽鑑賞など、2チャンネルソースを聴く際に使用してください。";
+                // ChkStereoUpmix.Content = "オン";
                 TxtHotkeySettings.Text = "ショートカットキー";
                 TxtVisualHotkeyLabel.Text = "表現モードの切り替え";
                 TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
-                TxtStereoHotkeyLabel.Text = "ステレオモードの切り替え";
-                TxtStereoHotkeyDesc.Text = "実行中にモードをリアルタイムで変更するショートカットです。";
+                TxtSoundModeHotkeyLabel.Text = "ステレオモードの切り替え";
+                TxtSoundModeHotkeyDesc.Text = "実行中にモードをリアルタイムで変更するショートカットです。";
                 TxtAdminSettings.Text = "詳細設定";
                 TxtAdminModeLabel.Text = "管理者モード";
                 TxtAdminModeDesc.Text = "デバッグ情報とオーディオエンジンの状態を画面に表示します。";
@@ -267,14 +267,14 @@ namespace SoundVisualizer
                 CmbVisualModeWave.Content = "波浪";
                 CmbVisualModePad.Content = "面板";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "圆形 (Circle)";
-                TxtStereoModeLabel.Text = "立体声模式";
-                TxtStereoModeDesc.Text = "基于双声道仅表现左右两侧的声音。\n在观看 YouTube 视频、欣赏音乐等收听双声道音源时请使用。";
-                ChkStereoUpmix.Content = "开启";
+                TxtSoundModeLabel.Text = "立体声模式";
+                TxtSoundModeDesc.Text = "基于双声道仅表现左右两侧的声音。\n在观看 YouTube 视频、欣赏音乐等收听双声道音源时请使用。";
+                // ChkStereoUpmix.Content = "开启";
                 TxtHotkeySettings.Text = "快捷键";
                 TxtVisualHotkeyLabel.Text = "切换表现模式";
                 TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
-                TxtStereoHotkeyLabel.Text = "切换立体声模式";
-                TxtStereoHotkeyDesc.Text = "在运行中实时改变模式的快捷键。";
+                TxtSoundModeHotkeyLabel.Text = "切换立体声模式";
+                TxtSoundModeHotkeyDesc.Text = "在运行中实时改变模式的快捷键。";
                 TxtAdminSettings.Text = "高级设置";
                 TxtAdminModeLabel.Text = "管理员模式";
                 TxtAdminModeDesc.Text = "在屏幕上显示调试信息和音频引擎状态。";
@@ -323,14 +323,14 @@ namespace SoundVisualizer
                 TxtVisualModeLabel.Text = "Modo visual";
                 TxtVisualModeDesc.Text = "Selecciona la forma básica de los gráficos en pantalla.";
                 CmbVisualModeWave.Content = "Ola";
-                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtStereoModeLabel.Text = "Modo Estéreo";
-                TxtStereoModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.\nÚselo al escuchar fuentes de 2 canales, como videos de YouTube o música.";
-                ChkStereoUpmix.Content = "Activar";
+                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtSoundModeLabel.Text = "Modo Estéreo";
+                TxtSoundModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.\nÚselo al escuchar fuentes de 2 canales, como videos de YouTube o música.";
+                // ChkStereoUpmix.Content = "Activar";
                 TxtHotkeySettings.Text = "Atajos";
                 TxtVisualHotkeyLabel.Text = "Cambiar modo visual";
                 TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
-                TxtStereoHotkeyLabel.Text = "Cambiar modo estéreo";
-                TxtStereoHotkeyDesc.Text = "Atajo para cambiar de modo en tiempo real durante la ejecución.";
+                TxtSoundModeHotkeyLabel.Text = "Cambiar modo estéreo";
+                TxtSoundModeHotkeyDesc.Text = "Atajo para cambiar de modo en tiempo real durante la ejecución.";
                 TxtAdminSettings.Text = "Configuración avanzada";
                 TxtAdminModeLabel.Text = "Modo administrador";
                 TxtAdminModeDesc.Text = "Muestra información de depuración y el estado del motor de audio en pantalla.";
@@ -380,14 +380,14 @@ namespace SoundVisualizer
                 TxtVisualModeDesc.Text = "Sélectionne la forme de base des graphiques dessinés à l'écran.";
                 CmbVisualModeWave.Content = "Vague";
                 CmbVisualModePad.Content = "Pad";
-                TxtStereoModeLabel.Text = "Mode Stéréo";
-                TxtStereoModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.\nVeuillez l'utiliser lors de l'écoute de sources à 2 canaux telles que des vidéos YouTube ou de la musique.";
-                ChkStereoUpmix.Content = "Activer";
+                TxtSoundModeLabel.Text = "Mode Stéréo";
+                TxtSoundModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.\nVeuillez l'utiliser lors de l'écoute de sources à 2 canaux telles que des vidéos YouTube ou de la musique.";
+                // ChkStereoUpmix.Content = "Activer";
                 TxtHotkeySettings.Text = "Raccourcis";
                 TxtVisualHotkeyLabel.Text = "Basculer le mode visuel";
                 TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
-                TxtStereoHotkeyLabel.Text = "Basculer le mode stéréo";
-                TxtStereoHotkeyDesc.Text = "Raccourci pour changer de mode en temps réel pendant l'exécution.";
+                TxtSoundModeHotkeyLabel.Text = "Basculer le mode stéréo";
+                TxtSoundModeHotkeyDesc.Text = "Raccourci pour changer de mode en temps réel pendant l'exécution.";
                 TxtAdminSettings.Text = "Paramètres avancés";
                 TxtAdminModeLabel.Text = "Mode Administrateur";
                 TxtAdminModeDesc.Text = "Affiche les informations de débogage et l'état du moteur audio à l'écran.";
@@ -438,14 +438,14 @@ namespace SoundVisualizer
                 CmbVisualModeWave.Content = "Welle";
                 CmbVisualModePad.Content = "Pad";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Kreis";
-                TxtStereoModeLabel.Text = "Stereo-Modus";
-                TxtStereoModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.\nBitte verwenden Sie dies beim Hören von 2-Kanal-Quellen wie YouTube-Videos oder Musik.";
-                ChkStereoUpmix.Content = "Aktivieren";
+                TxtSoundModeLabel.Text = "Stereo-Modus";
+                TxtSoundModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.\nBitte verwenden Sie dies beim Hören von 2-Kanal-Quellen wie YouTube-Videos oder Musik.";
+                // ChkStereoUpmix.Content = "Aktivieren";
                 TxtHotkeySettings.Text = "Tastenkombinationen";
                 TxtVisualHotkeyLabel.Text = "Visuellen Modus umschalten";
                 TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
-                TxtStereoHotkeyLabel.Text = "Stereo-Modus umschalten";
-                TxtStereoHotkeyDesc.Text = "Tastenkombination zum Ändern des Modus in Echtzeit während der Ausführung.";
+                TxtSoundModeHotkeyLabel.Text = "Stereo-Modus umschalten";
+                TxtSoundModeHotkeyDesc.Text = "Tastenkombination zum Ändern des Modus in Echtzeit während der Ausführung.";
                 TxtAdminSettings.Text = "Erweiterte Einstellungen";
                 TxtAdminModeLabel.Text = "Administratormodus";
                 TxtAdminModeDesc.Text = "Zeigt Debug-Informationen und den Status der Audio-Engine auf dem Bildschirm an.";
@@ -523,12 +523,12 @@ namespace SoundVisualizer
                 PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
             }
 
-            ChkStereoUpmix.IsChecked = AppSettings.IsStereoUpmixMode;
+            CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
             ChkGlowMode.IsChecked = AppSettings.IsGlowMode;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
-            CmbStereoHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
+            CmbSoundModeHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
 
             if (ChkShowAmbient != null)
             {
@@ -581,7 +581,7 @@ namespace SoundVisualizer
                     PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
                 }
             }
-            else if (sender == ChkStereoUpmix) AppSettings.IsStereoUpmixMode = ChkStereoUpmix.IsChecked ?? false;
+            else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
             else if (sender == ChkGlowMode) 
             {
                 AppSettings.IsGlowMode = ChkGlowMode.IsChecked ?? false;
@@ -593,7 +593,7 @@ namespace SoundVisualizer
             }
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
-            else if (sender == CmbStereoHotkey && CmbStereoHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
+            else if (sender == CmbSoundModeHotkey && CmbSoundModeHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
             else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
             else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;
@@ -699,7 +699,7 @@ namespace SoundVisualizer
             AppSettings.WaveSensitivity = 3.75;
             AppSettings.VisualOpacity = 50.0;
             AppSettings.VisualMode = 0;
-            AppSettings.IsStereoUpmixMode = false;
+            AppSettings.SoundMode = 2;
             
             AppSettings.IsAdminMode = false;
             AppSettings.VisualModeHotkey = 0x72; // F3
@@ -739,3 +739,5 @@ namespace SoundVisualizer
         }
     }
 }
+
+
