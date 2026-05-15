@@ -32,6 +32,7 @@ namespace SoundVisualizer
         private string _currentLabel = "SoundVisualizer 대기 중...";
         private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+        private volatile int _lastSourceChannels = 0;  // 현재 소스 채널 수 (실시간)
         
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[3];
@@ -83,12 +84,12 @@ namespace SoundVisualizer
                 int channels = _captureEngine.CaptureFormat.Channels;
                 if (channels != 8)
                 {
-                    StatusText.Text = $"⚠ 경고: 현재 {channels}채널(스테레오) 모드입니다. 레이더 기능을 위해 7.1채널 설정이 필요합니다.";
+                    StatusText.Text = $"⚠ PC 오디오 설정: {channels}ch (스테레오)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.Orange;
                 }
                 else
                 {
-                    StatusText.Text = "✅ 8채널(7.1) 사운드 엔진 정상 가동 중";
+                    StatusText.Text = "✅ PC 오디오 설정: 8ch (7.1)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.LimeGreen;
                 }
                 _audioRouter.StartRouting(_captureEngine.CaptureFormat);
@@ -248,6 +249,29 @@ namespace SoundVisualizer
             {
                 StatusBorder.Visibility = Visibility.Visible;
                 FpsBorder.Visibility = Visibility.Visible;
+
+                // PC 오디오 설정 채널 수
+                int pcChannels = _captureEngine?.CaptureFormat?.Channels ?? 0;
+                string pcLabel = pcChannels switch
+                {
+                    8 => "7.1",
+                    6 => "5.1",
+                    2 => "스테레오",
+                    > 0 => $"{pcChannels}ch",
+                    _ => "확인 중..."
+                };
+                string pcLine = pcChannels > 0
+                    ? $"PC 오디오 설정: {pcLabel} ({pcChannels}ch)"
+                    : "PC 오디오 설정: 확인 중...";
+
+                // 현재 소스 채널 수
+                int srcCh = _lastSourceChannels;
+                string srcLine = srcCh == 0 ? "현재 캡처 중인 오디오 채널 정보: 대기 중..." : $"현재 캡처 중인 오디오 채널 정보: {srcCh}ch";
+
+                StatusText.Text = $"{pcLine}\n{srcLine}";
+                StatusText.Foreground = (pcChannels == 8)
+                    ? (srcCh == 8 ? Brushes.LimeGreen : srcCh >= 6 ? Brushes.Yellow : Brushes.Orange)
+                    : Brushes.Orange;
             }
             else
             {
@@ -332,6 +356,7 @@ namespace SoundVisualizer
             await Task.Run(() =>
             {
                 _audioRouter.OnDataReceived(this, rawData);
+                _lastSourceChannels = CountActiveChannels(rawData, e.Channels);
                 var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, e.Channels);
                 
                 // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
@@ -347,6 +372,42 @@ namespace SoundVisualizer
                 _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
                 _currentLabel = _soundAI.PredictSoundType(rawData, bytesRecorded, e.Channels);
             });
+        }
+
+        /// <summary>
+        /// float32 멀티채널 버퍼에서 실제로 신호가 있는 채널 수를 반환합니다.
+        /// WASAPI는 소스가 2ch여도 장치 포맷(8ch)으로 패딩하므로,
+        /// 무음(절댓값 합산이 임계값 미만)인 채널은 제외합니다.
+        /// </summary>
+        private static int CountActiveChannels(byte[] buffer, int totalChannels)
+        {
+            const float threshold = 1e-6f;
+            const int bytesPerSample = 4; // float32
+            int frames = buffer.Length / (totalChannels * bytesPerSample);
+            if (frames == 0) return totalChannels;
+
+            // 채널별 RMS 계산 (전체 프레임의 일부만 샘플링)
+            int step = Math.Max(1, frames / 200);
+            var rms = new double[totalChannels];
+            int count = 0;
+            for (int i = 0; i < frames; i += step)
+            {
+                int baseOffset = i * totalChannels * bytesPerSample;
+                for (int ch = 0; ch < totalChannels; ch++)
+                {
+                    float s = BitConverter.ToSingle(buffer, baseOffset + ch * bytesPerSample);
+                    rms[ch] += s * s;
+                }
+                count++;
+            }
+
+            int active = 0;
+            for (int ch = 0; ch < totalChannels; ch++)
+            {
+                if (Math.Sqrt(rms[ch] / count) > threshold)
+                    active++;
+            }
+            return active > 0 ? active : totalChannels;
         }
 
 
