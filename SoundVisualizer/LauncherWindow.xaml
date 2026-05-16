@@ -509,7 +509,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <TextBlock x:Name="TxtAIDisplaySettings" Text="종류별 소리 표시" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
+                            <TextBlock x:Name="TxtAIDisplaySettings" Text="소리 분류 표시" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
 
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
@@ -520,13 +520,16 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            <Button Grid.Column="1" x:Name="BtnColorAmbient" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="{x:Type Button}">
-                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnColorAmbient" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
                                         </Grid>
                                     </StackPanel>
 
@@ -537,13 +540,16 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            <Button Grid.Column="1" x:Name="BtnColorSpeech" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="{x:Type Button}">
-                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnColorSpeech" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
                                         </Grid>
                                     </StackPanel>
 
@@ -554,13 +560,16 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            <Button Grid.Column="1" x:Name="BtnColorDanger" Width="80" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="{x:Type Button}">
-                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnColorDanger" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>

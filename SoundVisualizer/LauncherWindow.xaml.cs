@@ -156,7 +156,7 @@ namespace SoundVisualizer
                 
                 if (TxtAIDisplaySettings != null)
                 {
-                    TxtAIDisplaySettings.Text = "AI 소리 분류 표시 설정";
+                    TxtAIDisplaySettings.Text = "소리 분류 표시";
                     ChkShowAmbient.Content = "환경음 표시";
                     ChkShowSpeech.Content = "말소리 표시";
                     ChkShowDanger.Content = "강조음 표시";
