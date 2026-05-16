@@ -76,6 +76,20 @@ namespace SoundVisualizer
             _captureEngine = new AudioCaptureEngine();
             _audioRouter = new AudioRouter();
 
+            _captureEngine.OnChannelsChanged += (s, currentChannels) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    int autoSoundMode = currentChannels >= 8 ? 2 : (currentChannels >= 6 ? 1 : 0);
+                    if (AppSettings.SoundMode != autoSoundMode)
+                    {
+                        AppSettings.SoundMode = autoSoundMode;
+                        AppSettings.Save();
+                        OnSettingsChangedFromHotkey?.Invoke(); // UI 업데이트 트리거
+                    }
+                });
+            };
+
             _captureEngine.OnAudioDataAvailable += HandleAudioDataAsync;
             _captureEngine.StartCapture();
 

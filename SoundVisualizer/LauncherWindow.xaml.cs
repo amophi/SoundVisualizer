@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 
 namespace SoundVisualizer
 {
-    public partial class LauncherWindow : Window
+    public partial class LauncherWindow : Window, IMMNotificationClient
     {
         private bool _isInitializing = true;
         private MainWindow? _overlayWindow = null;
+        private MMDeviceEnumerator? _deviceEnumerator;
 
         private readonly Dictionary<string, int> _hotkeys = new Dictionary<string, int>
         {
@@ -21,6 +24,23 @@ namespace SoundVisualizer
         {
             InitializeComponent();
             InitializeUI();
+            
+            try
+            {
+                _deviceEnumerator = new MMDeviceEnumerator();
+                _deviceEnumerator.RegisterEndpointNotificationCallback(this);
+            }
+            catch { }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_deviceEnumerator != null)
+            {
+                _deviceEnumerator.UnregisterEndpointNotificationCallback(this);
+                _deviceEnumerator.Dispose();
+            }
+            base.OnClosed(e);
         }
 
         private void InitializeUI()
@@ -43,8 +63,24 @@ namespace SoundVisualizer
                 CmbLanguage.SelectedIndex = 5;
             else if (AppSettings.Language == "Deutsch")
                 CmbLanguage.SelectedIndex = 6;
+            else if (AppSettings.Language == "Русский")
+                CmbLanguage.SelectedIndex = 7;
             else
                 CmbLanguage.SelectedIndex = 0; // KOR
+
+            // 현재 환경의 출력 장치 사운드 채널 자동 파악 및 설정
+            try
+            {
+                using (var enumerator = new NAudio.CoreAudioApi.MMDeviceEnumerator())
+                {
+                    var device = enumerator.GetDefaultAudioEndpoint(NAudio.CoreAudioApi.DataFlow.Render, NAudio.CoreAudioApi.Role.Multimedia);
+                    int channels = device.AudioClient.MixFormat.Channels;
+                    if (channels >= 8) AppSettings.SoundMode = 2; // 7.1채널
+                    else if (channels >= 6) AppSettings.SoundMode = 1; // 5.1채널
+                    else AppSettings.SoundMode = 0; // 2채널
+                }
+            }
+            catch { }
 
             LoadSettingsToUI();
             _isInitializing = false;
@@ -72,7 +108,6 @@ namespace SoundVisualizer
 
             if (lang == "KOR")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "언어";
                 TabHome.Header = "홈";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 영화 감상까지 새로운 경험을 시작하세요.";
@@ -90,7 +125,7 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "그래픽의 투명도를 조절하여 배경의 비침 정도를 결정합니다.";
                 TxtModeSettings.Text = "모드 설정";
                 TxtVisualModeLabel.Text = "표현 모드";
-                TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 기본 형태를 선택합니다.";
+                TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 형태를 선택합니다.";
                 CmbVisualModeWave.Content = "파도";
                 CmbVisualModePad.Content = "패드";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "원형";
@@ -100,24 +135,24 @@ namespace SoundVisualizer
                 TxtHotkeySettings.Text = "단축키";
                 TxtVisualHotkeyLabel.Text = "표현 모드 전환";
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
-                TxtSoundModeHotkeyLabel.Text = "스테레오 모드 전환";
-                TxtSoundModeHotkeyDesc.Text = "실행 중 모드를 실시간으로 변경할 단축키입니다.";
+                TxtSoundModeHotkeyLabel.Text = "사운드 모드 전환";
+                TxtSoundModeHotkeyDesc.Text = "실행 중 사운드 모드를 실시간으로 변경할 단축키입니다.";
                 TxtAdminSettings.Text = "고급 설정";
-                TxtAdminModeLabel.Text = "관리자 모드";
+                TxtAdminModeLabel.Text = "개발자 모드";
                 TxtAdminModeDesc.Text = "디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다.";
                 ChkAdminMode.Content = "켜기";
                 BtnReset.Content = "기본값으로 되돌리기";
                 TabHelp.Header = "도움말";
-                TxtHelp1Title.Text = "7.1 서라운드 환경";
-                TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '스테레오 모드' 기능을 켜주세요.";
+                TxtHelp1Title.Text = "사운드 모드";
+                TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요.";
                 TxtHelp2Title.Text = "실시간 단축키 제어";
                 TxtHelp2Desc.Text = "오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 지정된 단축키(기본 F2, F3)를 누르면 실시간으로 형태와 모드가 즉시 전환됩니다.";
                 TxtHelp3Title.Text = "오버레이 종료 방법";
                 TxtHelp3Desc.Text = "종료하려면 홈 탭의 '실행 중단' 버튼을 누르거나, 이 런처 창 상단의 ✕ 버튼을 클릭하세요.";
                 TxtHelp4Title.Text = "AI 소리 분석 및 색상";
                 TxtHelp4Desc.Text = "AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 말소리, 강조음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다.";
-                TxtHelp5Title.Text = "관리자 모드와 디버깅";
-                TxtHelp5Desc.Text = "관리자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.";
+                TxtHelp5Title.Text = "개발자 모드";
+                TxtHelp5Desc.Text = "개발자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.";
                 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -130,7 +165,6 @@ namespace SoundVisualizer
             }
             else if (lang == "English")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Language";
                 TabHome.Header = "Home";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "Visualize the unseen sounds.\nStart a new experience from gaming to movies.";
@@ -148,33 +182,33 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "Adjusts the graphic transparency to reveal the background behind it.";
                 TxtModeSettings.Text = "Mode Settings";
                 TxtVisualModeLabel.Text = "Visual Mode";
-                TxtVisualModeDesc.Text = "Selects the basic shape of the graphics drawn on the screen.";
+                TxtVisualModeDesc.Text = "Selects the shape of the graphics drawn on the screen.";
                 CmbVisualModeWave.Content = "Wave";
                 CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Cercle";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Circle";
-                TxtSoundModeLabel.Text = "Stereo Mode";
-                TxtSoundModeDesc.Text = "Represents only left and right sounds based on 2 channels.\nPlease use this when listening to 2-channel sources such as YouTube videos or music.";
+                TxtSoundModeLabel.Text = "Sound Mode";
+                TxtSoundModeDesc.Text = "Select the sound channel suitable for your speaker environment.\nFor 2-channel environments, select '2 Channels', and for surround environments, select '5.1 Channels' or '7.1 Channels'.";
                 // ChkStereoUpmix.Content = "Enable";
                 TxtHotkeySettings.Text = "Hotkeys";
                 TxtVisualHotkeyLabel.Text = "Visual Mode Toggle";
                 TxtVisualHotkeyDesc.Text = "Hotkey to change the visual shape in real-time.";
-                TxtSoundModeHotkeyLabel.Text = "Stereo Mode Toggle";
-                TxtSoundModeHotkeyDesc.Text = "Hotkey to toggle stereo mode in real-time.";
+                TxtSoundModeHotkeyLabel.Text = "Sound Mode Toggle";
+                TxtSoundModeHotkeyDesc.Text = "Hotkey to toggle sound mode in real-time.";
                 TxtAdminSettings.Text = "Advanced Settings";
-                TxtAdminModeLabel.Text = "Admin Mode";
+                TxtAdminModeLabel.Text = "Developer Mode";
                 TxtAdminModeDesc.Text = "Displays debug information and audio engine status on screen.";
                 ChkAdminMode.Content = "Enable";
                 BtnReset.Content = "Reset to Defaults";
                 TabHelp.Header = "Help";
-                TxtHelp1Title.Text = "7.1 Surround Environment";
-                TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, enable 'Stereo Mode' in the settings.";
+                TxtHelp1Title.Text = "Sound Mode";
+                TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, set the 'Sound Mode' appropriately in the settings.";
                 TxtHelp2Title.Text = "Real-time Hotkeys";
                 TxtHelp2Desc.Text = "Even while the overlay is on screen, you can press the designated hotkeys (Default F2, F3) in the background to switch shapes and modes in real-time.";
                 TxtHelp3Title.Text = "How to Close Overlay";
                 TxtHelp3Desc.Text = "To close, click 'Stop' on the Home tab, or click the ✕ button at the top of this launcher window.";
                 TxtHelp4Title.Text = "AI Sound Analysis & Colors";
                 TxtHelp4Desc.Text = "AI analyzes the type of sound in real-time and displays it with labels and colors. You can assign unique colors to each sound type (Ambient, Speech, Danger) in the settings for intuitive identification.";
-                TxtHelp5Title.Text = "Admin Mode & Debugging";
-                TxtHelp5Desc.Text = "Enabling Admin Mode displays technical information such as detailed AI labels, real-time audio engine channel status, and FPS on the overlay. Useful for checking system operation.";
+                TxtHelp5Title.Text = "Developer Mode";
+                TxtHelp5Desc.Text = "Enabling Developer Mode displays technical information such as detailed AI labels, real-time audio engine channel status, and FPS on the overlay. Useful for checking system operation.";
                 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -187,7 +221,6 @@ namespace SoundVisualizer
             }
             else if (lang == "日本語")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "言語";
                 TabHome.Header = "ホーム";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "見えない音を画面に描きます。\nゲームから映画鑑賞まで、新しい体験を始めましょう。";
@@ -205,34 +238,34 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "グラフィックの透明度を調整して背景の透け具合を決定します。";
                 TxtModeSettings.Text = "モード設定";
                 TxtVisualModeLabel.Text = "表現モード";
-                TxtVisualModeDesc.Text = "画面に描画されるグラフィックの基本形状を選択します。";
+                TxtVisualModeDesc.Text = "画面に描画されるグラフィックの形状を選択します。";
                 CmbVisualModeWave.Content = "波";
                 CmbVisualModePad.Content = "パッド";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "円形 (Circle)";
-                TxtSoundModeLabel.Text = "ステレオモード";
-                TxtSoundModeDesc.Text = "2チャンネルに基づいて左右の音のみを表現します。\nYouTube動画や音楽鑑賞など、2チャンネルソースを聴く際に使用してください。";
+                TxtSoundModeLabel.Text = "サウンドモード";
+                TxtSoundModeDesc.Text = "スピーカー環境に合ったサウンドチャンネルを選択します。\n2チャンネル環境の場合は「2チャンネル」を、サラウンド環境の場合は「5.1チャンネル」または「7.1チャンネル」を選択してください。";
                 // ChkStereoUpmix.Content = "オン";
                 TxtHotkeySettings.Text = "ショートカットキー";
                 TxtVisualHotkeyLabel.Text = "表現モードの切り替え";
                 TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
-                TxtSoundModeHotkeyLabel.Text = "ステレオモードの切り替え";
-                TxtSoundModeHotkeyDesc.Text = "実行中にモードをリアルタイムで変更するショートカットです。";
+                TxtSoundModeHotkeyLabel.Text = "サウンドモードの切り替え";
+                TxtSoundModeHotkeyDesc.Text = "実行中にサウンドモードをリアルタイムで変更するショートカットです。";
                 TxtAdminSettings.Text = "詳細設定";
-                TxtAdminModeLabel.Text = "管理者モード";
+                TxtAdminModeLabel.Text = "開発者モード";
                 TxtAdminModeDesc.Text = "デバッグ情報とオーディオエンジンの状態を画面に表示します。";
                 ChkAdminMode.Content = "オン";
                 BtnReset.Content = "デフォルトに戻す";
                 TabHelp.Header = "ヘルプ";
-                TxtHelp1Title.Text = "7.1 サラウンド環境";
-                TxtHelp1Desc.Text = "正常な方向性（レーダー）動作のためには、Windowsのサウンド設定で出力デバイスが「7.1 サラウンド」（8チャンネル）に構成されている必要があります。通常のステレオ（2チャンネル）環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「ステレオモード」機能をオンにしてください。";
+                TxtHelp1Title.Text = "サウンドモード";
+                TxtHelp1Desc.Text = "正常な方向性(レーダー)動作のためには、Windowsのサウンド設定で出力デバイスが「5.1 サラウンド」(6チャンネル)または「7.1 サラウンド」(8チャンネル)に構成されている必要があります。通常のステレオ(2チャンネル)環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「サウンドモード」を適切に設定してください。";
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
                 TxtHelp3Desc.Text = "終了するには、ホームタブの「停止」ボタンを押すか、このランチャーウィンドウ上部の ✕ ボタンをクリックしてください。";
                 TxtHelp4Title.Text = "AI音声分析と色";
                 TxtHelp4Desc.Text = "AIがリアルタイムで音の種類を分析し、ラベルと色で表示します。設定で各音の種類（環境音、音声、強調音）ごとに固有の色を指定して、直感的に識別できます。";
-                TxtHelp5Title.Text = "管理者モードとデバッグ";
-                TxtHelp5Desc.Text = "管理者モードを有効にすると、詳細なAIラベル、オーディオエンジンのリアルタイムチャンネル状態、FPSなどの技術情報をオーバーレイに表示します。システムの動作確認に便利です。";
+                TxtHelp5Title.Text = "開発者モード";
+                TxtHelp5Desc.Text = "開発者モードを有効にすると、詳細なAIラベル、オーディオエンジンのリアルタイムチャンネル状態、FPSなどの技術情報をオーバーレイに表示します。システムの動作確認に便利です。";
 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -245,7 +278,6 @@ namespace SoundVisualizer
             }
             else if (lang == "中文")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "语言";
                 TabHome.Header = "主页";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "将看不见的声音描绘在屏幕上。\n从游戏到观影，开始全新的体验。";
@@ -263,34 +295,34 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "调整图形的透明度以决定背景的可见程度。";
                 TxtModeSettings.Text = "模式设置";
                 TxtVisualModeLabel.Text = "表现模式";
-                TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的基本形状。";
+                TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的形状。";
                 CmbVisualModeWave.Content = "波浪";
                 CmbVisualModePad.Content = "面板";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "圆形 (Circle)";
-                TxtSoundModeLabel.Text = "立体声模式";
-                TxtSoundModeDesc.Text = "基于双声道仅表现左右两侧的声音。\n在观看 YouTube 视频、欣赏音乐等收听双声道音源时请使用。";
+                TxtSoundModeLabel.Text = "声音模式";
+                TxtSoundModeDesc.Text = "选择适合您扬声器环境的声音声道。\n对于双声道环境，请选择“2 声道”，对于环绕声环境，请选择“5.1 声道”或“7.1 声道”。";
                 // ChkStereoUpmix.Content = "开启";
                 TxtHotkeySettings.Text = "快捷键";
                 TxtVisualHotkeyLabel.Text = "切换表现模式";
                 TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
-                TxtSoundModeHotkeyLabel.Text = "切换立体声模式";
-                TxtSoundModeHotkeyDesc.Text = "在运行中实时改变模式的快捷键。";
+                TxtSoundModeHotkeyLabel.Text = "切换声音模式";
+                TxtSoundModeHotkeyDesc.Text = "在运行中实时改变声音模式的快捷键。";
                 TxtAdminSettings.Text = "高级设置";
-                TxtAdminModeLabel.Text = "管理员模式";
+                TxtAdminModeLabel.Text = "开发者模式";
                 TxtAdminModeDesc.Text = "在屏幕上显示调试信息和音频引擎状态。";
                 ChkAdminMode.Content = "开启";
                 BtnReset.Content = "恢复默认值";
                 TabHelp.Header = "帮助";
-                TxtHelp1Title.Text = "7.1 环绕声环境";
-                TxtHelp1Desc.Text = "为了使方向性（雷达）正常工作，在Windows声音设置中，输出设备必须配置为“7.1 环绕声”（8声道）。在普通立体声（2声道）环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中开启“立体声模式”功能。";
+                TxtHelp1Title.Text = "声音模式";
+                TxtHelp1Desc.Text = "为了使方向性(雷达)正常工作，在Windows声音设置中，输出设备必须配置为“5.1 环绕声”(6声道)或“7.1 环绕声”(8声道)。在普通立体声(2声道)环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中正确设置“声音模式”。";
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
                 TxtHelp3Desc.Text = "要关闭，请点击“主页”选项卡中的“停止”，或点击此启动器窗口顶部的 ✕ 按钮即可一并关闭。";
                 TxtHelp4Title.Text = "AI 声音分析与颜色";
                 TxtHelp4Desc.Text = "AI 实时分析声音类型，并以标签和颜色显示。您可以在设置中为每种声音类型（环境音、语音、强调音）指定独特的颜色，以便直观区分。";
-                TxtHelp5Title.Text = "管理员模式与调试";
-                TxtHelp5Desc.Text = "启用管理员模式后，将在悬浮窗上显示详细的 AI 标签、音频引擎实时通道状态和 FPS 等技术信息。适用于检查系统运行状态。";
+                TxtHelp5Title.Text = "开发者模式";
+                TxtHelp5Desc.Text = "启用开发者模式后，将在悬浮窗上显示详细的 AI 标签、音频引擎实时通道状态和 FPS 等技术信息。适用于检查系统运行状态。";
 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -303,7 +335,6 @@ namespace SoundVisualizer
             }
             else if (lang == "Español")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Idioma";
                 TabHome.Header = "Inicio";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "Visualiza los sonidos invisibles.\nComienza una nueva experiencia, desde los juegos hasta el cine.";
@@ -321,32 +352,32 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "Ajusta la transparencia de los gráficos para determinar la visibilidad del fondo.";
                 TxtModeSettings.Text = "Ajustes de modo";
                 TxtVisualModeLabel.Text = "Modo visual";
-                TxtVisualModeDesc.Text = "Selecciona la forma básica de los gráficos en pantalla.";
+                TxtVisualModeDesc.Text = "Selecciona la forma de los gráficos en pantalla.";
                 CmbVisualModeWave.Content = "Ola";
-                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtSoundModeLabel.Text = "Modo Estéreo";
-                TxtSoundModeDesc.Text = "Representa solo los sonidos izquierdo y derecho en base a 2 canales.\nÚselo al escuchar fuentes de 2 canales, como videos de YouTube o música.";
+                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtSoundModeLabel.Text = "Modo de Sonido";
+                TxtSoundModeDesc.Text = "Seleccione el canal de sonido adecuado para su entorno de altavoces.\nPara entornos de 2 canales, seleccione '2 Canales', y para entornos envolventes, seleccione '5.1 Canales' o '7.1 Canales'.";
                 // ChkStereoUpmix.Content = "Activar";
                 TxtHotkeySettings.Text = "Atajos";
                 TxtVisualHotkeyLabel.Text = "Cambiar modo visual";
                 TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
-                TxtSoundModeHotkeyLabel.Text = "Cambiar modo estéreo";
-                TxtSoundModeHotkeyDesc.Text = "Atajo para cambiar de modo en tiempo real durante la ejecución.";
+                TxtSoundModeHotkeyLabel.Text = "Cambiar modo de sonido";
+                TxtSoundModeHotkeyDesc.Text = "Atajo para cambiar el modo de sonido en tiempo real durante la ejecución.";
                 TxtAdminSettings.Text = "Configuración avanzada";
-                TxtAdminModeLabel.Text = "Modo administrador";
+                TxtAdminModeLabel.Text = "Modo desarrollador";
                 TxtAdminModeDesc.Text = "Muestra información de depuración y el estado del motor de audio en pantalla.";
                 ChkAdminMode.Content = "Activar";
                 BtnReset.Content = "Restablecer por defecto";
                 TabHelp.Header = "Ayuda";
-                TxtHelp1Title.Text = "Entorno envolvente 7.1";
-                TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, activa la función 'Modo Estéreo' en los ajustes.";
+                TxtHelp1Title.Text = "Modo de Sonido";
+                TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 5.1' (6 canales) o 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, ajuste el 'Modo de Sonido' correctamente en la configuración.";
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
                 TxtHelp3Desc.Text = "Para cerrar, haga clic en 'Detener' en la pestaña Inicio, o haga clic en el botón ✕ en la parte superior de esta ventana.";
                 TxtHelp4Title.Text = "Análisis de Sonido AI y Colores";
                 TxtHelp4Desc.Text = "La IA analiza el tipo de sonido en tiempo real y lo muestra con etiquetas y colores. Puede asignar colores únicos a cada tipo de sonido (Ambiental, Voz, Peligro) en los ajustes para una identificación intuitiva.";
-                TxtHelp5Title.Text = "Modo Admin y Depuración";
-                TxtHelp5Desc.Text = "Al activar el Modo Admin, se muestra información técnica como etiquetas de IA detalladas, estado de los canales del motor de audio en tiempo real y FPS en la superposición. Útil para verificar el funcionamiento del sistema.";
+                TxtHelp5Title.Text = "Modo Desarrollador";
+                TxtHelp5Desc.Text = "Al activar el Modo Desarrollador, se muestra información técnica como etiquetas de IA detalladas, estado de los canales del motor de audio en tiempo real y FPS en la superposición. Útil para verificar el funcionamiento del sistema.";
 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -359,7 +390,6 @@ namespace SoundVisualizer
             }
             else if (lang == "Français")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Langue";
                 TabHome.Header = "Accueil";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "Visualisez les sons invisibles.\nCommencez une nouvelle expérience, des jeux aux films.";
@@ -377,33 +407,33 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "Ajuste la transparence des graphiques pour déterminer la visibilité de l'arrière-plan.";
                 TxtModeSettings.Text = "Paramètres de mode";
                 TxtVisualModeLabel.Text = "Mode visuel";
-                TxtVisualModeDesc.Text = "Sélectionne la forme de base des graphiques dessinés à l'écran.";
+                TxtVisualModeDesc.Text = "Sélectionne la forme des graphiques dessinés à l'écran.";
                 CmbVisualModeWave.Content = "Vague";
                 CmbVisualModePad.Content = "Pad";
-                TxtSoundModeLabel.Text = "Mode Stéréo";
-                TxtSoundModeDesc.Text = "Représente uniquement les sons gauche et droit basés sur 2 canaux.\nVeuillez l'utiliser lors de l'écoute de sources à 2 canaux telles que des vidéos YouTube ou de la musique.";
+                TxtSoundModeLabel.Text = "Mode Sonore";
+                TxtSoundModeDesc.Text = "Sélectionnez le canal audio adapté à votre environnement de haut-parleurs.\nPour les environnements à 2 canaux, sélectionnez '2 Canaux', et pour les environnements surround, sélectionnez '5.1 Canaux' ou '7.1 Canaux'.";
                 // ChkStereoUpmix.Content = "Activer";
                 TxtHotkeySettings.Text = "Raccourcis";
                 TxtVisualHotkeyLabel.Text = "Basculer le mode visuel";
                 TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
-                TxtSoundModeHotkeyLabel.Text = "Basculer le mode stéréo";
-                TxtSoundModeHotkeyDesc.Text = "Raccourci pour changer de mode en temps réel pendant l'exécution.";
+                TxtSoundModeHotkeyLabel.Text = "Basculer le mode sonore";
+                TxtSoundModeHotkeyDesc.Text = "Raccourci pour changer le mode sonore en temps réel pendant l'exécution.";
                 TxtAdminSettings.Text = "Paramètres avancés";
-                TxtAdminModeLabel.Text = "Mode Administrateur";
+                TxtAdminModeLabel.Text = "Mode Développeur";
                 TxtAdminModeDesc.Text = "Affiche les informations de débogage et l'état du moteur audio à l'écran.";
                 ChkAdminMode.Content = "Activer";
                 BtnReset.Content = "Réinitialiser";
                 TabHelp.Header = "Aide";
-                TxtHelp1Title.Text = "Environnement Surround 7.1";
-                TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, activez la fonction 'Mode Stéréo' dans les paramètres.";
+                TxtHelp1Title.Text = "Mode Sonore";
+                TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 5.1' (6 canaux) ou 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, réglez correctement le 'Mode Sonore' dans les paramètres.";
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
                 TxtHelp3Desc.Text = "Pour fermer, cliquez sur 'Arrêter' dans l'onglet Accueil, ou cliquez sur le bouton ✕ en haut de cette fenêtre.";
                 TxtHelp4Title.Text = "Analyse Sonore IA & Couleurs";
                 TxtHelp4Desc.Text = "L'IA analyse le type de son en temps réel et l'affiche avec des étiquettes et des couleurs. Vous pouvez attribuer des couleurs uniques à chaque type de son (Ambiance, Voix, Danger) dans les paramètres pour une identification intuitive.";
-                TxtHelp5Title.Text = "Mode Admin & Débogage";
-                TxtHelp5Desc.Text = "L'activation du mode Admin affiche des informations techniques telles que des étiquettes IA détaillées, l'état des canaux du moteur audio en temps réel et le FPS sur la superposition. Utile pour vérifier le fonctionnement du système.";
+                TxtHelp5Title.Text = "Mode Développeur";
+                TxtHelp5Desc.Text = "L'activation du mode Développeur affiche des informations techniques telles que des étiquettes IA détaillées, l'état des canaux du moteur audio en temps réel et le FPS sur la superposition. Utile pour vérifier le fonctionnement du système.";
 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -416,7 +446,6 @@ namespace SoundVisualizer
             }
             else if (lang == "Deutsch")
             {
-                if (TxtLanguageLabel != null) TxtLanguageLabel.Text = "Sprache";
                 TabHome.Header = "Startseite";
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "Machen Sie unsichtbare Klänge sichtbar.\nStarten Sie ein neues Erlebnis, von Spielen bis hin zu Filmen.";
@@ -434,34 +463,34 @@ namespace SoundVisualizer
                 TxtOpacityDesc.Text = "Passt die Transparenz der Grafiken an, um die Sichtbarkeit des Hintergrunds zu bestimmen.";
                 TxtModeSettings.Text = "Moduseinstellungen";
                 TxtVisualModeLabel.Text = "Visueller Modus";
-                TxtVisualModeDesc.Text = "Wählt die Grundform der auf dem Bildschirm gezeichneten Grafiken aus.";
+                TxtVisualModeDesc.Text = "Wählt die Form der auf dem Bildschirm gezeichneten Grafiken aus.";
                 CmbVisualModeWave.Content = "Welle";
                 CmbVisualModePad.Content = "Pad";
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Kreis";
-                TxtSoundModeLabel.Text = "Stereo-Modus";
-                TxtSoundModeDesc.Text = "Stellt basierend auf 2 Kanälen nur den linken und rechten Ton dar.\nBitte verwenden Sie dies beim Hören von 2-Kanal-Quellen wie YouTube-Videos oder Musik.";
+                TxtSoundModeLabel.Text = "Sound-Modus";
+                TxtSoundModeDesc.Text = "Wählen Sie den für Ihre Lautsprecherumgebung geeigneten Audiokanal.\nWählen Sie für 2-Kanal-Umgebungen '2 Kanäle' und für Surround-Umgebungen '5.1 Kanäle' oder '7.1 Kanäle'.";
                 // ChkStereoUpmix.Content = "Aktivieren";
                 TxtHotkeySettings.Text = "Tastenkombinationen";
                 TxtVisualHotkeyLabel.Text = "Visuellen Modus umschalten";
                 TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
-                TxtSoundModeHotkeyLabel.Text = "Stereo-Modus umschalten";
-                TxtSoundModeHotkeyDesc.Text = "Tastenkombination zum Ändern des Modus in Echtzeit während der Ausführung.";
+                TxtSoundModeHotkeyLabel.Text = "Sound-Modus umschalten";
+                TxtSoundModeHotkeyDesc.Text = "Tastenkombination zum Ändern des Sound-Modus in Echtzeit während der Ausführung.";
                 TxtAdminSettings.Text = "Erweiterte Einstellungen";
-                TxtAdminModeLabel.Text = "Administratormodus";
+                TxtAdminModeLabel.Text = "Entwicklermodus";
                 TxtAdminModeDesc.Text = "Zeigt Debug-Informationen und den Status der Audio-Engine auf dem Bildschirm an.";
                 ChkAdminMode.Content = "Aktivieren";
                 BtnReset.Content = "Auf Standard zurücksetzen";
                 TabHelp.Header = "Hilfe";
-                TxtHelp1Title.Text = "7.1 Surround-Umgebung";
-                TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, aktivieren Sie in den Einstellungen die Funktion 'Stereo-Modus'.";
+                TxtHelp1Title.Text = "Sound-Modus";
+                TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '5.1 Surround' (6 Kanäle) oder '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, stellen Sie den 'Sound-Modus' in den Einstellungen richtig ein.";
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
                 TxtHelp3Desc.Text = "Zum Schließen klicken Sie auf der Registerkarte 'Startseite' auf 'Stoppen' oder klicken Sie auf die Schaltfläche ✕ oben in diesem Fenster.";
                 TxtHelp4Title.Text = "KI-Soundanalyse & Farben";
                 TxtHelp4Desc.Text = "Die KI analysiert die Art des Geräusches in Echtzeit und zeigt sie mit Beschriftungen und Farben an. Sie können jedem Geräuschtyp (Umgebung, Sprache, Gefahr) in den Einstellungen eindeutige Farben zur intuitiven Identifizierung zuweisen.";
-                TxtHelp5Title.Text = "Admin-Modus & Debugging";
-                TxtHelp5Desc.Text = "Das Aktivieren des Admin-Modus zeigt technische Informationen wie detaillierte KI-Labels, Echtzeit-Audiokanäle-Status und FPS auf dem Overlay an. Nützlich zur Überprüfung des Systembetriebs.";
+                TxtHelp5Title.Text = "Entwicklermodus";
+                TxtHelp5Desc.Text = "Das Aktivieren des Entwicklermodus zeigt technische Informationen wie detaillierte KI-Labels, Echtzeit-Audiokanäle-Status und FPS auf dem Overlay an. Nützlich zur Überprüfung des Systembetriebs.";
 
                 if (TxtAIDisplaySettings != null)
                 {
@@ -469,6 +498,62 @@ namespace SoundVisualizer
                     ChkShowAmbient.Content = "Umgebungsgeräusche anzeigen";
                     ChkShowSpeech.Content = "Sprache anzeigen";
                     ChkShowDanger.Content = "Gefahrentöne anzeigen";
+                }
+                if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+            else if (lang == "Русский")
+            {
+                TabHome.Header = "Главная";
+                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeDesc.Text = "Визуализируйте невидимые звуки.\nНачните новый опыт, от игр до кино.";
+                if (BtnLaunch != null) BtnLaunch.Content = "Запустить";
+                if (BtnStop != null) BtnStop.Content = "Остановить";
+                TabSettings.Header = "Настройки";
+                TxtScreenSettings.Text = "Настройки экрана";
+                TxtIntensityLabel.Text = "Размер";
+                TxtIntensityDesc.Text = "Настраивает общий размер и длину графики на экране.";
+                TxtSpeedLabel.Text = "Скорость";
+                TxtSpeedDesc.Text = "Управляет скоростью, с которой оверлей следует за направлением звука.";
+                TxtSensitivityLabel.Text = "Чувствительность";
+                TxtSensitivityDesc.Text = "Определяет, насколько чувствительно графика реагирует на тихие звуки.";
+                TxtOpacityLabel.Text = "Непрозрачность";
+                TxtOpacityDesc.Text = "Настраивает прозрачность графики, чтобы определить видимость фона.";
+                TxtModeSettings.Text = "Настройки режима";
+                TxtVisualModeLabel.Text = "Визуальный режим";
+                TxtVisualModeDesc.Text = "Выбирает форму графики, отображаемой на экране.";
+                CmbVisualModeWave.Content = "Волна";
+                CmbVisualModePad.Content = "Панель";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Круг";
+                TxtSoundModeLabel.Text = "Режим звука";
+                TxtSoundModeDesc.Text = "Выберите звуковой канал, подходящий для среды ваших динамиков.\nДля 2-канальной среды выберите «2 канала», а для объемного звука выберите «5.1 каналов» или «7.1 каналов».";
+                TxtHotkeySettings.Text = "Горячие клавиши";
+                TxtVisualHotkeyLabel.Text = "Смена виз. режима";
+                TxtVisualHotkeyDesc.Text = "Горячая клавиша для изменения визуальной формы в реальном времени.";
+                TxtSoundModeHotkeyLabel.Text = "Смена режима звука";
+                TxtSoundModeHotkeyDesc.Text = "Горячая клавиша для переключения звукового режима в реальном времени.";
+                TxtAdminSettings.Text = "Дополнительные настройки";
+                TxtAdminModeLabel.Text = "Режим разработчика";
+                TxtAdminModeDesc.Text = "Отображает отладочную информацию и состояние аудиосистемы на экране.";
+                ChkAdminMode.Content = "Включить";
+                BtnReset.Content = "Сброс по умолчанию";
+                TabHelp.Header = "Помощь";
+                TxtHelp1Title.Text = "Режим звука";
+                TxtHelp1Desc.Text = "Для правильной работы направления (радара) устройство вывода звука Windows должно быть настроено как «5.1 Surround» (6 каналов) или «7.1 Surround» (8 каналов). В стандартной стереосреде (2 канала) визуализация может отображаться только слева/справа. Чтобы компенсировать это, установите «Режим звука» должным образом в настройках.";
+                TxtHelp2Title.Text = "Горячие клавиши в реальном времени";
+                TxtHelp2Desc.Text = "Даже когда оверлей находится на экране, вы можете нажимать назначенные горячие клавиши (по умолчанию F2, F3) в фоновом режиме, чтобы мгновенно переключать формы и режимы.";
+                TxtHelp3Title.Text = "Как закрыть оверлей";
+                TxtHelp3Desc.Text = "Чтобы закрыть, нажмите «Остановить» на вкладке Главная или нажмите кнопку ✕ в верхней части этого окна запуска.";
+                TxtHelp4Title.Text = "Анализ звука ИИ и цвета";
+                TxtHelp4Desc.Text = "ИИ в реальном времени анализирует тип звука и отображает его с помощью меток и цветов. Вы можете назначить уникальные цвета каждому типу звука (Фон, Речь, Опасность) в настройках для интуитивной идентификации.";
+                TxtHelp5Title.Text = "Режим разработчика";
+                TxtHelp5Desc.Text = "Включение режима разработчика отображает на оверлее техническую информацию, такую как подробные метки ИИ, состояние каналов аудиосистемы в реальном времени и FPS. Полезно для проверки работы системы.";
+
+                if (TxtAIDisplaySettings != null)
+                {
+                    TxtAIDisplaySettings.Text = "Настройки отображения ИИ";
+                    ChkShowAmbient.Content = "Показывать фоновые звуки";
+                    ChkShowSpeech.Content = "Показывать речь";
+                    ChkShowDanger.Content = "Показывать звуки опасности";
                 }
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
@@ -485,6 +570,7 @@ namespace SoundVisualizer
             else if (AppSettings.Language == "Español") { runningText = "Estado: En ejecución"; waitText = "Estado: Esperando inicio"; }
             else if (AppSettings.Language == "Français") { runningText = "Statut: En cours"; waitText = "Statut: En attente de démarrage"; }
             else if (AppSettings.Language == "Deutsch") { runningText = "Status: Wird ausgeführt"; waitText = "Status: Wartet auf Start"; }
+            else if (AppSettings.Language == "Русский") { runningText = "Статус: Запущено"; waitText = "Статус: Ожидание запуска"; }
 
             if (isRunning)
             {
@@ -736,6 +822,59 @@ namespace SoundVisualizer
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+
+        // --- IMMNotificationClient 구현 ---
+        private async void CheckAndApplyDeviceChannels()
+        {
+            await System.Threading.Tasks.Task.Delay(500); // 장치 초기화 안정화 딜레이
+
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    if (_deviceEnumerator != null)
+                    {
+                        var device = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                        int channels = device.AudioClient.MixFormat.Channels;
+                        int newSoundMode = channels >= 8 ? 2 : (channels >= 6 ? 1 : 0);
+
+                        if (AppSettings.SoundMode != newSoundMode)
+                        {
+                            AppSettings.SoundMode = newSoundMode;
+                            AppSettings.Save();
+
+                            bool wasInitializing = _isInitializing;
+                            _isInitializing = true;
+
+                            // 콤보박스 선택 변경 반영
+                            CmbSoundMode.SelectedIndex = newSoundMode;
+
+                            _isInitializing = wasInitializing;
+                        }
+                    }
+                }
+                catch { }
+            });
+        }
+
+        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+        {
+            if (flow != DataFlow.Render || role != Role.Multimedia) return;
+            CheckAndApplyDeviceChannels();
+        }
+
+        public void OnDeviceAdded(string pwstrDeviceId) { }
+        public void OnDeviceRemoved(string pwstrDeviceId) { }
+        
+        public void OnDeviceStateChanged(string deviceId, DeviceState newState)
+        {
+            CheckAndApplyDeviceChannels();
+        }
+        
+        public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
+        {
+            CheckAndApplyDeviceChannels();
         }
     }
 }

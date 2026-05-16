@@ -37,6 +37,7 @@ namespace SoundVisualizer.CoreAudio
 
         public event EventHandler<AudioDataAvailableEventArgs>? OnAudioDataAvailable;
         public event EventHandler<string>? OnCaptureError;
+        public event EventHandler<int>? OnChannelsChanged;
 
         public WaveFormat? CaptureFormat => _captureDevice?.WaveFormat;
         public bool IsCapturing => _isCapturing;
@@ -72,6 +73,9 @@ namespace SoundVisualizer.CoreAudio
                 // 실제 소리가 나오는 기본 출력 장치에서 캡처
                 // CABLE Input 등 가상 장치를 우선하면 해당 장치가 기본 출력이 아닐 때 소리가 안 잡힘
                 var targetDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+
+                int currentChannels = targetDevice.AudioClient.MixFormat.Channels;
+                OnChannelsChanged?.Invoke(this, currentChannels);
 
                 Console.WriteLine($"🎯 캡처 대상: {targetDevice.FriendlyName}");
 
@@ -169,13 +173,9 @@ namespace SoundVisualizer.CoreAudio
             }
         }
 
-        // 기본 출력 장치 변경 감지 → 300ms 디바운스 후 캡처 장치 자동 재시작
-        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+        // 장치 변경 또는 속성 변경(스피커 구성 등) 감지 시 캡처 장치 재시작
+        private void TriggerRestart()
         {
-            if (flow != DataFlow.Render || role != Role.Multimedia) return;
-
-            Console.WriteLine("🔄 기본 출력 장치 변경 감지 — 캡처 재시작 예약...");
-
             _restartCts?.Cancel();
             _restartCts = new CancellationTokenSource();
             var token = _restartCts.Token;
@@ -184,10 +184,10 @@ namespace SoundVisualizer.CoreAudio
             {
                 try
                 {
-                    await Task.Delay(300, token); // 장치 초기화 안정화 대기
+                    await Task.Delay(500, token); // 장치 초기화 안정화 대기
                     if (token.IsCancellationRequested) return;
 
-                    Console.WriteLine("🔄 새 기본 출력 장치로 캡처 재시작...");
+                    Console.WriteLine("🔄 오디오 장치 상태 변경 감지 — 캡처 재시작...");
                     StopCaptureDevice();
                     _firstDataLogged = false;
                     StartCaptureDevice();
@@ -200,9 +200,23 @@ namespace SoundVisualizer.CoreAudio
             });
         }
 
+        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+        {
+            if (flow != DataFlow.Render || role != Role.Multimedia) return;
+            TriggerRestart();
+        }
+
         void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId) { }
         void IMMNotificationClient.OnDeviceRemoved(string pwstrDeviceId) { }
-        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) { }
-        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
+        
+        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) 
+        {
+            TriggerRestart();
+        }
+        
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) 
+        {
+            TriggerRestart();
+        }
     }
 }
