@@ -34,6 +34,12 @@ namespace SoundVisualizer
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
         private volatile int _lastSourceChannels = 0;  // 현재 소스 채널 수 (실시간)
         
+        // YAMNet 추론 스로틀링 제어 필드
+        private readonly object _aiLock = new();
+        private volatile bool _isPredicting = false;
+        private long _lastPredictTimeTicks = 0;
+        private const long AI_PREDICT_INTERVAL_MS = 250; // YAMNet 추론 주기 (250ms)
+
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[3];
         
@@ -60,7 +66,14 @@ namespace SoundVisualizer
             this.Closed += (s, e) =>
             {
                 _renderRunning = false;
-                _captureEngine?.StopCapture();
+                
+                if (_captureEngine != null)
+                {
+                    _captureEngine.OnAudioDataAvailable -= HandleAudioDataAsync;
+                    _captureEngine.StopCapture();
+                }
+                
+                _audioRouter?.StopRouting();
                 _soundAI?.Dispose();
             };
         }
@@ -360,32 +373,80 @@ namespace SoundVisualizer
             _targetLFE *= 0.87f;
         }
 
-        private async void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
+        private void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
         {
             if (_audioRouter == null || _vectorCalc == null || _soundAI == null) return;
 
             byte[] rawData = e.Buffer;
             int bytesRecorded = rawData.Length;
+            int channels = e.Channels;
 
-            await Task.Run(() =>
+            // 1. 오디오 라우팅, 실시간 활성 채널 파악, 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
+            _audioRouter.OnDataReceived(this, rawData);
+            _lastSourceChannels = CountActiveChannels(rawData, channels);
+            
+            var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, channels);
+            
+            // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
+            // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
+            if (AppSettings.SoundMode == 0)
             {
-                _audioRouter.OnDataReceived(this, rawData);
-                _lastSourceChannels = CountActiveChannels(rawData, e.Channels);
-                var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, e.Channels);
-                
-                // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
-                // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
-                if (AppSettings.SoundMode == 0)
-                {
-                    sl = fl; bl = fl;
-                    sr = fr; br = fr;
-                }
+                sl = fl; bl = fl;
+                sr = fr; br = fr;
+            }
 
-                _targetFL = fl; _targetFR = fr; _targetFC = fc;
-                _targetBL = bl; _targetBR = br;
-                _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
-                _currentLabel = _soundAI.PredictSoundType(rawData, bytesRecorded, e.Channels);
-            });
+            // 렌더 스레드가 참조할 볼륨 변수를 즉시 갱신 (지연 시간 0)
+            _targetFL = fl; _targetFR = fr; _targetFC = fc;
+            _targetBL = bl; _targetBR = br;
+            _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
+
+            // YAMNet 실시간 링 버퍼에 데이터를 끊김 없이 모노 다운믹스하여 적재 (데이터의 연속성 및 정확도 보존)
+            int sampleRate = _captureEngine?.CaptureFormat?.SampleRate ?? SoundClassifier.DefaultCaptureSampleRate;
+            _soundAI.IngestAudio(rawData, bytesRecorded, channels, sampleRate);
+
+            // 2. AI 추론 스로틀링 (250ms 간격으로 백그라운드 스레드풀에서 무거운 ONNX 추론 실행)
+            long nowTicks = Environment.TickCount64;
+            long elapsedMs = nowTicks - _lastPredictTimeTicks;
+
+            if (elapsedMs >= AI_PREDICT_INTERVAL_MS && !_isPredicting)
+            {
+                lock (_aiLock)
+                {
+                    if (!_isPredicting)
+                    {
+                        _isPredicting = true;
+                        _lastPredictTimeTicks = nowTicks;
+
+                        Task.Run(() =>
+                        {
+                            try
+                            {
+                                // 링 버퍼에 안전하게 축적된 데이터에서 추론 진행
+                                string prediction = _soundAI.PredictSoundType(sampleRate);
+
+                                // UI 프레임 렌더링에 부정적인 영향을 미치지 않도록 Background 우선순위로 라벨 업데이트
+                                Dispatcher.InvokeAsync(() =>
+                                {
+                                    _currentLabel = prediction;
+                                }, System.Windows.Threading.DispatcherPriority.Background);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"[YAMNet Background Error] {ex.Message}");
+                            }
+                            finally
+                            {
+                                _isPredicting = false;
+                            }
+                        });
+                    }
+                }
+            }
+            else
+            {
+                // 스로틀링 중이거나 추론 작업이 아직 돌고 있으면, 무부하 O(1) 캐시 결과를 사용하여 라벨 고수
+                _currentLabel = _soundAI.GetLastPredictResult();
+            }
         }
 
         /// <summary>

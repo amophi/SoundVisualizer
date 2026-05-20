@@ -39,8 +39,12 @@ namespace SoundVisualizer.AIModel
 
         private const int RingSeconds = 2;
 
+        private readonly object _inferenceLock = new();
+        private bool _isDisposed;
+
         private readonly object _captureRingLock = new();
         private readonly List<float> _monoAtCaptureRateRing = new();
+        private string _lastPredictResult = "오디오 대기… | ambient | —";
 
 #if DEBUG
         private static long _lastClassifyDebugTickMs;
@@ -102,52 +106,94 @@ namespace SoundVisualizer.AIModel
 
         public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channels, int captureSampleRate = DefaultCaptureSampleRate)
         {
-            if (_session == null) return "AI 꺼짐";
+            IngestAudio(rawAudioData, bytesRecorded, channels, captureSampleRate);
+            return PredictSoundType(captureSampleRate);
+        }
 
-            if (bytesRecorded <= 0)
-                return "오디오 대기… | ambient | —";
+        /// <summary>
+        /// 실시간으로 캡처되는 원시 오디오 데이터를 다운믹싱하여 링 버퍼에 적재하기만 합니다.
+        /// 이 메서드는 가볍고 경합이 없으며 오디오 캡처 스레드에서 직접 동기적으로 안전하게 호출할 수 있습니다.
+        /// </summary>
+        public void IngestAudio(byte[] rawAudioData, int bytesRecorded, int channels, int captureSampleRate = DefaultCaptureSampleRate)
+        {
+            if (_isDisposed || bytesRecorded <= 0) return;
 
-            // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
-            // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
             float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
-
-            const float threshold = 0.25f;
-            float[]? tail = null;
-            int tailRate = captureSampleRate;
-            int ringCount;
-
             lock (_captureRingLock)
             {
                 AppendMonoCaptureRing(monoAudio, captureSampleRate);
-                ringCount = _monoAtCaptureRateRing.Count;
-                int resampleFrom = captureSampleRate == DefaultCaptureSampleRate ? 48000 : captureSampleRate;
-                int n = CaptureSamplesForOneYamnetWindow(resampleFrom);
-                tail = CopyRingTailRightPadded(n);
-                tailRate = resampleFrom;
             }
+        }
 
-            int minRingSamples = CaptureSamplesForOneYamnetWindow(tailRate);
-            if (ringCount < minRingSamples)
-                return "오디오 축적 중… | ambient | —";
+        /// <summary>
+        /// 링 버퍼에 누적된 최신 오디오 데이터를 기반으로 YAMNet ONNX 추론을 수행하고 결과를 캐시합니다.
+        /// 이 메서드는 무거우므로 백그라운드 스레드에서 약 250ms 단위로 스로틀링하여 호출해야 합니다.
+        /// </summary>
+        public string PredictSoundType(int captureSampleRate = DefaultCaptureSampleRate)
+        {
+            lock (_inferenceLock)
+            {
+                if (_isDisposed || _session == null)
+                {
+                    _lastPredictResult = "AI 꺼짐";
+                    return _lastPredictResult;
+                }
 
-            InferenceResult r = PredictFromMono16k(
-                ResampleMonoFloatTo16k(tail ?? Array.Empty<float>(), tailRate), threshold);
+                const float threshold = 0.25f;
+                float[]? tail = null;
+                int tailRate = captureSampleRate;
+                int ringCount;
 
-            if (r.YamnetClassIndex < 0)
-                return "AI 에러";
+                lock (_captureRingLock)
+                {
+                    ringCount = _monoAtCaptureRateRing.Count;
+                    int resampleFrom = captureSampleRate == DefaultCaptureSampleRate ? 48000 : captureSampleRate;
+                    int n = CaptureSamplesForOneYamnetWindow(resampleFrom);
+                    tail = CopyRingTailRightPadded(n);
+                    tailRate = resampleFrom;
+                }
+
+                int minRingSamples = CaptureSamplesForOneYamnetWindow(tailRate);
+                if (ringCount < minRingSamples)
+                {
+                    _lastPredictResult = "오디오 축적 중… | ambient | —";
+                    return _lastPredictResult;
+                }
+
+                InferenceResult r = PredictFromMono16k(
+                    ResampleMonoFloatTo16k(tail ?? Array.Empty<float>(), tailRate), threshold);
+
+                if (r.YamnetClassIndex < 0)
+                {
+                    _lastPredictResult = "AI 에러";
+                    return _lastPredictResult;
+                }
 
 #if DEBUG
-            LogClassificationDebugThrottled(in r, threshold);
+                LogClassificationDebugThrottled(in r, threshold);
 #endif
 
-            ApplyCoarseHysteresis(in r);
+                ApplyCoarseHysteresis(in r);
 
-            string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
+                string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
+                string resultText;
 
-            if (_confirmedConfidence < threshold)
-                return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+                if (_confirmedConfidence < threshold)
+                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+                else
+                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
 
-            return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
+                _lastPredictResult = resultText;
+                return resultText;
+            }
+        }
+
+        /// <summary>
+        /// 마지막으로 갱신된 YAMNet 예측 결과를 락 경합 없이 O(1)로 빠르게 반환합니다.
+        /// </summary>
+        public string GetLastPredictResult()
+        {
+            return _lastPredictResult;
         }
 
         private void ApplyCoarseHysteresis(in InferenceResult r)
@@ -1016,11 +1062,18 @@ namespace SoundVisualizer.AIModel
         // 메모리 누수 방지용
         public void Dispose()
         {
-            lock (_captureRingLock)
-                _monoAtCaptureRateRing.Clear();
-            _session?.Dispose();
-            _coarseHeadSession?.Dispose();
-            _gunshotBoosterSession?.Dispose();
+            lock (_inferenceLock)
+            {
+                if (_isDisposed) return;
+                _isDisposed = true;
+
+                lock (_captureRingLock)
+                    _monoAtCaptureRateRing.Clear();
+
+                _session?.Dispose();
+                _coarseHeadSession?.Dispose();
+                _gunshotBoosterSession?.Dispose();
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -28,6 +28,7 @@ namespace SoundVisualizer.CoreAudio
         private CancellationTokenSource? _restartCts;
         private bool _isCapturing;
         private bool _firstDataLogged;
+        private bool _isDisposed;
 
         // Latency 측정용
         private readonly Stopwatch _latencyWatch = new();
@@ -57,9 +58,11 @@ namespace SoundVisualizer.CoreAudio
 
         private void StartCaptureDevice()
         {
+            if (_isDisposed) return;
+
             try
             {
-                var enumerator = new MMDeviceEnumerator();
+                using var enumerator = new MMDeviceEnumerator();
                 var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
 
                 if (devices.Count == 0)
@@ -80,6 +83,8 @@ namespace SoundVisualizer.CoreAudio
                 Console.WriteLine($"🎯 캡처 대상: {targetDevice.FriendlyName}");
 
                 _captureDevice = new WasapiLoopbackCapture(targetDevice);
+                var format = _captureDevice.WaveFormat;
+                int channels = format.Channels;
 
                 _captureDevice.DataAvailable += (sender, args) =>
                 {
@@ -87,7 +92,7 @@ namespace SoundVisualizer.CoreAudio
 
                     if (!_firstDataLogged)
                     {
-                        Console.WriteLine($"✅ 오디오 데이터 수신 확인 — bytes: {args.BytesRecorded}, 채널: {_captureDevice.WaveFormat.Channels}");
+                        Console.WriteLine($"✅ 오디오 데이터 수신 확인 — bytes: {args.BytesRecorded}, 채널: {channels}");
                         _firstDataLogged = true;
                     }
 
@@ -96,7 +101,7 @@ namespace SoundVisualizer.CoreAudio
                     byte[] validData = new byte[args.BytesRecorded];
                     Array.Copy(args.Buffer, validData, args.BytesRecorded);
 
-                    var eventArgs = new AudioDataAvailableEventArgs(validData, _captureDevice.WaveFormat.Channels);
+                    var eventArgs = new AudioDataAvailableEventArgs(validData, channels);
                     OnAudioDataAvailable?.Invoke(this, eventArgs);
 
                     _latencyWatch.Stop();
@@ -142,11 +147,22 @@ namespace SoundVisualizer.CoreAudio
 
         public void StopCapture()
         {
+            if (_isDisposed) return;
+            _isDisposed = true;
+
             _restartCts?.Cancel();
+            _restartCts?.Dispose();
+            _restartCts = null;
+
             if (_notificationEnumerator != null)
             {
-                try { _notificationEnumerator.UnregisterEndpointNotificationCallback(this); }
+                try 
+                { 
+                    _notificationEnumerator.UnregisterEndpointNotificationCallback(this);
+                    _notificationEnumerator.Dispose();
+                }
                 catch { }
+                _notificationEnumerator = null;
             }
             StopCaptureDevice();
         }
@@ -176,6 +192,8 @@ namespace SoundVisualizer.CoreAudio
         // 장치 변경 또는 속성 변경(스피커 구성 등) 감지 시 캡처 장치 재시작
         private void TriggerRestart()
         {
+            if (_isDisposed) return;
+
             _restartCts?.Cancel();
             _restartCts = new CancellationTokenSource();
             var token = _restartCts.Token;
@@ -185,10 +203,11 @@ namespace SoundVisualizer.CoreAudio
                 try
                 {
                     await Task.Delay(500, token); // 장치 초기화 안정화 대기
-                    if (token.IsCancellationRequested) return;
+                    if (token.IsCancellationRequested || _isDisposed) return;
 
                     Console.WriteLine("🔄 오디오 장치 상태 변경 감지 — 캡처 재시작...");
                     StopCaptureDevice();
+                    if (_isDisposed) return;
                     _firstDataLogged = false;
                     StartCaptureDevice();
                 }

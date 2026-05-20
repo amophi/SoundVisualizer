@@ -35,12 +35,58 @@ namespace SoundVisualizer
 
         protected override void OnClosed(EventArgs e)
         {
-            if (_deviceEnumerator != null)
+            // 1. 오버레이 창 종료 처리 (오류 발생 시에도 계속 진행)
+            try
             {
-                _deviceEnumerator.UnregisterEndpointNotificationCallback(this);
-                _deviceEnumerator.Dispose();
+                if (_overlayWindow != null)
+                {
+                    _overlayWindow.Close();
+                    _overlayWindow = null;
+                }
             }
-            base.OnClosed(e);
+            catch { }
+
+            // 2. 오디오 기본 출력 장치 COM 콜백 해제 및 Dispose 처리 (COM 장치 이탈 시 등의 오류 원천 방어)
+            try
+            {
+                if (_deviceEnumerator != null)
+                {
+                    try
+                    {
+                        _deviceEnumerator.UnregisterEndpointNotificationCallback(this);
+                    }
+                    catch { }
+                    
+                    try
+                    {
+                        _deviceEnumerator.Dispose();
+                    }
+                    catch { }
+                    _deviceEnumerator = null;
+                }
+            }
+            catch { }
+
+            // 3. 부모 클래스 종료 이벤트 처리
+            try
+            {
+                base.OnClosed(e);
+            }
+            catch { }
+
+            // 4. 애플리케이션 정상 셧다운 및 OS 수준 강제 프로세스 종료 처리 (더블 보안 설계)
+            try
+            {
+                Application.Current.Shutdown();
+            }
+            catch
+            {
+                try
+                {
+                    Environment.Exit(0);
+                }
+                catch { }
+            }
         }
 
         private void InitializeUI()
