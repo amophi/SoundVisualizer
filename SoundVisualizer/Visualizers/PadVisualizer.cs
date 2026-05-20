@@ -6,8 +6,14 @@ namespace SoundVisualizer.Visualizers
 {
     public class PadVisualizer : IVisualizerMode
     {
+        private const int N = 16; // 폴리곤 해상도 최적화 (기존 30 -> 16)
+        
         // 8개 채널 각각의 패드 두께를 독립적으로 저장하여 부드러운 애니메이션 적용
-        private double[] _padThicknesses = new double[8];
+        private readonly double[] _padThicknesses = new double[8];
+        
+        // 매 프레임 가비지 할당을 차단하기 위해 셰이프 지오메트리 계산용 포인트 배열 캐싱 (GC Free)
+        private readonly Point[] _outerPts = new Point[N + 1];
+        private readonly Point[] _innerPts = new Point[N + 1];
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
@@ -57,16 +63,12 @@ namespace SoundVisualizer.Visualizers
                     // 패드 길이 설정 (디스플레이 높이의 1/4 정도)
                     double barLen = h / 4.0; 
                     double startDist = centerDist - barLen / 2.0;
-                    
-                    int N = 30; // 폴리곤 해상도
-                    var outerPts = new Point[N + 1];
-                    var innerPts = new Point[N + 1];
 
                     for (int i = 0; i <= N; i++)
                     {
                         double distPos = startDist + (barLen * i) / N;
                         Point edgePoint = GetEdgePosition(distPos, w, h, P);
-                        outerPts[i] = edgePoint;
+                        _outerPts[i] = edgePoint;
 
                         // 패드의 양 끝단을 유선형(물방울 모양)으로 부드럽게 깎음
                         double t = (double)i / N;
@@ -87,13 +89,13 @@ namespace SoundVisualizer.Visualizers
                         else // Left
                         { ix += currentThickness; iy = Math.Max(currentThickness, Math.Min(h - currentThickness, iy)); }
 
-                        innerPts[i] = new Point(ix, iy);
+                        _innerPts[i] = new Point(ix, iy);
                     }
 
                     // 도형 그리기
-                    ctx.BeginFigure(outerPts[0], true, true);
-                    for (int i = 1; i <= N; i++) ctx.LineTo(outerPts[i], false, false);
-                    for (int i = N; i >= 0; i--) ctx.LineTo(innerPts[i], false, false);
+                    ctx.BeginFigure(_outerPts[0], true, true);
+                    for (int i = 1; i <= N; i++) ctx.LineTo(_outerPts[i], false, false);
+                    for (int i = N; i >= 0; i--) ctx.LineTo(_innerPts[i], false, false);
                 }
             }
 

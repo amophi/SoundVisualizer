@@ -33,6 +33,33 @@ namespace SoundVisualizer
         private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
         private volatile int _lastSourceChannels = 0;  // 현재 소스 채널 수 (실시간)
+
+        // WPF UI 속성 갱신 및 가비지 최소화용 캐시 필드
+        private string? _cachedColorDangerHex;
+        private string? _cachedColorSpeechHex;
+        private string? _cachedColorAmbientHex;
+        private SolidColorBrush? _dangerBrush;
+        private SolidColorBrush? _speechBrush;
+        private SolidColorBrush? _ambientBrush;
+
+        private Color _cachedActiveColor = Colors.Transparent;
+        private int _cachedVisualModeForBrush = -1;
+
+        private string _cachedVisualModeText = "";
+        private string _cachedStereoModeText = "";
+        private Brush? _cachedStereoModeForeground = null;
+        private string _cachedFpsText = "";
+        private string _cachedStatusText = "";
+        private Brush? _cachedStatusForeground = null;
+
+        private Visibility _cachedAILabelBorderVisibility = Visibility.Collapsed;
+        private string _cachedAILabelText = "";
+        private Brush? _cachedAILabelForeground = null;
+        private Visibility _cachedUnifiedWaveVisibility = Visibility.Collapsed;
+
+        private Visibility _cachedStatusBorderVisibility = Visibility.Collapsed;
+        private Visibility _cachedFpsBorderVisibility = Visibility.Collapsed;
+        private Visibility _cachedModeUIStackVisibility = Visibility.Collapsed;
         
         // YAMNet 추론 스로틀링 제어 필드
         private readonly object _aiLock = new();
@@ -45,8 +72,9 @@ namespace SoundVisualizer
         
         public Action? OnSettingsChangedFromHotkey;
 
-        private Thread? _renderThread;
-        private volatile bool _renderRunning;
+        private readonly Stopwatch _renderStopwatch = new();
+        private double _lastRenderTimeMs = 0;
+        private long _lastChannelCountTick = 0;
         private const double TARGET_FPS = 144.0;
         private const double FRAME_INTERVAL_MS = 1000.0 / TARGET_FPS;
         
@@ -65,7 +93,7 @@ namespace SoundVisualizer
 
             this.Closed += (s, e) =>
             {
-                _renderRunning = false;
+                CompositionTarget.Rendering -= OnCompositionTargetRendering;
                 
                 if (_captureEngine != null)
                 {
@@ -128,40 +156,21 @@ namespace SoundVisualizer
         // ==========================================
         private void StartHighFpsRenderLoop()
         {
-            _renderRunning = true;
             _fpsStopwatch.Start();
+            _renderStopwatch.Start();
+            CompositionTarget.Rendering += OnCompositionTargetRendering;
+        }
 
-            _renderThread = new Thread(() =>
+        private void OnCompositionTargetRendering(object? sender, EventArgs e)
+        {
+            double now = _renderStopwatch.Elapsed.TotalMilliseconds;
+            double elapsed = now - _lastRenderTimeMs;
+
+            if (elapsed >= FRAME_INTERVAL_MS)
             {
-                var sw = new Stopwatch();
-                sw.Start();
-                double lastFrameTime = 0;
-
-                while (_renderRunning)
-                {
-                    double now = sw.Elapsed.TotalMilliseconds;
-                    double elapsed = now - lastFrameTime;
-
-                    if (elapsed >= FRAME_INTERVAL_MS)
-                    {
-                        lastFrameTime = now - (elapsed % FRAME_INTERVAL_MS);
-                        try
-                        {
-                            Dispatcher.Invoke(RenderFrame, System.Windows.Threading.DispatcherPriority.Send);
-                        }
-                        catch { break; }
-                    }
-                    else
-                    {
-                        double remaining = FRAME_INTERVAL_MS - elapsed;
-                        if (remaining > 2) Thread.Sleep(1);
-                        else Thread.SpinWait(100);
-                    }
-                }
-            });
-            _renderThread.IsBackground = true;
-            _renderThread.Priority = ThreadPriority.AboveNormal;
-            _renderThread.Start();
+                _lastRenderTimeMs = now - (elapsed % FRAME_INTERVAL_MS);
+                RenderFrame();
+            }
         }
 
         private void RenderFrame()
@@ -177,11 +186,16 @@ namespace SoundVisualizer
             }
             _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
-            VisualModeText.Text = AppSettings.VisualMode == 0 
+            string targetVisualModeText = AppSettings.VisualMode == 0 
                 ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
                 : AppSettings.VisualMode == 1
                     ? "🎨 시각화 모드: [F3] 패드 모드 (Pad)"
                     : "🎨 시각화 모드: [F3] 원형 모드 (Circle)";
+            if (_cachedVisualModeText != targetVisualModeText)
+            {
+                _cachedVisualModeText = targetVisualModeText;
+                VisualModeText.Text = targetVisualModeText;
+            }
 
             // F2 키: 스테레오 확장 모드 실시간 전환
             bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
@@ -194,10 +208,21 @@ namespace SoundVisualizer
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
 
-            StereoModeText.Text = AppSettings.SoundMode == 0 
+            string targetStereoModeText = AppSettings.SoundMode == 0 
                 ? "🎧 사운드 모드: [F2] 2 채널" 
                 : (AppSettings.SoundMode == 1 ? "🔊 사운드 모드: [F2] 5.1 채널" : "🔊 사운드 모드: [F2] 7.1 채널");
-            StereoModeText.Foreground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
+            Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
+
+            if (_cachedStereoModeText != targetStereoModeText)
+            {
+                _cachedStereoModeText = targetStereoModeText;
+                StereoModeText.Text = targetStereoModeText;
+            }
+            if (_cachedStereoModeForeground != targetStereoForeground)
+            {
+                _cachedStereoModeForeground = targetStereoForeground;
+                StereoModeText.Foreground = targetStereoForeground;
+            }
 
             _frameCount++;
             double fpsElapsed = _fpsStopwatch.Elapsed.TotalSeconds;
@@ -206,7 +231,13 @@ namespace SoundVisualizer
                 _currentFps = _frameCount / fpsElapsed;
                 _frameCount = 0;
                 _fpsStopwatch.Restart();
-                FpsText.Text = $"FPS: {_currentFps:F0}";
+                
+                string targetFpsText = $"FPS: {_currentFps:F0}";
+                if (_cachedFpsText != targetFpsText)
+                {
+                    _cachedFpsText = targetFpsText;
+                    FpsText.Text = targetFpsText;
+                }
             }
 
             _animationTime += 0.035;
@@ -251,31 +282,40 @@ namespace SoundVisualizer
             {
                 if (AppSettings.IsAdminMode)
                 {
-                    AILabelBorder.Visibility = Visibility.Visible;
-                    AILabelText.Text = _currentLabel;
-                    AILabelText.Foreground = new SolidColorBrush(activeColor);
+                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Visible);
+                    
+                    if (_cachedAILabelText != _currentLabel)
+                    {
+                        _cachedAILabelText = _currentLabel;
+                        AILabelText.Text = _currentLabel;
+                    }
+
+                    SolidColorBrush activeBrush = GetBrushForLabel(_currentLabel);
+                    if (_cachedAILabelForeground != activeBrush)
+                    {
+                        _cachedAILabelForeground = activeBrush;
+                        AILabelText.Foreground = activeBrush;
+                    }
                 }
                 else
                 {
-                    AILabelBorder.Visibility = Visibility.Collapsed;
+                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
                 }
-                UnifiedWave.Visibility = Visibility.Visible;
+                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Visible);
             }
             else
             {
-                AILabelBorder.Visibility = Visibility.Collapsed;
-                UnifiedWave.Visibility = Visibility.Collapsed;
+                SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Collapsed);
             }
 
-            if (DateTime.Now < _modeUIVisibleUntil)
-                ModeUIStack.Visibility = Visibility.Visible;
-            else
-                ModeUIStack.Visibility = Visibility.Collapsed;
+            Visibility targetModeUIStackVisibility = DateTime.Now < _modeUIVisibleUntil ? Visibility.Visible : Visibility.Collapsed;
+            SetVisibilityIfChanged(ModeUIStack, ref _cachedModeUIStackVisibility, targetModeUIStackVisibility);
 
             if (AppSettings.IsAdminMode)
             {
-                StatusBorder.Visibility = Visibility.Visible;
-                FpsBorder.Visibility = Visibility.Visible;
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Visible);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Visible);
 
                 // PC 오디오 설정 채널 수
                 int pcChannels = _captureEngine?.CaptureFormat?.Channels ?? 0;
@@ -295,15 +335,26 @@ namespace SoundVisualizer
                 int srcCh = _lastSourceChannels;
                 string srcLine = srcCh == 0 ? "현재 캡처 중인 오디오 채널 정보: 대기 중..." : $"현재 캡처 중인 오디오 채널 정보: {srcCh}ch";
 
-                StatusText.Text = $"{pcLine}\n{srcLine}";
-                StatusText.Foreground = (pcChannels == 8)
+                string targetStatusText = $"{pcLine}\n{srcLine}";
+                Brush targetStatusForeground = (pcChannels == 8)
                     ? (srcCh == 8 ? Brushes.LimeGreen : srcCh >= 6 ? Brushes.Yellow : Brushes.Orange)
                     : Brushes.Orange;
+
+                if (_cachedStatusText != targetStatusText)
+                {
+                    _cachedStatusText = targetStatusText;
+                    StatusText.Text = targetStatusText;
+                }
+                if (_cachedStatusForeground != targetStatusForeground)
+                {
+                    _cachedStatusForeground = targetStatusForeground;
+                    StatusText.Foreground = targetStatusForeground;
+                }
             }
             else
             {
-                StatusBorder.Visibility = Visibility.Collapsed;
-                FpsBorder.Visibility = Visibility.Collapsed;
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
             }
 
             double w = this.ActualWidth;
@@ -348,8 +399,14 @@ namespace SoundVisualizer
             var currentVisualizer = _visualizers[modeIndex];
 
             UnifiedWave.Data = currentVisualizer.GenerateGeometry(context);
-            var fillBrush = currentVisualizer.GetFillBrush(activeColor);
-            UnifiedWave.Fill = fillBrush;
+            
+            if (_cachedActiveColor != activeColor || _cachedVisualModeForBrush != modeIndex || UnifiedWave.Fill == null)
+            {
+                _cachedActiveColor = activeColor;
+                _cachedVisualModeForBrush = modeIndex;
+                UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+            }
+            
             UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
 
             if (AppSettings.IsGlowMode)
@@ -383,7 +440,13 @@ namespace SoundVisualizer
 
             // 1. 오디오 라우팅, 실시간 활성 채널 파악, 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
             _audioRouter.OnDataReceived(this, rawData);
-            _lastSourceChannels = CountActiveChannels(rawData, channels);
+            
+            long currentTick = Environment.TickCount64;
+            if (currentTick - _lastChannelCountTick >= 500)
+            {
+                _lastChannelCountTick = currentTick;
+                _lastSourceChannels = CountActiveChannels(rawData, channels);
+            }
             
             var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, channels);
             
@@ -424,11 +487,15 @@ namespace SoundVisualizer
                                 // 링 버퍼에 안전하게 축적된 데이터에서 추론 진행
                                 string prediction = _soundAI.PredictSoundType(sampleRate);
 
-                                // UI 프레임 렌더링에 부정적인 영향을 미치지 않도록 Background 우선순위로 라벨 업데이트
-                                Dispatcher.InvokeAsync(() =>
+                                // 이전 값과 다를 때만 UI 스레드에 디스패칭하여 가비지 및 컨텍스트 스위칭 최소화
+                                if (_currentLabel != prediction)
                                 {
-                                    _currentLabel = prediction;
-                                }, System.Windows.Threading.DispatcherPriority.Background);
+                                    // UI 프레임 렌더링에 부정적인 영향을 미치지 않도록 Background 우선순위로 라벨 업데이트
+                                    Dispatcher.InvokeAsync(() =>
+                                    {
+                                        _currentLabel = prediction;
+                                    }, System.Windows.Threading.DispatcherPriority.Background);
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -441,11 +508,6 @@ namespace SoundVisualizer
                         });
                     }
                 }
-            }
-            else
-            {
-                // 스로틀링 중이거나 추론 작업이 아직 돌고 있으면, 무부하 O(1) 캐시 결과를 사용하여 라벨 고수
-                _currentLabel = _soundAI.GetLastPredictResult();
             }
         }
 
@@ -486,6 +548,52 @@ namespace SoundVisualizer
         }
 
 
+
+        private void SetVisibilityIfChanged(UIElement element, ref Visibility cachedValue, Visibility newValue)
+        {
+            if (cachedValue != newValue)
+            {
+                cachedValue = newValue;
+                element.Visibility = newValue;
+            }
+        }
+
+        private void UpdateCachedBrushesIfNeeded()
+        {
+            string dangerHex = AppSettings.ColorDanger;
+            string speechHex = AppSettings.ColorSpeech;
+            string ambientHex = AppSettings.ColorAmbient;
+
+            if (_dangerBrush == null || _cachedColorDangerHex != dangerHex)
+            {
+                _cachedColorDangerHex = dangerHex;
+                var brush = new SolidColorBrush(ParseColor(dangerHex));
+                brush.Freeze();
+                _dangerBrush = brush;
+            }
+            if (_speechBrush == null || _cachedColorSpeechHex != speechHex)
+            {
+                _cachedColorSpeechHex = speechHex;
+                var brush = new SolidColorBrush(ParseColor(speechHex));
+                brush.Freeze();
+                _speechBrush = brush;
+            }
+            if (_ambientBrush == null || _cachedColorAmbientHex != ambientHex)
+            {
+                _cachedColorAmbientHex = ambientHex;
+                var brush = new SolidColorBrush(ParseColor(ambientHex));
+                brush.Freeze();
+                _ambientBrush = brush;
+            }
+        }
+
+        private SolidColorBrush GetBrushForLabel(string label)
+        {
+            UpdateCachedBrushesIfNeeded();
+            if (label.Contains("danger")) return _dangerBrush!;
+            if (label.Contains("speech")) return _speechBrush!;
+            return _ambientBrush!;
+        }
 
         private Color ParseColor(string hex)
         {

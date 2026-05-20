@@ -6,7 +6,12 @@ namespace SoundVisualizer.Visualizers
 {
     public class CircleRippleVisualizer : IVisualizerMode
     {
-        private double[] _recentTargets = new double[8];
+        private const int N = 64; // 원을 그릴 점의 해상도 최적화 (기존 120 -> 64)
+        private readonly double[] _recentTargets = new double[8];
+        
+        // 매 프레임 가비지 할당을 없애기 위해 포인트 배열 캐싱 (GC Free)
+        private readonly Point[] _outerPts = new Point[N];
+        private readonly Point[] _innerPts = new Point[N];
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
@@ -27,14 +32,14 @@ namespace SoundVisualizer.Visualizers
 
             bool isAnyVisible = false;
             
-            // 파도 모드용 가상 중앙 하단(BC - 4번 인덱스) 데이터 때문에 좌/우 후방 모양이 비대칭으로 찌그러지는 현상 방지
-            double[] depths = (double[])context.ChannelDepths.Clone();
-            depths[4] = 0; // Circle 모드에서는 인위적인 하단 중앙값을 제거하여 완벽한 대칭 유지
-
             for (int i = 0; i < 8; i++) 
             {
+                // 파도 모드용 가상 중앙 하단(BC - 4번 인덱스) 데이터 때문에 좌/우 후방 모양이 비대칭으로 찌그러지는 현상 방지
+                // Circle 모드에서는 인위적인 하단 중앙값(4번)을 0으로 처리하여 완벽한 대칭 유지 (Clone 힙 할당 제거)
+                double targetVal = (i == 4) ? 0 : context.ChannelDepths[i];
+
                 // 파도 모드 대비 스케일 조절
-                double target = depths[i] * 0.35;
+                double target = targetVal * 0.35;
                 if (target > h * 0.4) target = h * 0.4; // 폭주 방지용 최댓값 설정
 
                 // 부드러운 애니메이션
@@ -46,9 +51,6 @@ namespace SoundVisualizer.Visualizers
 
             using (var ctx = geometry.Open())
             {
-                int N = 120; // 원을 그릴 점의 해상도
-                var outerPts = new Point[N];
-                
                 for (int i = 0; i < N; i++)
                 {
                     double angle = (2 * Math.PI * i) / N; // 0은 우측 3시 방향, 시계 방향으로 증가
@@ -64,25 +66,24 @@ namespace SoundVisualizer.Visualizers
                     
                     double px = cx + Math.Cos(angle) * r;
                     double py = cy + Math.Sin(angle) * r;
-                    outerPts[i] = new Point(px, py);
+                    _outerPts[i] = new Point(px, py);
                 }
 
                 // 바깥쪽 출력 외곽선
-                ctx.BeginFigure(outerPts[0], isFilled: true, isClosed: true);
-                for (int i = 1; i < N; i++) ctx.LineTo(outerPts[i], isStroked: false, isSmoothJoin: true);
+                ctx.BeginFigure(_outerPts[0], isFilled: true, isClosed: true);
+                for (int i = 1; i < N; i++) ctx.LineTo(_outerPts[i], isStroked: false, isSmoothJoin: true);
 
                 // 안쪽에 역방향(반시계)으로 고정된 원을 그려서 EvenOdd 룰로 인해 구멍을 냄
-                var innerPts = new Point[N];
                 for (int i = 0; i < N; i++)
                 {
                     double angle = 2 * Math.PI * (N - 1 - i) / N;
                     double px = cx + Math.Cos(angle) * baseRadius;
                     double py = cy + Math.Sin(angle) * baseRadius;
-                    innerPts[i] = new Point(px, py);
+                    _innerPts[i] = new Point(px, py);
                 }
 
-                ctx.BeginFigure(innerPts[0], isFilled: true, isClosed: true);
-                for (int i = 1; i < N; i++) ctx.LineTo(innerPts[i], isStroked: false, isSmoothJoin: true);
+                ctx.BeginFigure(_innerPts[0], isFilled: true, isClosed: true);
+                for (int i = 1; i < N; i++) ctx.LineTo(_innerPts[i], isStroked: false, isSmoothJoin: true);
             }
 
             geometry.Freeze();

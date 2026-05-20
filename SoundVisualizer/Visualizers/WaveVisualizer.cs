@@ -7,7 +7,7 @@ namespace SoundVisualizer.Visualizers
 {
     public class WaveVisualizer : IVisualizerMode
     {
-        private const int WAVE_SAMPLE_COUNT = 400;
+        private const int WAVE_SAMPLE_COUNT = 150;
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
