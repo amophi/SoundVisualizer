@@ -97,6 +97,8 @@ namespace SoundVisualizer
         public MainWindow()
         {
             InitializeComponent();
+            LoadSettingsToEditPanel(); // UI 초기화 직후 설정값을 미리 반영하여, 지연된 레이아웃 패스에서 기본값(50)이 이벤트를 발생시켜도 올바른 값이 유지되도록 함
+            _isUpdatingEditPanelSliders = false;
             ApplyClickThroughMagic();
             BootSequence();
             StartHighFpsRenderLoop();
@@ -745,7 +747,7 @@ namespace SoundVisualizer
             }
         }
 
-        private bool _isUpdatingEditPanelSliders = false;
+        private bool _isUpdatingEditPanelSliders = true;
 
         private void LoadSettingsToEditPanel()
         {
