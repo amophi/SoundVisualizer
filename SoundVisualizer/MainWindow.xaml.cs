@@ -68,7 +68,7 @@ namespace SoundVisualizer
         private const long AI_PREDICT_INTERVAL_MS = 250; // YAMNet 추론 주기 (250ms)
 
         // 시각화 모듈 (Strategy Pattern)
-        private IVisualizerMode[] _visualizers = new IVisualizerMode[3];
+        private IVisualizerMode[] _visualizers = new IVisualizerMode[4];
         
         public Action? OnSettingsChangedFromHotkey;
 
@@ -111,6 +111,7 @@ namespace SoundVisualizer
             _visualizers[0] = new WaveVisualizer();
             _visualizers[1] = new PadVisualizer();
             _visualizers[2] = new CircleRippleVisualizer();
+            _visualizers[3] = new OutlineVisualizer();
 
             _vectorCalc = new VectorCalculator();
             _soundAI = new SoundClassifier();
@@ -190,7 +191,9 @@ namespace SoundVisualizer
                 ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
                 : AppSettings.VisualMode == 1
                     ? "🎨 시각화 모드: [F3] 패드 모드 (Pad)"
-                    : "🎨 시각화 모드: [F3] 원형 모드 (Circle)";
+                    : AppSettings.VisualMode == 2
+                        ? "🎨 시각화 모드: [F3] 원형 모드 (Circle)"
+                        : "🎨 시각화 모드: [F3] 외각선 모드 (Outline)";
             if (_cachedVisualModeText != targetVisualModeText)
             {
                 _cachedVisualModeText = targetVisualModeText;
@@ -404,7 +407,19 @@ namespace SoundVisualizer
             {
                 _cachedActiveColor = activeColor;
                 _cachedVisualModeForBrush = modeIndex;
-                UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+                
+                if (modeIndex == 3)
+                {
+                    UnifiedWave.Fill = Brushes.Transparent;
+                    UnifiedWave.Stroke = currentVisualizer.GetFillBrush(activeColor);
+                    UnifiedWave.StrokeThickness = 4.0;
+                }
+                else
+                {
+                    UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+                    UnifiedWave.Stroke = null;
+                    UnifiedWave.StrokeThickness = 0;
+                }
             }
             
             UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;

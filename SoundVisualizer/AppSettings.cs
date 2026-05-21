@@ -21,6 +21,7 @@ namespace SoundVisualizer
         public static VisualModeSettings WaveMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
         public static VisualModeSettings PadMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
         public static VisualModeSettings CircleMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+        public static VisualModeSettings OutlineMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
 
         // 1. 파도의 크기 (현재 모드값 반환/설정)
         public static double WaveIntensity
@@ -102,7 +103,8 @@ namespace SoundVisualizer
         {
             if (VisualMode == 0) return WaveMode;
             if (VisualMode == 1) return PadMode;
-            return CircleMode;
+            if (VisualMode == 2) return CircleMode;
+            return OutlineMode;
         }
 
         public static void Load()
@@ -138,6 +140,9 @@ namespace SoundVisualizer
 
                         if (data.CircleMode != null) CircleMode = data.CircleMode;
                         else CircleMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
+
+                        if (data.OutlineMode != null) OutlineMode = data.OutlineMode;
+                        else OutlineMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
                     }
                 }
             }
@@ -167,6 +172,7 @@ namespace SoundVisualizer
                     WaveMode = WaveMode,
                     PadMode = PadMode,
                     CircleMode = CircleMode,
+                    OutlineMode = OutlineMode,
 
                     // 구버전 호환성 저장을 위해 현재 모드의 최종 설정값도 루트 필드에 동시 저장
                     WaveIntensity = WaveIntensity,
@@ -209,6 +215,7 @@ namespace SoundVisualizer
             public VisualModeSettings WaveMode { get; set; }
             public VisualModeSettings PadMode { get; set; }
             public VisualModeSettings CircleMode { get; set; }
+            public VisualModeSettings OutlineMode { get; set; }
         }
     }
 }
