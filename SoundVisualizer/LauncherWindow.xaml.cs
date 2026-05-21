@@ -95,6 +95,7 @@ namespace SoundVisualizer
             {
                 CmbVisualHotkey.Items.Add(key);
                 CmbSoundModeHotkey.Items.Add(key);
+                CmbEditHotkey.Items.Add(key);
             }
 
             if (AppSettings.Language == "English" || AppSettings.Language == "ENG")
@@ -227,6 +228,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
                 TxtSoundModeHotkeyLabel.Text = "사운드 모드 전환";
                 TxtSoundModeHotkeyDesc.Text = "실행 중 사운드 모드를 실시간으로 변경할 단축키입니다.";
+                TxtEditHotkeyLabel.Text = "오버레이 전환";
+                TxtEditHotkeyDesc.Text = "오버레이 편집 화면을 표시하거나 닫는 단축키입니다.";
                 TxtAdminSettings.Text = "고급 설정";
                 TxtAdminModeLabel.Text = "개발자 모드";
                 TxtAdminModeDesc.Text = "디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다.";
@@ -328,6 +331,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "Hotkey to change the visual shape in real-time.";
                 TxtSoundModeHotkeyLabel.Text = "Sound Mode Toggle";
                 TxtSoundModeHotkeyDesc.Text = "Hotkey to toggle sound mode in real-time.";
+                TxtEditHotkeyLabel.Text = "Toggle Overlay Edit";
+                TxtEditHotkeyDesc.Text = "Hotkey to open or close the overlay editor.";
                 TxtAdminSettings.Text = "Advanced Settings";
                 TxtAdminModeLabel.Text = "Developer Mode";
                 TxtAdminModeDesc.Text = "Displays debug information and audio engine status on screen.";
@@ -430,6 +435,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
                 TxtSoundModeHotkeyLabel.Text = "サウンドモードの切り替え";
                 TxtSoundModeHotkeyDesc.Text = "実行中にサウンドモードをリアルタイムで変更するショートカットです。";
+                TxtEditHotkeyLabel.Text = "オーバーレイの切り替え";
+                TxtEditHotkeyDesc.Text = "オーバーレイ編集画面を表示または閉じるショートカットキーです。";
                 TxtAdminSettings.Text = "詳細設定";
                 TxtAdminModeLabel.Text = "開発者モード";
                 TxtAdminModeDesc.Text = "デバッグ情報とオーディオエンジンの状態を画面に表示します。";
@@ -531,6 +538,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
                 TxtSoundModeHotkeyLabel.Text = "切换声音模式";
                 TxtSoundModeHotkeyDesc.Text = "在运行中实时改变声音模式的快捷键。";
+                TxtEditHotkeyLabel.Text = "切换悬浮窗编辑";
+                TxtEditHotkeyDesc.Text = "显示或关闭悬浮窗编辑窗口的快捷键。";
                 TxtAdminSettings.Text = "高级设置";
                 TxtAdminModeLabel.Text = "开发者模式";
                 TxtAdminModeDesc.Text = "在屏幕上显示调试信息和音频引擎状态。";
@@ -632,6 +641,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
                 TxtSoundModeHotkeyLabel.Text = "Cambiar modo de sonido";
                 TxtSoundModeHotkeyDesc.Text = "Atajo para cambiar el modo de sonido en tiempo real durante la ejecución.";
+                TxtEditHotkeyLabel.Text = "Alternar editor";
+                TxtEditHotkeyDesc.Text = "Atajo para abrir o cerrar el editor de superposición.";
                 TxtAdminSettings.Text = "Configuración avanzada";
                 TxtAdminModeLabel.Text = "Modo desarrollador";
                 TxtAdminModeDesc.Text = "Muestra información de depuración y el estado del motor de audio en pantalla.";
@@ -733,6 +744,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
                 TxtSoundModeHotkeyLabel.Text = "Basculer le mode sonore";
                 TxtSoundModeHotkeyDesc.Text = "Raccourci pour changer le mode sonore en temps réel pendant l'exécution.";
+                TxtEditHotkeyLabel.Text = "Basculer l'éditeur";
+                TxtEditHotkeyDesc.Text = "Raccourci pour ouvrir ou fermer l'éditeur de superposition.";
                 TxtAdminSettings.Text = "Paramètres avancés";
                 TxtAdminModeLabel.Text = "Mode Développeur";
                 TxtAdminModeDesc.Text = "Affiche les informations de débogage et l'état du moteur audio à l'écran.";
@@ -834,6 +847,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
                 TxtSoundModeHotkeyLabel.Text = "Sound-Modus umschalten";
                 TxtSoundModeHotkeyDesc.Text = "Tastenkombination zum Ändern des Sound-Modus in Echtzeit während der Ausführung.";
+                TxtEditHotkeyLabel.Text = "Overlay-Editor umschalten";
+                TxtEditHotkeyDesc.Text = "Tastenkombination zum Öffnen oder Schließen des Overlay-Editors.";
                 TxtAdminSettings.Text = "Erweiterte Einstellungen";
                 TxtAdminModeLabel.Text = "Entwicklermodus";
                 TxtAdminModeDesc.Text = "Zeigt Debug-Informationen und den Status der Audio-Engine auf dem Bildschirm an.";
@@ -935,6 +950,8 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "Горячая клавиша для изменения визуальной формы в реальном времени.";
                 TxtSoundModeHotkeyLabel.Text = "Смена режима звука";
                 TxtSoundModeHotkeyDesc.Text = "Горячая клавиша для переключения звукового режима в реальном времени.";
+                TxtEditHotkeyLabel.Text = "Переключение редактора";
+                TxtEditHotkeyDesc.Text = "Горячая клавиша для открытия или закрытия редактора оверлея.";
                 TxtAdminSettings.Text = "Дополнительные настройки";
                 TxtAdminModeLabel.Text = "Режим разработчика";
                 TxtAdminModeDesc.Text = "Отображает отладочную информацию и состояние аудиосистемы на экране.";
@@ -1056,6 +1073,7 @@ namespace SoundVisualizer
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
             CmbSoundModeHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
+            CmbEditHotkey.SelectedItem = GetKeyName(AppSettings.EditModeHotkey) ?? "F4";
 
             if (ChkShowAmbient != null)
             {
@@ -1221,6 +1239,7 @@ namespace SoundVisualizer
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
             else if (sender == CmbSoundModeHotkey && CmbSoundModeHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
+            else if (sender == CmbEditHotkey && CmbEditHotkey.SelectedItem is string eKey && _hotkeys.TryGetValue(eKey, out int eCode)) AppSettings.EditModeHotkey = eCode;
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
             else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
             else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;

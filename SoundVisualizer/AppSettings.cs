@@ -80,6 +80,7 @@ namespace SoundVisualizer
         // 7. 단축키 설정
         public static int StereoUpmixHotkey { get; set; } = 0x71; // F2
         public static int VisualModeHotkey { get; set; } = 0x72;  // F3
+        public static int EditModeHotkey { get; set; } = 0x73;    // F4
 
         // 7. 현재 언어 설정
         public static string Language { get; set; } = "KOR";
@@ -121,6 +122,7 @@ namespace SoundVisualizer
                         SoundMode = data.SoundMode;
                         StereoUpmixHotkey = data.StereoUpmixHotkey;
                         VisualModeHotkey = data.VisualModeHotkey;
+                        EditModeHotkey = data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73;
                         Language = data.Language ?? "KOR";
                         
                         IsAdminMode = data.IsAdminMode;
@@ -159,6 +161,7 @@ namespace SoundVisualizer
                     SoundMode = SoundMode,
                     StereoUpmixHotkey = StereoUpmixHotkey,
                     VisualModeHotkey = VisualModeHotkey,
+                    EditModeHotkey = EditModeHotkey,
                     Language = Language,
                     
                     IsAdminMode = IsAdminMode,
@@ -202,6 +205,7 @@ namespace SoundVisualizer
             public double GlowIntensity { get; set; } = 0.0;
             public int StereoUpmixHotkey { get; set; } = 0x71; 
             public int VisualModeHotkey { get; set; } = 0x72;  
+            public int EditModeHotkey { get; set; } = 0x73;
             public string Language { get; set; } = "KOR";
             
             public bool IsAdminMode { get; set; } = false;

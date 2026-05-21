@@ -5,10 +5,221 @@
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
         Topmost="True" WindowState="Maximized" ShowInTaskbar="False">
     
+    <Window.Resources>
+        <!-- Modern Slider Style -->
+        <Style x:Key="ModernSliderStyle" TargetType="Slider">
+            <Setter Property="Background" Value="#25FFFFFF"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="TrackBackground" Grid.Row="1" Background="#20FFFFFF" CornerRadius="3" Height="6" VerticalAlignment="Center"/>
+                            <Track x:Name="PART_Track" Grid.Row="1">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="#00ADB5" Height="6" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Width="14" Height="14" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Fill="#00ADB5" Stroke="#FFFFFF" StrokeThickness="1.5">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="#00ADB5" BlurRadius="6" ShadowDepth="0"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Pink Slider Style (Glow 전용) -->
+        <Style x:Key="PinkSliderStyle" TargetType="Slider">
+            <Setter Property="Background" Value="#25FFFFFF"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="TrackBackground" Grid.Row="1" Background="#20FFFFFF" CornerRadius="3" Height="6" VerticalAlignment="Center"/>
+                            <Track x:Name="PART_Track" Grid.Row="1">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="#FF2E93" Height="6" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Width="14" Height="14" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Fill="#FF2E93" Stroke="#FFFFFF" StrokeThickness="1.5">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="#FF2E93" BlurRadius="6" ShadowDepth="0"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern CheckBox Style -->
+        <Style x:Key="ModernCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Width="42" Height="22">
+                                    <Border x:Name="Border" CornerRadius="11" Background="#30FFFFFF" BorderBrush="#20FFFFFF" BorderThickness="1"/>
+                                    <Ellipse x:Name="Dot" Width="14" Height="14" Fill="#A0FFFFFF" HorizontalAlignment="Left" Margin="4,0,0,0">
+                                        <Ellipse.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#3000ADB5"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#00ADB5"/>
+                                <Setter TargetName="Dot" Property="Fill" Value="#00ADB5"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="20" Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.15"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Dark ComboBox Style -->
+        <Style x:Key="ModernComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#1A202C"/>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" ClickMode="Press" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border x:Name="Bg" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                            <Path x:Name="Arrow" Fill="#A0FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" Data="M0,0 L8,0 L4,5 Z"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bg" Property="Background" Value="#2D3748"/>
+                                                <Setter TargetName="Bg" Property="BorderBrush" Value="#00ADB5"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Left" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border x:Name="DropDownBorder" Background="#121824" BorderThickness="1" BorderBrush="#30FFFFFF" CornerRadius="6" Margin="0,4,0,0" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.3"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" Margin="0,1">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#2D3748"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#3000ADB5"/>
+                                <Setter Property="Foreground" Value="#00ADB5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
     <Grid x:Name="MainGrid">
         <!-- 시스템 상태 메시지 (상단 고정) -->
         <Border x:Name="StatusBorder" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,50,0,0" 
-                Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False">
+                Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False" Visibility="Collapsed">
             <TextBlock x:Name="StatusText" Foreground="White" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료" TextAlignment="Center"/>
         </Border>
 
@@ -21,9 +232,9 @@
 
         <!-- AI 라벨 (화면 정중앙) -->
         <Border x:Name="AILabelBorder" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False">
+                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False" Visibility="Collapsed">
             <TextBlock x:Name="AILabelText" Foreground="White" FontSize="26" 
-                       FontWeight="Bold" Text="SoundVisualizer 대기 중..."/>
+                       FontWeight="Bold" Text=""/>
         </Border>
 
         <!-- FPS 카운터 (디버그용, 우상단) -->
@@ -41,5 +252,267 @@
                 <TextBlock x:Name="StereoModeText" Foreground="White" FontSize="16" FontWeight="SemiBold" Text="🔊 채널 확장 모드: [F2] 7.1 서라운드"/>
             </Border>
         </StackPanel>
+
+        <!-- 실시간 오버레이 편집 모드 패널 (F4) -->
+        <Grid x:Name="EditOverlayGrid" Visibility="Collapsed" Background="#900B0E14">
+            <!-- 가이드라인 인터랙션 영역 -->
+            <Canvas x:Name="GuidelineCanvas" Background="Transparent" MouseDown="GuidelineCanvas_MouseDown" MouseMove="GuidelineCanvas_MouseMove" MouseUp="GuidelineCanvas_MouseUp">
+                <!-- 사각형 가이드라인 (파도 / 패드 / 외각선 모드) -->
+                <Border x:Name="RectGuideline" BorderBrush="#00ADB5" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#00ADB5" BlurRadius="15" ShadowDepth="0"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType="Thumb">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Grid.Resources>
+                        <!-- 영역 명칭 및 크기값 -->
+                        <Border Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="#30FFFFFF" BorderThickness="1">
+                            <TextBlock x:Name="RectSizeLabel" Text="파도 한계선 (크기: 50%)" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                        </Border>
+                        
+                        <!-- 크기 조절용 4개 모서리 Thumb (드래그 감지) -->
+                        <Thumb x:Name="ResizeHandle_NW" Width="14" Height="14" Background="#00ADB5" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_NE" Width="14" Height="14" Background="#00ADB5" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_SW" Width="14" Height="14" Background="#00ADB5" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_SE" Width="14" Height="14" Background="#00ADB5" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                    </Grid>
+                </Border>
+
+                <!-- 원형 가이드라인 (원형 모드용) -->
+                <Grid x:Name="CircleGuideline" Visibility="Collapsed">
+                    <!-- 기본 뼈대 점선 원 (내경) -->
+                    <Ellipse x:Name="CircleBaseShape" Stroke="#00ADB5" StrokeThickness="2" StrokeDashArray="3,3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#00ADB5" BlurRadius="10" ShadowDepth="0"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <!-- 최대 돌출 상한선 원 (외경) -->
+                    <Ellipse x:Name="CircleMaxShape" Stroke="#FF2E93" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#FF2E93" BlurRadius="15" ShadowDepth="0"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <!-- 원형 모드 라벨 (중앙 고정) -->
+                    <Border Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="#30FFFFFF" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock x:Name="CircleRadiusLabel" Text="기본 반경: 40" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock x:Name="CircleIntensityLabel" Text="파도 크기: 50%" Foreground="#FF2E93" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Canvas>
+
+            <!-- 스팀 오버레이 테마의 좌측 설정 패널 -->
+            <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="380" Background="#F4090C11" BorderBrush="#30FFFFFF" BorderThickness="0,0,1,0">
+                <Grid Margin="25,40,25,40">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 상단 헤더 -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                        <TextBlock Text="Sound Visualizer" Foreground="#00ADB5" FontSize="10" FontWeight="Heavy"/>
+                        <TextBlock Text="실시간 오버레이 설정" Foreground="White" FontSize="24" FontWeight="ExtraBold" Margin="0,5,0,0"/>
+                        <Border Height="2" Margin="0,15,0,0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#00ADB5" Offset="0"/>
+                                    <GradientStop Color="#FF2E93" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 스크롤 가능한 컨트롤 셋 -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="0,0,5,0">
+                            <!-- 실시간 모드 전환 영역 -->
+                            <StackPanel Margin="0,0,0,20">
+                                <TextBlock Text="표현 모드" Foreground="#A0FFFFFF" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <ComboBox x:Name="CmbEditPanelVisualMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelVisualMode_SelectionChanged" Margin="0,0,0,12">
+                                    <ComboBoxItem Content="파도"/>
+                                    <ComboBoxItem Content="패드"/>
+                                    <ComboBoxItem Content="원형"/>
+                                    <ComboBoxItem Content="외각선"/>
+                                </ComboBox>
+                                
+                                <TextBlock Text="사운드 모드" Foreground="#A0FFFFFF" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <ComboBox x:Name="CmbEditPanelSoundMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelSoundMode_SelectionChanged">
+                                    <ComboBoxItem Content="2 채널"/>
+                                    <ComboBoxItem Content="5.1 채널"/>
+                                    <ComboBoxItem Content="7.1 채널"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- 설정 1: 파도 속도 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="속도" Foreground="#A0FFFFFF" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelSpeedValueText" Text="20" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelSpeedSlider" Minimum="1" Maximum="100" Value="20" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 2: 파도 민감성 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="민감도" Foreground="#A0FFFFFF" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelSensitivityValueText" Text="3.75" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelSensitivitySlider" Minimum="0.1" Maximum="10" Value="3.75" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 3: 투명도 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="투명도" Foreground="#A0FFFFFF" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelOpacityValueText" Text="50%" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelOpacitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 4: 크기 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="크기" Foreground="#A0FFFFFF" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelIntensityValueText" Text="50%" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelIntensitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 4: 글로우(광원) 설정 카드 -->
+                            <Border BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="#08FFFFFF">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="광원 효과" Foreground="White" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <CheckBox x:Name="EditPanelGlowCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelGlow_Changed" Unchecked="EditPanelGlow_Changed"/>
+                                    </Grid>
+                                    <StackPanel x:Name="EditPanelGlowIntensityPanel" Margin="0,15,0,0" Visibility="Collapsed">
+                                        <Grid>
+                                            <TextBlock Text="광원 세기" Foreground="#A0FFFFFF" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelGlowValueText" Text="0%" Foreground="#FF2E93" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelGlowSlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource PinkSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 5: 소리 분류 표시 설정 카드 -->
+                            <Border BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="#08FFFFFF">
+                                <StackPanel>
+                                    <TextBlock Text="소리 분류 표시" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    <!-- 환경음 -->
+                                    <Grid Margin="0,0,0,12">
+                                        <CheckBox x:Name="EditPanelShowAmbientCheckBox" Content="환경음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowAmbient_Changed" Unchecked="EditPanelShowAmbient_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="#A0FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelAmbientColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Ambient">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="#40FFFFFF" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                    <!-- 말소리 -->
+                                    <Grid Margin="0,0,0,12">
+                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="말소리 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="#A0FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelSpeechColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Speech">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="#40FFFFFF" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                    <!-- 강조음 -->
+                                    <Grid>
+                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="강조음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="#A0FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelDangerColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Danger">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="#40FFFFFF" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 6: 단축키 설정 카드 -->
+                            <Border BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="#08FFFFFF">
+                                <StackPanel>
+                                    <TextBlock Text="단축키 설정" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="표현 모드 전환" Foreground="#A0FFFFFF" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <ComboBox x:Name="CmbEditPanelVisualHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="사운드 모드 전환" Foreground="#A0FFFFFF" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <ComboBox x:Name="CmbEditPanelSoundModeHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <TextBlock Text="오버레이 전환" Foreground="#A0FFFFFF" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <ComboBox x:Name="CmbEditPanelEditHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 7: 고급 설정 카드 -->
+                            <Border BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="#08FFFFFF">
+                                <StackPanel>
+                                    <TextBlock Text="고급 설정" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <Grid>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="개발자 모드" Foreground="#A0FFFFFF" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock Text="디버그 정보 및 오디오 상태 표시" Foreground="#60FFFFFF" FontSize="10" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="EditPanelAdminCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelAdmin_Changed" Unchecked="EditPanelAdmin_Changed"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 드래그 도움말 알림 -->
+                            <Border Background="#10FF2E93" CornerRadius="8" Padding="12" BorderBrush="#30FF2E93" BorderThickness="1" Margin="0,5,0,0">
+                                <TextBlock x:Name="DragTipText" Text="💡 화면에 표시된 가이드 라인을 마우스 드래그하여 오버레이 파도의 높이 한계선 및 중앙 크기를 실시간 조절할 수 있습니다!" Foreground="#FFB2D2" FontSize="12" TextWrapping="Wrap" LineHeight="18"/>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- 하단 종료 안내 -->
+                    <Border Grid.Row="2" Background="#1000ADB5" BorderBrush="#3000ADB5" BorderThickness="1" CornerRadius="8" Padding="15">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Border Background="#00ADB5" CornerRadius="3" Padding="6,2" VerticalAlignment="Center">
+                                <TextBlock x:Name="EditPanelHotkeyText" Text="F4" Foreground="Black" FontWeight="Bold" FontSize="12"/>
+                            </Border>
+                            <TextBlock Text=" 키를 누르면 설정 저장 후 닫힘" Foreground="#D0FFFFFF" FontSize="13" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
