@@ -4,32 +4,85 @@ using System.Text.Json;
 
 namespace SoundVisualizer
 {
+    public class VisualModeSettings
+    {
+        public double Intensity { get; set; } = 50.0;
+        public double PositionSpeed { get; set; } = 20.0;
+        public double Sensitivity { get; set; } = 3.75;
+        public double VisualOpacity { get; set; } = 50.0;
+        public bool IsGlowMode { get; set; } = false;
+        public double GlowIntensity { get; set; } = 0.0;
+        public double CircleRadius { get; set; } = 40.0;
+    }
+
     public static class AppSettings
     {
-        // 1. 파도의 크기 (최대 진폭 스케일 0~100)
-        public static double WaveIntensity { get; set; } = 50.0;
-        // 2. 파도 위치 변화 속도 (화면상 파도의 위치 변화 속도)
-        public static double WavePositionSpeed { get; set; } = 20.0;
-        // 3. 파도의 민감성/떨림 (소리 크기가 변할 때 얼마나 즉각적으로 출렁이는지)
-        public static double WaveSensitivity { get; set; } = 3.75; // UI에서 15로 보이도록 설정 (15 / 4)
+        // 모드별 개별 설정 인스턴스
+        public static VisualModeSettings WaveMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+        public static VisualModeSettings PadMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+        public static VisualModeSettings CircleMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+
+        // 1. 파도의 크기 (현재 모드값 반환/설정)
+        public static double WaveIntensity
+        {
+            get => GetCurrentModeSettings().Intensity;
+            set => GetCurrentModeSettings().Intensity = value;
+        }
+
+        // 2. 파도 위치 변화 속도
+        public static double WavePositionSpeed
+        {
+            get => GetCurrentModeSettings().PositionSpeed;
+            set => GetCurrentModeSettings().PositionSpeed = value;
+        }
+
+        // 3. 파도의 민감성/떨림
+        public static double WaveSensitivity
+        {
+            get => GetCurrentModeSettings().Sensitivity;
+            set => GetCurrentModeSettings().Sensitivity = value;
+        }
+
         // 4. 파도/그래픽 투명도 (0 ~ 100)
-        public static double VisualOpacity { get; set; } = 50.0;
+        public static double VisualOpacity
+        {
+            get => GetCurrentModeSettings().VisualOpacity;
+            set => GetCurrentModeSettings().VisualOpacity = value;
+        }
+
         // 5. 시각화 모드 (0 = Wave 모드, 1 = Pad 모드, 2 = Circle 모드)
         public static int VisualMode { get; set; } = 0;
+
         // 5.5. 원형 모드 반지름 (10 ~ 100)
-        public static double CircleRadius { get; set; } = 40.0;
-        // 6. 스테레오 확장 모드 (2채널 소스를 좌/우 전용으로 표시할지 여부)
+        public static double CircleRadius
+        {
+            get => GetCurrentModeSettings().CircleRadius;
+            set => GetCurrentModeSettings().CircleRadius = value;
+        }
+
+        // 6. 스테레오 확장 모드
         public static int SoundMode { get; set; } = 2;
+
         // 6.5. 광원(Glow) 효과 모드
-        public static bool IsGlowMode { get; set; } = false;
-        public static double GlowIntensity { get; set; } = 0.0;
+        public static bool IsGlowMode
+        {
+            get => GetCurrentModeSettings().IsGlowMode;
+            set => GetCurrentModeSettings().IsGlowMode = value;
+        }
+
+        public static double GlowIntensity
+        {
+            get => GetCurrentModeSettings().GlowIntensity;
+            set => GetCurrentModeSettings().GlowIntensity = value;
+        }
+
         // 7. 단축키 설정
         public static int StereoUpmixHotkey { get; set; } = 0x71; // F2
         public static int VisualModeHotkey { get; set; } = 0x72;  // F3
+
         // 7. 현재 언어 설정
         public static string Language { get; set; } = "KOR";
-        // 8. 설정 모드 (일반/고급)
-        
+
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
 
@@ -45,6 +98,13 @@ namespace SoundVisualizer
 
         private static string SettingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
+        private static VisualModeSettings GetCurrentModeSettings()
+        {
+            if (VisualMode == 0) return WaveMode;
+            if (VisualMode == 1) return PadMode;
+            return CircleMode;
+        }
+
         public static void Load()
         {
             try
@@ -55,15 +115,8 @@ namespace SoundVisualizer
                     var data = JsonSerializer.Deserialize<SettingsData>(json);
                     if (data != null)
                     {
-                        WaveIntensity = data.WaveIntensity;
-                        WavePositionSpeed = data.WavePositionSpeed;
-                        WaveSensitivity = data.WaveSensitivity;
-                        VisualOpacity = data.VisualOpacity;
                         VisualMode = data.VisualMode;
-                        CircleRadius = data.CircleRadius;
                         SoundMode = data.SoundMode;
-                        IsGlowMode = data.IsGlowMode;
-                        GlowIntensity = data.GlowIntensity;
                         StereoUpmixHotkey = data.StereoUpmixHotkey;
                         VisualModeHotkey = data.VisualModeHotkey;
                         Language = data.Language ?? "KOR";
@@ -75,6 +128,16 @@ namespace SoundVisualizer
                         ColorAmbient = data.ColorAmbient ?? "#FFFFFFFF";
                         ColorSpeech = data.ColorSpeech ?? "#FFFFFF00";
                         ColorDanger = data.ColorDanger ?? "#FFFF0000";
+
+                        // 하이브리드 모드 로드 (모드별 설정이 없는 구버전 호환)
+                        if (data.WaveMode != null) WaveMode = data.WaveMode;
+                        else WaveMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
+
+                        if (data.PadMode != null) PadMode = data.PadMode;
+                        else PadMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
+
+                        if (data.CircleMode != null) CircleMode = data.CircleMode;
+                        else CircleMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
                     }
                 }
             }
@@ -87,15 +150,8 @@ namespace SoundVisualizer
             {
                 var data = new SettingsData
                 {
-                    WaveIntensity = WaveIntensity,
-                    WavePositionSpeed = WavePositionSpeed,
-                    WaveSensitivity = WaveSensitivity,
-                    VisualOpacity = VisualOpacity,
                     VisualMode = VisualMode,
-                    CircleRadius = CircleRadius,
                     SoundMode = SoundMode,
-                    IsGlowMode = IsGlowMode,
-                    GlowIntensity = GlowIntensity,
                     StereoUpmixHotkey = StereoUpmixHotkey,
                     VisualModeHotkey = VisualModeHotkey,
                     Language = Language,
@@ -106,7 +162,20 @@ namespace SoundVisualizer
                     ShowDanger = ShowDanger,
                     ColorAmbient = ColorAmbient,
                     ColorSpeech = ColorSpeech,
-                    ColorDanger = ColorDanger
+                    ColorDanger = ColorDanger,
+
+                    WaveMode = WaveMode,
+                    PadMode = PadMode,
+                    CircleMode = CircleMode,
+
+                    // 구버전 호환성 저장을 위해 현재 모드의 최종 설정값도 루트 필드에 동시 저장
+                    WaveIntensity = WaveIntensity,
+                    WavePositionSpeed = WavePositionSpeed,
+                    WaveSensitivity = WaveSensitivity,
+                    VisualOpacity = VisualOpacity,
+                    CircleRadius = CircleRadius,
+                    IsGlowMode = IsGlowMode,
+                    GlowIntensity = GlowIntensity
                 };
                 var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(SettingsFilePath, json);
@@ -136,6 +205,10 @@ namespace SoundVisualizer
             public string ColorAmbient { get; set; } = "#FFFFFFFF";
             public string ColorSpeech { get; set; } = "#FFFFFF00";
             public string ColorDanger { get; set; } = "#FFFF0000";
+
+            public VisualModeSettings WaveMode { get; set; }
+            public VisualModeSettings PadMode { get; set; }
+            public VisualModeSettings CircleMode { get; set; }
         }
     }
 }

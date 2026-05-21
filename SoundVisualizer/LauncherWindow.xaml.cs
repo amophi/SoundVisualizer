@@ -160,15 +160,47 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "실행";
                 if (BtnStop != null) BtnStop.Content = "실행 중단";
                 TabSettings.Header = "설정";
-                TxtScreenSettings.Text = "화면 설정";
-                TxtIntensityLabel.Text = "크기";
-                TxtIntensityDesc.Text = "그래픽이 화면을 덮는 전체적인 크기와 길이를 조절합니다.";
-                TxtSpeedLabel.Text = "속도";
-                TxtSpeedDesc.Text = "오버레이가 소리의 방향을 따라가는 속도를 조절합니다.";
-                TxtSensitivityLabel.Text = "민감도";
-                TxtSensitivityDesc.Text = "작은 소리에도 그래픽이 얼마나 민감하게 반응할지 결정합니다.";
-                TxtOpacityLabel.Text = "투명도";
-                TxtOpacityDesc.Text = "그래픽의 투명도를 조절하여 배경의 비침 정도를 결정합니다.";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "파도 모드 설정";
+                TxtIntensityLabelWave.Text = "크기";
+                TxtIntensityDescWave.Text = "파도의 위아래 높이와 전체적인 볼륨감을 조절합니다.";
+                TxtSpeedLabelWave.Text = "속도";
+                TxtSpeedDescWave.Text = "파도가 흘러가며 일렁이는 속도를 조절합니다.";
+                TxtSensitivityLabelWave.Text = "민감도";
+                TxtSensitivityDescWave.Text = "작은 데시벨 소리에도 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다.";
+                TxtOpacityLabelWave.Text = "투명도";
+                TxtOpacityDescWave.Text = "파도의 투명도를 조절하여 오버레이 뒤의 게임이나 화면 비침 정도를 결정합니다.";
+                TxtGlowModeLabelWave.Text = "광원";
+                TxtGlowModeDescWave.Text = "파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "패드 모드 설정";
+                TxtIntensityLabelPad.Text = "크기";
+                TxtIntensityDescPad.Text = "사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다.";
+                TxtSpeedLabelPad.Text = "속도";
+                TxtSpeedDescPad.Text = "패드가 특정 방향의 사운드로 회전하며 반응하는 반응 속도를 조절합니다.";
+                TxtSensitivityLabelPad.Text = "민감도";
+                TxtSensitivityDescPad.Text = "패드가 소리를 더 잘 포착하여 더 큰 폭으로 도드라지게 조절합니다.";
+                TxtOpacityLabelPad.Text = "투명도";
+                TxtOpacityDescPad.Text = "패드 그래픽의 불투명도를 조정합니다.";
+                TxtGlowModeLabelPad.Text = "광원";
+                TxtGlowModeDescPad.Text = "패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "원형 모드 설정";
+                TxtIntensityLabelCircle.Text = "크기";
+                TxtIntensityDescCircle.Text = "사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다.";
+                TxtSpeedLabelCircle.Text = "속도";
+                TxtSpeedDescCircle.Text = "원형 이퀄라이저의 물결이나 회전 반응 속도를 조절합니다.";
+                TxtSensitivityLabelCircle.Text = "민감도";
+                TxtSensitivityDescCircle.Text = "원형 진폭이 소리에 얼마나 섬세하게 쪼개지며 반응할지 조절합니다.";
+                TxtOpacityLabelCircle.Text = "투명도";
+                TxtOpacityDescCircle.Text = "원형 그래픽의 불투명도를 결정합니다.";
+                TxtCircleRadiusLabel.Text = "원 크기";
+                TxtCircleRadiusDesc.Text = "원형 모드에서 가운데 중심부의 지름(반지름) 크기를 개별 조절합니다.";
+                TxtGlowModeLabelCircle.Text = "광원";
+                TxtGlowModeDescCircle.Text = "원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다.";
                 TxtModeSettings.Text = "모드 설정";
                 TxtVisualModeLabel.Text = "표현 모드";
                 TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 형태를 선택합니다.";
@@ -177,7 +209,6 @@ namespace SoundVisualizer
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "원형";
                 TxtSoundModeLabel.Text = "사운드 모드";
                 TxtSoundModeDesc.Text = "스피커 환경에 맞는 사운드 채널을 선택합니다.\n2채널 환경은 '2 채널', 서라운드 환경은 '5.1 채널' 또는 '7.1 채널'을 선택하세요.";
-                // ChkStereoUpmix.Content = "켜기";
                 TxtHotkeySettings.Text = "단축키";
                 TxtVisualHotkeyLabel.Text = "표현 모드 전환";
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
@@ -217,23 +248,55 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "Start";
                 if (BtnStop != null) BtnStop.Content = "Stop";
                 TabSettings.Header = "Settings";
-                TxtScreenSettings.Text = "Screen Settings";
-                TxtIntensityLabel.Text = "Intensity";
-                TxtIntensityDesc.Text = "Adjusts the overall size and length of the graphics on the screen.";
-                TxtSpeedLabel.Text = "Speed";
-                TxtSpeedDesc.Text = "Controls the speed at which the overlay follows the direction of the sound.";
-                TxtSensitivityLabel.Text = "Sensitivity";
-                TxtSensitivityDesc.Text = "Determines how sensitively the graphics react to soft sounds.";
-                TxtOpacityLabel.Text = "Opacity";
-                TxtOpacityDesc.Text = "Adjusts the graphic transparency to reveal the background behind it.";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "Wave Mode Settings";
+                TxtIntensityLabelWave.Text = "Intensity";
+                TxtIntensityDescWave.Text = "Adjusts the vertical height and overall volume of the waves.";
+                TxtSpeedLabelWave.Text = "Speed";
+                TxtSpeedDescWave.Text = "Controls the speed at which the wave flows and ripples.";
+                TxtSensitivityLabelWave.Text = "Sensitivity";
+                TxtSensitivityDescWave.Text = "Determines how sensitively the waves react to low decibel sounds.";
+                TxtOpacityLabelWave.Text = "Opacity";
+                TxtOpacityDescWave.Text = "Adjusts wave opacity to determine transparency over background games or screens.";
+                TxtGlowModeLabelWave.Text = "Glow";
+                TxtGlowModeDescWave.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "Pad Mode Settings";
+                TxtIntensityLabelPad.Text = "Size";
+                TxtIntensityDescPad.Text = "Adjusts the pad thickness and horizontal width when responding to sound.";
+                TxtSpeedLabelPad.Text = "Speed";
+                TxtSpeedDescPad.Text = "Controls the speed at which the pad rotates in response to directional sounds.";
+                TxtSensitivityLabelPad.Text = "Sensitivity";
+                TxtSensitivityDescPad.Text = "Adjusts the pad to capture sounds better and stand out more.";
+                TxtOpacityLabelPad.Text = "Opacity";
+                TxtOpacityDescPad.Text = "Adjusts the opacity of the pad graphic.";
+                TxtGlowModeLabelPad.Text = "Glow";
+                TxtGlowModeDescPad.Text = "Gives a soft aura-style glow effect around the pad.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "Circle Mode Settings";
+                TxtIntensityLabelCircle.Text = "Intensity";
+                TxtIntensityDescCircle.Text = "Adjusts the protrusion amplitude scale of the circle equalizer.";
+                TxtSpeedLabelCircle.Text = "Speed";
+                TxtSpeedDescCircle.Text = "Adjusts the wave or rotation response speed of the circle equalizer.";
+                TxtSensitivityLabelCircle.Text = "Sensitivity";
+                TxtSensitivityDescCircle.Text = "Controls how delicately the circle amplitude splits and responds to sound.";
+                TxtOpacityLabelCircle.Text = "Opacity";
+                TxtOpacityDescCircle.Text = "Determines the opacity of the circle graphic.";
+                TxtCircleRadiusLabel.Text = "Circle Radius";
+                TxtCircleRadiusDesc.Text = "Individually adjusts the radius of the center core in circle mode.";
+                TxtGlowModeLabelCircle.Text = "Glow";
+                TxtGlowModeDescCircle.Text = "Creates a shimmering glow aura along the border of the circle equalizer.";
                 TxtModeSettings.Text = "Mode Settings";
                 TxtVisualModeLabel.Text = "Visual Mode";
                 TxtVisualModeDesc.Text = "Selects the shape of the graphics drawn on the screen.";
                 CmbVisualModeWave.Content = "Wave";
-                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Cercle";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Circle";
+                CmbVisualModePad.Content = "Pad";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Circle";
                 TxtSoundModeLabel.Text = "Sound Mode";
                 TxtSoundModeDesc.Text = "Select the sound channel suitable for your speaker environment.\nFor 2-channel environments, select '2 Channels', and for surround environments, select '5.1 Channels' or '7.1 Channels'.";
-                // ChkStereoUpmix.Content = "Enable";
                 TxtHotkeySettings.Text = "Hotkeys";
                 TxtVisualHotkeyLabel.Text = "Visual Mode Toggle";
                 TxtVisualHotkeyDesc.Text = "Hotkey to change the visual shape in real-time.";
@@ -273,15 +336,48 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "開始";
                 if (BtnStop != null) BtnStop.Content = "停止";
                 TabSettings.Header = "設定";
-                TxtScreenSettings.Text = "画面設定";
-                TxtIntensityLabel.Text = "サイズ";
-                TxtIntensityDesc.Text = "画面を覆うグラフィックの全体的なサイズと長さを調整します。";
-                TxtSpeedLabel.Text = "速度";
-                TxtSpeedDesc.Text = "オーバーレイが音の方向を追う速度を調整します。";
-                TxtSensitivityLabel.Text = "感度";
-                TxtSensitivityDesc.Text = "小さな音に対してグラフィックがどれだけ敏感に反応するかを決定します。";
-                TxtOpacityLabel.Text = "不透明度";
-                TxtOpacityDesc.Text = "グラフィックの透明度を調整して背景の透け具合を決定します。";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "波モード設定";
+                TxtIntensityLabelWave.Text = "サイズ";
+                TxtIntensityDescWave.Text = "波の上下の高さと全体的なボリューム感を調整します。";
+                TxtSpeedLabelWave.Text = "速度";
+                TxtSpeedDescWave.Text = "波が流れて揺れる速度を調整します。";
+                TxtSensitivityLabelWave.Text = "感度";
+                TxtSensitivityDescWave.Text = "小さなデシベルの音にも波がどれだけ敏感に反応して揺れるかを調整します。";
+                TxtOpacityLabelWave.Text = "不透明度";
+                TxtOpacityDescWave.Text = "波の透明度を調整し、オーバーレイの後ろのゲームや画面の透け具合を決定します。";
+                TxtGlowModeLabelWave.Text = "発光";
+                TxtGlowModeDescWave.Text = "波の輪郭にほのかなネオン光を適用し、その強度を調整します。";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "パッドモード設定";
+                TxtIntensityLabelPad.Text = "サイズ";
+                TxtIntensityDescPad.Text = "音に反応する際のパッドの厚さと横幅を調整します。";
+                TxtSpeedLabelPad.Text = "速度";
+                TxtSpeedDescPad.Text = "パッドが特定の方向の音に向かって回転して反応する速度を調整します。";
+                TxtSensitivityLabelPad.Text = "感度";
+                TxtSensitivityDescPad.Text = "パッドが音をよりよく捉え、より大きく目立つように調整します。";
+                TxtOpacityLabelPad.Text = "不透明度";
+                TxtOpacityDescPad.Text = "パッドグラフィックの不透明度を調整します。";
+                TxtGlowModeLabelPad.Text = "発光";
+                TxtGlowModeDescPad.Text = "パッドの周囲に柔らかいオーラ状の光エフェクトを付与します。";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "円形モード設定";
+                TxtIntensityLabelCircle.Text = "サイズ";
+                TxtIntensityDescCircle.Text = "音が鳴る際の円形イコライザーの突出振幅スケールを調整します。";
+                TxtSpeedLabelCircle.Text = "速度";
+                TxtSpeedDescCircle.Text = "円形イコライザーの波や回転の反応速度を調整します。";
+                TxtSensitivityLabelCircle.Text = "感度";
+                TxtSensitivityDescCircle.Text = "円形の振幅が音に対してどれだけ繊細に分割されて反応するかを調整します。";
+                TxtOpacityLabelCircle.Text = "不透明度";
+                TxtOpacityDescCircle.Text = "円形グラフィックの不透明度を決定します。";
+                TxtCircleRadiusLabel.Text = "円のサイズ";
+                TxtCircleRadiusDesc.Text = "円形モードでの中央中心部の半径サイズを個別に調整します。";
+                TxtGlowModeLabelCircle.Text = "発光";
+                TxtGlowModeDescCircle.Text = "円形イコライザーの縁に沿って輝くグロー後光を作成します。";
+
                 TxtModeSettings.Text = "モード設定";
                 TxtVisualModeLabel.Text = "表現モード";
                 TxtVisualModeDesc.Text = "画面に描画されるグラフィックの形状を選択します。";
@@ -290,7 +386,6 @@ namespace SoundVisualizer
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "円形 (Circle)";
                 TxtSoundModeLabel.Text = "サウンドモード";
                 TxtSoundModeDesc.Text = "スピーカー環境に合ったサウンドチャンネルを選択します。\n2チャンネル環境の場合は「2チャンネル」を、サラウンド環境の場合は「5.1チャンネル」または「7.1チャンネル」を選択してください。";
-                // ChkStereoUpmix.Content = "オン";
                 TxtHotkeySettings.Text = "ショートカットキー";
                 TxtVisualHotkeyLabel.Text = "表現モードの切り替え";
                 TxtVisualHotkeyDesc.Text = "実行中に形状をリアルタイムで変更するショートカットです。";
@@ -330,15 +425,47 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "开始";
                 if (BtnStop != null) BtnStop.Content = "停止";
                 TabSettings.Header = "设置";
-                TxtScreenSettings.Text = "画面设置";
-                TxtIntensityLabel.Text = "大小";
-                TxtIntensityDesc.Text = "调整覆盖屏幕的图形的整体大小和长度。";
-                TxtSpeedLabel.Text = "速度";
-                TxtSpeedDesc.Text = "调整覆盖层跟随声音方向的速度。";
-                TxtSensitivityLabel.Text = "灵敏度";
-                TxtSensitivityDesc.Text = "决定图形对微小声音的反应敏锐程度。";
-                TxtOpacityLabel.Text = "不透明度";
-                TxtOpacityDesc.Text = "调整图形的透明度以决定背景的可见程度。";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "波浪模式设置";
+                TxtIntensityLabelWave.Text = "大小";
+                TxtIntensityDescWave.Text = "调整波浪的上下高度和整体体积感。";
+                TxtSpeedLabelWave.Text = "速度";
+                TxtSpeedDescWave.Text = "调整波浪流动和波动的速度。";
+                TxtSensitivityLabelWave.Text = "灵敏度";
+                TxtSensitivityDescWave.Text = "调整波浪对低分贝声音的敏感反应程度。";
+                TxtOpacityLabelWave.Text = "不透明度";
+                TxtOpacityDescWave.Text = "调整波浪的透明度，决定覆盖层后游戏或屏幕的可见度。";
+                TxtGlowModeLabelWave.Text = "光源";
+                TxtGlowModeDescWave.Text = "在波浪轮廓上应用柔和的霓虹光源并调整其强度。";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "面板模式设置";
+                TxtIntensityLabelPad.Text = "大小";
+                TxtIntensityDescPad.Text = "调整声音反应时面板的厚度和横向宽度。";
+                TxtSpeedLabelPad.Text = "速度";
+                TxtSpeedDescPad.Text = "调整面板在特定方向声音下的旋转反应速度。";
+                TxtSensitivityLabelPad.Text = "灵敏度";
+                TxtSensitivityDescPad.Text = "调整面板以更好地捕获声音并使其更加突出。";
+                TxtOpacityLabelPad.Text = "不透明度";
+                TxtOpacityDescPad.Text = "调整面板图形的不透明度。";
+                TxtGlowModeLabelPad.Text = "光源";
+                TxtGlowModeDescPad.Text = "在面板周围赋予柔和的光晕效果。";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "圆形模式设置";
+                TxtIntensityLabelCircle.Text = "振幅";
+                TxtIntensityDescCircle.Text = "调整声音响亮时圆形均衡器的突出振幅比例。";
+                TxtSpeedLabelCircle.Text = "速度";
+                TxtSpeedDescCircle.Text = "调整圆形均衡器的波动或旋转反应速度。";
+                TxtSensitivityLabelCircle.Text = "灵敏度";
+                TxtSensitivityDescCircle.Text = "调整圆形振幅对声音进行何种细腻划分并产生反应。";
+                TxtOpacityLabelCircle.Text = "不透明度";
+                TxtOpacityDescCircle.Text = "决定圆形图形的不透明度。";
+                TxtCircleRadiusLabel.Text = "圆半径";
+                TxtCircleRadiusDesc.Text = "单独调整圆形模式下中心核心的半径大小。";
+                TxtGlowModeLabelCircle.Text = "光源";
+                TxtGlowModeDescCircle.Text = "沿圆形均衡器的边缘创建闪烁的辉光后光。";
                 TxtModeSettings.Text = "模式设置";
                 TxtVisualModeLabel.Text = "表现模式";
                 TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的形状。";
@@ -347,7 +474,6 @@ namespace SoundVisualizer
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "圆形 (Circle)";
                 TxtSoundModeLabel.Text = "声音模式";
                 TxtSoundModeDesc.Text = "选择适合您扬声器环境的声音声道。\n对于双声道环境，请选择“2 声道”，对于环绕声环境，请选择“5.1 声道”或“7.1 声道”。";
-                // ChkStereoUpmix.Content = "开启";
                 TxtHotkeySettings.Text = "快捷键";
                 TxtVisualHotkeyLabel.Text = "切换表现模式";
                 TxtVisualHotkeyDesc.Text = "在运行中实时改变形状的快捷键。";
@@ -387,22 +513,55 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "Iniciar";
                 if (BtnStop != null) BtnStop.Content = "Detener";
                 TabSettings.Header = "Ajustes";
-                TxtScreenSettings.Text = "Ajustes de pantalla";
-                TxtIntensityLabel.Text = "Tamaño";
-                TxtIntensityDesc.Text = "Ajusta el tamaño y longitud general de los gráficos en la pantalla.";
-                TxtSpeedLabel.Text = "Velocidad";
-                TxtSpeedDesc.Text = "Controla la velocidad a la que la superposición sigue la dirección del sonido.";
-                TxtSensitivityLabel.Text = "Sensibilidad";
-                TxtSensitivityDesc.Text = "Determina la sensibilidad de los gráficos ante pequeños sonidos.";
-                TxtOpacityLabel.Text = "Opacidad";
-                TxtOpacityDesc.Text = "Ajusta la transparencia de los gráficos para determinar la visibilidad del fondo.";
-                TxtModeSettings.Text = "Ajustes de modo";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "Ajustes de Modo Ola";
+                TxtIntensityLabelWave.Text = "Intensidad";
+                TxtIntensityDescWave.Text = "Ajusta la altura vertical y el volumen general de las olas.";
+                TxtSpeedLabelWave.Text = "Velocidad";
+                TxtSpeedDescWave.Text = "Controla la velocidad a la que la ola fluye y ondula.";
+                TxtSensitivityLabelWave.Text = "Sensibilidad";
+                TxtSensitivityDescWave.Text = "Determina qué tan sensiblemente reaccionan las olas a sonidos de bajos decibelios.";
+                TxtOpacityLabelWave.Text = "Opacidad";
+                TxtOpacityDescWave.Text = "Ajusta la opacidad de la ola para determinar la transparencia sobre el fondo.";
+                TxtGlowModeLabelWave.Text = "Brillo";
+                TxtGlowModeDescWave.Text = "Aplica un brillo de neón suave al contorno de la ola y ajusta su intensidad.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "Ajustes de Modo Pad";
+                TxtIntensityLabelPad.Text = "Tamaño";
+                TxtIntensityDescPad.Text = "Ajusta el grosor y el ancho del pad al responder al sonido.";
+                TxtSpeedLabelPad.Text = "Velocidad";
+                TxtSpeedDescPad.Text = "Controla la velocidad a la que el pad gira en respuesta a sonidos direccionales.";
+                TxtSensitivityLabelPad.Text = "Sensibilidad";
+                TxtSensitivityDescPad.Text = "Ajusta el pad para capturar mejor los sonidos y destacar más.";
+                TxtOpacityLabelPad.Text = "Opacidad";
+                TxtOpacityDescPad.Text = "Ajusta la opacidad del gráfico del pad.";
+                TxtGlowModeLabelPad.Text = "Brillo";
+                TxtGlowModeDescPad.Text = "Da un efecto de brillo suave estilo aura al pad.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "Ajustes de Modo Círculo";
+                TxtIntensityLabelCircle.Text = "Intensidad";
+                TxtIntensityDescCircle.Text = "Ajusta la escala de amplitud de la protuberancia del ecualizador circular.";
+                TxtSpeedLabelCircle.Text = "Velocidad";
+                TxtSpeedDescCircle.Text = "Ajusta la velocidad de respuesta de ondulación o rotación del ecualizador circular.";
+                TxtSensitivityLabelCircle.Text = "Sensibilidad";
+                TxtSensitivityDescCircle.Text = "Controla qué tan delicadamente la amplitud del círculo se divide y responde al sonido.";
+                TxtOpacityLabelCircle.Text = "Opacidad";
+                TxtOpacityDescCircle.Text = "Determina la opacidad del gráfico circular.";
+                TxtCircleRadiusLabel.Text = "Radio del Círculo";
+                TxtCircleRadiusDesc.Text = "Ajusta individualmente el tamaño del radio del núcleo en el modo círculo.";
+                TxtGlowModeLabelCircle.Text = "Brillo";
+                TxtGlowModeDescCircle.Text = "Crea un halo de brillo parpadeante a lo largo del ecualizador circular.";
+                TxtModeSettings.Text = "Ajustes de Modo";
                 TxtVisualModeLabel.Text = "Modo visual";
                 TxtVisualModeDesc.Text = "Selecciona la forma de los gráficos en pantalla.";
                 CmbVisualModeWave.Content = "Ola";
-                CmbVisualModePad.Content = "Pad";                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";                TxtSoundModeLabel.Text = "Modo de Sonido";
+                CmbVisualModePad.Content = "Pad";
+                if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Círculo";
+                TxtSoundModeLabel.Text = "Modo de Sonido";
                 TxtSoundModeDesc.Text = "Seleccione el canal de sonido adecuado para su entorno de altavoces.\nPara entornos de 2 canales, seleccione '2 Canales', y para entornos envolventes, seleccione '5.1 Canales' o '7.1 Canales'.";
-                // ChkStereoUpmix.Content = "Activar";
                 TxtHotkeySettings.Text = "Atajos";
                 TxtVisualHotkeyLabel.Text = "Cambiar modo visual";
                 TxtVisualHotkeyDesc.Text = "Atajo para cambiar la forma en tiempo real durante la ejecución.";
@@ -442,23 +601,54 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "Démarrer";
                 if (BtnStop != null) BtnStop.Content = "Arrêter";
                 TabSettings.Header = "Paramètres";
-                TxtScreenSettings.Text = "Paramètres d'écran";
-                TxtIntensityLabel.Text = "Taille";
-                TxtIntensityDesc.Text = "Ajuste la taille et la longueur globales des graphiques à l'écran.";
-                TxtSpeedLabel.Text = "Vitesse";
-                TxtSpeedDesc.Text = "Contrôle la vitesse à laquelle la superposition suit la direction du son.";
-                TxtSensitivityLabel.Text = "Sensibilité";
-                TxtSensitivityDesc.Text = "Détermine la sensibilité de réaction des graphiques aux petits sons.";
-                TxtOpacityLabel.Text = "Opacité";
-                TxtOpacityDesc.Text = "Ajuste la transparence des graphiques pour déterminer la visibilité de l'arrière-plan.";
-                TxtModeSettings.Text = "Paramètres de mode";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "Paramètres du Mode Vague";
+                TxtIntensityLabelWave.Text = "Intensité";
+                TxtIntensityDescWave.Text = "Ajuste la hauteur verticale et le volume général des vagues.";
+                TxtSpeedLabelWave.Text = "Vitesse";
+                TxtSpeedDescWave.Text = "Contrôle la vitesse à laquelle la vague s'écoule et ondule.";
+                TxtSensitivityLabelWave.Text = "Sensibilité";
+                TxtSensitivityDescWave.Text = "Détermine la sensibilité de réaction des vagues aux sons de faible décibel.";
+                TxtOpacityLabelWave.Text = "Opacité";
+                TxtOpacityDescWave.Text = "Ajuste l'opacité de la vague pour déterminer la transparence sur le fond.";
+                TxtGlowModeLabelWave.Text = "Halo";
+                TxtGlowModeDescWave.Text = "Applique une lueur néon douce au contour de la vague et ajuste son intensité.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "Paramètres du Mode Pad";
+                TxtIntensityLabelPad.Text = "Taille";
+                TxtIntensityDescPad.Text = "Ajuste l'épaisseur et la largeur du pad lors de la réponse au son.";
+                TxtSpeedLabelPad.Text = "Vitesse";
+                TxtSpeedDescPad.Text = "Contrôle la vitesse à laquelle le pad tourne en réponse aux sons directionnels.";
+                TxtSensitivityLabelPad.Text = "Sensibilité";
+                TxtSensitivityDescPad.Text = "Ajuste le pad pour mieux capturer les sons et se démarquer davantage.";
+                TxtOpacityLabelPad.Text = "Opacité";
+                TxtOpacityDescPad.Text = "Ajuste l'opacité du graphique du pad.";
+                TxtGlowModeLabelPad.Text = "Halo";
+                TxtGlowModeDescPad.Text = "Donne un effet de lueur douce de type aura autour du pad.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "Paramètres du Mode Cercle";
+                TxtIntensityLabelCircle.Text = "Intensité";
+                TxtIntensityDescCircle.Text = "Ajuste l'échelle d'amplitude de protrusion de l'égaliseur circulaire.";
+                TxtSpeedLabelCircle.Text = "Vitesse";
+                TxtSpeedDescCircle.Text = "Ajuste la vitesse de réponse d'ondulation ou de rotation de l'égaliseur circulaire.";
+                TxtSensitivityLabelCircle.Text = "Sensibilité";
+                TxtSensitivityDescCircle.Text = "Contrôle la finesse avec laquelle l'amplitude du cercle se divise et répond au son.";
+                TxtOpacityLabelCircle.Text = "Opacité";
+                TxtOpacityDescCircle.Text = "Détermine l'opacité du graphique circulaire.";
+                TxtCircleRadiusLabel.Text = "Rayon du Cercle";
+                TxtCircleRadiusDesc.Text = "Ajuste individuellement la taille du rayon du noyau dans le mode cercle.";
+                TxtGlowModeLabelCircle.Text = "Halo";
+                TxtGlowModeDescCircle.Text = "Crée une lueur scintillante le long de la bordure de l'égaliseur circulaire.";
+                TxtModeSettings.Text = "Paramètres de Mode";
                 TxtVisualModeLabel.Text = "Mode visuel";
                 TxtVisualModeDesc.Text = "Sélectionne la forme des graphiques dessinés à l'écran.";
                 CmbVisualModeWave.Content = "Vague";
                 CmbVisualModePad.Content = "Pad";
                 TxtSoundModeLabel.Text = "Mode Sonore";
                 TxtSoundModeDesc.Text = "Sélectionnez le canal audio adapté à votre environnement de haut-parleurs.\nPour les environnements à 2 canaux, sélectionnez '2 Canaux', et pour les environnements surround, sélectionnez '5.1 Canaux' ou '7.1 Canaux'.";
-                // ChkStereoUpmix.Content = "Activer";
                 TxtHotkeySettings.Text = "Raccourcis";
                 TxtVisualHotkeyLabel.Text = "Basculer le mode visuel";
                 TxtVisualHotkeyDesc.Text = "Raccourci pour changer la forme en temps réel pendant l'exécution.";
@@ -498,16 +688,48 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "Starten";
                 if (BtnStop != null) BtnStop.Content = "Stoppen";
                 TabSettings.Header = "Einstellungen";
-                TxtScreenSettings.Text = "Bildeinstellungen";
-                TxtIntensityLabel.Text = "Größe";
-                TxtIntensityDesc.Text = "Passt die Gesamtgröße und Länge der Grafiken auf dem Bildschirm an.";
-                TxtSpeedLabel.Text = "Geschwindigkeit";
-                TxtSpeedDesc.Text = "Steuert die Geschwindigkeit, mit der das Overlay der Schallrichtung folgt.";
-                TxtSensitivityLabel.Text = "Empfindlichkeit";
-                TxtSensitivityDesc.Text = "Bestimmt, wie empfindlich die Grafiken auf leise Töne reagieren.";
-                TxtOpacityLabel.Text = "Deckkraft";
-                TxtOpacityDesc.Text = "Passt die Transparenz der Grafiken an, um die Sichtbarkeit des Hintergrunds zu bestimmen.";
-                TxtModeSettings.Text = "Moduseinstellungen";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "Wellenmodus-Einstellungen";
+                TxtIntensityLabelWave.Text = "Intensität";
+                TxtIntensityDescWave.Text = "Passt die vertikale Höhe und das Gesamtvolumen der Wellen an.";
+                TxtSpeedLabelWave.Text = "Geschwindigkeit";
+                TxtSpeedDescWave.Text = "Steuert die Geschwindigkeit, mit der die Welle fließt und wogt.";
+                TxtSensitivityLabelWave.Text = "Empfindlichkeit";
+                TxtSensitivityDescWave.Text = "Bestimmt, wie empfindlich die Wellen auf leise Geräusche reagieren.";
+                TxtOpacityLabelWave.Text = "Deckkraft";
+                TxtOpacityDescWave.Text = "Passt die Wellendeckkraft an, um die Transparenz über dem Hintergrund zu bestimmen.";
+                TxtGlowModeLabelWave.Text = "Leuchten";
+                TxtGlowModeDescWave.Text = "Trägt ein sanftes Neonleuchten auf die Wellenkontur auf und passt die Intensität an.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "Padmodus-Einstellungen";
+                TxtIntensityLabelPad.Text = "Größe";
+                TxtIntensityDescPad.Text = "Passt die Dicke und Breite des Pads bei der Tonreaktion an.";
+                TxtSpeedLabelPad.Text = "Geschwindigkeit";
+                TxtSpeedDescPad.Text = "Steuert die Geschwindigkeit, mit der sich das Pad als Reaktion auf Richtungstöne dreht.";
+                TxtSensitivityLabelPad.Text = "Empfindlichkeit";
+                TxtSensitivityDescPad.Text = "Passt das Pad an, um Töne besser zu erfassen und sich deutlicher abzuheben.";
+                TxtOpacityLabelPad.Text = "Deckkraft";
+                TxtOpacityDescPad.Text = "Passt die Deckkraft der Pad-Grafik an.";
+                TxtGlowModeLabelPad.Text = "Leuchten";
+                TxtGlowModeDescPad.Text = "Erzeugt einen sanften Aura-Lichteffekt um das Pad.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "Kreismus-Einstellungen";
+                TxtIntensityLabelCircle.Text = "Intensität";
+                TxtIntensityDescCircle.Text = "Passt die Skala der Amplitudenauslenkung des Kreis-Equalizers an.";
+                TxtSpeedLabelCircle.Text = "Geschwindigkeit";
+                TxtSpeedDescCircle.Text = "Passt die Wellen- oder Rotationsgeschwindigkeit des Kreis-Equalizers an.";
+                TxtSensitivityLabelCircle.Text = "Empfindlichkeit";
+                TxtSensitivityDescCircle.Text = "Steuert, wie fein die Kreisamplitude aufgeteilt wird und auf Töne reagiert.";
+                TxtOpacityLabelCircle.Text = "Deckkraft";
+                TxtOpacityDescCircle.Text = "Bestimmt die Deckkraft der Kreis-Grafik.";
+                TxtCircleRadiusLabel.Text = "Kreisradius";
+                TxtCircleRadiusDesc.Text = "Passt den Radius des inneren Kerns im Kreis-Modus individuell an.";
+                TxtGlowModeLabelCircle.Text = "Leuchten";
+                TxtGlowModeDescCircle.Text = "Erzeugt eine schimmernde Aura entlang des Rands des Kreis-Equalizers.";
+                TxtModeSettings.Text = "Modus-Einstellungen";
                 TxtVisualModeLabel.Text = "Visueller Modus";
                 TxtVisualModeDesc.Text = "Wählt die Form der auf dem Bildschirm gezeichneten Grafiken aus.";
                 CmbVisualModeWave.Content = "Welle";
@@ -515,7 +737,6 @@ namespace SoundVisualizer
                 if (CmbVisualModeCircle != null) CmbVisualModeCircle.Content = "Kreis";
                 TxtSoundModeLabel.Text = "Sound-Modus";
                 TxtSoundModeDesc.Text = "Wählen Sie den für Ihre Lautsprecherumgebung geeigneten Audiokanal.\nWählen Sie für 2-Kanal-Umgebungen '2 Kanäle' und für Surround-Umgebungen '5.1 Kanäle' oder '7.1 Kanäle'.";
-                // ChkStereoUpmix.Content = "Aktivieren";
                 TxtHotkeySettings.Text = "Tastenkombinationen";
                 TxtVisualHotkeyLabel.Text = "Visuellen Modus umschalten";
                 TxtVisualHotkeyDesc.Text = "Tastenkombination zum Ändern der Form in Echtzeit während der Ausführung.";
@@ -555,15 +776,47 @@ namespace SoundVisualizer
                 if (BtnLaunch != null) BtnLaunch.Content = "Запустить";
                 if (BtnStop != null) BtnStop.Content = "Остановить";
                 TabSettings.Header = "Настройки";
-                TxtScreenSettings.Text = "Настройки экрана";
-                TxtIntensityLabel.Text = "Размер";
-                TxtIntensityDesc.Text = "Настраивает общий размер и длину графики на экране.";
-                TxtSpeedLabel.Text = "Скорость";
-                TxtSpeedDesc.Text = "Управляет скоростью, с которой оверлей следует за направлением звука.";
-                TxtSensitivityLabel.Text = "Чувствительность";
-                TxtSensitivityDesc.Text = "Определяет, насколько чувствительно графика реагирует на тихие звуки.";
-                TxtOpacityLabel.Text = "Непрозрачность";
-                TxtOpacityDesc.Text = "Настраивает прозрачность графики, чтобы определить видимость фона.";
+                
+                // Wave Mode Settings
+                TxtExpanderWaveTitle.Text = "Настройки режима Волна";
+                TxtIntensityLabelWave.Text = "Размер";
+                TxtIntensityDescWave.Text = "Настраивает высоту волны и общий объем.";
+                TxtSpeedLabelWave.Text = "Скорость";
+                TxtSpeedDescWave.Text = "Управляет скоростью течения и колебания волны.";
+                TxtSensitivityLabelWave.Text = "Чувствительность";
+                TxtSensitivityDescWave.Text = "Определяет, насколько чувствительно волны реагируют на тихие звуки.";
+                TxtOpacityLabelWave.Text = "Непрозрачность";
+                TxtOpacityDescWave.Text = "Настраивает прозрачность волны для определения видимости фона.";
+                TxtGlowModeLabelWave.Text = "Свечение";
+                TxtGlowModeDescWave.Text = "Применяет мягкое неоновое свечение к контуру волны и регулирует его интенсивность.";
+
+                // Pad Mode Settings
+                TxtExpanderPadTitle.Text = "Настройки режима Панель";
+                TxtIntensityLabelPad.Text = "Размер";
+                TxtIntensityDescPad.Text = "Регулирует толщину и ширину панели при реагировании на звук.";
+                TxtSpeedLabelPad.Text = "Скорость";
+                TxtSpeedDescPad.Text = "Управляет скоростью вращения панели в ответ на направленные звуки.";
+                TxtSensitivityLabelPad.Text = "Чувствительность";
+                TxtSensitivityDescPad.Text = "Настраивает панель для лучшего захвата звука и большей выразительности.";
+                TxtOpacityLabelPad.Text = "Непрозрачность";
+                TxtOpacityDescPad.Text = "Регулирует непрозрачность графики панели.";
+                TxtGlowModeLabelPad.Text = "Свечение";
+                TxtGlowModeDescPad.Text = "Создает мягкое свечение в стиле ауры вокруг панели.";
+
+                // Circle Mode Settings
+                TxtExpanderCircleTitle.Text = "Настройки режима Круг";
+                TxtIntensityLabelCircle.Text = "Размер";
+                TxtIntensityDescCircle.Text = "Регулирует масштаб амплитуды выступов кругового эквалайзера при звуке.";
+                TxtSpeedLabelCircle.Text = "Скорость";
+                TxtSpeedDescCircle.Text = "Настраивает скорость волны или вращения кругового эквалайзера.";
+                TxtSensitivityLabelCircle.Text = "Чувствительность";
+                TxtSensitivityDescCircle.Text = "Определяет, насколько тонко круговая амплитуда разделяется и реагирует на звук.";
+                TxtOpacityLabelCircle.Text = "Непрозрачность";
+                TxtOpacityDescCircle.Text = "Определяет непрозрачность графики круга.";
+                TxtCircleRadiusLabel.Text = "Радиус круга";
+                TxtCircleRadiusDesc.Text = "Индивидуально настраивает радиус центрального ядра в режиме круга.";
+                TxtGlowModeLabelCircle.Text = "Свечение";
+                TxtGlowModeDescCircle.Text = "Создает мерцающее свечение по краю кругового эквалайзера.";
                 TxtModeSettings.Text = "Настройки режима";
                 TxtVisualModeLabel.Text = "Визуальный режим";
                 TxtVisualModeDesc.Text = "Выбирает форму графики, отображаемой на экране.";
@@ -634,29 +887,52 @@ namespace SoundVisualizer
 
         private void LoadSettingsToUI()
         {
-            SldIntensity.Value = AppSettings.WaveIntensity;
-            SldSpeed.Value = AppSettings.WavePositionSpeed;
-            SldSensitivity.Value = AppSettings.WaveSensitivity * 4.0; // 0~25 범위를 0~100으로 확장
+            // 1. Wave Mode Load
+            SldIntensityWave.Value = AppSettings.WaveMode.Intensity;
+            SldSpeedWave.Value = AppSettings.WaveMode.PositionSpeed;
+            SldSensitivityWave.Value = AppSettings.WaveMode.Sensitivity * 4.0;
+            SldOpacityWave.Value = 100 - AppSettings.WaveMode.VisualOpacity;
+            ChkGlowModeWave.IsChecked = AppSettings.WaveMode.IsGlowMode;
+            SldGlowIntensityWave.Value = AppSettings.WaveMode.GlowIntensity;
             
-            SldOpacity.Value = 100 - AppSettings.VisualOpacity; // 투명도 수치 반전 (100=완전 투명)
-            SldGlowIntensity.Value = AppSettings.GlowIntensity;
-            SldGlowIntensity.IsEnabled = AppSettings.IsGlowMode;
-            SldGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeLabel.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeDesc.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
+            SldGlowIntensityWave.IsEnabled = AppSettings.WaveMode.IsGlowMode;
+            SldGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeLabelWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeDescWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
 
+            // 2. Pad Mode Load
+            SldIntensityPad.Value = AppSettings.PadMode.Intensity;
+            SldSpeedPad.Value = AppSettings.PadMode.PositionSpeed;
+            SldSensitivityPad.Value = AppSettings.PadMode.Sensitivity * 4.0;
+            SldOpacityPad.Value = 100 - AppSettings.PadMode.VisualOpacity;
+            ChkGlowModePad.IsChecked = AppSettings.PadMode.IsGlowMode;
+            SldGlowIntensityPad.Value = AppSettings.PadMode.GlowIntensity;
+            
+            SldGlowIntensityPad.IsEnabled = AppSettings.PadMode.IsGlowMode;
+            SldGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeLabelPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeDescPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+
+            // 3. Circle Mode Load
+            SldIntensityCircle.Value = AppSettings.CircleMode.Intensity;
+            SldSpeedCircle.Value = AppSettings.CircleMode.PositionSpeed;
+            SldSensitivityCircle.Value = AppSettings.CircleMode.Sensitivity * 4.0;
+            SldOpacityCircle.Value = 100 - AppSettings.CircleMode.VisualOpacity;
+            ChkGlowModeCircle.IsChecked = AppSettings.CircleMode.IsGlowMode;
+            SldGlowIntensityCircle.Value = AppSettings.CircleMode.GlowIntensity;
+            SldCircleRadius.Value = AppSettings.CircleMode.CircleRadius;
+            
+            SldGlowIntensityCircle.IsEnabled = AppSettings.CircleMode.IsGlowMode;
+            SldGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeLabelCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+            TxtGlowModeDescCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+
+            // 4. Common settings
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
-            if (SldCircleRadius != null && PanelCircleRadius != null)
-            {
-                SldCircleRadius.Value = AppSettings.CircleRadius;
-                bool isCircle = AppSettings.VisualMode == 2;
-                PanelCircleRadius.IsEnabled = isCircle;
-                PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
-            }
-
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
-            ChkGlowMode.IsChecked = AppSettings.IsGlowMode;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
             CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
@@ -672,6 +948,48 @@ namespace SoundVisualizer
                 SetColorButton(BtnColorSpeech, AppSettings.ColorSpeech);
                 SetColorButton(BtnColorDanger, AppSettings.ColorDanger);
             }
+
+            // 5. Expander states update
+            UpdateExpanderStates();
+        }
+
+        private void UpdateExpanderStates()
+        {
+            if (ExpanderWave == null || ExpanderPad == null || ExpanderCircle == null || PanelModeExpanders == null) return;
+            
+            bool wasInitializing = _isInitializing;
+            _isInitializing = true; // IsExpanded 변경이 이벤트를 유발하여 설정을 변경하는 악순환 원천 차단
+            
+            // 1. 상태 변경 (현재 선택된 모드는 펼치고 나머지는 접음)
+            ExpanderWave.IsExpanded = (AppSettings.VisualMode == 0);
+            ExpanderPad.IsExpanded = (AppSettings.VisualMode == 1);
+            ExpanderCircle.IsExpanded = (AppSettings.VisualMode == 2);
+            
+            // 2. 동적 물리적 순서 정렬 (현재 활성화된 모드가 맨 첫 번째로 가도록 패널 재배치)
+            PanelModeExpanders.Children.Remove(ExpanderWave);
+            PanelModeExpanders.Children.Remove(ExpanderPad);
+            PanelModeExpanders.Children.Remove(ExpanderCircle);
+            
+            if (AppSettings.VisualMode == 0)
+            {
+                PanelModeExpanders.Children.Add(ExpanderWave);
+                PanelModeExpanders.Children.Add(ExpanderPad);
+                PanelModeExpanders.Children.Add(ExpanderCircle);
+            }
+            else if (AppSettings.VisualMode == 1)
+            {
+                PanelModeExpanders.Children.Add(ExpanderPad);
+                PanelModeExpanders.Children.Add(ExpanderWave);
+                PanelModeExpanders.Children.Add(ExpanderCircle);
+            }
+            else if (AppSettings.VisualMode == 2)
+            {
+                PanelModeExpanders.Children.Add(ExpanderCircle);
+                PanelModeExpanders.Children.Add(ExpanderWave);
+                PanelModeExpanders.Children.Add(ExpanderPad);
+            }
+            
+            _isInitializing = wasInitializing;
         }
 
         private void SetColorButton(Button btn, string hex)
@@ -697,32 +1015,62 @@ namespace SoundVisualizer
         {
             if (_isInitializing) return;
 
-            if (sender == SldIntensity) AppSettings.WaveIntensity = SldIntensity.Value;
-            else if (sender == SldSpeed) AppSettings.WavePositionSpeed = SldSpeed.Value;
-            else if (sender == SldSensitivity) AppSettings.WaveSensitivity = SldSensitivity.Value / 4.0;
-            else if (sender == SldOpacity) AppSettings.VisualOpacity = 100 - SldOpacity.Value;
-            else if (sender == SldGlowIntensity) AppSettings.GlowIntensity = SldGlowIntensity.Value;
-            else if (sender == SldCircleRadius) AppSettings.CircleRadius = SldCircleRadius.Value;
-            else if (sender == CmbVisualMode) 
+            // Wave
+            if (sender == SldIntensityWave) AppSettings.WaveMode.Intensity = SldIntensityWave.Value;
+            else if (sender == SldSpeedWave) AppSettings.WaveMode.PositionSpeed = SldSpeedWave.Value;
+            else if (sender == SldSensitivityWave) AppSettings.WaveMode.Sensitivity = SldSensitivityWave.Value / 4.0;
+            else if (sender == SldOpacityWave) AppSettings.WaveMode.VisualOpacity = 100 - SldOpacityWave.Value;
+            else if (sender == ChkGlowModeWave)
+            {
+                AppSettings.WaveMode.IsGlowMode = ChkGlowModeWave.IsChecked ?? false;
+                SldGlowIntensityWave.IsEnabled = AppSettings.WaveMode.IsGlowMode;
+                SldGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeLabelWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeDescWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+            }
+            else if (sender == SldGlowIntensityWave) AppSettings.WaveMode.GlowIntensity = SldGlowIntensityWave.Value;
+
+            // Pad
+            else if (sender == SldIntensityPad) AppSettings.PadMode.Intensity = SldIntensityPad.Value;
+            else if (sender == SldSpeedPad) AppSettings.PadMode.PositionSpeed = SldSpeedPad.Value;
+            else if (sender == SldSensitivityPad) AppSettings.PadMode.Sensitivity = SldSensitivityPad.Value / 4.0;
+            else if (sender == SldOpacityPad) AppSettings.PadMode.VisualOpacity = 100 - SldOpacityPad.Value;
+            else if (sender == ChkGlowModePad)
+            {
+                AppSettings.PadMode.IsGlowMode = ChkGlowModePad.IsChecked ?? false;
+                SldGlowIntensityPad.IsEnabled = AppSettings.PadMode.IsGlowMode;
+                SldGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeLabelPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeDescPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
+            }
+            else if (sender == SldGlowIntensityPad) AppSettings.PadMode.GlowIntensity = SldGlowIntensityPad.Value;
+
+            // Circle
+            else if (sender == SldIntensityCircle) AppSettings.CircleMode.Intensity = SldIntensityCircle.Value;
+            else if (sender == SldSpeedCircle) AppSettings.CircleMode.PositionSpeed = SldSpeedCircle.Value;
+            else if (sender == SldSensitivityCircle) AppSettings.CircleMode.Sensitivity = SldSensitivityCircle.Value / 4.0;
+            else if (sender == SldOpacityCircle) AppSettings.CircleMode.VisualOpacity = 100 - SldOpacityCircle.Value;
+            else if (sender == ChkGlowModeCircle)
+            {
+                AppSettings.CircleMode.IsGlowMode = ChkGlowModeCircle.IsChecked ?? false;
+                SldGlowIntensityCircle.IsEnabled = AppSettings.CircleMode.IsGlowMode;
+                SldGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeLabelCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+                TxtGlowModeDescCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
+            }
+            else if (sender == SldGlowIntensityCircle) AppSettings.CircleMode.GlowIntensity = SldGlowIntensityCircle.Value;
+            else if (sender == SldCircleRadius) AppSettings.CircleMode.CircleRadius = SldCircleRadius.Value;
+
+            // Common
+            else if (sender == CmbVisualMode)
             {
                 AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
-                if (PanelCircleRadius != null)
-                {
-                    bool isCircle = AppSettings.VisualMode == 2;
-                    PanelCircleRadius.IsEnabled = isCircle;
-                    PanelCircleRadius.Opacity = isCircle ? 1.0 : 0.4;
-                }
+                UpdateExpanderStates();
             }
             else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
-            else if (sender == ChkGlowMode) 
-            {
-                AppSettings.IsGlowMode = ChkGlowMode.IsChecked ?? false;
-                SldGlowIntensity.IsEnabled = AppSettings.IsGlowMode;
-                SldGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowIntensity.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeLabel.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeDesc.Opacity = AppSettings.IsGlowMode ? 1.0 : 0.4;
-            }
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
             else if (sender == CmbSoundModeHotkey && CmbSoundModeHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
@@ -826,10 +1174,11 @@ namespace SoundVisualizer
 
             _isInitializing = true;
 
-            AppSettings.WaveIntensity = 50.0;
-            AppSettings.WavePositionSpeed = 20.0;
-            AppSettings.WaveSensitivity = 3.75;
-            AppSettings.VisualOpacity = 50.0;
+            // 모드별 개별 설정을 모두 기본값으로 안전하게 초기화
+            AppSettings.WaveMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            AppSettings.PadMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            AppSettings.CircleMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+
             AppSettings.VisualMode = 0;
             AppSettings.SoundMode = 2;
             

@@ -281,6 +281,71 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Toss Expander Style -->
+        <Style x:Key="TossExpander" TargetType="{x:Type Expander}">
+            <Setter Property="Background" Value="{StaticResource CardColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Expander}">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="24" BorderBrush="#222429" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition x:Name="ContentRow" Height="0"/>
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Header Button -->
+                                <ToggleButton x:Name="HeaderButton" Grid.Row="0" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Content="{TemplateBinding Header}" Cursor="Hand" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Grid Background="Transparent">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Header Content -->
+                                                <ContentPresenter Grid.Column="0" ContentSource="Content" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+                                                <!-- Arrow Indicator -->
+                                                <Path x:Name="Arrow" Grid.Column="1" Fill="{StaticResource SecondaryTextColor}" HorizontalAlignment="Right" VerticalAlignment="Center" Data="M 0,0 L 5,5 L 10,0 Z" RenderTransformOrigin="0.5,0.5" Margin="0,0,8,0">
+                                                    <Path.RenderTransform>
+                                                        <RotateTransform Angle="0"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="Arrow" Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <RotateTransform Angle="180"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+
+                                <!-- Expandable Content -->
+                                <Border x:Name="ContentBorder" Grid.Row="1" Visibility="Collapsed" Margin="0,16,0,0">
+                                    <ContentPresenter/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ContentRow" Property="Height" Value="*"/>
+                                <Setter TargetName="ContentBorder" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <!-- Main Window Background -->
@@ -354,7 +419,9 @@
                             <TextBlock x:Name="TxtHomeDesc" Text="보이지 않던 소리를 화면에 그려냅니다.&#xA;게이밍부터 영화 감상까지 새로운 경험을 시작하세요." 
                                        FontSize="16" Foreground="{StaticResource SecondaryTextColor}" LineHeight="26" Margin="0,0,0,24"/>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,48">
+
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
                                 <Ellipse x:Name="StatusDot" Width="12" Height="12" Fill="#8B95A1" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="TxtStatus" Text="상태: 실행 대기 중" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextColor}" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -377,88 +444,9 @@
                     <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
                         <StackPanel Margin="0,0,0,24">
 
-                            <TextBlock x:Name="TxtScreenSettings" Text="화면 설정" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,16"/>
+                            <TextBlock x:Name="TxtModeSettings" Text="모드 설정" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,16"/>
 
-                            <Border Style="{StaticResource TossCard}">
-                                <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabel" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensity" Text="{Binding Value, ElementName=SldIntensity, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDesc" Text="그래픽이 화면을 덮는 전체적인 크기와 길이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSpeedLabel" Text="속도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSpeed" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSpeed" Text="{Binding Value, ElementName=SldSpeed, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSpeedDesc" Text="오버레이가 소리의 방향을 따라가는 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel x:Name="PanelNormalSensitivity" Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSensitivityLabel" Text="민감도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSensitivity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivity" Text="{Binding Value, ElementName=SldSensitivity, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDesc" Text="작은 소리에도 그래픽이 얼마나 민감하게 반응할지 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabel" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacity" Text="{Binding Value, ElementName=SldOpacity, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDesc" Text="그래픽의 투명도를 조절하여 배경의 비침 정도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtGlowModeLabel" Text="광원" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkGlowMode" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldGlowIntensity" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensity" Text="{Binding Value, ElementName=SldGlowIntensity, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDesc" Text="그래픽 외곽에 광원을 부여하고, 그 강도를 조절합니다. (GPU 리소스 약간 필요)" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <TextBlock x:Name="TxtModeSettings" Text="모드 설정" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
-
-                            <Border Style="{StaticResource TossCard}">
+                            <Border Style="{StaticResource TossCard}" Margin="0,0,0,24">
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
                                         <Grid>
@@ -478,21 +466,6 @@
                                         </Grid>
                                     </StackPanel>
 
-                                    <!-- 원 크기 셋팅 (원형 모드일 때만 활성화) -->
-                                    <StackPanel x:Name="PanelCircleRadius" Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtCircleRadiusLabel" Text="원 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldCircleRadius" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="40" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtCircleRadius" Text="{Binding Value, ElementName=SldCircleRadius, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtCircleRadiusDesc" Text="원형 모드에서 가운데 빈 공간의 크기(반지름)를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
                                     <StackPanel>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -503,11 +476,277 @@
                                                 <TextBlock x:Name="TxtSoundModeLabel" Text="사운드 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
                                                 <TextBlock x:Name="TxtSoundModeDesc" Text="스피커 환경에 맞는 사운드 채널을 선택합니다.&#x0a;2채널 환경은 '2 채널', 서라운드 환경은 '5.1 채널' 또는 '7.1 채널'을 선택하세요." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
-                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed"><ComboBoxItem x:Name="CmbSoundMode2" Content="2 채널"/><ComboBoxItem x:Name="CmbSoundMode51" Content="5.1 채널"/><ComboBoxItem x:Name="CmbSoundMode71" Content="7.1 채널"/></ComboBox>
+                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed">
+                                                <ComboBoxItem x:Name="CmbSoundMode2" Content="2 채널"/>
+                                                <ComboBoxItem x:Name="CmbSoundMode51" Content="5.1 채널"/>
+                                                <ComboBoxItem x:Name="CmbSoundMode71" Content="7.1 채널"/>
+                                            </ComboBox>
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
+
+                            <TextBlock x:Name="TxtModeDetailSettings" Text="모드별 상세 설정" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,16"/>
+
+                            <!-- 모드 상세 설정 아코디언들을 묶는 전용 컨테이너 (동적 정렬 대상) -->
+                            <StackPanel x:Name="PanelModeExpanders">
+                                <!-- 🌊 파도 모드 설정 -->
+                            <Expander x:Name="ExpanderWave" Style="{StaticResource TossExpander}">
+                                <Expander.Header>
+                                    <TextBlock x:Name="TxtExpanderWaveTitle" Text="파도 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                </Expander.Header>
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelWave" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityWave" Text="{Binding Value, ElementName=SldIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescWave" Text="파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSpeedLabelWave" Text="속도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSpeedWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedWave" Text="{Binding Value, ElementName=SldSpeedWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSpeedDescWave" Text="파도가 흘러가며 일렁이는 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSensitivityLabelWave" Text="민감도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSensitivityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityWave" Text="{Binding Value, ElementName=SldSensitivityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSensitivityDescWave" Text="작은 데시벨 소리에도 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelWave" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityWave" Text="{Binding Value, ElementName=SldOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescWave" Text="파도의 투명도를 조절하여 오버레이 뒤의 게임이나 화면 비침 정도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtGlowModeLabelWave" Text="광원" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <CheckBox x:Name="ChkGlowModeWave" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            </StackPanel>
+                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityWave" Text="{Binding Value, ElementName=SldGlowIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtGlowModeDescWave" Text="파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- 🟦 패드 모드 설정 -->
+                            <Expander x:Name="ExpanderPad" Style="{StaticResource TossExpander}">
+                                <Expander.Header>
+                                    <TextBlock x:Name="TxtExpanderPadTitle" Text="패드 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                </Expander.Header>
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelPad" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityPad" Text="{Binding Value, ElementName=SldIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescPad" Text="사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSpeedLabelPad" Text="속도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSpeedPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedPad" Text="{Binding Value, ElementName=SldSpeedPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSpeedDescPad" Text="패드가 특정 방향의 사운드로 회전하며 반응하는 반응 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSensitivityLabelPad" Text="민감도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSensitivityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityPad" Text="{Binding Value, ElementName=SldSensitivityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSensitivityDescPad" Text="패드가 소리를 더 잘 포착하여 더 큰 폭으로 도드라지게 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelPad" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityPad" Text="{Binding Value, ElementName=SldOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescPad" Text="패드 그래픽의 불투명도를 조정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtGlowModeLabelPad" Text="광원" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <CheckBox x:Name="ChkGlowModePad" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            </StackPanel>
+                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityPad" Text="{Binding Value, ElementName=SldGlowIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtGlowModeDescPad" Text="패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- 🟢 원형 모드 설정 -->
+                            <Expander x:Name="ExpanderCircle" Style="{StaticResource TossExpander}">
+                                <Expander.Header>
+                                    <TextBlock x:Name="TxtExpanderCircleTitle" Text="원형 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                </Expander.Header>
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelCircle" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityCircle" Text="{Binding Value, ElementName=SldIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescCircle" Text="사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSpeedLabelCircle" Text="속도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSpeedCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedCircle" Text="{Binding Value, ElementName=SldSpeedCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSpeedDescCircle" Text="원형 이퀄라이저의 물결이나 회전 반응 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtSensitivityLabelCircle" Text="민감도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldSensitivityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityCircle" Text="{Binding Value, ElementName=SldSensitivityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtSensitivityDescCircle" Text="원형 진폭이 소리에 얼마나 섬세하게 쪼개지며 반응할지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelCircle" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityCircle" Text="{Binding Value, ElementName=SldOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescCircle" Text="원형 그래픽의 불투명도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtCircleRadiusLabel" Text="원 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldCircleRadius" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="40" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtCircleRadius" Text="{Binding Value, ElementName=SldCircleRadius, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtCircleRadiusDesc" Text="원형 모드에서 가운데 중심부의 지름(반지름) 크기를 개별 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtGlowModeLabelCircle" Text="광원" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <CheckBox x:Name="ChkGlowModeCircle" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            </StackPanel>
+                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityCircle" Text="{Binding Value, ElementName=SldGlowIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtGlowModeDescCircle" Text="원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                            </StackPanel>
 
                             <TextBlock x:Name="TxtAIDisplaySettings" Text="소리 분류 표시" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
 
