@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace SoundVisualizer
 {
@@ -78,9 +79,14 @@ namespace SoundVisualizer
         }
 
         // 7. 단축키 설정
-        public static int StereoUpmixHotkey { get; set; } = 0x71; // F2
-        public static int VisualModeHotkey { get; set; } = 0x72;  // F3
-        public static int EditModeHotkey { get; set; } = 0x73;    // F4
+        public static List<int> StereoUpmixKeyBind { get; set; } = new List<int> { 0x71 }; // F2
+        public static List<int> VisualModeKeyBind { get; set; } = new List<int> { 0x72 };  // F3
+        public static List<int> EditModeKeyBind { get; set; } = new List<int> { 0x73 };    // F4
+
+        // 구버전 호환용
+        public static int StereoUpmixHotkey { get; set; } = 0x71; 
+        public static int VisualModeHotkey { get; set; } = 0x72;  
+        public static int EditModeHotkey { get; set; } = 0x73;    
 
         // 7. 현재 언어 설정
         public static string Language { get; set; } = "KOR";
@@ -120,9 +126,15 @@ namespace SoundVisualizer
                     {
                         VisualMode = data.VisualMode;
                         SoundMode = data.SoundMode;
-                        StereoUpmixHotkey = data.StereoUpmixHotkey;
-                        VisualModeHotkey = data.VisualModeHotkey;
-                        EditModeHotkey = data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73;
+                        if (data.StereoUpmixKeyBind != null && data.StereoUpmixKeyBind.Count > 0) StereoUpmixKeyBind = data.StereoUpmixKeyBind;
+                        else StereoUpmixKeyBind = new List<int> { data.StereoUpmixHotkey != 0 ? data.StereoUpmixHotkey : 0x71 };
+
+                        if (data.VisualModeKeyBind != null && data.VisualModeKeyBind.Count > 0) VisualModeKeyBind = data.VisualModeKeyBind;
+                        else VisualModeKeyBind = new List<int> { data.VisualModeHotkey != 0 ? data.VisualModeHotkey : 0x72 };
+
+                        if (data.EditModeKeyBind != null && data.EditModeKeyBind.Count > 0) EditModeKeyBind = data.EditModeKeyBind;
+                        else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73 };
+
                         Language = data.Language ?? "KOR";
                         
                         IsAdminMode = data.IsAdminMode;
@@ -159,9 +171,9 @@ namespace SoundVisualizer
                 {
                     VisualMode = VisualMode,
                     SoundMode = SoundMode,
-                    StereoUpmixHotkey = StereoUpmixHotkey,
-                    VisualModeHotkey = VisualModeHotkey,
-                    EditModeHotkey = EditModeHotkey,
+                    StereoUpmixKeyBind = StereoUpmixKeyBind,
+                    VisualModeKeyBind = VisualModeKeyBind,
+                    EditModeKeyBind = EditModeKeyBind,
                     Language = Language,
                     
                     IsAdminMode = IsAdminMode,
@@ -203,6 +215,11 @@ namespace SoundVisualizer
             public int SoundMode { get; set; } = 2;
             public bool IsGlowMode { get; set; } = false;
             public double GlowIntensity { get; set; } = 0.0;
+            public List<int> StereoUpmixKeyBind { get; set; }
+            public List<int> VisualModeKeyBind { get; set; }
+            public List<int> EditModeKeyBind { get; set; }
+            
+            // 구버전 호환
             public int StereoUpmixHotkey { get; set; } = 0x71; 
             public int VisualModeHotkey { get; set; } = 0x72;  
             public int EditModeHotkey { get; set; } = 0x73;

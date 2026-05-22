@@ -189,7 +189,7 @@ namespace SoundVisualizer
         private void RenderFrame()
         {
             // 실시간 오버레이 편집 모드 토글
-            bool isEditHotkeyPressed = (GetAsyncKeyState(AppSettings.EditModeHotkey) & 0x8000) != 0;
+            bool isEditHotkeyPressed = IsHotkeyPressed(AppSettings.EditModeKeyBind);
             if (isEditHotkeyPressed && !_wasEditHotkeyPressed)
             {
                 ToggleEditMode(!_isEditMode);
@@ -197,7 +197,7 @@ namespace SoundVisualizer
             _wasEditHotkeyPressed = isEditHotkeyPressed;
 
             // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
-            bool isVisualHotkeyPressed = (GetAsyncKeyState(AppSettings.VisualModeHotkey) & 0x8000) != 0;
+            bool isVisualHotkeyPressed = IsHotkeyPressed(AppSettings.VisualModeKeyBind);
             if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
             {
                 AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
@@ -227,7 +227,7 @@ namespace SoundVisualizer
             }
 
             // F2 키: 스테레오 확장 모드 실시간 전환
-            bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
+            bool isStereoHotkeyPressed = IsHotkeyPressed(AppSettings.StereoUpmixKeyBind);
             if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
             {
                 AppSettings.SoundMode = (AppSettings.SoundMode + 1) % 3;
@@ -681,32 +681,30 @@ namespace SoundVisualizer
         [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         [DllImport("user32.dll")] static extern short GetAsyncKeyState(int vKey);
 
-        private readonly Dictionary<string, int> _hotkeys = new Dictionary<string, int>
+        private bool IsHotkeyPressed(System.Collections.Generic.List<int> keys)
         {
-            {"F1", 0x70}, {"F2", 0x71}, {"F3", 0x72}, {"F4", 0x73},
-            {"F5", 0x74}, {"F6", 0x75}, {"F7", 0x76}, {"F8", 0x77},
-            {"F9", 0x78}, {"F10", 0x79}, {"F11", 0x7A}, {"F12", 0x7B}
-        };
-
-        private string GetKeyName(int code)
-        {
-            foreach (var pair in _hotkeys)
+            if (keys == null || keys.Count == 0) return false;
+            foreach (int key in keys)
             {
-                if (pair.Value == code) return pair.Key;
+                if ((GetAsyncKeyState(key) & 0x8000) == 0) return false;
             }
-            return null;
+            return true;
         }
 
-        private void InitHotkeyComboBoxes()
+        private string GetKeysName(System.Collections.Generic.List<int> codes)
         {
-            if (CmbEditPanelVisualHotkey == null || CmbEditPanelVisualHotkey.Items.Count > 0) return;
-
-            foreach (var key in _hotkeys.Keys)
+            if (codes == null || codes.Count == 0) return "없음";
+            System.Collections.Generic.List<string> names = new System.Collections.Generic.List<string>();
+            foreach (var code in codes)
             {
-                CmbEditPanelVisualHotkey.Items.Add(key);
-                CmbEditPanelSoundModeHotkey.Items.Add(key);
-                CmbEditPanelEditHotkey.Items.Add(key);
+                var key = System.Windows.Input.KeyInterop.KeyFromVirtualKey(code);
+                string keyName = key.ToString();
+                if (keyName.Contains("System")) keyName = "Alt"; 
+                else if (keyName.StartsWith("Left")) keyName = keyName.Substring(4);
+                else if (keyName.StartsWith("Right")) keyName = "R" + keyName.Substring(5);
+                names.Add(keyName);
             }
+            return string.Join(" + ", names);
         }
 
         // ==========================================
@@ -799,17 +797,16 @@ namespace SoundVisualizer
                 EditPanelDangerColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorDanger));
 
             // 단축키 설정 바인딩
-            InitHotkeyComboBoxes();
-
-            if (CmbEditPanelVisualHotkey != null)
-                CmbEditPanelVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
-            if (CmbEditPanelSoundModeHotkey != null)
-                CmbEditPanelSoundModeHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
-            if (CmbEditPanelEditHotkey != null)
-                CmbEditPanelEditHotkey.SelectedItem = GetKeyName(AppSettings.EditModeHotkey) ?? "F4";
+            
+            if (BtnEditPanelVisualHotkey != null)
+                BtnEditPanelVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
+            if (BtnEditPanelSoundModeHotkey != null)
+                BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
+            if (BtnEditPanelEditHotkey != null)
+                BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
             
             if (EditPanelHotkeyText != null)
-                EditPanelHotkeyText.Text = GetKeyName(AppSettings.EditModeHotkey) ?? "F4";
+                EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
 
             // 고급 설정 바인딩
             if (EditPanelAdminCheckBox != null)
@@ -955,26 +952,82 @@ namespace SoundVisualizer
             }
         }
 
-        private void CmbEditPanelHotkey_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private string? _bindingTarget = null;
+        private System.Collections.Generic.HashSet<int> _currentlyHeldKeys = new System.Collections.Generic.HashSet<int>();
+        private System.Collections.Generic.HashSet<int> _maxKeysInCurrentBinding = new System.Collections.Generic.HashSet<int>();
+
+        private void BtnEditPanelHotkey_Click(object sender, RoutedEventArgs e)
         {
-            if (_isUpdatingEditPanelSliders) return;
+            if (sender == BtnEditPanelVisualHotkey) StartBinding("Visual");
+            else if (sender == BtnEditPanelSoundModeHotkey) StartBinding("Sound");
+            else if (sender == BtnEditPanelEditHotkey) StartBinding("Edit");
+        }
 
-            if (sender == CmbEditPanelVisualHotkey && CmbEditPanelVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode))
-            {
-                AppSettings.VisualModeHotkey = vCode;
-            }
-            else if (sender == CmbEditPanelSoundModeHotkey && CmbEditPanelSoundModeHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode))
-            {
-                AppSettings.StereoUpmixHotkey = sCode;
-            }
-            else if (sender == CmbEditPanelEditHotkey && CmbEditPanelEditHotkey.SelectedItem is string eKey && _hotkeys.TryGetValue(eKey, out int eCode))
-            {
-                AppSettings.EditModeHotkey = eCode;
-                if (EditPanelHotkeyText != null) EditPanelHotkeyText.Text = eKey;
-            }
+        private void StartBinding(string target)
+        {
+            _bindingTarget = target;
+            _currentlyHeldKeys.Clear();
+            _maxKeysInCurrentBinding.Clear();
+            string msg = AppSettings.Language == "KOR" ? "키 누르기.. (ESC 취소)" : "Press key.. (ESC cancel)";
+            if (target == "Visual") BtnEditPanelVisualHotkey.Content = msg;
+            else if (target == "Sound") BtnEditPanelSoundModeHotkey.Content = msg;
+            else if (target == "Edit") BtnEditPanelEditHotkey.Content = msg;
+        }
 
-            AppSettings.Save();
-            OnSettingsChangedFromHotkey?.Invoke();
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                if (e.Key == System.Windows.Input.Key.Escape)
+                {
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToEditPanel();
+                    e.Handled = true;
+                    return;
+                }
+
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Add(vKey);
+                _maxKeysInCurrentBinding.Add(vKey);
+                
+                string currentStr = GetKeysName(new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding));
+                if (_bindingTarget == "Visual") BtnEditPanelVisualHotkey.Content = currentStr;
+                else if (_bindingTarget == "Sound") BtnEditPanelSoundModeHotkey.Content = currentStr;
+                else if (_bindingTarget == "Edit") BtnEditPanelEditHotkey.Content = currentStr;
+
+                e.Handled = true;
+            }
+        }
+
+        private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Remove(vKey);
+
+                if (_currentlyHeldKeys.Count == 0 && _maxKeysInCurrentBinding.Count > 0)
+                {
+                    var keysToSave = new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding);
+                    
+                    if (_bindingTarget == "Visual") AppSettings.VisualModeKeyBind = keysToSave;
+                    else if (_bindingTarget == "Sound") AppSettings.StereoUpmixKeyBind = keysToSave;
+                    else if (_bindingTarget == "Edit") AppSettings.EditModeKeyBind = keysToSave;
+
+                    if (_bindingTarget == "Edit" && EditPanelHotkeyText != null) EditPanelHotkeyText.Text = GetKeysName(keysToSave);
+
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToEditPanel();
+                }
+                e.Handled = true;
+            }
         }
 
         private void EditPanelAdmin_Changed(object sender, RoutedEventArgs e)
@@ -1055,7 +1108,7 @@ namespace SoundVisualizer
                 Canvas.SetTop(CircleMaxShape, cy - maxRadius);
 
                 CircleRadiusLabel.Text = $"기본 반경: {AppSettings.CircleRadius:F0}";
-                CircleIntensityLabel.Text = $"파도 크기: {AppSettings.WaveIntensity:F0}%";
+                CircleIntensityLabel.Text = $"한계 크기: {AppSettings.WaveIntensity:F0}%";
             }
         }
 

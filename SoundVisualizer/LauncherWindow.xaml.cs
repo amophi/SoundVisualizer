@@ -13,12 +13,9 @@ namespace SoundVisualizer
         private MainWindow? _overlayWindow = null;
         private MMDeviceEnumerator? _deviceEnumerator;
 
-        private readonly Dictionary<string, int> _hotkeys = new Dictionary<string, int>
-        {
-            {"F1", 0x70}, {"F2", 0x71}, {"F3", 0x72}, {"F4", 0x73},
-            {"F5", 0x74}, {"F6", 0x75}, {"F7", 0x76}, {"F8", 0x77},
-            {"F9", 0x78}, {"F10", 0x79}, {"F11", 0x7A}, {"F12", 0x7B}
-        };
+        private string? _bindingTarget = null;
+        private System.Collections.Generic.HashSet<int> _currentlyHeldKeys = new System.Collections.Generic.HashSet<int>();
+        private System.Collections.Generic.HashSet<int> _maxKeysInCurrentBinding = new System.Collections.Generic.HashSet<int>();
 
         public LauncherWindow()
         {
@@ -91,12 +88,7 @@ namespace SoundVisualizer
 
         private void InitializeUI()
         {
-            foreach (var key in _hotkeys.Keys)
-            {
-                CmbVisualHotkey.Items.Add(key);
-                CmbSoundModeHotkey.Items.Add(key);
-                CmbEditHotkey.Items.Add(key);
-            }
+            // ComboBox initialization removed
 
             if (AppSettings.Language == "English" || AppSettings.Language == "ENG")
                 CmbLanguage.SelectedIndex = 1;
@@ -238,10 +230,10 @@ namespace SoundVisualizer
                 TabHelp.Header = "도움말";
                 TxtHelp1Title.Text = "사운드 모드";
                 TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요.";
-                TxtHelp2Title.Text = "실시간 단축키 제어";
-                TxtHelp2Desc.Text = "오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 지정된 단축키(기본 F2, F3)를 누르면 실시간으로 형태와 모드가 즉시 전환됩니다.";
-                TxtHelp3Title.Text = "오버레이 종료 방법";
-                TxtHelp3Desc.Text = "종료하려면 홈 탭의 '실행 중단' 버튼을 누르거나, 이 런처 창 상단의 ✕ 버튼을 클릭하세요.";
+                TxtHelp2Title.Text = "실시간 커스텀 단축키 제어";
+                TxtHelp2Desc.Text = "설정 탭에서 핫키 버튼을 클릭한 뒤, 단일 키 또는 복합 키 조합(예: Ctrl + Shift + A)을 눌러 자유롭게 단축키를 변경할 수 있습니다. 백그라운드에서 지정된 단축키를 누르면 실시간으로 모드가 즉시 전환됩니다.";
+                TxtHelp3Title.Text = "오버레이 실시간 편집 모드";
+                TxtHelp3Desc.Text = "지정된 단축키(기본 F4)를 누르면 오버레이 편집 모드가 활성화됩니다. 화면에서 직접 마우스를 드래그하여 그래픽의 크기 한계선을 조절할 수 있으며, 팝업된 설정 패널에서 세부 조작이 가능합니다.";
                 TxtHelp4Title.Text = "AI 소리 분석 및 색상";
                 TxtHelp4Desc.Text = "AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 말소리, 강조음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다.";
                 TxtHelp5Title.Text = "개발자 모드";
@@ -341,10 +333,10 @@ namespace SoundVisualizer
                 TabHelp.Header = "Help";
                 TxtHelp1Title.Text = "Sound Mode";
                 TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, set the 'Sound Mode' appropriately in the settings.";
-                TxtHelp2Title.Text = "Real-time Hotkeys";
-                TxtHelp2Desc.Text = "Even while the overlay is on screen, you can press the designated hotkeys (Default F2, F3) in the background to switch shapes and modes in real-time.";
-                TxtHelp3Title.Text = "How to Close Overlay";
-                TxtHelp3Desc.Text = "To close, click 'Stop' on the Home tab, or click the ✕ button at the top of this launcher window.";
+                TxtHelp2Title.Text = "Real-time Custom Hotkeys";
+                TxtHelp2Desc.Text = "You can freely customize hotkeys by clicking the button in the settings and pressing a single key or combination (e.g., Ctrl + Shift + A). Pressing these hotkeys in the background will switch modes instantly.";
+                TxtHelp3Title.Text = "Overlay Real-time Edit Mode";
+                TxtHelp3Desc.Text = "Press the assigned hotkey (Default F4) to activate the overlay edit mode. You can drag your mouse on the screen to adjust the size limit of the graphics and use the pop-up panel for detailed settings.";
                 TxtHelp4Title.Text = "AI Sound Analysis & Colors";
                 TxtHelp4Desc.Text = "AI analyzes the type of sound in real-time and displays it with labels and colors. You can assign unique colors to each sound type (Ambient, Speech, Danger) in the settings for intuitive identification.";
                 TxtHelp5Title.Text = "Developer Mode";
@@ -1071,9 +1063,9 @@ namespace SoundVisualizer
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
-            CmbVisualHotkey.SelectedItem = GetKeyName(AppSettings.VisualModeHotkey) ?? "F3";
-            CmbSoundModeHotkey.SelectedItem = GetKeyName(AppSettings.StereoUpmixHotkey) ?? "F2";
-            CmbEditHotkey.SelectedItem = GetKeyName(AppSettings.EditModeHotkey) ?? "F4";
+            if (BtnVisualHotkey != null) BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
+            if (BtnSoundModeHotkey != null) BtnSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
+            if (BtnEditHotkey != null) BtnEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
 
             if (ChkShowAmbient != null)
             {
@@ -1151,13 +1143,98 @@ namespace SoundVisualizer
             catch { }
         }
 
-        private string? GetKeyName(int code)
+        private string GetKeysName(List<int> codes)
         {
-            foreach (var pair in _hotkeys)
+            if (codes == null || codes.Count == 0) return "없음";
+            List<string> names = new List<string>();
+            foreach (var code in codes)
             {
-                if (pair.Value == code) return pair.Key;
+                var key = System.Windows.Input.KeyInterop.KeyFromVirtualKey(code);
+                string keyName = key.ToString();
+                if (keyName.Contains("System")) keyName = "Alt"; 
+                else if (keyName.StartsWith("Left")) keyName = keyName.Substring(4);
+                else if (keyName.StartsWith("Right")) keyName = "R" + keyName.Substring(5);
+                names.Add(keyName);
             }
-            return null;
+            return string.Join(" + ", names);
+        }
+
+        private void BtnVisualHotkey_Click(object sender, RoutedEventArgs e)
+        {
+            StartBinding("Visual");
+        }
+
+        private void BtnSoundModeHotkey_Click(object sender, RoutedEventArgs e)
+        {
+            StartBinding("Sound");
+        }
+
+        private void BtnEditHotkey_Click(object sender, RoutedEventArgs e)
+        {
+            StartBinding("Edit");
+        }
+
+        private void StartBinding(string target)
+        {
+            _bindingTarget = target;
+            _currentlyHeldKeys.Clear();
+            _maxKeysInCurrentBinding.Clear();
+            string msg = AppSettings.Language == "KOR" ? "키 누르기.. (ESC 취소)" : "Press key.. (ESC cancel)";
+            if (target == "Visual") BtnVisualHotkey.Content = msg;
+            else if (target == "Sound") BtnSoundModeHotkey.Content = msg;
+            else if (target == "Edit") BtnEditHotkey.Content = msg;
+        }
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                if (e.Key == System.Windows.Input.Key.Escape)
+                {
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToUI();
+                    e.Handled = true;
+                    return;
+                }
+
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Add(vKey);
+                _maxKeysInCurrentBinding.Add(vKey);
+                
+                string currentStr = GetKeysName(new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding));
+                if (_bindingTarget == "Visual") BtnVisualHotkey.Content = currentStr;
+                else if (_bindingTarget == "Sound") BtnSoundModeHotkey.Content = currentStr;
+                else if (_bindingTarget == "Edit") BtnEditHotkey.Content = currentStr;
+
+                e.Handled = true;
+            }
+        }
+
+        private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Remove(vKey);
+
+                if (_currentlyHeldKeys.Count == 0 && _maxKeysInCurrentBinding.Count > 0)
+                {
+                    var keysToSave = new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding);
+                    
+                    if (_bindingTarget == "Visual") AppSettings.VisualModeKeyBind = keysToSave;
+                    else if (_bindingTarget == "Sound") AppSettings.StereoUpmixKeyBind = keysToSave;
+                    else if (_bindingTarget == "Edit") AppSettings.EditModeKeyBind = keysToSave;
+
+                    AppSettings.Save();
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToUI();
+                }
+                e.Handled = true;
+            }
         }
 
         private void Setting_Changed(object sender, RoutedEventArgs e)
@@ -1237,9 +1314,7 @@ namespace SoundVisualizer
             }
             else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
-            else if (sender == CmbVisualHotkey && CmbVisualHotkey.SelectedItem is string vKey && _hotkeys.TryGetValue(vKey, out int vCode)) AppSettings.VisualModeHotkey = vCode;
-            else if (sender == CmbSoundModeHotkey && CmbSoundModeHotkey.SelectedItem is string sKey && _hotkeys.TryGetValue(sKey, out int sCode)) AppSettings.StereoUpmixHotkey = sCode;
-            else if (sender == CmbEditHotkey && CmbEditHotkey.SelectedItem is string eKey && _hotkeys.TryGetValue(eKey, out int eCode)) AppSettings.EditModeHotkey = eCode;
+            // Removed old hotkey combo logic
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
             else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
             else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;

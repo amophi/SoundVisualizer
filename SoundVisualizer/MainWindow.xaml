@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SoundVisualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
-        Topmost="True" WindowState="Maximized" ShowInTaskbar="False">
+        Topmost="True" WindowState="Maximized" ShowInTaskbar="False"
+        PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
     
         <Window.Resources>
         <!-- Toss Colors -->
@@ -15,6 +16,37 @@
         <SolidColorBrush x:Key="AccentHoverColor" Color="#1B64DA"/>
         <SolidColorBrush x:Key="DividerColor" Color="#222429"/>
         <SolidColorBrush x:Key="DangerColor" Color="#E53935"/>
+
+        <!-- Primary Button -->
+        <Style x:Key="TossButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="24,16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource AccentHoverColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#104EAD"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bg" Property="Background" Value="#333A44"/>
+                                <Setter Property="Foreground" Value="#8B95A1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- Toss Slider -->
         <Style x:Key="ModernSliderStyle" TargetType="{x:Type Slider}">
@@ -241,9 +273,9 @@
             <!-- 가이드라인 인터랙션 영역 -->
             <Canvas x:Name="GuidelineCanvas" Background="Transparent" MouseDown="GuidelineCanvas_MouseDown" MouseMove="GuidelineCanvas_MouseMove" MouseUp="GuidelineCanvas_MouseUp">
                 <!-- 사각형 가이드라인 (파도 / 패드 / 외각선 모드) -->
-                <Border x:Name="RectGuideline" BorderBrush="{StaticResource AccentColor}" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
+                <Border x:Name="RectGuideline" BorderBrush="{StaticResource DangerColor}" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
                     <Border.Effect>
-                        <DropShadowEffect Color="#3182F6" BlurRadius="15" ShadowDepth="0"/>
+                        <DropShadowEffect Color="#E53935" BlurRadius="15" ShadowDepth="0"/>
                     </Border.Effect>
                     <Grid>
                         <Grid.Resources>
@@ -447,17 +479,17 @@
                                     
                                     <StackPanel Margin="0,0,0,12">
                                         <TextBlock Text="표현 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <ComboBox x:Name="CmbEditPanelVisualHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                        <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F3"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,12">
                                         <TextBlock Text="사운드 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <ComboBox x:Name="CmbEditPanelSoundModeHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                        <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F2"/>
                                     </StackPanel>
 
                                     <StackPanel>
                                         <TextBlock Text="오버레이 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <ComboBox x:Name="CmbEditPanelEditHotkey" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelHotkey_SelectionChanged"/>
+                                        <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F4"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
