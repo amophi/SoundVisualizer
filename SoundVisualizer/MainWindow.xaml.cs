@@ -920,34 +920,24 @@ namespace SoundVisualizer
                 else if (type == "Speech") currentColorHex = AppSettings.ColorSpeech;
                 else if (type == "Danger") currentColorHex = AppSettings.ColorDanger;
 
-                System.Windows.Media.Color currentMediaColor = System.Windows.Media.Colors.White;
-                try { currentMediaColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(currentColorHex); } catch { }
-
-                var currentDrawingColor = System.Drawing.Color.FromArgb(currentMediaColor.A, currentMediaColor.R, currentMediaColor.G, currentMediaColor.B);
-
-                using (var dialog = new System.Windows.Forms.ColorDialog())
+                var dialog = new ColorPickerWindow(currentColorHex);
+                dialog.Owner = this;
+                if (dialog.ShowDialog() == true)
                 {
-                    dialog.Color = currentDrawingColor;
-                    dialog.FullOpen = true;
+                    string hex = dialog.SelectedHexColor;
 
-                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var newDrawingColor = dialog.Color;
-                        var newMediaColor = System.Windows.Media.Color.FromArgb(newDrawingColor.A, newDrawingColor.R, newDrawingColor.G, newDrawingColor.B);
-                        string hex = newMediaColor.ToString();
+                    if (type == "Ambient") AppSettings.ColorAmbient = hex;
+                    else if (type == "Speech") AppSettings.ColorSpeech = hex;
+                    else if (type == "Danger") AppSettings.ColorDanger = hex;
 
-                        if (type == "Ambient") AppSettings.ColorAmbient = hex;
-                        else if (type == "Speech") AppSettings.ColorSpeech = hex;
-                        else if (type == "Danger") AppSettings.ColorDanger = hex;
+                    AppSettings.Save();
 
-                        AppSettings.Save();
+                    // 버튼 배경색 즉시 변경
+                    System.Windows.Media.Color newMediaColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+                    btn.Background = new SolidColorBrush(newMediaColor);
 
-                        // 버튼 배경색 즉시 변경
-                        btn.Background = new SolidColorBrush(newMediaColor);
-
-                        // 런처 등 외부 프로그램에 즉각 실시간 동조 반영
-                        OnSettingsChangedFromHotkey?.Invoke();
-                    }
+                    // 런처 등 외부 프로그램에 즉각 실시간 동조 반영
+                    OnSettingsChangedFromHotkey?.Invoke();
                 }
             }
         }

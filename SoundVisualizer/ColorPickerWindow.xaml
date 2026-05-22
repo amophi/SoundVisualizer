@@ -1,0 +1,247 @@
+<Window x:Class="SoundVisualizer.ColorPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="색상 선택" Height="620" Width="360"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        FontFamily="Malgun Gothic, Segoe UI">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="BackgroundColor" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="CardColor" Color="#2A2A2A"/>
+        <SolidColorBrush x:Key="PrimaryTextColor" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SecondaryTextColor" Color="#B0B0B0"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#3182F6"/>
+        <SolidColorBrush x:Key="HoverColor" Color="#3D3D3D"/>
+
+        <Style x:Key="TossButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TossCancelButton" TargetType="{x:Type Button}" BasedOn="{StaticResource TossButton}">
+            <Setter Property="Background" Value="{StaticResource CardColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="10" BorderBrush="{StaticResource HoverColor}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource HoverColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource HoverColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{StaticResource BackgroundColor}" CornerRadius="16" BorderBrush="{StaticResource HoverColor}" BorderThickness="1">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="색상 선택" Foreground="{StaticResource PrimaryTextColor}" FontSize="20" FontWeight="Bold"/>
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{StaticResource SecondaryTextColor}" FontSize="18" Cursor="Hand" Click="BtnCancel_Click" Content="✕" Width="30" Height="30">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="15">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource HoverColor}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <!-- Content -->
+            <StackPanel Grid.Row="1">
+                <!-- Color Pickers -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <!-- Saturation/Value Area -->
+                    <Border x:Name="SVBorder" Width="220" Height="220" BorderBrush="{StaticResource HoverColor}" BorderThickness="1" CornerRadius="4" 
+                            MouseLeftButtonDown="SV_MouseDown" MouseMove="SV_MouseMove" MouseLeftButtonUp="SV_MouseUp" MouseLeave="SV_MouseLeave">
+                        <Grid>
+                            <Border x:Name="SVBackground" Background="#FF0000" CornerRadius="3"/>
+                            <Border CornerRadius="3">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#FFFFFFFF" Offset="0"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Border CornerRadius="3">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#00000000" Offset="0"/>
+                                        <GradientStop Color="#FF000000" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Canvas x:Name="SVCanvas" ClipToBounds="True">
+                                <Ellipse x:Name="SVThumb" Width="14" Height="14" Stroke="White" StrokeThickness="2" Margin="-7,-7,0,0">
+                                    <Ellipse.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="1" Opacity="0.5"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                            </Canvas>
+                        </Grid>
+                    </Border>
+
+                    <!-- Hue Area -->
+                    <Border x:Name="HueBorder" Width="30" Height="220" Margin="15,0,0,0" BorderBrush="{StaticResource HoverColor}" BorderThickness="1" CornerRadius="4"
+                            MouseLeftButtonDown="Hue_MouseDown" MouseMove="Hue_MouseMove" MouseLeftButtonUp="Hue_MouseUp" MouseLeave="Hue_MouseLeave">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#FF0000" Offset="0.0"/>
+                                <GradientStop Color="#FFFF00" Offset="0.1666"/>
+                                <GradientStop Color="#00FF00" Offset="0.3333"/>
+                                <GradientStop Color="#00FFFF" Offset="0.5"/>
+                                <GradientStop Color="#0000FF" Offset="0.6666"/>
+                                <GradientStop Color="#FF00FF" Offset="0.8333"/>
+                                <GradientStop Color="#FF0000" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Canvas x:Name="HueCanvas" ClipToBounds="True">
+                            <Border x:Name="HueThumb" Width="34" Height="8" BorderBrush="White" BorderThickness="2" CornerRadius="2" Margin="-2,-4,0,0" Background="#33000000">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="1" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
+                        </Canvas>
+                    </Border>
+                </StackPanel>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Width="60" Height="60" CornerRadius="8" BorderBrush="{StaticResource HoverColor}" BorderThickness="1" HorizontalAlignment="Left">
+                        <Border x:Name="ColorPreview" CornerRadius="7" Background="#FFFF0000"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="HEX 코드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                        <TextBox x:Name="TxtHexCode" Style="{StaticResource ModernTextBox}" Text="#FF0000" TextChanged="TxtHexCode_TextChanged"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Sliders -->
+                <StackPanel Margin="0,20,0,0">
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="R" Foreground="#FF5252" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" x:Name="SldRed" Minimum="0" Maximum="255" Value="255" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <TextBlock Grid.Column="2" x:Name="TxtRed" Text="255" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="G" Foreground="#4CAF50" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" x:Name="SldGreen" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <TextBlock Grid.Column="2" x:Name="TxtGreen" Text="0" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="B" Foreground="#448AFF" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" x:Name="SldBlue" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <TextBlock Grid.Column="2" x:Name="TxtBlue" Text="0" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Footer Buttons -->
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="취소" Style="{StaticResource TossCancelButton}" Click="BtnCancel_Click"/>
+                <Button Grid.Column="2" Content="적용" Style="{StaticResource TossButton}" Click="BtnApply_Click"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
