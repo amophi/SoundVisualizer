@@ -257,10 +257,7 @@
                                 </Setter>
                             </Style>
                         </Grid.Resources>
-                        <!-- 영역 명칭 및 크기값 -->
-                        <Border Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{StaticResource DividerColor}" BorderThickness="1">
-                            <TextBlock x:Name="RectSizeLabel" Text="파도 한계선 (크기: 50%)" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
-                        </Border>
+                        <!-- 영역 명칭 및 크기값 제거 (화면 상단으로 이동됨) -->
                         
                         <!-- 크기 조절용 4개 모서리 Thumb (드래그 감지) -->
                         <Thumb x:Name="ResizeHandle_NW" Width="14" Height="14" Background="{StaticResource AccentColor}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
@@ -295,6 +292,14 @@
                     </Border>
                 </Grid>
             </Canvas>
+
+            <!-- 사각형 가이드라인 라벨 (화면 상단 고정) -->
+            <Border x:Name="RectGuidelineLabelBox" Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,0" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" Visibility="Collapsed" IsHitTestVisible="False">
+                <StackPanel>
+                    <TextBlock x:Name="RectModeLabel" Text="파도 한계선" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock x:Name="RectSizeLabel" Text="파도 크기: 50%" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
 
             <!-- 스팀 오버레이 테마의 좌측 설정 패널 -->
             <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="380" Background="{StaticResource BgColor}" BorderBrush="{StaticResource DividerColor}" BorderThickness="0,0,1,0">
@@ -357,7 +362,7 @@
                                     <TextBlock Text="투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                     <TextBlock x:Name="EditPanelOpacityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                 </Grid>
-                                <Slider x:Name="EditPanelOpacitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                <Slider x:Name="EditPanelOpacitySlider" Minimum="0" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
                             </StackPanel>
 
                             <!-- 설정 4: 크기 -->

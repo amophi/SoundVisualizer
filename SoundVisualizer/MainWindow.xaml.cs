@@ -361,8 +361,10 @@ namespace SoundVisualizer
             double h = this.ActualHeight;
             if (w == 0 || h == 0) return;
 
-            // VisualizerContext 설정 (Intensity 100일때 기존 대비 2배 효과를 주기 위해 * 6.0)
-            double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 6.0) / 100.0);
+            // VisualizerContext 설정 (Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)
+            double maxBaseDepthRender = Math.Min(w, h) / 2.0 - 10;
+            if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
+            double baseDepth = maxBaseDepthRender * (Math.Max(0.0, AppSettings.WaveIntensity) / 100.0);
             double[] channelDepths;
             
             if (AppSettings.SoundMode == 0)
@@ -419,7 +421,7 @@ namespace SoundVisualizer
                 }
             }
             
-            UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
+            UnifiedWave.Opacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
 
             if (AppSettings.IsGlowMode)
             {
@@ -857,7 +859,7 @@ namespace SoundVisualizer
             {
                 AppSettings.VisualOpacity = EditPanelOpacitySlider.Value;
                 EditPanelOpacityValueText.Text = $"{EditPanelOpacitySlider.Value:F0}%";
-                UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
+                UnifiedWave.Opacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
             }
             else if (sender == EditPanelIntensitySlider)
             {
@@ -994,11 +996,13 @@ namespace SoundVisualizer
             if (visualMode == 0 || visualMode == 1 || visualMode == 3)
             {
                 RectGuideline.Visibility = Visibility.Visible;
+                if (RectGuidelineLabelBox != null) RectGuidelineLabelBox.Visibility = Visibility.Visible;
                 CircleGuideline.Visibility = Visibility.Collapsed;
 
-                double baseDepth = 450.0 * (AppSettings.WaveIntensity * 6.0) / 100.0;
-                
                 double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                
+                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
                 double displayBaseDepth = Math.Min(baseDepth, maxBaseDepth);
 
                 double rectLeft = displayBaseDepth;
@@ -1015,11 +1019,13 @@ namespace SoundVisualizer
                 RectGuideline.Height = rectHeight;
 
                 string modeName = visualMode == 1 ? "패드" : visualMode == 3 ? "외각선" : "파도";
-                RectSizeLabel.Text = $"{modeName} 한계선 (크기: {AppSettings.WaveIntensity:F0}%)";
+                if (RectModeLabel != null) RectModeLabel.Text = $"{modeName} 한계선";
+                if (RectSizeLabel != null) RectSizeLabel.Text = $"{modeName} 크기: {AppSettings.WaveIntensity:F0}%";
             }
             else if (visualMode == 2)
             {
                 RectGuideline.Visibility = Visibility.Collapsed;
+                if (RectGuidelineLabelBox != null) RectGuidelineLabelBox.Visibility = Visibility.Collapsed;
                 CircleGuideline.Visibility = Visibility.Visible;
 
                 double cx = w / 2.0;
@@ -1028,7 +1034,9 @@ namespace SoundVisualizer
                 double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
                 double baseRadius = Math.Min(w, h) * radiusRatio;
 
-                double baseDepth = 450.0 * (AppSettings.WaveIntensity * 6.0) / 100.0;
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
                 double maxRadius = baseRadius + baseDepth * 0.35;
 
                 Canvas.SetLeft(CircleGuideline, 0);
@@ -1068,7 +1076,9 @@ namespace SoundVisualizer
             double baseDepth = Math.Min(depthX, depthY);
             if (baseDepth < 0) baseDepth = 0;
 
-            double intensity = (baseDepth / 450.0) * 100.0 / 6.0;
+            double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+            if (maxBaseDepth < 10) maxBaseDepth = 10;
+            double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
             if (intensity < 0.0) intensity = 0.0;
             if (intensity > 100.0) intensity = 100.0;
@@ -1100,7 +1110,9 @@ namespace SoundVisualizer
                 double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
                 double baseRadius = Math.Min(w, h) * radiusRatio;
 
-                double baseDepth = 450.0 * (AppSettings.WaveIntensity * 6.0) / 100.0;
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
                 double maxRadius = baseRadius + baseDepth * 0.35;
 
                 double distToBase = Math.Abs(dist - baseRadius);
@@ -1164,7 +1176,9 @@ namespace SoundVisualizer
                     double baseDepth = (dist - baseRadius) / 0.35;
                     if (baseDepth < 0) baseDepth = 0;
 
-                    double intensity = (baseDepth / 450.0) * 100.0 / 6.0;
+                    double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                    if (maxBaseDepth < 10) maxBaseDepth = 10;
+                    double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
                     if (intensity < 0.0) intensity = 0.0;
                     if (intensity > 100.0) intensity = 100.0;
@@ -1195,7 +1209,9 @@ namespace SoundVisualizer
                 double baseDepth = Math.Min(depthX, depthY);
                 if (baseDepth < 0) baseDepth = 0;
 
-                double intensity = (baseDepth / 450.0) * 100.0 / 6.0;
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
                 if (intensity < 10.0) intensity = 10.0;
                 if (intensity > 100.0) intensity = 100.0;
