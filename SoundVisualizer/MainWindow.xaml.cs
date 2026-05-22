@@ -213,13 +213,14 @@ namespace SoundVisualizer
             }
             _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
+            string visualKeyName = GetKeysName(AppSettings.VisualModeKeyBind);
             string targetVisualModeText = AppSettings.VisualMode == 0 
-                ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
+                ? $"🎨 시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
                 : AppSettings.VisualMode == 1
-                    ? "🎨 시각화 모드: [F3] 패드 모드 (Pad)"
+                    ? $"🎨 시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
                     : AppSettings.VisualMode == 2
-                        ? "🎨 시각화 모드: [F3] 원형 모드 (Circle)"
-                        : "🎨 시각화 모드: [F3] 외각선 모드 (Outline)";
+                        ? $"🎨 시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
+                        : $"🎨 시각화 모드: [{visualKeyName}] 외각선 모드 (Outline)";
             if (_cachedVisualModeText != targetVisualModeText)
             {
                 _cachedVisualModeText = targetVisualModeText;
@@ -242,9 +243,10 @@ namespace SoundVisualizer
             }
             _wasStereoHotkeyPressed = isStereoHotkeyPressed;
 
+            string stereoKeyName = GetKeysName(AppSettings.StereoUpmixKeyBind);
             string targetStereoModeText = AppSettings.SoundMode == 0 
-                ? "🎧 사운드 모드: [F2] 2 채널" 
-                : (AppSettings.SoundMode == 1 ? "🔊 사운드 모드: [F2] 5.1 채널" : "🔊 사운드 모드: [F2] 7.1 채널");
+                ? $"🎧 사운드 모드: [{stereoKeyName}] 2 채널" 
+                : (AppSettings.SoundMode == 1 ? $"🔊 사운드 모드: [{stereoKeyName}] 5.1 채널" : $"🔊 사운드 모드: [{stereoKeyName}] 7.1 채널");
             Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
 
             if (_cachedStereoModeText != targetStereoModeText)
@@ -256,6 +258,13 @@ namespace SoundVisualizer
             {
                 _cachedStereoModeForeground = targetStereoForeground;
                 StereoModeText.Foreground = targetStereoForeground;
+            }
+
+            string editKeyName = GetKeysName(AppSettings.EditModeKeyBind);
+            string targetEditModeText = $"⚙️ 실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
+            if (EditModeText != null && EditModeText.Text != targetEditModeText)
+            {
+                EditModeText.Text = targetEditModeText;
             }
 
             _frameCount++;
@@ -762,8 +771,8 @@ namespace SoundVisualizer
             EditPanelSpeedSlider.Value = AppSettings.WavePositionSpeed;
             EditPanelSpeedValueText.Text = $"{AppSettings.WavePositionSpeed:F0}";
 
-            EditPanelSensitivitySlider.Value = AppSettings.WaveSensitivity;
-            EditPanelSensitivityValueText.Text = $"{AppSettings.WaveSensitivity:F2}";
+            EditPanelSensitivitySlider.Value = AppSettings.WaveSensitivity * 4.0;
+            EditPanelSensitivityValueText.Text = $"{AppSettings.WaveSensitivity * 4.0:F0}";
 
             EditPanelOpacitySlider.Value = AppSettings.VisualOpacity;
             EditPanelOpacityValueText.Text = $"{AppSettings.VisualOpacity:F0}%";
@@ -849,8 +858,9 @@ namespace SoundVisualizer
             }
             else if (sender == EditPanelSensitivitySlider)
             {
-                AppSettings.WaveSensitivity = EditPanelSensitivitySlider.Value;
-                EditPanelSensitivityValueText.Text = $"{EditPanelSensitivitySlider.Value:F2}";
+                AppSettings.WaveSensitivity = EditPanelSensitivitySlider.Value / 4.0;
+                EditPanelSensitivityValueText.Text = $"{EditPanelSensitivitySlider.Value:F0}";
+                OnSettingsChangedFromHotkey?.Invoke();
             }
             else if (sender == EditPanelOpacitySlider)
             {
@@ -940,6 +950,11 @@ namespace SoundVisualizer
                     OnSettingsChangedFromHotkey?.Invoke();
                 }
             }
+        }
+
+        private void BtnCloseOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
 
         private string? _bindingTarget = null;

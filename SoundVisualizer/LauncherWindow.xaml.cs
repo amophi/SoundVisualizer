@@ -151,7 +151,7 @@ namespace SoundVisualizer
                 TxtHomeTitle.Text = "SoundVisualizer";
                 TxtHomeDesc.Text = "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 영화 감상까지 새로운 경험을 시작하세요.";
                 if (BtnLaunch != null) BtnLaunch.Content = "실행";
-                if (BtnStop != null) BtnStop.Content = "실행 중단";
+                if (BtnStop != null) BtnStop.Content = "실행 종료";
                 TabSettings.Header = "설정";
                 
                 // Wave Mode Settings

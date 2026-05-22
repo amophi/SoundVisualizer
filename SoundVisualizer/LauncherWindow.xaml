@@ -435,7 +435,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Button Grid.Column="0" x:Name="BtnLaunch" Content="실행" Style="{StaticResource TossButton}" Click="BtnLaunch_Click"/>
-                                <Button Grid.Column="2" x:Name="BtnStop" Content="실행 중단" Style="{StaticResource TossDangerButton}" Click="BtnStop_Click" IsEnabled="False"/>
+                                <Button Grid.Column="2" x:Name="BtnStop" Content="실행 종료" Style="{StaticResource TossDangerButton}" Click="BtnStop_Click" IsEnabled="False"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
