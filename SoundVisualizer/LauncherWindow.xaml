@@ -486,6 +486,22 @@
                                             </ComboBox>
                                         </Grid>
                                     </StackPanel>
+
+                                    <StackPanel Margin="0,24,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="80"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtTargetFpsLabel" Text="최대 프레임" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtTargetFpsDesc" Text="오버레이 애니메이션이 그려지는 최대 프레임 속도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                                            </StackPanel>
+                                            <Slider Grid.Column="1" x:Name="SldTargetFps" Style="{StaticResource TossSlider}" Minimum="30" Maximum="240" Value="144" VerticalAlignment="Center" ValueChanged="Setting_Changed" Margin="0,0,16,0"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtTargetFps" Text="{Binding Value, ElementName=SldTargetFps, StringFormat='{}{0:F0} FPS'}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
 

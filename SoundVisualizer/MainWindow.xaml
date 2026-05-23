@@ -254,7 +254,7 @@
 
         <!-- FPS 카운터 (디버그용, 우상단) -->
         <Border x:Name="FpsBorder" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,50,20,0" 
-                Background="#60000000" CornerRadius="5" Padding="8,4" IsHitTestVisible="False">
+                Background="#60000000" CornerRadius="5" Padding="8,4" IsHitTestVisible="False" Visibility="Collapsed">
             <TextBlock x:Name="FpsText" Foreground="#80FFFFFF" FontSize="11" Text="FPS: --"/>
         </Border>
 
@@ -376,6 +376,15 @@
                                     <ComboBoxItem Content="5.1 채널"/>
                                     <ComboBoxItem Content="7.1 채널"/>
                                 </ComboBox>
+                            </StackPanel>
+
+                            <!-- 최대 프레임 설정 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="최대 프레임" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelTargetFpsValueText" Text="144 FPS" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelTargetFpsSlider" Minimum="30" Maximum="240" Value="144" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
                             </StackPanel>
 
                             <!-- 설정 1: 파도 속도 -->

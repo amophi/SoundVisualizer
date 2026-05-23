@@ -12,11 +12,13 @@ namespace SoundVisualizer.CoreAudio
     public class AudioDataAvailableEventArgs : EventArgs
     {
         public byte[] Buffer { get; set; }
+        public int BytesRecorded { get; set; }
         public int Channels { get; set; }
 
-        public AudioDataAvailableEventArgs(byte[] buffer, int channels)
+        public AudioDataAvailableEventArgs(byte[] buffer, int bytesRecorded, int channels)
         {
             Buffer = buffer;
+            BytesRecorded = bytesRecorded;
             Channels = channels;
         }
     }
@@ -98,10 +100,7 @@ namespace SoundVisualizer.CoreAudio
 
                     _latencyWatch.Restart();
 
-                    byte[] validData = new byte[args.BytesRecorded];
-                    Array.Copy(args.Buffer, validData, args.BytesRecorded);
-
-                    var eventArgs = new AudioDataAvailableEventArgs(validData, channels);
+                    var eventArgs = new AudioDataAvailableEventArgs(args.Buffer, args.BytesRecorded, channels);
                     OnAudioDataAvailable?.Invoke(this, eventArgs);
 
                     _latencyWatch.Stop();

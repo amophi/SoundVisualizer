@@ -1061,6 +1061,7 @@ namespace SoundVisualizer
             // 4. Common settings
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
+            SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
             if (BtnVisualHotkey != null) BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
@@ -1313,6 +1314,7 @@ namespace SoundVisualizer
                 UpdateExpanderStates();
             }
             else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
+            else if (sender == SldTargetFps) AppSettings.TargetFps = SldTargetFps.Value;
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
             // Removed old hotkey combo logic
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;

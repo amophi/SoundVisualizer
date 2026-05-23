@@ -80,13 +80,16 @@ namespace SoundVisualizer
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[4];
         
+        // 렌더링 최적화를 위한 재사용 객체
+        private VisualizerContext _renderContext = new VisualizerContext();
+        private double[] _channelDepths = new double[8];
+        private double[] _channelDists = new double[8];
+        
         public Action? OnSettingsChangedFromHotkey;
 
         private readonly Stopwatch _renderStopwatch = new();
         private double _lastRenderTimeMs = 0;
         private long _lastChannelCountTick = 0;
-        private const double TARGET_FPS = 144.0;
-        private const double FRAME_INTERVAL_MS = 1000.0 / TARGET_FPS;
         
         private int _frameCount;
         private double _currentFps;
@@ -176,12 +179,15 @@ namespace SoundVisualizer
 
         private void OnCompositionTargetRendering(object? sender, EventArgs e)
         {
+            double targetFps = Math.Max(30.0, AppSettings.TargetFps);
+            double frameIntervalMs = 1000.0 / targetFps;
+
             double now = _renderStopwatch.Elapsed.TotalMilliseconds;
             double elapsed = now - _lastRenderTimeMs;
 
-            if (elapsed >= FRAME_INTERVAL_MS)
+            if (elapsed >= frameIntervalMs)
             {
-                _lastRenderTimeMs = now - (elapsed % FRAME_INTERVAL_MS);
+                _lastRenderTimeMs = now - (elapsed % frameIntervalMs);
                 RenderFrame();
             }
         }
@@ -374,42 +380,53 @@ namespace SoundVisualizer
             double maxBaseDepthRender = Math.Min(w, h) / 2.0 - 10;
             if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
             double baseDepth = maxBaseDepthRender * (Math.Max(0.0, AppSettings.WaveIntensity) / 100.0);
-            double[] channelDepths;
             
             if (AppSettings.SoundMode == 0)
             {
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
-                channelDepths = new double[]
-                {
-                    0, 0, baseDepth * _smoothFR, 0,
-                    0, 0, baseDepth * _smoothFL, 0
-                };
+                _channelDepths[0] = 0;
+                _channelDepths[1] = 0;
+                _channelDepths[2] = baseDepth * _smoothFR;
+                _channelDepths[3] = 0;
+                _channelDepths[4] = 0;
+                _channelDepths[5] = 0;
+                _channelDepths[6] = baseDepth * _smoothFL;
+                _channelDepths[7] = 0;
             }
             else
             {
                 double phantomBC = (_smoothBL + _smoothBR) / 2.0;
-                channelDepths = new double[]
-                {
-                    baseDepth * _smoothFC, baseDepth * _smoothFR, baseDepth * _smoothSR, baseDepth * _smoothBR,
-                    baseDepth * phantomBC, baseDepth * _smoothBL, baseDepth * _smoothSL, baseDepth * _smoothFL
-                };
+                _channelDepths[0] = baseDepth * _smoothFC;
+                _channelDepths[1] = baseDepth * _smoothFR;
+                _channelDepths[2] = baseDepth * _smoothSR;
+                _channelDepths[3] = baseDepth * _smoothBR;
+                _channelDepths[4] = baseDepth * phantomBC;
+                _channelDepths[5] = baseDepth * _smoothBL;
+                _channelDepths[6] = baseDepth * _smoothSL;
+                _channelDepths[7] = baseDepth * _smoothFL;
             }
 
-            var context = new VisualizerContext
-            {
-                Width = w,
-                Height = h,
-                ChannelDepths = channelDepths,
-                ChannelDists = new double[] { _distFC, _distFR, _distSR, _distBR, _distLFE, _distBL, _distSL, _distFL },
-                TotalVolume = (float)totalTarget,
-                AnimationTime = _animationTime
-            };
+            _channelDists[0] = _distFC;
+            _channelDists[1] = _distFR;
+            _channelDists[2] = _distSR;
+            _channelDists[3] = _distBR;
+            _channelDists[4] = _distLFE;
+            _channelDists[5] = _distBL;
+            _channelDists[6] = _distSL;
+            _channelDists[7] = _distFL;
+
+            _renderContext.Width = w;
+            _renderContext.Height = h;
+            _renderContext.ChannelDepths = _channelDepths;
+            _renderContext.ChannelDists = _channelDists;
+            _renderContext.TotalVolume = (float)totalTarget;
+            _renderContext.AnimationTime = _animationTime;
 
             // 선택된 렌더러(Wave 또는 Pad)에게 그리기 위임
             int modeIndex = (AppSettings.VisualMode >= 0 && AppSettings.VisualMode < _visualizers.Length) ? AppSettings.VisualMode : 0;
             var currentVisualizer = _visualizers[modeIndex];
 
-            UnifiedWave.Data = currentVisualizer.GenerateGeometry(context);
+            UnifiedWave.Data = currentVisualizer.GenerateGeometry(_renderContext);
             
             if (_cachedActiveColor != activeColor || _cachedVisualModeForBrush != modeIndex || UnifiedWave.Fill == null)
             {
@@ -463,7 +480,7 @@ namespace SoundVisualizer
             if (_audioRouter == null || _vectorCalc == null || _soundAI == null) return;
 
             byte[] rawData = e.Buffer;
-            int bytesRecorded = rawData.Length;
+            int bytesRecorded = e.BytesRecorded;
             int channels = e.Channels;
 
             // 1. 오디오 라우팅, 실시간 활성 채널 파악, 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
@@ -818,6 +835,12 @@ namespace SoundVisualizer
                 EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
 
             // 고급 설정 바인딩
+            if (EditPanelTargetFpsSlider != null)
+            {
+                EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
+                EditPanelTargetFpsValueText.Text = $"{AppSettings.TargetFps:F0} FPS";
+            }
+
             if (EditPanelAdminCheckBox != null)
                 EditPanelAdminCheckBox.IsChecked = AppSettings.IsAdminMode;
 
@@ -878,6 +901,11 @@ namespace SoundVisualizer
             {
                 AppSettings.GlowIntensity = EditPanelGlowSlider.Value;
                 EditPanelGlowValueText.Text = $"{EditPanelGlowSlider.Value:F0}%";
+            }
+            else if (sender == EditPanelTargetFpsSlider)
+            {
+                AppSettings.TargetFps = EditPanelTargetFpsSlider.Value;
+                EditPanelTargetFpsValueText.Text = $"{EditPanelTargetFpsSlider.Value:F0} FPS";
             }
 
             AppSettings.Save();
