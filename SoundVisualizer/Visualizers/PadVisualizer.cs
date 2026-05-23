@@ -14,6 +14,7 @@ namespace SoundVisualizer.Visualizers
         // 매 프레임 가비지 할당을 차단하기 위해 셰이프 지오메트리 계산용 포인트 배열 캐싱 (GC Free)
         private readonly Point[] _outerPts = new Point[N + 1];
         private readonly Point[] _innerPts = new Point[N + 1];
+        private readonly double[] _centerDists = new double[8];
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
@@ -26,17 +27,14 @@ namespace SoundVisualizer.Visualizers
             double[] depths = context.ChannelDepths;
 
             // 각 채널이 모니터 테두리 상에서 위치할 중심점(Distance)
-            double[] centerDists = new double[]
-            {
-                0,                             // 0: 상단 중앙 (FC)
-                w / 2.0,                       // 1: 우상단 (FR)
-                w / 2.0 + h / 2.0,             // 2: 우측 중앙 (SR)
-                w / 2.0 + h,                   // 3: 우하단 (BR)
-                w / 2.0 + h + w / 2.0,         // 4: 하단 중앙 (BC)
-                w / 2.0 + h + w,               // 5: 좌하단 (BL)
-                w / 2.0 + h + w + h / 2.0,     // 6: 좌측 중앙 (SL)
-                w / 2.0 + h + w + h            // 7: 좌상단 (FL)
-            };
+            _centerDists[0] = 0;                             // 0: 상단 중앙 (FC)
+            _centerDists[1] = w / 2.0;                       // 1: 우상단 (FR)
+            _centerDists[2] = w / 2.0 + h / 2.0;             // 2: 우측 중앙 (SR)
+            _centerDists[3] = w / 2.0 + h;                   // 3: 우하단 (BR)
+            _centerDists[4] = w / 2.0 + h + w / 2.0;         // 4: 하단 중앙 (BC)
+            _centerDists[5] = w / 2.0 + h + w;               // 5: 좌하단 (BL)
+            _centerDists[6] = w / 2.0 + h + w + h / 2.0;     // 6: 좌측 중앙 (SL)
+            _centerDists[7] = w / 2.0 + h + w + h;           // 7: 좌상단 (FL)
 
             var geometry = new StreamGeometry();
             geometry.FillRule = FillRule.EvenOdd;
@@ -57,7 +55,7 @@ namespace SoundVisualizer.Visualizers
                     if (_padThicknesses[c] < 0.5) continue; // 소리가 거의 없으면 그리지 않음
 
                     isAnyVisible = true;
-                    double centerDist = centerDists[c];
+                    double centerDist = _centerDists[c];
                     double maxThickness = _padThicknesses[c];
                     
                     // 패드 길이 설정 (디스플레이 높이의 1/4 정도)

@@ -379,9 +379,10 @@ namespace SoundVisualizer
             // VisualizerContext 설정 (Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)
             double maxBaseDepthRender = Math.Min(w, h) / 2.0 - 10;
             if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
-            double baseDepth = maxBaseDepthRender * (Math.Max(0.0, AppSettings.WaveIntensity) / 100.0);
             
             bool useOpacity = AppSettings.IntensityAsOpacity;
+            double currentIntensity = useOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
+            double baseDepth = maxBaseDepthRender * (Math.Max(0.0, currentIntensity) / 100.0);
             
             if (AppSettings.SoundMode == 0)
             {
@@ -812,7 +813,24 @@ namespace SoundVisualizer
                 EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
                 EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
                 if (EditPanelIntensityAsOpacityCheckBox != null)
+                {
                     EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
+                    bool isOpacity = AppSettings.IntensityAsOpacity;
+
+                    if (EditPanelIntensityPanel != null)
+                    {
+                        EditPanelIntensityPanel.IsEnabled = !isOpacity;
+                        EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+                    }
+
+                    if (EditPanelOpacityFixedSizePanel != null)
+                    {
+                        EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
+                        EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+                        EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                        EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                    }
+                }
             }
 
             EditPanelGlowCheckBox.IsChecked = AppSettings.IsGlowMode;
@@ -912,6 +930,12 @@ namespace SoundVisualizer
                 EditPanelIntensityValueText.Text = $"{EditPanelIntensitySlider.Value:F0}%";
                 UpdateGuidelinePositions();
             }
+            else if (sender == EditPanelOpacityFixedSizeSlider)
+            {
+                AppSettings.OpacityFixedSize = EditPanelOpacityFixedSizeSlider.Value;
+                EditPanelOpacityFixedSizeValueText.Text = $"{EditPanelOpacityFixedSizeSlider.Value:F0}%";
+                UpdateGuidelinePositions();
+            }
             else if (sender == EditPanelGlowSlider)
             {
                 AppSettings.GlowIntensity = EditPanelGlowSlider.Value;
@@ -931,6 +955,20 @@ namespace SoundVisualizer
         {
             if (_isUpdatingEditPanelSliders) return;
             AppSettings.IntensityAsOpacity = EditPanelIntensityAsOpacityCheckBox.IsChecked ?? false;
+            bool isOpacity = AppSettings.IntensityAsOpacity;
+
+            if (EditPanelIntensityPanel != null)
+            {
+                EditPanelIntensityPanel.IsEnabled = !isOpacity;
+                EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+            }
+
+            if (EditPanelOpacityFixedSizePanel != null)
+            {
+                EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
+                EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+            }
+
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
         }

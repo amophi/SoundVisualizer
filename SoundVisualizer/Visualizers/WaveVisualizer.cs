@@ -8,13 +8,17 @@ namespace SoundVisualizer.Visualizers
     public class WaveVisualizer : IVisualizerMode
     {
         private const int WAVE_SAMPLE_COUNT = 150;
+        
+        // 매 프레임 발생하는 GC 스파이크 방지용 전역 캐시 배열
+        private readonly Point[] _innerPts = new Point[WAVE_SAMPLE_COUNT];
+        private readonly double[] _channelPos = new double[8];
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
-            double[] channelDepths = context.ChannelDepths;
-            double time = context.AnimationTime;
             double w = context.Width;
             double h = context.Height;
+            double[] channelDepths = context.ChannelDepths;
+            double time = context.AnimationTime;
 
             bool anyActive = false;
             for (int i = 0; i < channelDepths.Length; i++)
@@ -34,28 +38,30 @@ namespace SoundVisualizer.Visualizers
             double dist_lc = w / 2.0 + h + w + h / 2.0;
             double dist_tl = w / 2.0 + h + w + h;
 
-            double[] channelPos = new double[]
-            {
-                dist_tc / P, dist_tr / P, dist_rc / P, dist_br / P,
-                dist_bc / P, dist_bl / P, dist_lc / P, dist_tl / P
-            };
+            _channelPos[0] = dist_tc / P;
+            _channelPos[1] = dist_tr / P;
+            _channelPos[2] = dist_rc / P;
+            _channelPos[3] = dist_br / P;
+            _channelPos[4] = dist_bc / P;
+            _channelPos[5] = dist_bl / P;
+            _channelPos[6] = dist_lc / P;
+            _channelPos[7] = dist_tl / P;
 
-            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, channelPos);
-            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, channelPos);
-            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, channelPos);
-            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, channelPos);
+            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, _channelPos);
+            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, _channelPos);
+            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, _channelPos);
+            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, _channelPos);
 
             int N = WAVE_SAMPLE_COUNT;
-            var inner = new Point[N];
 
             for (int i = 0; i < N; i++)
             {
                 double dist = (P * i) / N; 
                 double t = dist / P;
                 
-                double d = GetWaveDepth(t, time, channelDepths, channelPos);
+                double d = GetWaveDepth(t, time, channelDepths, _channelPos);
                 
-                inner[i] = GetRoundedInnerPoint(dist, w, h, P, d, d_tr, d_br, d_bl, d_tl);
+                _innerPts[i] = GetRoundedInnerPoint(dist, w, h, P, d, d_tr, d_br, d_bl, d_tl);
             }
 
             var geometry = new StreamGeometry();
@@ -68,15 +74,15 @@ namespace SoundVisualizer.Visualizers
                 ctx.LineTo(new Point(w, h), false, false);
                 ctx.LineTo(new Point(0, h), false, false);
 
-                ctx.BeginFigure(inner[0], true, true);
+                ctx.BeginFigure(_innerPts[0], true, true);
 
                 var bezierPts = new List<Point>(N * 3);
                 for (int i = 0; i < N; i++)
                 {
-                    Point p0 = inner[(i - 1 + N) % N];
-                    Point p1 = inner[i];
-                    Point p2 = inner[(i + 1) % N];
-                    Point p3 = inner[(i + 2) % N];
+                    Point p0 = _innerPts[(i - 1 + N) % N];
+                    Point p1 = _innerPts[i];
+                    Point p2 = _innerPts[(i + 1) % N];
+                    Point p3 = _innerPts[(i + 2) % N];
 
                     Point cp1 = new Point(p1.X + (p2.X - p0.X) / 6.0, p1.Y + (p2.Y - p0.Y) / 6.0);
                     Point cp2 = new Point(p2.X - (p3.X - p1.X) / 6.0, p2.Y - (p3.Y - p1.Y) / 6.0);

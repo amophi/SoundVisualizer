@@ -415,7 +415,7 @@
                             </StackPanel>
 
                             <!-- 설정 4: 크기 -->
-                            <StackPanel Margin="0,0,0,18">
+                            <StackPanel x:Name="EditPanelIntensityPanel" Margin="0,0,0,18">
                                 <Grid>
                                     <TextBlock Text="크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                     <TextBlock x:Name="EditPanelIntensityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
@@ -425,10 +425,19 @@
 
                             <!-- 설정: 세기 투명도 표현 (크기 고정) 카드 -->
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,0,0,15" Background="{StaticResource CardColor}">
-                                <Grid>
-                                    <TextBlock Text="세기 투명도 표현" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                                    <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
-                                </Grid>
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="세기 투명도 표현" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
+                                    </Grid>
+                                    <StackPanel x:Name="EditPanelOpacityFixedSizePanel" Margin="0,15,0,0">
+                                        <Grid>
+                                            <TextBlock Text="고정 크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityFixedSizeValueText" Text="30%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelOpacityFixedSizeSlider" Minimum="10" Maximum="100" Value="30" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                </StackPanel>
                             </Border>
 
                             <!-- 설정 4: 글로우(광원) 설정 카드 -->

@@ -15,6 +15,7 @@ namespace SoundVisualizer
         public double GlowIntensity { get; set; } = 0.0;
         public double CircleRadius { get; set; } = 40.0;
         public bool IntensityAsOpacity { get; set; } = false;
+        public double OpacityFixedSize { get; set; } = 30.0;
     }
 
     public static class AppSettings
@@ -68,6 +69,12 @@ namespace SoundVisualizer
         {
             get => GetCurrentModeSettings().IntensityAsOpacity;
             set => GetCurrentModeSettings().IntensityAsOpacity = value;
+        }
+
+        public static double OpacityFixedSize
+        {
+            get => GetCurrentModeSettings().OpacityFixedSize;
+            set => GetCurrentModeSettings().OpacityFixedSize = value;
         }
 
         // 6. 스테레오 확장 모드
