@@ -421,8 +421,15 @@
                                     <TextBlock x:Name="EditPanelIntensityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                 </Grid>
                                 <Slider x:Name="EditPanelIntensitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
-                                <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" Content="세기를 투명도로 표현 (크기 고정)" Margin="0,10,0,0" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
                             </StackPanel>
+
+                            <!-- 설정: 세기 투명도 표현 (크기 고정) 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,0,0,15" Background="{StaticResource CardColor}">
+                                <Grid>
+                                    <TextBlock Text="세기 투명도 표현" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
+                                </Grid>
+                            </Border>
 
                             <!-- 설정 4: 글로우(광원) 설정 카드 -->
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">

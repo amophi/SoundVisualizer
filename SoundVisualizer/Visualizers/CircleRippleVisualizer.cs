@@ -34,9 +34,7 @@ namespace SoundVisualizer.Visualizers
             
             for (int i = 0; i < 8; i++) 
             {
-                // 파도 모드용 가상 중앙 하단(BC - 4번 인덱스) 데이터 때문에 좌/우 후방 모양이 비대칭으로 찌그러지는 현상 방지
-                // Circle 모드에서는 인위적인 하단 중앙값(4번)을 0으로 처리하여 완벽한 대칭 유지 (Clone 힙 할당 제거)
-                double targetVal = (i == 4) ? 0 : context.ChannelDepths[i];
+                double targetVal = context.ChannelDepths[i];
 
                 // 파도 모드 대비 스케일 조절
                 double target = targetVal * 0.35;
