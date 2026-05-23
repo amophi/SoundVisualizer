@@ -527,6 +527,7 @@
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensityWave" Text="{Binding Value, ElementName=SldIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
                                         <TextBlock x:Name="TxtIntensityDescWave" Text="파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityWave" Content="세기를 투명도로 표현 (크기 고정)" Style="{StaticResource TossCheckBox}" Margin="0,12,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </StackPanel>
                                     
                                     <StackPanel Margin="0,0,0,24">
@@ -608,6 +609,7 @@
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensityPad" Text="{Binding Value, ElementName=SldIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
                                         <TextBlock x:Name="TxtIntensityDescPad" Text="사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityPad" Content="세기를 투명도로 표현 (크기 고정)" Style="{StaticResource TossCheckBox}" Margin="0,12,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -689,6 +691,7 @@
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensityCircle" Text="{Binding Value, ElementName=SldIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
                                         <TextBlock x:Name="TxtIntensityDescCircle" Text="사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityCircle" Content="세기를 투명도로 표현 (크기 고정)" Style="{StaticResource TossCheckBox}" Margin="0,12,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -784,6 +787,7 @@
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensityOutline" Text="{Binding Value, ElementName=SldIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
                                         <TextBlock x:Name="TxtIntensityDescOutline" Text="외각선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityOutline" Content="세기를 투명도로 표현 (크기 고정)" Style="{StaticResource TossCheckBox}" Margin="0,12,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </StackPanel>
                                     
                                     <StackPanel Margin="0,0,0,24">

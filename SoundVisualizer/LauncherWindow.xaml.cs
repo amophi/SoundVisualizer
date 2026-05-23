@@ -1003,6 +1003,7 @@ namespace SoundVisualizer
         {
             // 1. Wave Mode Load
             SldIntensityWave.Value = AppSettings.WaveMode.Intensity;
+            ChkIntensityAsOpacityWave.IsChecked = AppSettings.WaveMode.IntensityAsOpacity;
             SldSpeedWave.Value = AppSettings.WaveMode.PositionSpeed;
             SldSensitivityWave.Value = AppSettings.WaveMode.Sensitivity * 4.0;
             SldOpacityWave.Value = 100 - AppSettings.WaveMode.VisualOpacity;
@@ -1017,6 +1018,7 @@ namespace SoundVisualizer
 
             // 2. Pad Mode Load
             SldIntensityPad.Value = AppSettings.PadMode.Intensity;
+            ChkIntensityAsOpacityPad.IsChecked = AppSettings.PadMode.IntensityAsOpacity;
             SldSpeedPad.Value = AppSettings.PadMode.PositionSpeed;
             SldSensitivityPad.Value = AppSettings.PadMode.Sensitivity * 4.0;
             SldOpacityPad.Value = 100 - AppSettings.PadMode.VisualOpacity;
@@ -1031,6 +1033,7 @@ namespace SoundVisualizer
 
             // 3. Circle Mode Load
             SldIntensityCircle.Value = AppSettings.CircleMode.Intensity;
+            ChkIntensityAsOpacityCircle.IsChecked = AppSettings.CircleMode.IntensityAsOpacity;
             SldSpeedCircle.Value = AppSettings.CircleMode.PositionSpeed;
             SldSensitivityCircle.Value = AppSettings.CircleMode.Sensitivity * 4.0;
             SldOpacityCircle.Value = 100 - AppSettings.CircleMode.VisualOpacity;
@@ -1046,6 +1049,7 @@ namespace SoundVisualizer
 
             // 3.5. Outline Mode Load
             SldIntensityOutline.Value = AppSettings.OutlineMode.Intensity;
+            ChkIntensityAsOpacityOutline.IsChecked = AppSettings.OutlineMode.IntensityAsOpacity;
             SldSpeedOutline.Value = AppSettings.OutlineMode.PositionSpeed;
             SldSensitivityOutline.Value = AppSettings.OutlineMode.Sensitivity * 4.0;
             SldOpacityOutline.Value = 100 - AppSettings.OutlineMode.VisualOpacity;
@@ -1244,6 +1248,7 @@ namespace SoundVisualizer
 
             // Wave
             if (sender == SldIntensityWave) AppSettings.WaveMode.Intensity = SldIntensityWave.Value;
+            else if (sender == ChkIntensityAsOpacityWave) AppSettings.WaveMode.IntensityAsOpacity = ChkIntensityAsOpacityWave.IsChecked ?? false;
             else if (sender == SldSpeedWave) AppSettings.WaveMode.PositionSpeed = SldSpeedWave.Value;
             else if (sender == SldSensitivityWave) AppSettings.WaveMode.Sensitivity = SldSensitivityWave.Value / 4.0;
             else if (sender == SldOpacityWave) AppSettings.WaveMode.VisualOpacity = 100 - SldOpacityWave.Value;
@@ -1260,6 +1265,7 @@ namespace SoundVisualizer
 
             // Pad
             else if (sender == SldIntensityPad) AppSettings.PadMode.Intensity = SldIntensityPad.Value;
+            else if (sender == ChkIntensityAsOpacityPad) AppSettings.PadMode.IntensityAsOpacity = ChkIntensityAsOpacityPad.IsChecked ?? false;
             else if (sender == SldSpeedPad) AppSettings.PadMode.PositionSpeed = SldSpeedPad.Value;
             else if (sender == SldSensitivityPad) AppSettings.PadMode.Sensitivity = SldSensitivityPad.Value / 4.0;
             else if (sender == SldOpacityPad) AppSettings.PadMode.VisualOpacity = 100 - SldOpacityPad.Value;
@@ -1276,6 +1282,7 @@ namespace SoundVisualizer
 
             // Circle
             else if (sender == SldIntensityCircle) AppSettings.CircleMode.Intensity = SldIntensityCircle.Value;
+            else if (sender == ChkIntensityAsOpacityCircle) AppSettings.CircleMode.IntensityAsOpacity = ChkIntensityAsOpacityCircle.IsChecked ?? false;
             else if (sender == SldSpeedCircle) AppSettings.CircleMode.PositionSpeed = SldSpeedCircle.Value;
             else if (sender == SldSensitivityCircle) AppSettings.CircleMode.Sensitivity = SldSensitivityCircle.Value / 4.0;
             else if (sender == SldOpacityCircle) AppSettings.CircleMode.VisualOpacity = 100 - SldOpacityCircle.Value;
@@ -1293,6 +1300,7 @@ namespace SoundVisualizer
 
             // Outline
             else if (sender == SldIntensityOutline) AppSettings.OutlineMode.Intensity = SldIntensityOutline.Value;
+            else if (sender == ChkIntensityAsOpacityOutline) AppSettings.OutlineMode.IntensityAsOpacity = ChkIntensityAsOpacityOutline.IsChecked ?? false;
             else if (sender == SldSpeedOutline) AppSettings.OutlineMode.PositionSpeed = SldSpeedOutline.Value;
             else if (sender == SldSensitivityOutline) AppSettings.OutlineMode.Sensitivity = SldSensitivityOutline.Value / 4.0;
             else if (sender == SldOpacityOutline) AppSettings.OutlineMode.VisualOpacity = 100 - SldOpacityOutline.Value;

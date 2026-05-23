@@ -381,29 +381,33 @@ namespace SoundVisualizer
             if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
             double baseDepth = maxBaseDepthRender * (Math.Max(0.0, AppSettings.WaveIntensity) / 100.0);
             
+            bool useOpacity = AppSettings.IntensityAsOpacity;
+            
             if (AppSettings.SoundMode == 0)
             {
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
                 _channelDepths[0] = 0;
                 _channelDepths[1] = 0;
-                _channelDepths[2] = baseDepth * _smoothFR;
+                _channelDepths[2] = baseDepth * (useOpacity ? 1.0 : _smoothFR);
                 _channelDepths[3] = 0;
                 _channelDepths[4] = 0;
                 _channelDepths[5] = 0;
-                _channelDepths[6] = baseDepth * _smoothFL;
+                _channelDepths[6] = baseDepth * (useOpacity ? 1.0 : _smoothFL);
                 _channelDepths[7] = 0;
             }
             else
             {
                 double phantomBC = (_smoothBL + _smoothBR) / 2.0;
-                _channelDepths[0] = baseDepth * _smoothFC;
-                _channelDepths[1] = baseDepth * _smoothFR;
-                _channelDepths[2] = baseDepth * _smoothSR;
-                _channelDepths[3] = baseDepth * _smoothBR;
-                _channelDepths[4] = baseDepth * phantomBC;
-                _channelDepths[5] = baseDepth * _smoothBL;
-                _channelDepths[6] = baseDepth * _smoothSL;
-                _channelDepths[7] = baseDepth * _smoothFL;
+                double phantomDistBC = (_distBL + _distBR) / 2.0;
+                
+                _channelDepths[0] = baseDepth * (useOpacity ? (_distFC * 4.0) : _smoothFC);
+                _channelDepths[1] = baseDepth * (useOpacity ? (_distFR * 4.0) : _smoothFR);
+                _channelDepths[2] = baseDepth * (useOpacity ? (_distSR * 4.0) : _smoothSR);
+                _channelDepths[3] = baseDepth * (useOpacity ? (_distBR * 4.0) : _smoothBR);
+                _channelDepths[4] = baseDepth * (useOpacity ? (phantomDistBC * 4.0) : phantomBC);
+                _channelDepths[5] = baseDepth * (useOpacity ? (_distBL * 4.0) : _smoothBL);
+                _channelDepths[6] = baseDepth * (useOpacity ? (_distSL * 4.0) : _smoothSL);
+                _channelDepths[7] = baseDepth * (useOpacity ? (_distFL * 4.0) : _smoothFL);
             }
 
             _channelDists[0] = _distFC;
@@ -447,7 +451,16 @@ namespace SoundVisualizer
                 }
             }
             
-            UnifiedWave.Opacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
+            double baseOpacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
+            if (AppSettings.IntensityAsOpacity)
+            {
+                double volumeFactor = Math.Max(0.0, Math.Min(1.0, _smoothTotal / 2.5));
+                UnifiedWave.Opacity = baseOpacity * volumeFactor;
+            }
+            else
+            {
+                UnifiedWave.Opacity = baseOpacity;
+            }
 
             if (AppSettings.IsGlowMode)
             {
@@ -798,6 +811,8 @@ namespace SoundVisualizer
             {
                 EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
                 EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                if (EditPanelIntensityAsOpacityCheckBox != null)
+                    EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
             }
 
             EditPanelGlowCheckBox.IsChecked = AppSettings.IsGlowMode;
@@ -908,6 +923,14 @@ namespace SoundVisualizer
                 EditPanelTargetFpsValueText.Text = $"{EditPanelTargetFpsSlider.Value:F0} FPS";
             }
 
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelIntensityAsOpacity_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.IntensityAsOpacity = EditPanelIntensityAsOpacityCheckBox.IsChecked ?? false;
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
         }
