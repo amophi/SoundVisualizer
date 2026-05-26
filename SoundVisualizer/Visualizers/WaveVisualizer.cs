@@ -12,6 +12,7 @@ namespace SoundVisualizer.Visualizers
         // 매 프레임 발생하는 GC 스파이크 방지용 전역 캐시 배열
         private readonly Point[] _innerPts = new Point[WAVE_SAMPLE_COUNT];
         private readonly double[] _channelPos = new double[8];
+        private readonly List<Point> _bezierPts = new List<Point>(WAVE_SAMPLE_COUNT * 3);
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
@@ -76,7 +77,7 @@ namespace SoundVisualizer.Visualizers
 
                 ctx.BeginFigure(_innerPts[0], true, true);
 
-                var bezierPts = new List<Point>(N * 3);
+                _bezierPts.Clear();
                 for (int i = 0; i < N; i++)
                 {
                     Point p0 = _innerPts[(i - 1 + N) % N];
@@ -87,12 +88,12 @@ namespace SoundVisualizer.Visualizers
                     Point cp1 = new Point(p1.X + (p2.X - p0.X) / 6.0, p1.Y + (p2.Y - p0.Y) / 6.0);
                     Point cp2 = new Point(p2.X - (p3.X - p1.X) / 6.0, p2.Y - (p3.Y - p1.Y) / 6.0);
 
-                    bezierPts.Add(cp1);
-                    bezierPts.Add(cp2);
-                    bezierPts.Add(p2);
+                    _bezierPts.Add(cp1);
+                    _bezierPts.Add(cp2);
+                    _bezierPts.Add(p2);
                 }
 
-                ctx.PolyBezierTo(bezierPts, true, true);
+                ctx.PolyBezierTo(_bezierPts, true, true);
             }
 
             geometry.Freeze();

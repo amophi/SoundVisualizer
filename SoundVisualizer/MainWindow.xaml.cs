@@ -88,6 +88,9 @@ namespace SoundVisualizer
         private readonly Stopwatch _renderStopwatch = new();
         private double _lastRenderTimeMs = 0;
         private long _lastChannelCountTick = 0;
+        private long _lastHotkeyCheckTick = 0;
+        private long _lastHudUpdateTick = 0;
+        private bool _forceUpdateHUDTexts = true;
         
         private int _frameCount;
         private double _currentFps;
@@ -192,83 +195,100 @@ namespace SoundVisualizer
 
         private void RenderFrame()
         {
-            // 실시간 오버레이 편집 모드 토글
-            bool isEditHotkeyPressed = IsHotkeyPressed(AppSettings.EditModeKeyBind);
-            if (isEditHotkeyPressed && !_wasEditHotkeyPressed)
-            {
-                ToggleEditMode(!_isEditMode);
-            }
-            _wasEditHotkeyPressed = isEditHotkeyPressed;
+            long nowTicks = Environment.TickCount64;
 
-            // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
-            bool isVisualHotkeyPressed = IsHotkeyPressed(AppSettings.VisualModeKeyBind);
-            if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
+            // 1. 핫키 체크 스로틀링 (약 30Hz - CPU 사용량 감소 및 P/Invoke 부하 최소화)
+            if (nowTicks - _lastHotkeyCheckTick >= 33)
             {
-                AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
-                AppSettings.Save();
-                OnSettingsChangedFromHotkey?.Invoke();
-                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                _lastHotkeyCheckTick = nowTicks;
 
-                if (_isEditMode)
+                // 실시간 오버레이 편집 모드 토글
+                bool isEditHotkeyPressed = IsHotkeyPressed(AppSettings.EditModeKeyBind);
+                if (isEditHotkeyPressed && !_wasEditHotkeyPressed)
                 {
-                    LoadSettingsToEditPanel();
-                    UpdateGuidelinePositions();
+                    ToggleEditMode(!_isEditMode);
                 }
-            }
-            _wasVisualHotkeyPressed = isVisualHotkeyPressed;
+                _wasEditHotkeyPressed = isEditHotkeyPressed;
 
-            string visualKeyName = GetKeysName(AppSettings.VisualModeKeyBind);
-            string targetVisualModeText = AppSettings.VisualMode == 0 
-                ? $"🎨 시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
-                : AppSettings.VisualMode == 1
-                    ? $"🎨 시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
-                    : AppSettings.VisualMode == 2
-                        ? $"🎨 시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
-                        : $"🎨 시각화 모드: [{visualKeyName}] 외각선 모드 (Outline)";
-            if (_cachedVisualModeText != targetVisualModeText)
-            {
-                _cachedVisualModeText = targetVisualModeText;
-                VisualModeText.Text = targetVisualModeText;
-            }
-
-            // F2 키: 스테레오 확장 모드 실시간 전환
-            bool isStereoHotkeyPressed = IsHotkeyPressed(AppSettings.StereoUpmixKeyBind);
-            if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
-            {
-                AppSettings.SoundMode = (AppSettings.SoundMode + 1) % 3;
-                AppSettings.Save();
-                OnSettingsChangedFromHotkey?.Invoke();
-                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
-                
-                if (_isEditMode)
+                // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
+                bool isVisualHotkeyPressed = IsHotkeyPressed(AppSettings.VisualModeKeyBind);
+                if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
                 {
-                    LoadSettingsToEditPanel();
+                    AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+                    _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                    _forceUpdateHUDTexts = true;
+
+                    if (_isEditMode)
+                    {
+                        LoadSettingsToEditPanel();
+                        UpdateGuidelinePositions();
+                    }
                 }
-            }
-            _wasStereoHotkeyPressed = isStereoHotkeyPressed;
+                _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
-            string stereoKeyName = GetKeysName(AppSettings.StereoUpmixKeyBind);
-            string targetStereoModeText = AppSettings.SoundMode == 0 
-                ? $"🎧 사운드 모드: [{stereoKeyName}] 2 채널" 
-                : (AppSettings.SoundMode == 1 ? $"🔊 사운드 모드: [{stereoKeyName}] 5.1 채널" : $"🔊 사운드 모드: [{stereoKeyName}] 7.1 채널");
-            Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
-
-            if (_cachedStereoModeText != targetStereoModeText)
-            {
-                _cachedStereoModeText = targetStereoModeText;
-                StereoModeText.Text = targetStereoModeText;
+                // F2 키: 스테레오 확장 모드 실시간 전환
+                bool isStereoHotkeyPressed = IsHotkeyPressed(AppSettings.StereoUpmixKeyBind);
+                if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
+                {
+                    AppSettings.SoundMode = (AppSettings.SoundMode + 1) % 3;
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+                    _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                    _forceUpdateHUDTexts = true;
+                    
+                    if (_isEditMode)
+                    {
+                        LoadSettingsToEditPanel();
+                    }
+                }
+                _wasStereoHotkeyPressed = isStereoHotkeyPressed;
             }
-            if (_cachedStereoModeForeground != targetStereoForeground)
-            {
-                _cachedStereoModeForeground = targetStereoForeground;
-                StereoModeText.Foreground = targetStereoForeground;
-            }
 
-            string editKeyName = GetKeysName(AppSettings.EditModeKeyBind);
-            string targetEditModeText = $"⚙️ 실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
-            if (EditModeText != null && EditModeText.Text != targetEditModeText)
+            // 2. UI 텍스트 문자열 할당 최소화 (500ms마다 또는 강제 업데이트 필요 시에만 수행)
+            if (nowTicks - _lastHudUpdateTick >= 500 || _forceUpdateHUDTexts)
             {
-                EditModeText.Text = targetEditModeText;
+                _lastHudUpdateTick = nowTicks;
+                _forceUpdateHUDTexts = false;
+
+                string visualKeyName = GetKeysName(AppSettings.VisualModeKeyBind);
+                string targetVisualModeText = AppSettings.VisualMode == 0 
+                    ? $"🎨 시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
+                    : AppSettings.VisualMode == 1
+                        ? $"🎨 시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
+                        : AppSettings.VisualMode == 2
+                            ? $"🎨 시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
+                            : $"🎨 시각화 모드: [{visualKeyName}] 외각선 모드 (Outline)";
+                if (_cachedVisualModeText != targetVisualModeText)
+                {
+                    _cachedVisualModeText = targetVisualModeText;
+                    VisualModeText.Text = targetVisualModeText;
+                }
+
+                string stereoKeyName = GetKeysName(AppSettings.StereoUpmixKeyBind);
+                string targetStereoModeText = AppSettings.SoundMode == 0 
+                    ? $"🎧 사운드 모드: [{stereoKeyName}] 2 채널" 
+                    : (AppSettings.SoundMode == 1 ? $"🔊 사운드 모드: [{stereoKeyName}] 5.1 채널" : $"🔊 사운드 모드: [{stereoKeyName}] 7.1 채널");
+                Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
+
+                if (_cachedStereoModeText != targetStereoModeText)
+                {
+                    _cachedStereoModeText = targetStereoModeText;
+                    StereoModeText.Text = targetStereoModeText;
+                }
+                if (_cachedStereoModeForeground != targetStereoForeground)
+                {
+                    _cachedStereoModeForeground = targetStereoForeground;
+                    StereoModeText.Foreground = targetStereoForeground;
+                }
+
+                string editKeyName = GetKeysName(AppSettings.EditModeKeyBind);
+                string targetEditModeText = $"⚙️ 실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
+                if (EditModeText != null && EditModeText.Text != targetEditModeText)
+                {
+                    EditModeText.Text = targetEditModeText;
+                }
             }
 
             _frameCount++;
