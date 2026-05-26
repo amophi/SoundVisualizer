@@ -418,7 +418,6 @@ namespace SoundVisualizer.AIModel
             float dangerEvidence = SumCoarseProbabilityFromTop5(_topKIndices, _topKProbs, 5, "danger");
             bool hasStrongDangerCue = HasStrongDangerCueInTop5(_topKIndices, 5);
             bool hasCriticalDangerCue = HasCriticalDangerCueInTop5(_topKIndices, 5);
-            bool boostedDangerByGunshot = false;
 
             if (TryPredictGunshotBoosterScore(probs, out float gunshotScore))
             {
@@ -439,7 +438,6 @@ namespace SoundVisualizer.AIModel
                 {
                     coarse = "danger";
                     coarseConf = MathF.Max(coarseConf, MathF.Max(gunshotScore, gunshotEvidence));
-                    boostedDangerByGunshot = true;
                 }
             }
 

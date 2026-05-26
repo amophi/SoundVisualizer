@@ -59,8 +59,6 @@ namespace SoundVisualizer
         private string _cachedStereoModeText = "";
         private Brush? _cachedStereoModeForeground = null;
         private string _cachedFpsText = "";
-        private string _cachedStatusText = "";
-        private Brush? _cachedStatusForeground = null;
 
         private Visibility _cachedAILabelBorderVisibility = Visibility.Collapsed;
         private string _cachedAILabelText = "";
@@ -381,7 +379,7 @@ namespace SoundVisualizer
             if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
             
             bool useOpacity = AppSettings.IntensityAsOpacity;
-            double currentIntensity = useOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
+            double currentIntensity = useOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
             double baseDepth = maxBaseDepthRender * (Math.Max(0.0, currentIntensity) / 100.0);
             
             if (AppSettings.SoundMode == 0)
@@ -389,11 +387,11 @@ namespace SoundVisualizer
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
                 _channelDepths[0] = 0;
                 _channelDepths[1] = 0;
-                _channelDepths[2] = baseDepth * (useOpacity ? 1.0 : _smoothFR);
+                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFR));
                 _channelDepths[3] = 0;
                 _channelDepths[4] = 0;
                 _channelDepths[5] = 0;
-                _channelDepths[6] = baseDepth * (useOpacity ? 1.0 : _smoothFL);
+                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFL));
                 _channelDepths[7] = 0;
             }
             else
@@ -401,14 +399,14 @@ namespace SoundVisualizer
                 double phantomBC = (_smoothBL + _smoothBR) / 2.0;
                 double phantomDistBC = (_distBL + _distBR) / 2.0;
                 
-                _channelDepths[0] = baseDepth * (useOpacity ? (_distFC * 4.0) : _smoothFC);
-                _channelDepths[1] = baseDepth * (useOpacity ? (_distFR * 4.0) : _smoothFR);
-                _channelDepths[2] = baseDepth * (useOpacity ? (_distSR * 4.0) : _smoothSR);
-                _channelDepths[3] = baseDepth * (useOpacity ? (_distBR * 4.0) : _smoothBR);
-                _channelDepths[4] = baseDepth * (useOpacity ? (phantomDistBC * 4.0) : phantomBC);
-                _channelDepths[5] = baseDepth * (useOpacity ? (_distBL * 4.0) : _smoothBL);
-                _channelDepths[6] = baseDepth * (useOpacity ? (_distSL * 4.0) : _smoothSL);
-                _channelDepths[7] = baseDepth * (useOpacity ? (_distFL * 4.0) : _smoothFL);
+                _channelDepths[0] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFC * 4.0) : _smoothFC));
+                _channelDepths[1] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFR * 4.0) : _smoothFR));
+                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSR * 4.0) : _smoothSR));
+                _channelDepths[3] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBR * 4.0) : _smoothBR));
+                _channelDepths[4] = Math.Min(baseDepth, baseDepth * (useOpacity ? (phantomDistBC * 4.0) : phantomBC));
+                _channelDepths[5] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBL * 4.0) : _smoothBL));
+                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSL * 4.0) : _smoothSL));
+                _channelDepths[7] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFL * 4.0) : _smoothFL));
             }
 
             _channelDists[0] = _distFC;
@@ -422,6 +420,7 @@ namespace SoundVisualizer
 
             _renderContext.Width = w;
             _renderContext.Height = h;
+            _renderContext.BaseDepth = baseDepth;
             _renderContext.ChannelDepths = _channelDepths;
             _renderContext.ChannelDists = _channelDists;
             _renderContext.TotalVolume = (float)totalTarget;
@@ -452,7 +451,7 @@ namespace SoundVisualizer
                 }
             }
             
-            double baseOpacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
+            double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
             if (AppSettings.IntensityAsOpacity)
             {
                 double volumeFactor = Math.Max(0.0, Math.Min(1.0, _smoothTotal / 2.5));
@@ -805,8 +804,8 @@ namespace SoundVisualizer
             EditPanelSensitivitySlider.Value = AppSettings.WaveSensitivity * 4.0;
             EditPanelSensitivityValueText.Text = $"{AppSettings.WaveSensitivity * 4.0:F0}";
 
-            EditPanelOpacitySlider.Value = AppSettings.VisualOpacity;
-            EditPanelOpacityValueText.Text = $"{AppSettings.VisualOpacity:F0}%";
+            EditPanelOpacitySlider.Value = 100.0 - AppSettings.VisualOpacity;
+            EditPanelOpacityValueText.Text = $"{100.0 - AppSettings.VisualOpacity:F0}%";
 
             if (EditPanelIntensitySlider != null)
             {
@@ -920,9 +919,9 @@ namespace SoundVisualizer
             }
             else if (sender == EditPanelOpacitySlider)
             {
-                AppSettings.VisualOpacity = EditPanelOpacitySlider.Value;
+                AppSettings.VisualOpacity = 100.0 - EditPanelOpacitySlider.Value;
                 EditPanelOpacityValueText.Text = $"{EditPanelOpacitySlider.Value:F0}%";
-                UnifiedWave.Opacity = Math.Max(0.0, 100.0 - AppSettings.VisualOpacity) / 100.0;
+                UnifiedWave.Opacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
             }
             else if (sender == EditPanelIntensitySlider)
             {
@@ -1149,7 +1148,8 @@ namespace SoundVisualizer
                 double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
                 if (maxBaseDepth < 10) maxBaseDepth = 10;
                 
-                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
                 double displayBaseDepth = Math.Min(baseDepth, maxBaseDepth);
 
                 double rectLeft = displayBaseDepth;
@@ -1166,8 +1166,9 @@ namespace SoundVisualizer
                 RectGuideline.Height = rectHeight;
 
                 string modeName = visualMode == 1 ? "패드" : visualMode == 3 ? "외각선" : "파도";
+                double displayIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
                 if (RectModeLabel != null) RectModeLabel.Text = $"{modeName} 한계선";
-                if (RectSizeLabel != null) RectSizeLabel.Text = $"{modeName} 크기: {AppSettings.WaveIntensity:F0}%";
+                if (RectSizeLabel != null) RectSizeLabel.Text = $"{modeName} 크기: {displayIntensity:F0}%";
             }
             else if (visualMode == 2)
             {
@@ -1183,7 +1184,8 @@ namespace SoundVisualizer
 
                 double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
                 if (maxBaseDepth < 10) maxBaseDepth = 10;
-                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
                 double maxRadius = baseRadius + baseDepth * 0.35;
 
                 Canvas.SetLeft(CircleGuideline, 0);
@@ -1201,8 +1203,9 @@ namespace SoundVisualizer
                 Canvas.SetLeft(CircleMaxShape, cx - maxRadius);
                 Canvas.SetTop(CircleMaxShape, cy - maxRadius);
 
+                double displayIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
                 CircleRadiusLabel.Text = $"기본 반경: {AppSettings.CircleRadius:F0}";
-                CircleIntensityLabel.Text = $"한계 크기: {AppSettings.WaveIntensity:F0}%";
+                CircleIntensityLabel.Text = $"한계 크기: {displayIntensity:F0}%";
             }
         }
 
@@ -1213,28 +1216,44 @@ namespace SoundVisualizer
             if (w == 0 || h == 0) return;
 
             Point mousePos = System.Windows.Input.Mouse.GetPosition(GuidelineCanvas);
+            System.Windows.Controls.Primitives.Thumb? thumb = sender as System.Windows.Controls.Primitives.Thumb;
+            if (thumb == null) return;
 
-            double dx = Math.Abs(mousePos.X - w / 2.0);
-            double dy = Math.Abs(mousePos.Y - h / 2.0);
+            double baseDepth = 0;
+            if (thumb.Name == "ResizeHandle_NW")
+                baseDepth = Math.Min(mousePos.X, mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_NE")
+                baseDepth = Math.Min(w - mousePos.X, mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_SW")
+                baseDepth = Math.Min(mousePos.X, h - mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_SE")
+                baseDepth = Math.Min(w - mousePos.X, h - mousePos.Y);
 
-            double depthX = w / 2.0 - dx;
-            double depthY = h / 2.0 - dy;
-
-            double baseDepth = Math.Min(depthX, depthY);
             if (baseDepth < 0) baseDepth = 0;
 
             double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
             if (maxBaseDepth < 10) maxBaseDepth = 10;
             double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
-            if (intensity < 0.0) intensity = 0.0;
-            if (intensity > 100.0) intensity = 100.0;
-
-            AppSettings.WaveIntensity = intensity;
+            if (AppSettings.IntensityAsOpacity)
+            {
+                double opSize = intensity * 2.0;
+                if (opSize < 10.0) opSize = 10.0;
+                if (opSize > 100.0) opSize = 100.0;
+                AppSettings.OpacityFixedSize = opSize;
+                if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+            }
+            else
+            {
+                if (intensity < 10.0) intensity = 10.0;
+                if (intensity > 100.0) intensity = 100.0;
+                AppSettings.WaveIntensity = intensity;
+                if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+            }
 
             UpdateGuidelinePositions();
-            if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-            if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
         }
@@ -1259,7 +1278,8 @@ namespace SoundVisualizer
 
                 double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
                 if (maxBaseDepth < 10) maxBaseDepth = 10;
-                double baseDepth = maxBaseDepth * (AppSettings.WaveIntensity / 100.0);
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
                 double maxRadius = baseRadius + baseDepth * 0.35;
 
                 double distToBase = Math.Abs(dist - baseRadius);
@@ -1282,7 +1302,7 @@ namespace SoundVisualizer
             {
                 _isDraggingRectIntensity = true;
                 _rectDragStartPos = e.GetPosition(GuidelineCanvas);
-                _rectDragStartIntensity = AppSettings.WaveIntensity;
+                _rectDragStartIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
                 GuidelineCanvas.CaptureMouse();
             }
         }
@@ -1327,15 +1347,26 @@ namespace SoundVisualizer
                     if (maxBaseDepth < 10) maxBaseDepth = 10;
                     double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
-                    if (intensity < 0.0) intensity = 0.0;
-                    if (intensity > 100.0) intensity = 100.0;
-
-                    AppSettings.WaveIntensity = intensity;
+                    if (AppSettings.IntensityAsOpacity)
+                    {
+                        double opSize = intensity * 2.0;
+                        if (opSize < 0.0) opSize = 0.0;
+                        if (opSize > 100.0) opSize = 100.0;
+                        AppSettings.OpacityFixedSize = opSize;
+                        if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                        if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                    }
+                    else
+                    {
+                        if (intensity < 0.0) intensity = 0.0;
+                        if (intensity > 100.0) intensity = 100.0;
+                        AppSettings.WaveIntensity = intensity;
+                        if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                        if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                    }
                 }
 
                 UpdateGuidelinePositions();
-                if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
                 AppSettings.Save();
                 OnSettingsChangedFromHotkey?.Invoke();
             }
@@ -1347,27 +1378,44 @@ namespace SoundVisualizer
 
                 Point mousePos = e.GetPosition(GuidelineCanvas);
 
-                double dx = Math.Abs(mousePos.X - w / 2.0);
-                double dy = Math.Abs(mousePos.Y - h / 2.0);
+                double distLeft = _rectDragStartPos.X;
+                double distRight = w - _rectDragStartPos.X;
+                double distTop = _rectDragStartPos.Y;
+                double distBottom = h - _rectDragStartPos.Y;
 
-                double depthX = w / 2.0 - dx;
-                double depthY = h / 2.0 - dy;
+                double minDist = Math.Min(Math.Min(distLeft, distRight), Math.Min(distTop, distBottom));
 
-                double baseDepth = Math.Min(depthX, depthY);
+                double baseDepth = 0;
+                if (minDist == distLeft) baseDepth = mousePos.X;
+                else if (minDist == distRight) baseDepth = w - mousePos.X;
+                else if (minDist == distTop) baseDepth = mousePos.Y;
+                else baseDepth = h - mousePos.Y;
+
                 if (baseDepth < 0) baseDepth = 0;
 
                 double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
                 if (maxBaseDepth < 10) maxBaseDepth = 10;
                 double intensity = (baseDepth / maxBaseDepth) * 100.0;
 
-                if (intensity < 10.0) intensity = 10.0;
-                if (intensity > 100.0) intensity = 100.0;
-
-                AppSettings.WaveIntensity = intensity;
+                if (AppSettings.IntensityAsOpacity)
+                {
+                    double opSize = intensity * 2.0;
+                    if (opSize < 10.0) opSize = 10.0;
+                    if (opSize > 100.0) opSize = 100.0;
+                    AppSettings.OpacityFixedSize = opSize;
+                    if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                    if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                }
+                else
+                {
+                    if (intensity < 10.0) intensity = 10.0;
+                    if (intensity > 100.0) intensity = 100.0;
+                    AppSettings.WaveIntensity = intensity;
+                    if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                    if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                }
 
                 UpdateGuidelinePositions();
-                if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
                 AppSettings.Save();
                 OnSettingsChangedFromHotkey?.Invoke();
             }

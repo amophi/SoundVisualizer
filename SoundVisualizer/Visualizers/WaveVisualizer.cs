@@ -47,10 +47,10 @@ namespace SoundVisualizer.Visualizers
             _channelPos[6] = dist_lc / P;
             _channelPos[7] = dist_tl / P;
 
-            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, _channelPos);
-            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, _channelPos);
-            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, _channelPos);
-            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, _channelPos);
+            double d_tr = GetWaveDepth(dist_tr / P, time, channelDepths, _channelPos, context.BaseDepth);
+            double d_br = GetWaveDepth(dist_br / P, time, channelDepths, _channelPos, context.BaseDepth);
+            double d_bl = GetWaveDepth(dist_bl / P, time, channelDepths, _channelPos, context.BaseDepth);
+            double d_tl = GetWaveDepth(dist_tl / P, time, channelDepths, _channelPos, context.BaseDepth);
 
             int N = WAVE_SAMPLE_COUNT;
 
@@ -59,7 +59,7 @@ namespace SoundVisualizer.Visualizers
                 double dist = (P * i) / N; 
                 double t = dist / P;
                 
-                double d = GetWaveDepth(t, time, channelDepths, _channelPos);
+                double d = GetWaveDepth(t, time, channelDepths, _channelPos, context.BaseDepth);
                 
                 _innerPts[i] = GetRoundedInnerPoint(dist, w, h, P, d, d_tr, d_br, d_bl, d_tl);
             }
@@ -175,9 +175,9 @@ namespace SoundVisualizer.Visualizers
             return new Point(dist - (w / 2 + h + w + h), 0);
         }
 
-        private double GetWaveDepth(double t, double time, double[] depths, double[] positions)
+        private double GetWaveDepth(double t, double time, double[] depths, double[] positions, double maxDepth)
         {
-            return Math.Max(0, InterpolateDepthCatmullRom(t, depths, positions));
+            return Math.Min(maxDepth, Math.Max(0, InterpolateDepthCatmullRom(t, depths, positions)));
         }
 
         private double InterpolateDepthCatmullRom(double t, double[] depths, double[] positions)
