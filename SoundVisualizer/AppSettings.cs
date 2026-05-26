@@ -16,6 +16,7 @@ namespace SoundVisualizer
         public double CircleRadius { get; set; } = 40.0;
         public bool IntensityAsOpacity { get; set; } = false;
         public double OpacityFixedSize { get; set; } = 30.0;
+        public double OpacityFixedMaxOpacity { get; set; } = 100.0;
     }
 
     public static class AppSettings
@@ -75,6 +76,12 @@ namespace SoundVisualizer
         {
             get => GetCurrentModeSettings().OpacityFixedSize;
             set => GetCurrentModeSettings().OpacityFixedSize = value;
+        }
+
+        public static double OpacityFixedMaxOpacity
+        {
+            get => GetCurrentModeSettings().OpacityFixedMaxOpacity;
+            set => GetCurrentModeSettings().OpacityFixedMaxOpacity = value;
         }
 
         // 6. 스테레오 확장 모드
@@ -216,7 +223,8 @@ namespace SoundVisualizer
                     VisualOpacity = VisualOpacity,
                     CircleRadius = CircleRadius,
                     IsGlowMode = IsGlowMode,
-                    GlowIntensity = GlowIntensity
+                    GlowIntensity = GlowIntensity,
+                    OpacityFixedMaxOpacity = OpacityFixedMaxOpacity
                 };
                 var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(SettingsFilePath, json);
@@ -235,6 +243,7 @@ namespace SoundVisualizer
             public int SoundMode { get; set; } = 2;
             public bool IsGlowMode { get; set; } = false;
             public double GlowIntensity { get; set; } = 0.0;
+            public double OpacityFixedMaxOpacity { get; set; } = 100.0;
             public List<int> StereoUpmixKeyBind { get; set; }
             public List<int> VisualModeKeyBind { get; set; }
             public List<int> EditModeKeyBind { get; set; }

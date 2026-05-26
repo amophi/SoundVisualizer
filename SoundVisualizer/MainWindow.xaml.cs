@@ -451,14 +451,15 @@ namespace SoundVisualizer
                 }
             }
             
-            double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
             if (AppSettings.IntensityAsOpacity)
             {
+                double maxOpacity = Math.Max(0.0, AppSettings.OpacityFixedMaxOpacity) / 100.0;
                 double volumeFactor = Math.Max(0.0, Math.Min(1.0, _smoothTotal / 2.5));
-                UnifiedWave.Opacity = baseOpacity * volumeFactor;
+                UnifiedWave.Opacity = maxOpacity * volumeFactor;
             }
             else
             {
+                double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
                 UnifiedWave.Opacity = baseOpacity;
             }
 
@@ -821,13 +822,35 @@ namespace SoundVisualizer
                         EditPanelIntensityPanel.IsEnabled = !isOpacity;
                         EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
                     }
+                    
+                    if (EditPanelOpacityPanel != null)
+                    {
+                        EditPanelOpacityPanel.IsEnabled = !isOpacity;
+                        EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+                    }
 
                     if (EditPanelOpacityFixedSizePanel != null)
                     {
                         EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
                         EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+                        
+                        if (EditPanelOpacityFixedSizeLabel != null)
+                        {
+                            string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외각선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                            EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+                        }
+                        
                         EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
                         EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                    }
+
+                    if (EditPanelOpacityFixedMaxOpacityPanel != null)
+                    {
+                        EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
+                        EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
+                        
+                        EditPanelOpacityFixedMaxOpacitySlider.Value = 100.0 - AppSettings.OpacityFixedMaxOpacity;
+                        EditPanelOpacityFixedMaxOpacityValueText.Text = $"{100.0 - AppSettings.OpacityFixedMaxOpacity:F0}%";
                     }
                 }
             }
@@ -886,6 +909,12 @@ namespace SoundVisualizer
             AppSettings.VisualMode = CmbEditPanelVisualMode.SelectedIndex;
             AppSettings.Save();
 
+            if (EditPanelOpacityFixedSizeLabel != null)
+            {
+                string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외각선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+            }
+
             // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
             UpdateGuidelinePositions();
 
@@ -935,6 +964,11 @@ namespace SoundVisualizer
                 EditPanelOpacityFixedSizeValueText.Text = $"{EditPanelOpacityFixedSizeSlider.Value:F0}%";
                 UpdateGuidelinePositions();
             }
+            else if (sender == EditPanelOpacityFixedMaxOpacitySlider)
+            {
+                AppSettings.OpacityFixedMaxOpacity = 100.0 - EditPanelOpacityFixedMaxOpacitySlider.Value;
+                EditPanelOpacityFixedMaxOpacityValueText.Text = $"{EditPanelOpacityFixedMaxOpacitySlider.Value:F0}%";
+            }
             else if (sender == EditPanelGlowSlider)
             {
                 AppSettings.GlowIntensity = EditPanelGlowSlider.Value;
@@ -962,10 +996,22 @@ namespace SoundVisualizer
                 EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
             }
 
+            if (EditPanelOpacityPanel != null)
+            {
+                EditPanelOpacityPanel.IsEnabled = !isOpacity;
+                EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+            }
+
             if (EditPanelOpacityFixedSizePanel != null)
             {
                 EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
                 EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+            }
+
+            if (EditPanelOpacityFixedMaxOpacityPanel != null)
+            {
+                EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
+                EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
             }
 
             AppSettings.Save();

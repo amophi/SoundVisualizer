@@ -406,7 +406,7 @@
                             </StackPanel>
 
                             <!-- 설정 3: 투명도 -->
-                            <StackPanel Margin="0,0,0,18">
+                            <StackPanel x:Name="EditPanelOpacityPanel" Margin="0,0,0,18">
                                 <Grid>
                                     <TextBlock Text="투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                     <TextBlock x:Name="EditPanelOpacityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
@@ -432,10 +432,17 @@
                                     </Grid>
                                     <StackPanel x:Name="EditPanelOpacityFixedSizePanel" Margin="0,15,0,0">
                                         <Grid>
-                                            <TextBlock Text="고정 크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityFixedSizeLabel" Text="파도 크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelOpacityFixedSizeValueText" Text="30%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelOpacityFixedSizeSlider" Minimum="10" Maximum="100" Value="30" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                    <StackPanel x:Name="EditPanelOpacityFixedMaxOpacityPanel" Margin="0,10,0,0">
+                                        <Grid>
+                                            <TextBlock Text="최대 투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityFixedMaxOpacityValueText" Text="0%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelOpacityFixedMaxOpacitySlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>

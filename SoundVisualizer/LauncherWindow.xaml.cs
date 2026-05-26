@@ -267,6 +267,9 @@ namespace SoundVisualizer
                 TxtSensitivityDescWave.Text = "Determines how sensitively the waves react to low decibel sounds.";
                 TxtOpacityLabelWave.Text = "Opacity";
                 TxtOpacityDescWave.Text = "Adjusts wave opacity to determine transparency over background games or screens.";
+                TxtIntensityAsOpacityLabelWave.Text = "Intensity as Opacity";
+                TxtIntensityAsOpacityDescWave.Text = "Graphic size is fixed and opacity changes based on sound.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Max Opacity";
                 TxtGlowModeLabelWave.Text = "Glow";
                 TxtGlowModeDescWave.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.";
 
@@ -280,6 +283,9 @@ namespace SoundVisualizer
                 TxtSensitivityDescPad.Text = "Adjusts the pad to capture sounds better and stand out more.";
                 TxtOpacityLabelPad.Text = "Opacity";
                 TxtOpacityDescPad.Text = "Adjusts the opacity of the pad graphic.";
+                TxtIntensityAsOpacityLabelPad.Text = "Intensity as Opacity";
+                TxtIntensityAsOpacityDescPad.Text = "Graphic size is fixed and opacity changes based on sound.";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Max Opacity";
                 TxtGlowModeLabelPad.Text = "Glow";
                 TxtGlowModeDescPad.Text = "Gives a soft aura-style glow effect around the pad.";
 
@@ -293,6 +299,9 @@ namespace SoundVisualizer
                 TxtSensitivityDescCircle.Text = "Controls how delicately the circle amplitude splits and responds to sound.";
                 TxtOpacityLabelCircle.Text = "Opacity";
                 TxtOpacityDescCircle.Text = "Determines the opacity of the circle graphic.";
+                TxtIntensityAsOpacityLabelCircle.Text = "Intensity as Opacity";
+                TxtIntensityAsOpacityDescCircle.Text = "Graphic size is fixed and opacity changes based on sound.";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Max Opacity";
                 TxtCircleRadiusLabel.Text = "Circle Radius";
                 TxtCircleRadiusDesc.Text = "Individually adjusts the radius of the center core in circle mode.";
                 TxtGlowModeLabelCircle.Text = "Glow";
@@ -307,6 +316,9 @@ namespace SoundVisualizer
                 TxtSensitivityDescOutline.Text = "Determines how sensitively the outline waves react to low decibel sounds.";
                 TxtOpacityLabelOutline.Text = "Opacity";
                 TxtOpacityDescOutline.Text = "Adjusts the opacity of the outline waves.";
+                TxtIntensityAsOpacityLabelOutline.Text = "Intensity as Opacity";
+                TxtIntensityAsOpacityDescOutline.Text = "Graphic size is fixed and opacity changes based on sound.";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Max Opacity";
                 TxtGlowModeLabelOutline.Text = "Glow";
                 TxtGlowModeDescOutline.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.";
                 TxtModeSettings.Text = "Mode Settings";
@@ -1005,11 +1017,18 @@ namespace SoundVisualizer
             SldIntensityWave.Value = AppSettings.WaveMode.Intensity;
             ChkIntensityAsOpacityWave.IsChecked = AppSettings.WaveMode.IntensityAsOpacity;
             SldOpacityFixedSizeWave.Value = AppSettings.WaveMode.OpacityFixedSize;
+            SldOpacityFixedMaxOpacityWave.Value = 100.0 - AppSettings.WaveMode.OpacityFixedMaxOpacity;
             
             bool waveOpacity = AppSettings.WaveMode.IntensityAsOpacity;
             SldOpacityFixedSizeWave.IsEnabled = waveOpacity;
             SldOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
+            SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
             
@@ -1018,6 +1037,12 @@ namespace SoundVisualizer
             TxtIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
             TxtIntensityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
             TxtIntensityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+            
+            SldOpacityWave.IsEnabled = !waveOpacity;
+            SldOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+            TxtOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+            TxtOpacityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+            TxtOpacityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
             SldSpeedWave.Value = AppSettings.WaveMode.PositionSpeed;
             SldSensitivityWave.Value = AppSettings.WaveMode.Sensitivity * 4.0;
             SldOpacityWave.Value = 100 - AppSettings.WaveMode.VisualOpacity;
@@ -1034,11 +1059,18 @@ namespace SoundVisualizer
             SldIntensityPad.Value = AppSettings.PadMode.Intensity;
             ChkIntensityAsOpacityPad.IsChecked = AppSettings.PadMode.IntensityAsOpacity;
             SldOpacityFixedSizePad.Value = AppSettings.PadMode.OpacityFixedSize;
+            SldOpacityFixedMaxOpacityPad.Value = 100.0 - AppSettings.PadMode.OpacityFixedMaxOpacity;
             
             bool padOpacity = AppSettings.PadMode.IntensityAsOpacity;
             SldOpacityFixedSizePad.IsEnabled = padOpacity;
             SldOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Opacity = padOpacity ? 1.0 : 0.4;
+            SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
+            SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
             
@@ -1047,6 +1079,12 @@ namespace SoundVisualizer
             TxtIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
             TxtIntensityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
             TxtIntensityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
+            
+            SldOpacityPad.IsEnabled = !padOpacity;
+            SldOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
+            TxtOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
+            TxtOpacityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
+            TxtOpacityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
             SldSpeedPad.Value = AppSettings.PadMode.PositionSpeed;
             SldSensitivityPad.Value = AppSettings.PadMode.Sensitivity * 4.0;
             SldOpacityPad.Value = 100 - AppSettings.PadMode.VisualOpacity;
@@ -1063,11 +1101,18 @@ namespace SoundVisualizer
             SldIntensityCircle.Value = AppSettings.CircleMode.Intensity;
             ChkIntensityAsOpacityCircle.IsChecked = AppSettings.CircleMode.IntensityAsOpacity;
             SldOpacityFixedSizeCircle.Value = AppSettings.CircleMode.OpacityFixedSize;
+            SldOpacityFixedMaxOpacityCircle.Value = 100.0 - AppSettings.CircleMode.OpacityFixedMaxOpacity;
             
             bool circleOpacity = AppSettings.CircleMode.IntensityAsOpacity;
             SldOpacityFixedSizeCircle.IsEnabled = circleOpacity;
             SldOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
+            SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             
@@ -1076,6 +1121,12 @@ namespace SoundVisualizer
             TxtIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
             TxtIntensityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
             TxtIntensityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+            
+            SldOpacityCircle.IsEnabled = !circleOpacity;
+            SldOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+            TxtOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+            TxtOpacityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+            TxtOpacityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
             SldSpeedCircle.Value = AppSettings.CircleMode.PositionSpeed;
             SldSensitivityCircle.Value = AppSettings.CircleMode.Sensitivity * 4.0;
             SldOpacityCircle.Value = 100 - AppSettings.CircleMode.VisualOpacity;
@@ -1093,11 +1144,18 @@ namespace SoundVisualizer
             SldIntensityOutline.Value = AppSettings.OutlineMode.Intensity;
             ChkIntensityAsOpacityOutline.IsChecked = AppSettings.OutlineMode.IntensityAsOpacity;
             SldOpacityFixedSizeOutline.Value = AppSettings.OutlineMode.OpacityFixedSize;
+            SldOpacityFixedMaxOpacityOutline.Value = 100.0 - AppSettings.OutlineMode.OpacityFixedMaxOpacity;
             
             bool outlineOpacity = AppSettings.OutlineMode.IntensityAsOpacity;
             SldOpacityFixedSizeOutline.IsEnabled = outlineOpacity;
             SldOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
+            SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             
@@ -1106,6 +1164,12 @@ namespace SoundVisualizer
             TxtIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
             TxtIntensityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
             TxtIntensityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+            
+            SldOpacityOutline.IsEnabled = !outlineOpacity;
+            SldOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
             SldSpeedOutline.Value = AppSettings.OutlineMode.PositionSpeed;
             SldSensitivityOutline.Value = AppSettings.OutlineMode.Sensitivity * 4.0;
             SldOpacityOutline.Value = 100 - AppSettings.OutlineMode.VisualOpacity;
@@ -1311,6 +1375,12 @@ namespace SoundVisualizer
                 SldOpacityFixedSizeWave.IsEnabled = waveOpacity;
                 SldOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
+                SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
+                SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 
@@ -1319,8 +1389,15 @@ namespace SoundVisualizer
                 TxtIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
                 TxtIntensityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
                 TxtIntensityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+                
+                SldOpacityWave.IsEnabled = !waveOpacity;
+                SldOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+                TxtOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+                TxtOpacityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+                TxtOpacityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
             }
             else if (sender == SldOpacityFixedSizeWave) AppSettings.WaveMode.OpacityFixedSize = SldOpacityFixedSizeWave.Value;
+            else if (sender == SldOpacityFixedMaxOpacityWave) AppSettings.WaveMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityWave.Value;
             else if (sender == SldSpeedWave) AppSettings.WaveMode.PositionSpeed = SldSpeedWave.Value;
             else if (sender == SldSensitivityWave) AppSettings.WaveMode.Sensitivity = SldSensitivityWave.Value / 4.0;
             else if (sender == SldOpacityWave) AppSettings.WaveMode.VisualOpacity = 100 - SldOpacityWave.Value;
@@ -1344,6 +1421,12 @@ namespace SoundVisualizer
                 SldOpacityFixedSizePad.IsEnabled = padOpacity;
                 SldOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Opacity = padOpacity ? 1.0 : 0.4;
+                SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
+                SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
                 
@@ -1352,8 +1435,15 @@ namespace SoundVisualizer
                 TxtIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
                 TxtIntensityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
                 TxtIntensityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
+                
+                SldOpacityPad.IsEnabled = !padOpacity;
+                SldOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
+                TxtOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
+                TxtOpacityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
+                TxtOpacityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
             }
             else if (sender == SldOpacityFixedSizePad) AppSettings.PadMode.OpacityFixedSize = SldOpacityFixedSizePad.Value;
+            else if (sender == SldOpacityFixedMaxOpacityPad) AppSettings.PadMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityPad.Value;
             else if (sender == SldSpeedPad) AppSettings.PadMode.PositionSpeed = SldSpeedPad.Value;
             else if (sender == SldSensitivityPad) AppSettings.PadMode.Sensitivity = SldSensitivityPad.Value / 4.0;
             else if (sender == SldOpacityPad) AppSettings.PadMode.VisualOpacity = 100 - SldOpacityPad.Value;
@@ -1377,6 +1467,12 @@ namespace SoundVisualizer
                 SldOpacityFixedSizeCircle.IsEnabled = circleOpacity;
                 SldOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+                SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
+                SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 
@@ -1385,8 +1481,15 @@ namespace SoundVisualizer
                 TxtIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
                 TxtIntensityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
                 TxtIntensityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+                
+                SldOpacityCircle.IsEnabled = !circleOpacity;
+                SldOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+                TxtOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+                TxtOpacityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
+                TxtOpacityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
             }
             else if (sender == SldOpacityFixedSizeCircle) AppSettings.CircleMode.OpacityFixedSize = SldOpacityFixedSizeCircle.Value;
+            else if (sender == SldOpacityFixedMaxOpacityCircle) AppSettings.CircleMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityCircle.Value;
             else if (sender == SldSpeedCircle) AppSettings.CircleMode.PositionSpeed = SldSpeedCircle.Value;
             else if (sender == SldSensitivityCircle) AppSettings.CircleMode.Sensitivity = SldSensitivityCircle.Value / 4.0;
             else if (sender == SldOpacityCircle) AppSettings.CircleMode.VisualOpacity = 100 - SldOpacityCircle.Value;
@@ -1411,6 +1514,12 @@ namespace SoundVisualizer
                 SldOpacityFixedSizeOutline.IsEnabled = outlineOpacity;
                 SldOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+                SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
+                SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+                TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 
@@ -1419,8 +1528,15 @@ namespace SoundVisualizer
                 TxtIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+                
+                SldOpacityOutline.IsEnabled = !outlineOpacity;
+                SldOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+                TxtOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+                TxtOpacityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
+                TxtOpacityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
             }
             else if (sender == SldOpacityFixedSizeOutline) AppSettings.OutlineMode.OpacityFixedSize = SldOpacityFixedSizeOutline.Value;
+            else if (sender == SldOpacityFixedMaxOpacityOutline) AppSettings.OutlineMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityOutline.Value;
             else if (sender == SldSpeedOutline) AppSettings.OutlineMode.PositionSpeed = SldSpeedOutline.Value;
             else if (sender == SldSensitivityOutline) AppSettings.OutlineMode.Sensitivity = SldSensitivityOutline.Value / 4.0;
             else if (sender == SldOpacityOutline) AppSettings.OutlineMode.VisualOpacity = 100 - SldOpacityOutline.Value;
