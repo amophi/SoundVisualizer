@@ -424,14 +424,19 @@ namespace SoundVisualizer.AIModel
                 float gunshotEvidence = SumGunshotProbabilityFromTop5(_topKIndices, _topKProbs, 5);
                 bool hasGunshotCue = HasGunshotCueInTop5(_topKIndices, 5);
 
+                // 게임 믹스: top-k에 Gunshot이 없을 때가 많아 booster 단독·완화 임계 사용
                 bool adoptGunshotDanger = false;
                 if (hasGunshotCue)
                 {
-                    adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
+                    adoptGunshotDanger = gunshotScore >= 0.15f && gunshotEvidence >= 0.04f;
+                }
+                else if (gunshotScore >= 0.38f)
+                {
+                    adoptGunshotDanger = true;
                 }
                 else
                 {
-                    adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                    adoptGunshotDanger = gunshotScore >= 0.28f && gunshotEvidence >= 0.04f;
                 }
 
                 if (adoptGunshotDanger)
