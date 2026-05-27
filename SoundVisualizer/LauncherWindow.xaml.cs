@@ -249,6 +249,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "말소리 표시";
                     ChkShowDanger.Content = "강조음 표시";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "더 알아보기";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 저장소 및 프로젝트 기여";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub 저장소 방문하기";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "English")
@@ -367,6 +372,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Show Speech Sounds";
                     ChkShowDanger.Content = "Show Danger Sounds";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Learn More";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub Repository & Contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer is an open-source project, and its source code is publicly available on GitHub. You can participate in the project by reporting bugs, suggesting features, and contributing to development. Click the button below to visit the official GitHub repository!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visit GitHub Repository";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "日本語")
@@ -474,6 +484,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "音声の表示";
                     ChkShowDanger.Content = "強調音の表示";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "詳細情報";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHubリポジトリとプロジェクト貢献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer는 오픈ソースプロジェクトであり、ソースコードはGitHubで公開されています。バグ報告、機能提案、開発への貢献を通じて、プロジェクトに参加できます。下のボタンをクリックして、公式GitHubリポジトリにアクセスしてください！";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHubリポジトリにアクセス";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "中文")
@@ -580,6 +595,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "显示语音";
                     ChkShowDanger.Content = "显示强调音";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "了解更多";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 仓库与项目贡献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer 是一个开源项目，其源代码已在 GitHub 上公开。您可以通过报告错误、提出功能建议和参与开发来共同建设该项目。点击下方按钮访问官方 GitHub 仓库！";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "访问 GitHub 仓库";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Español")
@@ -686,6 +706,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Mostrar voz";
                     ChkShowDanger.Content = "Mostrar sonido de peligro";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Saber más";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Repositorio de GitHub y contribución";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer es un proyecto de código abierto y su código fuente está disponible públicamente en GitHub. Puedes participar en el proyecto informando errores, sugiriendo características y contribuyendo al desarrollo. ¡Haz clic en el botón de abajo para visitar el repositorio oficial de GitHub!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visitar el repositorio de GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Français")
@@ -792,6 +817,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Afficher la voix";
                     ChkShowDanger.Content = "Afficher les sons de danger";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "En savoir plus";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Dépôt GitHub et contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer est un projet open-source, et son code source est disponible publiquement sur GitHub. Vous pouvez participer au projet en signalant des bogues, en suggérant des fonctionnalités et en contribuant au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel !";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visiter le dépôt GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Deutsch")
@@ -898,6 +928,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Sprache anzeigen";
                     ChkShowDanger.Content = "Gefahrentöne anzeigen";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Mehr erfahren";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub-Repository & Projektbeitrag";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer ist ein Open-Source-Projekt und sein Quellcode ist öffentlich auf GitHub verfügbar. Sie können sich am Projekt beteiligen, indem Sie Fehler melden, Funktionen vorschlagen und zur Entwicklung beitragen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub-Repository besuchen";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Русский")
@@ -1004,6 +1039,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Показывать речь";
                     ChkShowDanger.Content = "Показывать звуки опасности";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Подробнее";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Репозиторий GitHub и вклад в проект";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer — это проект с открытым исходным кодом, исходный код которого общедоступен на GitHub. Вы можете принять участие в проекте, сообщая об ошибках, предлагая новые функции и внося свой вклад в разработку. Нажмите кнопку ниже, чтобы посетить официальный репозиторий GitHub!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Посетить репозиторий GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
         }
@@ -1784,6 +1824,22 @@ namespace SoundVisualizer
                     UseShellExecute = true
                 });
                 e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"링크를 열 수 없습니다: {ex.Message}");
+            }
+        }
+
+        private void BtnMoreInfoGithub_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/amophi/SoundVisualizer",
+                    UseShellExecute = true
+                });
             }
             catch (Exception ex)
             {

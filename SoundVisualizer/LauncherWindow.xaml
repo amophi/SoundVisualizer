@@ -101,12 +101,11 @@
             <Setter Property="Foreground" Value="{StaticResource SecondaryTextColor}"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Grid Background="Transparent" Margin="0,0,24,0">
+                        <Grid Background="Transparent" Margin="0,0,24,0" Cursor="Hand">
                             <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="0,0,0,12"/>
                             <Border x:Name="Indicator" Height="3" Background="Transparent" VerticalAlignment="Bottom" CornerRadius="1.5"/>
                         </Grid>
@@ -1142,6 +1141,22 @@
                                     <TextBlock x:Name="TxtHelp5Title" Text="개발자 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
                                     <TextBlock x:Name="TxtHelp5Desc" Text="개발자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- 더 알아보기 탭 -->
+                <TabItem x:Name="TabMoreInfo" Header="더 알아보기">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
+                        <StackPanel>
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel Margin="0,8">
+                                    <TextBlock x:Name="TxtMoreInfoTitle" Text="GitHub 저장소 및 프로젝트 기여" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="TxtMoreInfoDesc" Text="SoundVisualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요!" 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,24"/>
+                                    <Button x:Name="BtnMoreInfoGithub" Content="GitHub 저장소 방문하기" Style="{StaticResource TossButton}" HorizontalAlignment="Left" Padding="28,14" Click="BtnMoreInfoGithub_Click"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
