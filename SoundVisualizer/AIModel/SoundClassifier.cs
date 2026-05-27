@@ -438,18 +438,18 @@ namespace SoundVisualizer.AIModel
                 {
                     if (hasGunshotCue)
                     {
-                        adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
+                        adoptGunshotDanger = gunshotScore >= 0.28f && gunshotEvidence >= 0.08f;
                     }
                     else if (IsGameMixMaskDisplay(display) || hasStrongDangerCue)
                     {
                         // 게임 BGM(음악·Sound effect) 위 총소리: booster·총 클래스 확률 둘 다 참고
                         adoptGunshotDanger =
-                            gunshotScore >= 0.50f ||
-                            (gunshotScore >= 0.40f && gunshotEvidence >= 0.04f);
+                            gunshotScore >= 0.55f ||
+                            (gunshotScore >= 0.45f && gunshotEvidence >= 0.06f);
                     }
                     else
                     {
-                        adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                        adoptGunshotDanger = gunshotScore >= 0.48f && gunshotEvidence >= 0.12f;
                     }
                 }
 
@@ -474,7 +474,7 @@ namespace SoundVisualizer.AIModel
             float effectiveThreshold = confidenceThreshold;
             if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue || adoptedDangerFromBooster))
             {
-                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.18f : 0.20f);
+                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.22f : 0.20f);
             }
             else if (coarse == "speech")
             {
