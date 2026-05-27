@@ -1102,7 +1102,14 @@
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp1Title" Text="사운드 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
                                     <TextBlock x:Name="TxtHelp1Desc" Text="정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요." 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="TxtHelp1Tip" FontSize="14" Foreground="#FF9E3A" LineHeight="22" TextWrapping="Wrap">
+                                        <Run x:Name="TxtHelp1TipPrefix" Text="💡 만약 7.1 출력 장치가 없다면 "/>
+                                        <Hyperlink NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF9E3A">
+                                            <Run x:Name="TxtHelp1TipLink" Text="VB-CABLE 가상 드라이버"/>
+                                        </Hyperlink>
+                                        <Run x:Name="TxtHelp1TipSuffix" Text="를 설치하고 출력장치를 7.1채널로 설정한다면 7.1 서라운드 사운드를 사용하여 오버레이를 표현할 수 있습니다."/>
+                                    </TextBlock>
                                 </StackPanel>
                             </Border>
 
