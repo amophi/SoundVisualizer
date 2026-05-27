@@ -411,7 +411,7 @@ namespace SoundVisualizer.AIModel
             float conf = _topKProbs[0];
             string display = _classNames[maxIndex];
 
-            PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
+            PreferDangerWhenTopIsMaskedByGameMix(probs, ref maxIndex, ref conf, ref display);
 
             string coarse = VoteCoarseFromTop5(_topKIndices, _topKProbs, 3);
             float coarseConf = conf;
@@ -419,6 +419,7 @@ namespace SoundVisualizer.AIModel
             bool hasStrongDangerCue = HasStrongDangerCueInTop5(_topKIndices, 5);
             bool hasCriticalDangerCue = HasCriticalDangerCueInTop5(_topKIndices, 5);
             string yamnetCoarse = coarse;
+            bool adoptedDangerFromBooster = false;
 
             if (TryPredictGunshotBoosterScore(probs, out float gunshotScore))
             {
@@ -439,10 +440,12 @@ namespace SoundVisualizer.AIModel
                     {
                         adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
                     }
-                    else if (YamnetThreeClassMapper.IsGenericSoundEffectLabel(display) || hasStrongDangerCue)
+                    else if (IsGameMixMaskDisplay(display) || hasStrongDangerCue)
                     {
-                        // 게임: Sound effect / 폭발·사이렌 단서 + booster (top-k에 Gunshot 없을 때)
-                        adoptGunshotDanger = gunshotScore >= 0.34f && gunshotEvidence >= 0.04f;
+                        // 게임 BGM(음악·Sound effect) 위 총소리: booster·총 클래스 확률 둘 다 참고
+                        adoptGunshotDanger =
+                            gunshotScore >= 0.50f ||
+                            (gunshotScore >= 0.40f && gunshotEvidence >= 0.04f);
                     }
                     else
                     {
@@ -452,8 +455,15 @@ namespace SoundVisualizer.AIModel
 
                 if (adoptGunshotDanger)
                 {
+                    adoptedDangerFromBooster = true;
                     coarse = "danger";
                     coarseConf = MathF.Max(coarseConf, MathF.Max(gunshotScore, gunshotEvidence));
+                    if (TryPickBestGunshotDisplay(probs, _classNames, out int gunIdx, out float gunProb))
+                    {
+                        maxIndex = gunIdx;
+                        display = _classNames[gunIdx];
+                        coarseConf = MathF.Max(coarseConf, gunProb);
+                    }
                 }
             }
 
@@ -462,9 +472,9 @@ namespace SoundVisualizer.AIModel
             // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
             // speech/ambient는 기본 임계를 그대로 유지합니다.
             float effectiveThreshold = confidenceThreshold;
-            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue))
+            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue || adoptedDangerFromBooster))
             {
-                effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
+                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.18f : 0.20f);
             }
             else if (coarse == "speech")
             {
@@ -763,6 +773,33 @@ namespace SoundVisualizer.AIModel
             return s.Contains("silence") || s.Contains("quiet") || s.Contains("background noise");
         }
 
+        /// <summary>게임 BGM·효과음 레이어로 총소리가 가려지는 top-1 패턴 (말소리 제외).</summary>
+        private static bool IsGameMixMaskDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            if (IsSpeechLikeDisplay(display) || IsSilenceLikeDisplay(display)) return false;
+            if (YamnetThreeClassMapper.IsGenericSoundEffectLabel(display)) return true;
+            var s = display.ToLowerInvariant();
+            return s.Contains("music") || s.Contains("video game");
+        }
+
+        private static bool TryPickBestGunshotDisplay(float[] probs, string[] classNames, out int index, out float prob)
+        {
+            index = -1;
+            prob = 0f;
+            int n = Math.Min(probs.Length, classNames.Length);
+            for (int i = 0; i < n; i++)
+            {
+                if (!IsGunshotKeyword(classNames[i])) continue;
+                if (probs[i] > prob)
+                {
+                    prob = probs[i];
+                    index = i;
+                }
+            }
+            return index >= 0;
+        }
+
         private static bool IsStrongDangerKeyword(string name)
         {
             if (string.IsNullOrEmpty(name)) return false;
@@ -805,13 +842,13 @@ namespace SoundVisualizer.AIModel
         }
 
         /// <summary>
-        /// top-1이 “Sound effect”일 때, 총·폭발 등 danger 세부 클래스가 상위 softmax에 있으면 그쪽을 채택합니다.
+        /// top-1이 음악·Sound effect 등 게임 믹스에 가려질 때, 521클래스 중 danger(총·폭발) 후보를 찾습니다.
         /// </summary>
-        private void PreferDangerWhenTopIsGenericSoundEffect(float[] probs, ref int maxIndex, ref float conf, ref string display)
+        private void PreferDangerWhenTopIsMaskedByGameMix(float[] probs, ref int maxIndex, ref float conf, ref string display)
         {
             if (maxIndex < 0 || maxIndex >= _classNames.Length || probs.Length != _classNames.Length)
                 return;
-            if (!YamnetThreeClassMapper.IsGenericSoundEffectLabel(display))
+            if (!IsGameMixMaskDisplay(display))
                 return;
 
             int bestDangerIdx = -1;
