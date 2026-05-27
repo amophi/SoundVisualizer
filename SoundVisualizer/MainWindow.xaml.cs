@@ -259,7 +259,7 @@ namespace SoundVisualizer
                         ? $"🎨 시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
                         : AppSettings.VisualMode == 2
                             ? $"🎨 시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
-                            : $"🎨 시각화 모드: [{visualKeyName}] 외각선 모드 (Outline)";
+                            : $"🎨 시각화 모드: [{visualKeyName}] 외곽선 모드 (Outline)";
                 if (_cachedVisualModeText != targetVisualModeText)
                 {
                     _cachedVisualModeText = targetVisualModeText;
@@ -856,7 +856,7 @@ namespace SoundVisualizer
                         
                         if (EditPanelOpacityFixedSizeLabel != null)
                         {
-                            string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외각선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                            string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
                             EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
                         }
                         
@@ -931,7 +931,7 @@ namespace SoundVisualizer
 
             if (EditPanelOpacityFixedSizeLabel != null)
             {
-                string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외각선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
                 EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
             }
 
@@ -1231,7 +1231,7 @@ namespace SoundVisualizer
                 RectGuideline.Width = rectWidth;
                 RectGuideline.Height = rectHeight;
 
-                string modeName = visualMode == 1 ? "패드" : visualMode == 3 ? "외각선" : "파도";
+                string modeName = visualMode == 1 ? "패드" : visualMode == 3 ? "외곽선" : "파도";
                 double displayIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
                 if (RectModeLabel != null) RectModeLabel.Text = $"{modeName} 한계선";
                 if (RectSizeLabel != null) RectSizeLabel.Text = $"{modeName} 크기: {displayIntensity:F0}%";

@@ -275,7 +275,7 @@
         <Grid x:Name="EditOverlayGrid" Visibility="Collapsed" Background="#F22A2C31">
             <!-- 가이드라인 인터랙션 영역 -->
             <Canvas x:Name="GuidelineCanvas" Background="Transparent" MouseDown="GuidelineCanvas_MouseDown" MouseMove="GuidelineCanvas_MouseMove" MouseUp="GuidelineCanvas_MouseUp">
-                <!-- 사각형 가이드라인 (파도 / 패드 / 외각선 모드) -->
+                <!-- 사각형 가이드라인 (파도 / 패드 / 외곽선 모드) -->
                 <Border x:Name="RectGuideline" BorderBrush="{StaticResource DangerColor}" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
                     <Border.Effect>
                         <DropShadowEffect Color="#E53935" BlurRadius="15" ShadowDepth="0"/>
@@ -367,7 +367,7 @@
                                     <ComboBoxItem Content="파도"/>
                                     <ComboBoxItem Content="패드"/>
                                     <ComboBoxItem Content="원형"/>
-                                    <ComboBoxItem Content="외각선"/>
+                                    <ComboBoxItem Content="외곽선"/>
                                 </ComboBox>
                                 
                                 <TextBlock Text="사운드 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>

@@ -464,7 +464,7 @@
                                                 <ComboBoxItem x:Name="CmbVisualModeWave" Content="파도"/>
                                                 <ComboBoxItem x:Name="CmbVisualModePad" Content="패드"/>
                                                 <ComboBoxItem x:Name="CmbVisualModeCircle" Content="원형"/>
-                                                <ComboBoxItem x:Name="CmbVisualModeOutline" Content="외각선"/>
+                                                <ComboBoxItem x:Name="CmbVisualModeOutline" Content="외곽선"/>
                                             </ComboBox>
                                         </Grid>
                                     </StackPanel>
@@ -850,10 +850,10 @@
                                 </StackPanel>
                             </Expander>
 
-                            <!-- 〰 외각선 모드 설정 -->
+                            <!-- 〰 외곽선 모드 설정 -->
                             <Expander x:Name="ExpanderOutline" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderOutlineTitle" Text="외각선 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                    <TextBlock x:Name="TxtExpanderOutlineTitle" Text="외곽선 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
                                 </Expander.Header>
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
@@ -867,7 +867,7 @@
                                             <Slider Grid.Column="1" x:Name="SldIntensityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtIntensityOutline" Text="{Binding Value, ElementName=SldIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescOutline" Text="외각선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtIntensityDescOutline" Text="외곽선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                         <StackPanel Margin="0,24,0,0">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
                                                 <TextBlock x:Name="TxtIntensityAsOpacityLabelOutline" Text="세기 투명도 표현" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
@@ -879,7 +879,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="50"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelOutline" Text="외각선 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelOutline" Text="외곽선 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeOutline" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeOutline" Text="{Binding Value, ElementName=SldOpacityFixedSizeOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
@@ -909,7 +909,7 @@
                                             <Slider Grid.Column="1" x:Name="SldSpeedOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtSpeedOutline" Text="{Binding Value, ElementName=SldSpeedOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtSpeedDescOutline" Text="외각선 파도가 흘러가며 일렁이는 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtSpeedDescOutline" Text="외곽선 파도가 흘러가며 일렁이는 속도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -923,7 +923,7 @@
                                             <Slider Grid.Column="1" x:Name="SldSensitivityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtSensitivityOutline" Text="{Binding Value, ElementName=SldSensitivityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDescOutline" Text="작은 데시벨 소리에도 외각선 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtSensitivityDescOutline" Text="작은 데시벨 소리에도 외곽선 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -937,7 +937,7 @@
                                             <Slider Grid.Column="1" x:Name="SldOpacityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtOpacityOutline" Text="{Binding Value, ElementName=SldOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescOutline" Text="외각선 파도의 투명도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtOpacityDescOutline" Text="외곽선 파도의 투명도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel>
@@ -954,7 +954,7 @@
                                             <Slider Grid.Column="1" x:Name="SldGlowIntensityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityOutline" Text="{Binding Value, ElementName=SldGlowIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescOutline" Text="외각선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtGlowModeDescOutline" Text="외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Expander>
