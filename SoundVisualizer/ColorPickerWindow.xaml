@@ -103,7 +103,7 @@
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,20">
                 <TextBlock Text="색상 선택" Foreground="{StaticResource PrimaryTextColor}" FontSize="20" FontWeight="Bold"/>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{StaticResource SecondaryTextColor}" FontSize="18" Cursor="Hand" Click="BtnCancel_Click" Content="✕" Width="30" Height="30">
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="{StaticResource SecondaryTextColor}" FontSize="18" Cursor="Hand" Click="BtnCancel_Click" Content="" Width="30" Height="30">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" CornerRadius="15">

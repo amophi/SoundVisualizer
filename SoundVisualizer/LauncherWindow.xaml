@@ -509,7 +509,7 @@
 
                             <!-- 모드 상세 설정 아코디언들을 묶는 전용 컨테이너 (동적 정렬 대상) -->
                             <StackPanel x:Name="PanelModeExpanders">
-                                <!-- 🌊 파도 모드 설정 -->
+                                <!-- 파도 모드 설정 -->
                             <Expander x:Name="ExpanderWave" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
                                     <TextBlock x:Name="TxtExpanderWaveTitle" Text="파도 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
@@ -618,7 +618,7 @@
                                 </StackPanel>
                             </Expander>
 
-                            <!-- 🟦 패드 모드 설정 -->
+                            <!-- 패드 모드 설정 -->
                             <Expander x:Name="ExpanderPad" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
                                     <TextBlock x:Name="TxtExpanderPadTitle" Text="패드 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
@@ -727,7 +727,7 @@
                                 </StackPanel>
                             </Expander>
 
-                            <!-- 🟢 원형 모드 설정 -->
+                            <!-- 원형 모드 설정 -->
                             <Expander x:Name="ExpanderCircle" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
                                     <TextBlock x:Name="TxtExpanderCircleTitle" Text="원형 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
@@ -850,7 +850,7 @@
                                 </StackPanel>
                             </Expander>
 
-                            <!-- 〰 외곽선 모드 설정 -->
+                            <!-- 외곽선 모드 설정 -->
                             <Expander x:Name="ExpanderOutline" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
                                     <TextBlock x:Name="TxtExpanderOutlineTitle" Text="외곽선 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
@@ -1117,7 +1117,7 @@
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp3Title" Text="오버레이 종료 방법" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp3Desc" Text="실행된 그래픽은 마우스 클릭을 방해하지 않도록 뒤로 투과됩니다. 종료하시려면 윈도우 작업 표시줄의 아이콘을 우클릭하여 '창 닫기'를 누르시거나, 이 런처 창 상단의 ✕ 버튼을 클릭하시면 함께 종료됩니다." 
+                                    <TextBlock x:Name="TxtHelp3Desc" Text="실행된 그래픽은 마우스 클릭을 방해하지 않도록 뒤로 투과됩니다. 종료하시려면 윈도우 작업 표시줄의 아이콘을 우클릭하여 '창 닫기'를 누르시거나, 이 런처 창 상단의 버튼을 클릭하시면 함께 종료됩니다." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>

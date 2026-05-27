@@ -124,11 +124,11 @@ namespace SoundVisualizer.AIModel
                 {
                     Console.WriteLine($"[YAMNet] Input: {kv.Key} | {kv.Value}");
                 }
-                Console.WriteLine("🧠 AI 모델(YAMNet) 로딩 완료 (스레딩 최적화 적용)!");
+                Console.WriteLine("AI 모델(YAMNet) 로딩 완료 (스레딩 최적화 적용)!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 AI 모델 로드 실패: {ex.Message}");
+                Console.WriteLine($"AI 모델 로드 실패: {ex.Message}");
             }
         }
 
@@ -391,7 +391,7 @@ namespace SoundVisualizer.AIModel
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 [YAMNet] Inference failed: {ex}");
+                Console.WriteLine($"[YAMNet] Inference failed: {ex}");
                 return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
             finally
@@ -1128,7 +1128,7 @@ namespace SoundVisualizer.AIModel
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet_class_map.csv");
             if (!File.Exists(path))
             {
-                Console.WriteLine($"⚠️ yamnet_class_map.csv 없음: {path}");
+                Console.WriteLine($"yamnet_class_map.csv 없음: {path}");
                 return;
             }
 

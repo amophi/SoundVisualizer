@@ -156,12 +156,12 @@ namespace SoundVisualizer
                 int channels = _captureEngine.CaptureFormat.Channels;
                 if (channels != 8)
                 {
-                    StatusText.Text = $"⚠ PC 오디오 설정: {channels}ch (스테레오)\n소스: 대기 중...";
+                    StatusText.Text = $"PC 오디오 설정: {channels}ch (스테레오)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.Orange;
                 }
                 else
                 {
-                    StatusText.Text = "✅ PC 오디오 설정: 8ch (7.1)\n소스: 대기 중...";
+                    StatusText.Text = "PC 오디오 설정: 8ch (7.1)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.LimeGreen;
                 }
                 _audioRouter.StartRouting(_captureEngine.CaptureFormat);
@@ -254,12 +254,12 @@ namespace SoundVisualizer
 
                 string visualKeyName = GetKeysName(AppSettings.VisualModeKeyBind);
                 string targetVisualModeText = AppSettings.VisualMode == 0 
-                    ? $"🎨 시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
+                    ? $"시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
                     : AppSettings.VisualMode == 1
-                        ? $"🎨 시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
+                        ? $"시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
                         : AppSettings.VisualMode == 2
-                            ? $"🎨 시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
-                            : $"🎨 시각화 모드: [{visualKeyName}] 외곽선 모드 (Outline)";
+                            ? $"시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
+                            : $"시각화 모드: [{visualKeyName}] 외곽선 모드 (Outline)";
                 if (_cachedVisualModeText != targetVisualModeText)
                 {
                     _cachedVisualModeText = targetVisualModeText;
@@ -268,8 +268,8 @@ namespace SoundVisualizer
 
                 string stereoKeyName = GetKeysName(AppSettings.StereoUpmixKeyBind);
                 string targetStereoModeText = AppSettings.SoundMode == 0 
-                    ? $"🎧 사운드 모드: [{stereoKeyName}] 2 채널" 
-                    : (AppSettings.SoundMode == 1 ? $"🔊 사운드 모드: [{stereoKeyName}] 5.1 채널" : $"🔊 사운드 모드: [{stereoKeyName}] 7.1 채널");
+                    ? $"사운드 모드: [{stereoKeyName}] 2 채널" 
+                    : (AppSettings.SoundMode == 1 ? $"사운드 모드: [{stereoKeyName}] 5.1 채널" : $"사운드 모드: [{stereoKeyName}] 7.1 채널");
                 Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
 
                 if (_cachedStereoModeText != targetStereoModeText)
@@ -284,7 +284,7 @@ namespace SoundVisualizer
                 }
 
                 string editKeyName = GetKeysName(AppSettings.EditModeKeyBind);
-                string targetEditModeText = $"⚙️ 실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
+                string targetEditModeText = $"실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
                 if (EditModeText != null && EditModeText.Text != targetEditModeText)
                 {
                     EditModeText.Text = targetEditModeText;

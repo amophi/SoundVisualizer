@@ -452,7 +452,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
-                TxtHelp3Desc.Text = "終了するには、ホームタブの「停止」ボタンを押すか、このランチャーウィンドウ上部の ✕ ボタンをクリックしてください。";
+                TxtHelp3Desc.Text = "終了するには、ホームタブの「停止」ボタンを押すか、このランチャーウィンドウ上部の ボタンをクリックしてください。";
                 TxtHelp4Title.Text = "AI音声分析と色";
                 TxtHelp4Desc.Text = "AIがリアルタイムで音の種類を分析し、ラベルと色で表示します。設定で各音の種類（環境音、音声、強調音）ごとに固有の色を指定して、直感的に識別できます。";
                 TxtHelp5Title.Text = "開発者モード";
@@ -555,7 +555,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
-                TxtHelp3Desc.Text = "要关闭，请点击“主页”选项卡中的“停止”，或点击此启动器窗口顶部的 ✕ 按钮即可一并关闭。";
+                TxtHelp3Desc.Text = "要关闭，请点击“主页”选项卡中的“停止”，或点击此启动器窗口顶部的 按钮即可一并关闭。";
                 TxtHelp4Title.Text = "AI 声音分析与颜色";
                 TxtHelp4Desc.Text = "AI 实时分析声音类型，并以标签和颜色显示。您可以在设置中为每种声音类型（环境音、语音、强调音）指定独特的颜色，以便直观区分。";
                 TxtHelp5Title.Text = "开发者模式";
@@ -658,7 +658,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
-                TxtHelp3Desc.Text = "Para cerrar, haga clic en 'Detener' en la pestaña Inicio, o haga clic en el botón ✕ en la parte superior de esta ventana.";
+                TxtHelp3Desc.Text = "Para cerrar, haga clic en 'Detener' en la pestaña Inicio, o haga clic en el botón en la parte superior de esta ventana.";
                 TxtHelp4Title.Text = "Análisis de Sonido AI y Colores";
                 TxtHelp4Desc.Text = "La IA analiza el tipo de sonido en tiempo real y lo muestra con etiquetas y colores. Puede asignar colores únicos a cada tipo de sonido (Ambiental, Voz, Peligro) en los ajustes para una identificación intuitiva.";
                 TxtHelp5Title.Text = "Modo Desarrollador";
@@ -761,7 +761,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
-                TxtHelp3Desc.Text = "Pour fermer, cliquez sur 'Arrêter' dans l'onglet Accueil, ou cliquez sur le bouton ✕ en haut de cette fenêtre.";
+                TxtHelp3Desc.Text = "Pour fermer, cliquez sur 'Arrêter' dans l'onglet Accueil, ou cliquez sur le bouton en haut de cette fenêtre.";
                 TxtHelp4Title.Text = "Analyse Sonore IA & Couleurs";
                 TxtHelp4Desc.Text = "L'IA analyse le type de son en temps réel et l'affiche avec des étiquettes et des couleurs. Vous pouvez attribuer des couleurs uniques à chaque type de son (Ambiance, Voix, Danger) dans les paramètres pour une identification intuitive.";
                 TxtHelp5Title.Text = "Mode Développeur";
@@ -864,7 +864,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
-                TxtHelp3Desc.Text = "Zum Schließen klicken Sie auf der Registerkarte 'Startseite' auf 'Stoppen' oder klicken Sie auf die Schaltfläche ✕ oben in diesem Fenster.";
+                TxtHelp3Desc.Text = "Zum Schließen klicken Sie auf der Registerkarte 'Startseite' auf 'Stoppen' oder klicken Sie auf die Schaltfläche oben in diesem Fenster.";
                 TxtHelp4Title.Text = "KI-Soundanalyse & Farben";
                 TxtHelp4Desc.Text = "Die KI analysiert die Art des Geräusches in Echtzeit und zeigt sie mit Beschriftungen und Farben an. Sie können jedem Geräuschtyp (Umgebung, Sprache, Gefahr) in den Einstellungen eindeutige Farben zur intuitiven Identifizierung zuweisen.";
                 TxtHelp5Title.Text = "Entwicklermodus";
@@ -967,7 +967,7 @@ namespace SoundVisualizer
                 TxtHelp2Title.Text = "Горячие клавиши в реальном времени";
                 TxtHelp2Desc.Text = "Даже когда оверлей находится на экране, вы можете нажимать назначенные горячие клавиши (по умолчанию F2, F3) в фоновом режиме, чтобы мгновенно переключать формы и режимы.";
                 TxtHelp3Title.Text = "Как закрыть оверлей";
-                TxtHelp3Desc.Text = "Чтобы закрыть, нажмите «Остановить» на вкладке Главная или нажмите кнопку ✕ в верхней части этого окна запуска.";
+                TxtHelp3Desc.Text = "Чтобы закрыть, нажмите «Остановить» на вкладке Главная или нажмите кнопку в верхней части этого окна запуска.";
                 TxtHelp4Title.Text = "Анализ звука ИИ и цвета";
                 TxtHelp4Desc.Text = "ИИ в реальном времени анализирует тип звука и отображает его с помощью меток и цветов. Вы можете назначить уникальные цвета каждому типу звука (Фон, Речь, Опасность) в настройках для интуитивной идентификации.";
                 TxtHelp5Title.Text = "Режим разработчика";

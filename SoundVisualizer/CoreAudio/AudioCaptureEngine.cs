@@ -69,7 +69,7 @@ namespace SoundVisualizer.CoreAudio
 
                 if (devices.Count == 0)
                 {
-                    string msg = "🚨 출력 장치를 찾을 수 없습니다.";
+                    string msg = "출력 장치를 찾을 수 없습니다.";
                     Console.WriteLine(msg);
                     OnCaptureError?.Invoke(this, msg);
                     return;
@@ -82,7 +82,7 @@ namespace SoundVisualizer.CoreAudio
                 int currentChannels = targetDevice.AudioClient.MixFormat.Channels;
                 OnChannelsChanged?.Invoke(this, currentChannels);
 
-                Console.WriteLine($"🎯 캡처 대상: {targetDevice.FriendlyName}");
+                Console.WriteLine($"캡처 대상: {targetDevice.FriendlyName}");
 
                 _captureDevice = new WasapiLoopbackCapture(targetDevice);
                 var format = _captureDevice.WaveFormat;
@@ -94,7 +94,7 @@ namespace SoundVisualizer.CoreAudio
 
                     if (!_firstDataLogged)
                     {
-                        Console.WriteLine($"✅ 오디오 데이터 수신 확인 — bytes: {args.BytesRecorded}, 채널: {channels}");
+                        Console.WriteLine($"오디오 데이터 수신 확인 — bytes: {args.BytesRecorded}, 채널: {channels}");
                         _firstDataLogged = true;
                     }
 
@@ -110,7 +110,7 @@ namespace SoundVisualizer.CoreAudio
 
                     if (_latencySampleCount % _logInterval == 0)
                     {
-                        Console.WriteLine($"⏱ Latency: {LastLatencyMs:F3}ms (평균: {AverageLatencyMs:F3}ms, 샘플: {_latencySampleCount})");
+                        Console.WriteLine($"Latency: {LastLatencyMs:F3}ms (평균: {AverageLatencyMs:F3}ms, 샘플: {_latencySampleCount})");
                     }
                 };
 
@@ -120,25 +120,25 @@ namespace SoundVisualizer.CoreAudio
 
                     if (args.Exception != null)
                     {
-                        string msg = $"🚨 캡처 비정상 종료: {args.Exception.Message}";
+                        string msg = $"캡처 비정상 종료: {args.Exception.Message}";
                         Console.WriteLine(msg);
                         OnCaptureError?.Invoke(this, msg);
                     }
                     else
                     {
-                        Console.WriteLine("🛑 오디오 캡처 정상 종료.");
+                        Console.WriteLine("오디오 캡처 정상 종료.");
                     }
                 };
 
                 _captureDevice.StartRecording();
                 _isCapturing = true;
-                Console.WriteLine($"🔥 오디오 후킹 시작: {targetDevice.FriendlyName}");
-                Console.WriteLine($"📊 감지된 채널 수: {_captureDevice.WaveFormat.Channels}채널");
+                Console.WriteLine($"오디오 후킹 시작: {targetDevice.FriendlyName}");
+                Console.WriteLine($"감지된 채널 수: {_captureDevice.WaveFormat.Channels}채널");
             }
             catch (Exception ex)
             {
                 _isCapturing = false;
-                string msg = $"🚨 캡처 엔진 시작 실패: {ex.Message}";
+                string msg = $"캡처 엔진 시작 실패: {ex.Message}";
                 Console.WriteLine(msg);
                 OnCaptureError?.Invoke(this, msg);
             }
@@ -175,12 +175,12 @@ namespace SoundVisualizer.CoreAudio
                     _captureDevice.StopRecording();
                     _captureDevice.Dispose();
                     _captureDevice = null;
-                    Console.WriteLine("🛑 오디오 후킹 중지됨.");
+                    Console.WriteLine("오디오 후킹 중지됨.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"⚠ 캡처 중지 중 오류: {ex.Message}");
+                Console.WriteLine($"캡처 중지 중 오류: {ex.Message}");
             }
             finally
             {
@@ -204,7 +204,7 @@ namespace SoundVisualizer.CoreAudio
                     await Task.Delay(500, token); // 장치 초기화 안정화 대기
                     if (token.IsCancellationRequested || _isDisposed) return;
 
-                    Console.WriteLine("🔄 오디오 장치 상태 변경 감지 — 캡처 재시작...");
+                    Console.WriteLine("오디오 장치 상태 변경 감지 — 캡처 재시작...");
                     StopCaptureDevice();
                     if (_isDisposed) return;
                     _firstDataLogged = false;
@@ -213,7 +213,7 @@ namespace SoundVisualizer.CoreAudio
                 catch (OperationCanceledException) { }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"🚨 캡처 재시작 실패: {ex.Message}");
+                    Console.WriteLine($"캡처 재시작 실패: {ex.Message}");
                 }
             });
         }
