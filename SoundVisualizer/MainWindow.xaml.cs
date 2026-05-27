@@ -51,6 +51,9 @@ namespace SoundVisualizer
         private SolidColorBrush? _dangerBrush;
         private SolidColorBrush? _speechBrush;
         private SolidColorBrush? _ambientBrush;
+        private Color _dangerColor = Colors.Red;
+        private Color _speechColor = Colors.Green;
+        private Color _ambientColor = Colors.Blue;
 
         private Color _cachedActiveColor = Colors.Transparent;
         private int _cachedVisualModeForBrush = -1;
@@ -81,6 +84,7 @@ namespace SoundVisualizer
         // 렌더링 최적화를 위한 재사용 객체
         private VisualizerContext _renderContext = new VisualizerContext();
         private double[] _channelDepths = new double[8];
+        private readonly double[] _rmsBuffer = new double[8];
         private double[] _channelDists = new double[8];
         
         public Action? OnSettingsChangedFromHotkey;
@@ -471,6 +475,24 @@ namespace SoundVisualizer
                 }
             }
             
+            if (AppSettings.IsGlowMode && AppSettings.GlowIntensity > 0)
+            {
+                if (UnifiedWave.Effect != WaveGlowEffect)
+                {
+                    UnifiedWave.Effect = WaveGlowEffect;
+                }
+                WaveGlowEffect.Color = activeColor;
+                WaveGlowEffect.Opacity = Math.Min(1.0, AppSettings.GlowIntensity / 100.0 * 1.6);
+                WaveGlowEffect.BlurRadius = Math.Max(1.0, AppSettings.GlowIntensity * 0.5);
+            }
+            else
+            {
+                if (UnifiedWave.Effect != null)
+                {
+                    UnifiedWave.Effect = null;
+                }
+            }
+            
             if (AppSettings.IntensityAsOpacity)
             {
                 double maxOpacity = Math.Max(0.0, AppSettings.OpacityFixedMaxOpacity) / 100.0;
@@ -483,16 +505,7 @@ namespace SoundVisualizer
                 UnifiedWave.Opacity = baseOpacity;
             }
 
-            if (AppSettings.IsGlowMode)
-            {
-                WaveGlowEffect.Color = activeColor;
-                WaveGlowEffect.Opacity = Math.Min(1.0, AppSettings.GlowIntensity / 100.0 * 1.6); 
-                WaveGlowEffect.BlurRadius = Math.Max(1.0, AppSettings.GlowIntensity * 0.5); 
-            }
-            else
-            {
-                WaveGlowEffect.Opacity = 0;
-            }
+
 
             _targetFL *= 0.87f;
             _targetFR *= 0.87f;
@@ -595,7 +608,7 @@ namespace SoundVisualizer
         /// WASAPI는 소스가 2ch여도 장치 포맷(8ch)으로 패딩하므로,
         /// 무음(절댓값 합산이 임계값 미만)인 채널은 제외합니다.
         /// </summary>
-        private static int CountActiveChannels(byte[] buffer, int totalChannels)
+        private int CountActiveChannels(byte[] buffer, int totalChannels)
         {
             const float threshold = 1e-6f;
             const int bytesPerSample = 4; // float32
@@ -604,14 +617,25 @@ namespace SoundVisualizer
 
             // 채널별 RMS 계산 (전체 프레임의 일부만 샘플링)
             int step = Math.Max(1, frames / 200);
-            var rms = new double[totalChannels];
+            
+            double[] rms = _rmsBuffer;
+            if (totalChannels > rms.Length)
+            {
+                rms = new double[totalChannels];
+            }
+            else
+            {
+                Array.Clear(rms, 0, totalChannels);
+            }
+
+            ReadOnlySpan<float> samples = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(buffer.AsSpan(0, buffer.Length));
             int count = 0;
             for (int i = 0; i < frames; i += step)
             {
-                int baseOffset = i * totalChannels * bytesPerSample;
+                int baseOffset = i * totalChannels;
                 for (int ch = 0; ch < totalChannels; ch++)
                 {
-                    float s = BitConverter.ToSingle(buffer, baseOffset + ch * bytesPerSample);
+                    float s = samples[baseOffset + ch];
                     rms[ch] += s * s;
                 }
                 count++;
@@ -646,21 +670,24 @@ namespace SoundVisualizer
             if (_dangerBrush == null || _cachedColorDangerHex != dangerHex)
             {
                 _cachedColorDangerHex = dangerHex;
-                var brush = new SolidColorBrush(ParseColor(dangerHex));
+                _dangerColor = ParseColor(dangerHex);
+                var brush = new SolidColorBrush(_dangerColor);
                 brush.Freeze();
                 _dangerBrush = brush;
             }
             if (_speechBrush == null || _cachedColorSpeechHex != speechHex)
             {
                 _cachedColorSpeechHex = speechHex;
-                var brush = new SolidColorBrush(ParseColor(speechHex));
+                _speechColor = ParseColor(speechHex);
+                var brush = new SolidColorBrush(_speechColor);
                 brush.Freeze();
                 _speechBrush = brush;
             }
             if (_ambientBrush == null || _cachedColorAmbientHex != ambientHex)
             {
                 _cachedColorAmbientHex = ambientHex;
-                var brush = new SolidColorBrush(ParseColor(ambientHex));
+                _ambientColor = ParseColor(ambientHex);
+                var brush = new SolidColorBrush(_ambientColor);
                 brush.Freeze();
                 _ambientBrush = brush;
             }
@@ -688,9 +715,10 @@ namespace SoundVisualizer
 
         private Color GetColorForLabel(string label)
         {
-            if (label.Contains("danger")) return ParseColor(AppSettings.ColorDanger);
-            if (label.Contains("speech")) return ParseColor(AppSettings.ColorSpeech);
-            return ParseColor(AppSettings.ColorAmbient);
+            UpdateCachedBrushesIfNeeded();
+            if (label.Contains("danger")) return _dangerColor;
+            if (label.Contains("speech")) return _speechColor;
+            return _ambientColor;
         }
 
         private bool IsLabelVisible(string label)
@@ -912,6 +940,7 @@ namespace SoundVisualizer
             // 고급 설정 바인딩
             if (EditPanelTargetFpsSlider != null)
             {
+                EditPanelTargetFpsSlider.Maximum = AppSettings.GetMonitorRefreshRate();
                 EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
                 EditPanelTargetFpsValueText.Text = $"{AppSettings.TargetFps:F0} FPS";
             }

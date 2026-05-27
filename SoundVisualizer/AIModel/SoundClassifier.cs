@@ -89,12 +89,34 @@ namespace SoundVisualizer.AIModel
         // Precomputed preprocessing artifacts
         private readonly float[] _hannWindow;
         private readonly float[,] _melFilterBank; // [MelBins, FftSize/2+1]
+        private readonly int[] _melStartBins;
+        private readonly int[] _melEndBins;
         private readonly int[] _bitReversed;       // [FftSize]
 
         public SoundClassifier()
         {
             _hannWindow = CreateHannWindow(WindowLength);
             _melFilterBank = CreateMelFilterBank(MelBins, FftSize, SampleRate, MelFMin, MelFMax);
+            
+            _melStartBins = new int[MelBins];
+            _melEndBins = new int[MelBins];
+            int freqBins = (FftSize / 2) + 1;
+            for (int m = 0; m < MelBins; m++)
+            {
+                int start = 0;
+                while (start < freqBins && _melFilterBank[m, start] == 0f)
+                {
+                    start++;
+                }
+                int last = freqBins - 1;
+                while (last >= start && _melFilterBank[m, last] == 0f)
+                {
+                    last--;
+                }
+                _melStartBins[m] = start;
+                _melEndBins[m] = Math.Min(freqBins, last + 1);
+            }
+
             _bitReversed = CreateBitReversedIndices(FftSize);
 
             // 링 버퍼 및 사전 캐싱 버퍼들 할당
@@ -874,7 +896,7 @@ namespace SoundVisualizer.AIModel
         private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels, out int actualFrames)
         {
             int floatCount = bytesRecorded / 4;
-            if (channels <= 0 || floatCount < channels)
+            if (floatCount == 0 || channels <= 0)
             {
                 actualFrames = 0;
                 return Array.Empty<float>();
@@ -884,17 +906,17 @@ namespace SoundVisualizer.AIModel
             actualFrames = frames;
             float[] monoAudio = ArrayPool<float>.Shared.Rent(frames);
 
+            ReadOnlySpan<float> samples = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(rawAudioData.AsSpan(0, bytesRecorded));
+
             if (channels == 8)
             {
-                int bytesPerFrame = channels * 4;
                 const float eps = 1e-12f;
-
                 for (int f = 0; f < frames; f++)
                 {
-                    int o = f * bytesPerFrame;
-                    float fl = BitConverter.ToSingle(rawAudioData, o + 0);
-                    float fr = BitConverter.ToSingle(rawAudioData, o + 4);
-                    float fc = BitConverter.ToSingle(rawAudioData, o + 8);
+                    int o = f * channels;
+                    float fl = samples[o + 0];
+                    float fr = samples[o + 1];
+                    float fc = samples[o + 2];
                     float lr = 0.5f * (fl + fr);
                     float eFc = fc * fc;
                     float eLr = lr * lr;
@@ -910,7 +932,7 @@ namespace SoundVisualizer.AIModel
             {
                 float sum = 0f;
                 for (int c = 0; c < channels; c++)
-                    sum += BitConverter.ToSingle(rawAudioData, (i + c) * 4);
+                    sum += samples[i + c];
                 monoAudio[frameIndex++] = sum / channels;
             }
 
@@ -995,10 +1017,11 @@ namespace SoundVisualizer.AIModel
                 for (int mel = 0; mel < MelBins; mel++)
                 {
                     double melSum = 0.0;
-                    for (int k = 0; k < freqBins; k++)
+                    int startBin = _melStartBins[mel];
+                    int endBin = _melEndBins[mel];
+                    for (int k = startBin; k < endBin; k++)
                     {
-                        float w = _melFilterBank[mel, k];
-                        if (w != 0f) melSum += w * _fftPowerBuffer[k];
+                        melSum += _melFilterBank[mel, k] * _fftPowerBuffer[k];
                     }
 
                     float value = (float)Math.Log(melSum + LogEps);

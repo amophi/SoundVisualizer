@@ -1185,6 +1185,7 @@ namespace SoundVisualizer
             // 4. Common settings
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
+            SldTargetFps.Maximum = AppSettings.GetMonitorRefreshRate();
             SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
