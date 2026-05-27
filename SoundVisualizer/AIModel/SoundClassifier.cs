@@ -438,18 +438,30 @@ namespace SoundVisualizer.AIModel
                 {
                     if (hasGunshotCue)
                     {
-                        adoptGunshotDanger = gunshotScore >= 0.28f && gunshotEvidence >= 0.08f;
+                        // top-k에 총 단서가 있으면 실탄에 가깝게 민감 유지
+                        adoptGunshotDanger = gunshotScore >= 0.22f && gunshotEvidence >= 0.06f;
                     }
-                    else if (IsGameMixMaskDisplay(display) || hasStrongDangerCue)
+                    else if (IsGameMixMaskDisplay(display))
                     {
-                        // 게임 BGM(음악·Sound effect) 위 총소리: booster·총 클래스 확률 둘 다 참고
-                        adoptGunshotDanger =
-                            gunshotScore >= 0.55f ||
-                            (gunshotScore >= 0.45f && gunshotEvidence >= 0.06f);
+                        // BGM만(top-1 Music 등, 총 확률 거의 없음)일 때만 booster 단독 채택을 억제
+                        if (gunshotEvidence >= 0.04f)
+                        {
+                            adoptGunshotDanger =
+                                gunshotScore >= 0.48f ||
+                                (gunshotScore >= 0.38f && gunshotEvidence >= 0.05f);
+                        }
+                        else
+                        {
+                            adoptGunshotDanger = gunshotScore >= 0.56f;
+                        }
+                    }
+                    else if (hasStrongDangerCue)
+                    {
+                        adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
                     }
                     else
                     {
-                        adoptGunshotDanger = gunshotScore >= 0.48f && gunshotEvidence >= 0.12f;
+                        adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
                     }
                 }
 
@@ -474,7 +486,7 @@ namespace SoundVisualizer.AIModel
             float effectiveThreshold = confidenceThreshold;
             if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue || adoptedDangerFromBooster))
             {
-                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.22f : 0.20f);
+                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.18f : 0.20f);
             }
             else if (coarse == "speech")
             {
