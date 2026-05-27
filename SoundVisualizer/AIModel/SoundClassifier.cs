@@ -418,25 +418,36 @@ namespace SoundVisualizer.AIModel
             float dangerEvidence = SumCoarseProbabilityFromTop5(_topKIndices, _topKProbs, 5, "danger");
             bool hasStrongDangerCue = HasStrongDangerCueInTop5(_topKIndices, 5);
             bool hasCriticalDangerCue = HasCriticalDangerCueInTop5(_topKIndices, 5);
+            string yamnetCoarse = coarse;
 
             if (TryPredictGunshotBoosterScore(probs, out float gunshotScore))
             {
                 float gunshotEvidence = SumGunshotProbabilityFromTop5(_topKIndices, _topKProbs, 5);
                 bool hasGunshotCue = HasGunshotCueInTop5(_topKIndices, 5);
 
-                // 게임 믹스: top-k에 Gunshot이 없을 때가 많아 booster 단독·완화 임계 사용
+                // speech·무음·저신뢰에서는 booster danger 채택 금지 (전 클래스 danger 오탐 방지)
+                bool blockBooster =
+                    yamnetCoarse == "speech" ||
+                    IsSpeechLikeDisplay(display) ||
+                    IsSilenceLikeDisplay(display) ||
+                    conf < 0.12f;
+
                 bool adoptGunshotDanger = false;
-                if (hasGunshotCue)
+                if (!blockBooster)
                 {
-                    adoptGunshotDanger = gunshotScore >= 0.15f && gunshotEvidence >= 0.04f;
-                }
-                else if (gunshotScore >= 0.38f)
-                {
-                    adoptGunshotDanger = true;
-                }
-                else
-                {
-                    adoptGunshotDanger = gunshotScore >= 0.28f && gunshotEvidence >= 0.04f;
+                    if (hasGunshotCue)
+                    {
+                        adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
+                    }
+                    else if (YamnetThreeClassMapper.IsGenericSoundEffectLabel(display) || hasStrongDangerCue)
+                    {
+                        // 게임: Sound effect / 폭발·사이렌 단서 + booster (top-k에 Gunshot 없을 때)
+                        adoptGunshotDanger = gunshotScore >= 0.34f && gunshotEvidence >= 0.04f;
+                    }
+                    else
+                    {
+                        adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                    }
                 }
 
                 if (adoptGunshotDanger)
@@ -733,6 +744,23 @@ namespace SoundVisualizer.AIModel
                    name.Contains("artillery", StringComparison.OrdinalIgnoreCase) || 
                    name.Contains("fusillade", StringComparison.OrdinalIgnoreCase) || 
                    name.Contains("cap gun", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsSpeechLikeDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            var s = display.ToLowerInvariant();
+            return s.Contains("speech") || s.Contains("conversation") || s.Contains("narration") ||
+                   s.Contains("speaking") || s.Contains("babbling") || s.Contains("whisper") ||
+                   s.Contains("singing") || s.Contains("choir") || s.Contains("laughter") ||
+                   s.Contains("crying") || s.Contains("sobbing") || s.Contains("shout");
+        }
+
+        private static bool IsSilenceLikeDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            var s = display.ToLowerInvariant();
+            return s.Contains("silence") || s.Contains("quiet") || s.Contains("background noise");
         }
 
         private static bool IsStrongDangerKeyword(string name)
