@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace SoundVisualizer.Visualizers
 {
-    public class WaveVisualizer : IVisualizerMode
+    public class OutlineVisualizer : IVisualizerMode
     {
         private const int WAVE_SAMPLE_COUNT = 150;
         
@@ -16,10 +16,10 @@ namespace SoundVisualizer.Visualizers
 
         public Geometry GenerateGeometry(VisualizerContext context)
         {
-            double w = context.Width;
-            double h = context.Height;
             double[] channelDepths = context.ChannelDepths;
             double time = context.AnimationTime;
+            double w = context.Width;
+            double h = context.Height;
 
             bool anyActive = false;
             for (int i = 0; i < channelDepths.Length; i++)
@@ -70,20 +70,21 @@ namespace SoundVisualizer.Visualizers
 
             using (var ctx = geometry.Open())
             {
-                ctx.BeginFigure(new Point(0, 0), true, true);
-                ctx.LineTo(new Point(w, 0), false, false);
-                ctx.LineTo(new Point(w, h), false, false);
-                ctx.LineTo(new Point(0, h), false, false);
-
+                // 외곽 사각형을 그리지 않고, 오직 파도의 내부 경계선(inner) 루프만 독립된 Figure로 그립니다.
+                // 이를 통해 안쪽이 칠해지지 않고 외곽선만 그릴 수 있는 기하학 구조를 만듭니다.
                 ctx.BeginFigure(_innerPts[0], true, true);
 
                 _bezierPts.Clear();
-                for (int i = 0; i < N; i++)
+                for (int i = N - 1; i >= 0; i--)
                 {
-                    Point p0 = _innerPts[(i - 1 + N) % N];
-                    Point p1 = _innerPts[i];
-                    Point p2 = _innerPts[(i + 1) % N];
-                    Point p3 = _innerPts[(i + 2) % N];
+                    int prev = (i - 1 + N) % N;
+                    int next = (i + 1) % N;
+                    int nnext = (i + 2) % N;
+
+                    Point p0 = _innerPts[nnext];
+                    Point p1 = _innerPts[next];
+                    Point p2 = _innerPts[i];
+                    Point p3 = _innerPts[prev];
 
                     Point cp1 = new Point(p1.X + (p2.X - p0.X) / 6.0, p1.Y + (p2.Y - p0.Y) / 6.0);
                     Point cp2 = new Point(p2.X - (p3.X - p1.X) / 6.0, p2.Y - (p3.Y - p1.Y) / 6.0);

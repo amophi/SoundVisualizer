@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 
@@ -12,6 +13,9 @@ namespace SoundVisualizer.CoreAudio
         private int _captureChannels;
         private int _captureBytesPerSample;
         private int _outputChannels;
+        
+        // 매 캡처 프레임마다 대량의 byte 배열이 할당되어 GC를 유발하는 현상을 방지하기 위한 공유 캐시 버퍼 (GC Free)
+        private byte[] _conversionBuffer = Array.Empty<byte>();
 
         public void StartRouting(WaveFormat captureFormat)
         {
@@ -33,8 +37,8 @@ namespace SoundVisualizer.CoreAudio
             var realSpeaker = allDevices.FirstOrDefault(d => !d.FriendlyName.Contains("cable", StringComparison.OrdinalIgnoreCase));
             if (realSpeaker == null)
             {
-                Console.WriteLine("⚠ CABLE 외 출력 장치를 찾을 수 없습니다 — 라우팅 비활성");
-                Console.WriteLine("⚠ 라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
+                Console.WriteLine("CABLE 외 출력 장치를 찾을 수 없습니다 — 라우팅 비활성");
+                Console.WriteLine("라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
                 return;
             }
 
@@ -64,7 +68,7 @@ namespace SoundVisualizer.CoreAudio
                     _realSpeakerOut.Init(_bufferedWaveProvider);
                     _realSpeakerOut.Play();
                     string mixMode = (_captureChannels == 8 && _outputChannels == 2) ? " [다운믹스]" : "";
-                    Console.WriteLine($"🔊 라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch{mixMode}, latency: {latency}ms)");
+                    Console.WriteLine($"라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch{mixMode}, latency: {latency}ms)");
                     return;
                 }
                 catch (Exception ex)
@@ -75,8 +79,8 @@ namespace SoundVisualizer.CoreAudio
                 }
             }
 
-            Console.WriteLine($"⚠ 오디오 라우팅 초기화 실패: {lastError?.Message}");
-            Console.WriteLine("⚠ 라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
+            Console.WriteLine($"오디오 라우팅 초기화 실패: {lastError?.Message}");
+            Console.WriteLine("라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
         }
 
         public void OnDataReceived(object sender, byte[] rawAudioData)
@@ -86,8 +90,8 @@ namespace SoundVisualizer.CoreAudio
             // 캡처-출력 채널 수가 다르면 변환
             if (_captureChannels != _outputChannels)
             {
-                byte[] converted = ConvertChannels(rawAudioData, _captureChannels, _captureBytesPerSample, _outputChannels);
-                _bufferedWaveProvider.AddSamples(converted, 0, converted.Length);
+                int neededSize = ConvertChannels(rawAudioData, _captureChannels, _captureBytesPerSample, _outputChannels, ref _conversionBuffer);
+                _bufferedWaveProvider.AddSamples(_conversionBuffer, 0, neededSize);
             }
             else
             {
@@ -96,66 +100,100 @@ namespace SoundVisualizer.CoreAudio
         }
 
         /// <summary>
-        /// 채널 수 변환. 8ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제.
+        /// 채널 수 변환. 8ch→2ch 및 6ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제 (가비지 할당 0%).
         /// </summary>
-        private static byte[] ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh)
+        private static int ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh, ref byte[] outputBuffer)
         {
-            if (inCh == 8 && outCh == 2 && bytesPerSample == 4)
-                return DownmixTo2ch(input);
-
             int frames = input.Length / (inCh * bytesPerSample);
-            byte[] output = new byte[frames * outCh * bytesPerSample];
+            int neededSize = frames * outCh * bytesPerSample;
+            if (outputBuffer.Length < neededSize)
+            {
+                outputBuffer = new byte[neededSize * 2]; // 넉넉하게 2배 스케일링하여 재할당 최소화
+            }
+
+            if (inCh == 8 && outCh == 2 && bytesPerSample == 4)
+            {
+                Downmix8chTo2ch(input, outputBuffer);
+                return neededSize;
+            }
+            if (inCh == 6 && outCh == 2 && bytesPerSample == 4)
+            {
+                Downmix6chTo2ch(input, outputBuffer);
+                return neededSize;
+            }
+
+            // 일반 추출/복제 (Span을 이용한 0-allocation 고속 복사)
+            var srcSpan = MemoryMarshal.Cast<byte, float>(input.AsSpan());
+            var dstSpan = MemoryMarshal.Cast<byte, float>(outputBuffer.AsSpan(0, neededSize));
 
             for (int i = 0; i < frames; i++)
             {
                 for (int ch = 0; ch < outCh; ch++)
                 {
                     int srcCh = ch < inCh ? ch : 0;
-                    Buffer.BlockCopy(
-                        input, (i * inCh + srcCh) * bytesPerSample,
-                        output, (i * outCh + ch) * bytesPerSample,
-                        bytesPerSample);
+                    dstSpan[i * outCh + ch] = srcSpan[i * inCh + srcCh];
                 }
             }
-            return output;
+            return neededSize;
         }
 
         /// <summary>
-        /// 7.1ch float32 → 2ch float32 다운믹스 (ITU-R BS.775 기반)
-        /// 채널 인덱스: 0=FL 1=FR 2=FC 3=LFE 4=SL 5=SR 6=BL 7=BR
+        /// 7.1ch float32 → 2ch float32 다운믹스 (ITU-R BS.775 기반 - GC Free)
         /// L = FL + 0.707*FC + 0.707*SL + 0.5*BL
         /// R = FR + 0.707*FC + 0.707*SR + 0.5*BR
-        /// LFE는 서브우퍼 전용 저음역이므로 일반 스피커 출력에서 제외
         /// </summary>
-        private static byte[] DownmixTo2ch(byte[] input)
+        private static void Downmix8chTo2ch(byte[] input, byte[] output)
         {
             const float kCenter = 0.707f; // -3dB
             const float kSide   = 0.707f; // -3dB
             const float kBack   = 0.500f; // -6dB
 
-            int frames = input.Length / 32; // 8ch * 4bytes
-            byte[] output = new byte[frames * 8]; // 2ch * 4bytes
+            var src = MemoryMarshal.Cast<byte, float>(input.AsSpan());
+            var dst = MemoryMarshal.Cast<byte, float>(output.AsSpan());
+            int frames = src.Length / 8;
 
             for (int i = 0; i < frames; i++)
             {
-                int srcOffset = i * 32;
-                float fl = BitConverter.ToSingle(input, srcOffset +  0);
-                float fr = BitConverter.ToSingle(input, srcOffset +  4);
-                float fc = BitConverter.ToSingle(input, srcOffset +  8);
-                // srcOffset + 12 = LFE → 제외
-                float sl = BitConverter.ToSingle(input, srcOffset + 16);
-                float sr = BitConverter.ToSingle(input, srcOffset + 20);
-                float bl = BitConverter.ToSingle(input, srcOffset + 24);
-                float br = BitConverter.ToSingle(input, srcOffset + 28);
+                int srcOffset = i * 8;
+                float fl = src[srcOffset + 0];
+                float fr = src[srcOffset + 1];
+                float fc = src[srcOffset + 2];
+                // srcOffset + 3 (LFE) -> 제외
+                float sl = src[srcOffset + 4];
+                float sr = src[srcOffset + 5];
+                float bl = src[srcOffset + 6];
+                float br = src[srcOffset + 7];
 
-                float left  = Math.Clamp(fl + kCenter * fc + kSide * sl + kBack * bl, -1f, 1f);
-                float right = Math.Clamp(fr + kCenter * fc + kSide * sr + kBack * br, -1f, 1f);
-
-                int dstOffset = i * 8;
-                Buffer.BlockCopy(BitConverter.GetBytes(left),  0, output, dstOffset,     4);
-                Buffer.BlockCopy(BitConverter.GetBytes(right), 0, output, dstOffset + 4, 4);
+                dst[i * 2 + 0] = Math.Clamp(fl + kCenter * fc + kSide * sl + kBack * bl, -1f, 1f);
+                dst[i * 2 + 1] = Math.Clamp(fr + kCenter * fc + kSide * sr + kBack * br, -1f, 1f);
             }
-            return output;
+        }
+
+        /// <summary>
+        /// 5.1ch float32 → 2ch float32 다운믹스 (GC Free)
+        /// </summary>
+        private static void Downmix6chTo2ch(byte[] input, byte[] output)
+        {
+            const float kCenter = 0.707f; // -3dB
+            const float kSurround = 0.707f; // -3dB
+
+            var src = MemoryMarshal.Cast<byte, float>(input.AsSpan());
+            var dst = MemoryMarshal.Cast<byte, float>(output.AsSpan());
+            int frames = src.Length / 6;
+
+            for (int i = 0; i < frames; i++)
+            {
+                int srcOffset = i * 6;
+                float fl = src[srcOffset + 0];
+                float fr = src[srcOffset + 1];
+                float fc = src[srcOffset + 2];
+                // LFE는 제외
+                float sl = src[srcOffset + 4];
+                float sr = src[srcOffset + 5];
+
+                dst[i * 2 + 0] = Math.Clamp(fl + kCenter * fc + kSurround * sl, -1f, 1f);
+                dst[i * 2 + 1] = Math.Clamp(fr + kCenter * fc + kSurround * sr, -1f, 1f);
+            }
         }
 
         public void StopRouting()
@@ -165,7 +203,7 @@ namespace SoundVisualizer.CoreAudio
                 _realSpeakerOut.Stop();
                 _realSpeakerOut.Dispose();
                 _bufferedWaveProvider = null;
-                Console.WriteLine("🛑 오디오 출력 라우팅 중지.");
+                Console.WriteLine("오디오 출력 라우팅 중지.");
             }
         }
     }

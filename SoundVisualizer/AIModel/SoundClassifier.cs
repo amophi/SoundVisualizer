@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -34,23 +35,48 @@ namespace SoundVisualizer.AIModel
         private const float MelFMax = 7500f;
         private const float LogEps = 0.001f;
 
-        /// <summary>멜 스펙트럼 한 윈도우에 필요한 16kHz 모노 샘플 수(≈0.975s). 콜백 한 번 분량만 넣으면 대부분 0 패딩이라 신뢰도가 붕괴합니다.</summary>
+        /// <summary>멜 스펙트럼 한 윈도우에 필요한 16kHz 모노 샘플 수(≈0.975s).</summary>
         private static readonly int RequiredMono16kSamples = WindowLength + HopLength * (TimeFrames - 1);
 
         private const int RingSeconds = 2;
 
+        private readonly object _inferenceLock = new();
+        private bool _isDisposed;
+
         private readonly object _captureRingLock = new();
-        private readonly List<float> _monoAtCaptureRateRing = new();
+        
+        // 고정 크기 순환 링 버퍼 필드
+        private float[]? _ringBuffer;
+        private int _ringHead;
+        private int _ringTail;
+        private int _ringCount;
+        private const int MaxRingSize = 131072; // 2의 거듭제곱 (비트마스킹 & 131071 가속)
+
+        // GC Free 전처리 및 추론용 캐시 버퍼
+        private float[]? _preprocessedAudio; // 크기: RequiredMono16kSamples
+        private Complex[]? _fftComplexBuffer; // 크기: FftSize (512)
+        private float[]? _fftPowerBuffer; // 크기: FftSize / 2 + 1 (257)
+        private float[]? _logMelSpectrogramBuffer; // 크기: TimeFrames * MelBins (6144)
+        private float[]? _softmaxBuffer; // 크기: 521
+        private float[]? _captureTailBuffer; // 16kHz 리샘플 이전 원시 오디오 복사용 임시 버퍼
+
+        // Top-K 계산용 캐시 버퍼 (가비지 프리)
+        private int[]? _topKIndices; // 크기: 5
+        private float[]? _topKProbs; // 크기: 5
+
+        private string _lastPredictResult = "오디오 대기… | ambient | —";
 
 #if DEBUG
         private static long _lastClassifyDebugTickMs;
         private const int ClassifyDebugMinIntervalMs = 200;
 #endif
 
-        // coarse 히스테리시스: 연속 N프레임 동일해야 전환 (값이 클수록 안정·느린 반응)
+        // coarse 히스테리시스: 연속 N프레임 동일해야 전환
         private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
+        /// <summary>danger→non-danger: booster 미재채택·충분 신뢰 시에만 이탈 1프레임 (총 직후 잔향/BGM).</summary>
+        private const float DangerExitRelaxedConfidence = 0.27f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -59,7 +85,6 @@ namespace SoundVisualizer.AIModel
 
         /// <summary>
         /// WASAPI 루프백이 흔히 48kHz float이므로, 호출부에서 샘플레이트를 넘기지 않을 때의 기본값입니다.
-        /// 44.1kHz 환경이면 <see cref="PredictSoundType(byte[], int, int, int)"/> 네 번째 인자로 44100을 넘기세요.
         /// </summary>
         public const int DefaultCaptureSampleRate = 48000;
 
@@ -70,84 +95,159 @@ namespace SoundVisualizer.AIModel
 
         public SoundClassifier()
         {
-            // 최소 전처리(로그-멜 생성)에 필요한 파라미터를 항상 초기화
             _hannWindow = CreateHannWindow(WindowLength);
             _melFilterBank = CreateMelFilterBank(MelBins, FftSize, SampleRate, MelFMin, MelFMax);
             _bitReversed = CreateBitReversedIndices(FftSize);
 
-            // 1. AI 뇌(ONNX 모델) 로드
-            // (주의: yamnet.onnx 파일이 실행 파일과 같은 폴더에 있어야 합니다!)
+            // 링 버퍼 및 사전 캐싱 버퍼들 할당
+            _ringBuffer = new float[MaxRingSize];
+            _preprocessedAudio = new float[RequiredMono16kSamples];
+            _fftComplexBuffer = new Complex[FftSize];
+            _fftPowerBuffer = new float[(FftSize / 2) + 1];
+            _logMelSpectrogramBuffer = new float[TimeFrames * MelBins];
+            _softmaxBuffer = new float[521];
+            _topKIndices = new int[5];
+            _topKProbs = new float[5];
+
+            // 1. AI 뇌(ONNX 모델) 로드 (SessionOptions 세팅으로 스레드 1개 제한)
             try
             {
-                // csproj에서 AIModel 폴더 안의 yamnet.onnx가 그대로 출력 디렉터리의 AIModel 하위 폴더로 복사되도록 설정되었으므로 경로를 수정합니다.
-                string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
-                _session = new InferenceSession(modelPath);
-                LoadClassNames(); // 실제로는 csv 파일에서 "총소리", "폭발음" 목록을 불러옴
-                // A 모드: 521 기본 경로 + gunshot booster만 사용
-                // TryLoadDistilledCoarseHead();
-                TryLoadGunshotBooster();
+                using var options = new SessionOptions();
+                options.IntraOpNumThreads = 1;
+                options.InterOpNumThreads = 1;
+                options.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
 
-                // 입력명 확인(디버깅용). metadata.yaml이 말하는 input name이 실제로도 같은지 체크합니다.
+                string modelPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet.onnx");
+                _session = new InferenceSession(modelPath, options);
+                LoadClassNames();
+                TryLoadGunshotBooster(options);
+
                 foreach (var kv in _session.InputMetadata)
                 {
                     Console.WriteLine($"[YAMNet] Input: {kv.Key} | {kv.Value}");
                 }
-                Console.WriteLine("🧠 AI 모델(YAMNet) 로딩 완료!");
+                Console.WriteLine("AI 모델(YAMNet) 로딩 완료 (스레딩 최적화 적용)!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 AI 모델 로드 실패: {ex.Message}");
+                Console.WriteLine($"AI 모델 로드 실패: {ex.Message}");
             }
         }
 
         public string PredictSoundType(byte[] rawAudioData, int bytesRecorded, int channels, int captureSampleRate = DefaultCaptureSampleRate)
         {
-            if (_session == null) return "AI 꺼짐";
+            IngestAudio(rawAudioData, bytesRecorded, channels, captureSampleRate);
+            return PredictSoundType(captureSampleRate);
+        }
 
-            if (bytesRecorded <= 0)
-                return "오디오 대기… | ambient | —";
+        /// <summary>
+        /// 실시간으로 캡처되는 원시 오디오 데이터를 다운믹싱하여 링 버퍼에 적재하기만 합니다.
+        /// </summary>
+        public void IngestAudio(byte[] rawAudioData, int bytesRecorded, int channels, int captureSampleRate = DefaultCaptureSampleRate)
+        {
+            if (_isDisposed || bytesRecorded <= 0) return;
 
-            // 2. 전처리 (Pre-processing): AI는 다채널을 못 먹습니다. 
-            // 전방향(모든 채널) 소리를 모노로 다운믹스하여 모든 방향의 소리를 인식할 수 있게 수정
-            float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels);
-
-            const float threshold = 0.25f;
-            float[]? tail = null;
-            int tailRate = captureSampleRate;
-            int ringCount;
-
-            lock (_captureRingLock)
+            float[] monoAudio = DownmixToMono(rawAudioData, bytesRecorded, channels, out int actualFrames);
+            try
             {
-                AppendMonoCaptureRing(monoAudio, captureSampleRate);
-                ringCount = _monoAtCaptureRateRing.Count;
+                lock (_captureRingLock)
+                {
+                    AppendMonoCaptureRing(monoAudio, actualFrames, captureSampleRate);
+                }
+            }
+            finally
+            {
+                if (monoAudio != Array.Empty<float>())
+                {
+                    ArrayPool<float>.Shared.Return(monoAudio);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 링 버퍼에 누적된 최신 오디오 데이터를 기반으로 YAMNet ONNX 추론을 수행하고 결과를 캐시합니다.
+        /// </summary>
+        public string PredictSoundType(int captureSampleRate = DefaultCaptureSampleRate)
+        {
+            lock (_inferenceLock)
+            {
+                if (_isDisposed || _session == null)
+                {
+                    _lastPredictResult = "AI 꺼짐";
+                    return _lastPredictResult;
+                }
+
+                const float threshold = 0.25f;
                 int resampleFrom = captureSampleRate == DefaultCaptureSampleRate ? 48000 : captureSampleRate;
                 int n = CaptureSamplesForOneYamnetWindow(resampleFrom);
-                tail = CopyRingTailRightPadded(n);
-                tailRate = resampleFrom;
-            }
+                int ringCount;
 
-            int minRingSamples = CaptureSamplesForOneYamnetWindow(tailRate);
-            if (ringCount < minRingSamples)
-                return "오디오 축적 중… | ambient | —";
+                lock (_captureRingLock)
+                {
+                    ringCount = _ringCount;
+                    if (_captureTailBuffer == null || _captureTailBuffer.Length != n)
+                    {
+                        _captureTailBuffer = new float[n];
+                    }
+                    CopyRingTailRightPadded(_captureTailBuffer, n);
+                }
 
-            InferenceResult r = PredictFromMono16k(
-                ResampleMonoFloatTo16k(tail ?? Array.Empty<float>(), tailRate), threshold);
+                int minRingSamples = CaptureSamplesForOneYamnetWindow(resampleFrom);
+                if (ringCount < minRingSamples)
+                {
+                    _lastPredictResult = "오디오 축적 중… | ambient | —";
+                    return _lastPredictResult;
+                }
 
-            if (r.YamnetClassIndex < 0)
-                return "AI 에러";
+                if (_preprocessedAudio == null)
+                {
+                    _preprocessedAudio = new float[RequiredMono16kSamples];
+                }
+                ResampleMonoFloatTo16kCustom(_captureTailBuffer, n, resampleFrom, _preprocessedAudio);
+
+                InferenceResult r = PredictFromMono16k(_preprocessedAudio, threshold);
+
+                if (r.YamnetClassIndex < 0)
+                {
+                    _lastPredictResult = "AI 에러";
+                    return _lastPredictResult;
+                }
 
 #if DEBUG
-            LogClassificationDebugThrottled(in r, threshold);
+                LogClassificationDebugThrottled(in r, threshold);
 #endif
+                ApplyCoarseHysteresis(in r);
 
-            ApplyCoarseHysteresis(in r);
+                // booster가 danger로 올린 프레임은 UI만 즉시 반영, 확정 상태는 히스테리시스 유지
+                bool useBoosterDangerPreview =
+                    _confirmedCoarse != "danger" &&
+                    r.AdoptedDangerFromBooster &&
+                    r.CoarseClass == "danger" &&
+                    r.MeetsThreshold;
 
-            string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
+                string displayForUi = useBoosterDangerPreview ? r.YamnetDisplayName : _confirmedDisplay;
+                string coarseForUi = useBoosterDangerPreview ? "danger" : _confirmedCoarse;
+                float confidenceForUi = useBoosterDangerPreview ? r.Confidence : _confirmedConfidence;
 
-            if (_confirmedConfidence < threshold)
-                return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+                string translatedName = YamnetThreeClassMapper.TranslateToKorean(displayForUi);
+                string resultText;
 
-            return $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
+                if (confidenceForUi < threshold)
+                    resultText = $"{translatedName} | {coarseForUi} | {confidenceForUi * 100f:F1}% (저신뢰)";
+                else
+                    resultText = $"{translatedName} | {coarseForUi} | {confidenceForUi * 100f:F1}%";
+
+                _lastPredictResult = resultText;
+                return resultText;
+            }
+        }
+
+        /// <summary>
+        /// 마지막으로 갱신된 YAMNet 예측 결과를 락 경합 없이 O(1)로 빠르게 반환합니다.
+        /// </summary>
+        public string GetLastPredictResult()
+        {
+            return _lastPredictResult;
         }
 
         private void ApplyCoarseHysteresis(in InferenceResult r)
@@ -190,6 +290,14 @@ namespace SoundVisualizer.AIModel
             }
 
             int requiredStreak = newCoarse == "danger" ? DangerHysteresisThreshold : CoarseHysteresisThreshold;
+            if (_confirmedCoarse == "danger" &&
+                newCoarse != "danger" &&
+                !r.AdoptedDangerFromBooster &&
+                r.Confidence >= DangerExitRelaxedConfidence)
+            {
+                requiredStreak = 1;
+            }
+
             if (_candidateStreak >= requiredStreak)
             {
                 _confirmedCoarse = newCoarse;
@@ -219,36 +327,64 @@ namespace SoundVisualizer.AIModel
         private static int CaptureSamplesForOneYamnetWindow(int captureSampleRate) =>
             (int)Math.Ceiling(RequiredMono16kSamples * (double)captureSampleRate / SampleRate);
 
-        private void AppendMonoCaptureRing(float[] monoChunk, int captureSampleRate)
+        private void AppendMonoCaptureRing(float[] monoChunk, int length, int captureSampleRate)
         {
-            if (monoChunk.Length == 0)
+            if (length <= 0)
                 return;
             if (captureSampleRate <= 0)
                 captureSampleRate = DefaultCaptureSampleRate;
 
-            for (int i = 0; i < monoChunk.Length; i++)
-                _monoAtCaptureRateRing.Add(monoChunk[i]);
-
             int cap = Math.Max(DefaultCaptureSampleRate * RingSeconds, captureSampleRate * RingSeconds);
-            while (_monoAtCaptureRateRing.Count > cap)
-                _monoAtCaptureRateRing.RemoveAt(0);
+            if (_ringBuffer == null)
+            {
+                _ringBuffer = new float[MaxRingSize];
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                _ringBuffer[_ringTail] = monoChunk[i];
+                _ringTail = (_ringTail + 1) & (MaxRingSize - 1);
+
+                if (_ringCount < MaxRingSize)
+                {
+                    _ringCount++;
+                }
+                else
+                {
+                    _ringHead = (_ringHead + 1) & (MaxRingSize - 1);
+                }
+            }
+
+            while (_ringCount > cap)
+            {
+                _ringHead = (_ringHead + 1) & (MaxRingSize - 1);
+                _ringCount--;
+            }
         }
 
-        /// <summary>맨 끝(가장 최근) <paramref name="length"/>샘플. 부족하면 앞을 0으로 패딩.</summary>
-        private float[] CopyRingTailRightPadded(int length)
+        private void CopyRingTailRightPadded(float[] destination, int count)
         {
-            var buf = new float[length];
-            int n = _monoAtCaptureRateRing.Count;
-            int take = Math.Min(length, n);
-            if (take <= 0)
-                return buf;
-            int dst = length - take;
-            for (int i = 0; i < take; i++)
-                buf[dst + i] = _monoAtCaptureRateRing[n - take + i];
-            return buf;
-        }
+            if (destination == null || count <= 0)
+                return;
 
-        // InferLoopbackPickBestFromTails 제거됨 — 48k 단일 리샘플만 사용
+            int take = Math.Min(_ringCount, count);
+            int dstStart = count - take;
+
+            // 앞부분(왼쪽)을 0f로 패딩 (오른쪽 정렬을 위함)
+            for (int i = 0; i < dstStart; i++)
+            {
+                destination[i] = 0f;
+            }
+
+            if (take > 0)
+            {
+                int ringStart = (_ringTail - take) & (MaxRingSize - 1);
+                for (int i = 0; i < take; i++)
+                {
+                    destination[dstStart + i] = _ringBuffer[(ringStart + i) & (MaxRingSize - 1)];
+                }
+            }
+        }
 
         /// <summary>
         /// 모노 PCM(float)을 16kHz로 맞춘 뒤 전처리·추론합니다. WAV 파일 테스트 등에 사용합니다.
@@ -275,7 +411,7 @@ namespace SoundVisualizer.AIModel
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 [YAMNet] Inference failed: {ex}");
+                Console.WriteLine($"[YAMNet] Inference failed: {ex}");
                 return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
             finally
@@ -286,38 +422,68 @@ namespace SoundVisualizer.AIModel
             inferMs = sw.Elapsed.TotalMilliseconds;
 
             float[] probs = Softmax(logits);
-            int maxIndex = Array.IndexOf(probs, probs.Max());
-            float conf = probs[maxIndex];
+            
+            if (_topKIndices == null) _topKIndices = new int[5];
+            if (_topKProbs == null) _topKProbs = new float[5];
+            ComputeTop5(probs, _topKIndices, _topKProbs);
+
+            int maxIndex = _topKIndices[0];
+            float conf = _topKProbs[0];
             string display = _classNames[maxIndex];
 
-            PreferDangerWhenTopIsGenericSoundEffect(probs, ref maxIndex, ref conf, ref display);
+            PreferDangerWhenTopIsMaskedByGameMix(probs, ref maxIndex, ref conf, ref display);
 
-            string coarse = VoteCoarseFromTopK(probs, 3);
+            string coarse = VoteCoarseFromTop5(_topKIndices, _topKProbs, 3);
             float coarseConf = conf;
-            float dangerEvidence = SumCoarseProbabilityFromTopK(probs, 5, "danger");
-            bool hasStrongDangerCue = HasStrongDangerCueInTopK(probs, 5);
-            bool hasCriticalDangerCue = HasCriticalDangerCueInTopK(probs, 5);
-            bool boostedDangerByGunshot = false;
+            float dangerEvidence = SumCoarseProbabilityFromTop5(_topKIndices, _topKProbs, 5, "danger");
+            bool hasStrongDangerCue = HasStrongDangerCueInTop5(_topKIndices, 5);
+            bool hasCriticalDangerCue = HasCriticalDangerCueInTop5(_topKIndices, 5);
+            string yamnetCoarse = coarse;
+            bool adoptedDangerFromBooster = false;
+
             if (TryPredictGunshotBoosterScore(probs, out float gunshotScore))
             {
-                float gunshotEvidence = SumGunshotProbabilityFromTopK(probs, 5);
-                bool hasGunshotCue = HasGunshotCueInTopK(probs, 5);
+                float gunshotEvidence = SumGunshotProbabilityFromTop5(_topKIndices, _topKProbs, 5);
+                bool hasGunshotCue = HasGunshotCueInTop5(_topKIndices, 5);
+
+                // speech·무음·저신뢰에서는 booster danger 채택 금지 (전 클래스 danger 오탐 방지)
+                bool blockBooster =
+                    yamnetCoarse == "speech" ||
+                    IsSpeechLikeDisplay(display) ||
+                    IsSilenceLikeDisplay(display) ||
+                    conf < 0.12f;
 
                 bool adoptGunshotDanger = false;
-                if (hasGunshotCue)
+                if (!blockBooster)
                 {
-                    adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
-                }
-                else
-                {
-                    adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                    if (hasGunshotCue)
+                    {
+                        adoptGunshotDanger = gunshotScore >= 0.20f && gunshotEvidence >= 0.05f;
+                    }
+                    else if (IsGameMixMaskDisplay(display) || hasStrongDangerCue)
+                    {
+                        // 게임 BGM(음악·Sound effect) 위 총소리: booster·총 클래스 확률 둘 다 참고
+                        adoptGunshotDanger =
+                            gunshotScore >= 0.50f ||
+                            (gunshotScore >= 0.40f && gunshotEvidence >= 0.04f);
+                    }
+                    else
+                    {
+                        adoptGunshotDanger = gunshotScore >= 0.45f && gunshotEvidence >= 0.10f;
+                    }
                 }
 
                 if (adoptGunshotDanger)
                 {
+                    adoptedDangerFromBooster = true;
                     coarse = "danger";
                     coarseConf = MathF.Max(coarseConf, MathF.Max(gunshotScore, gunshotEvidence));
-                    boostedDangerByGunshot = true;
+                    if (TryPickBestGunshotDisplay(probs, _classNames, out int gunIdx, out float gunProb))
+                    {
+                        maxIndex = gunIdx;
+                        display = _classNames[gunIdx];
+                        coarseConf = MathF.Max(coarseConf, gunProb);
+                    }
                 }
             }
 
@@ -326,9 +492,9 @@ namespace SoundVisualizer.AIModel
             // danger는 강한 단서(top-k)에서 임계를 낮춰 미검출을 줄이고,
             // speech/ambient는 기본 임계를 그대로 유지합니다.
             float effectiveThreshold = confidenceThreshold;
-            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue))
+            if (coarse == "danger" && (hasStrongDangerCue || hasCriticalDangerCue || adoptedDangerFromBooster))
             {
-                effectiveThreshold = MathF.Min(effectiveThreshold, 0.20f);
+                effectiveThreshold = MathF.Min(effectiveThreshold, adoptedDangerFromBooster ? 0.18f : 0.20f);
             }
             else if (coarse == "speech")
             {
@@ -337,12 +503,13 @@ namespace SoundVisualizer.AIModel
             }
 
             bool ok = coarseConf >= effectiveThreshold;
-            string? topK = FormatTopKSoftmaxLabels(probs, 3);
+            string? topK = FormatTop5SoftmaxLabels(_topKIndices, _topKProbs, 3);
 
-            return new InferenceResult(maxIndex, display, coarseConf, coarse, ok, inferMs, topK);
+            return new InferenceResult(
+                maxIndex, display, coarseConf, coarse, ok, inferMs, topK, adoptedDangerFromBooster);
         }
 
-        private void TryLoadDistilledCoarseHead()
+        private void TryLoadDistilledCoarseHead(SessionOptions options)
         {
             try
             {
@@ -353,7 +520,7 @@ namespace SoundVisualizer.AIModel
                     return;
                 }
 
-                _coarseHeadSession = new InferenceSession(path);
+                _coarseHeadSession = new InferenceSession(path, options);
                 _coarseHeadInputName = _coarseHeadSession.InputMetadata.Keys.FirstOrDefault();
                 _coarseHeadOutputName = _coarseHeadSession.OutputMetadata.Keys.FirstOrDefault();
                 Console.WriteLine($"[3ClassHead] 로드 완료: {path}");
@@ -367,7 +534,7 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        private void TryLoadGunshotBooster()
+        private void TryLoadGunshotBooster(SessionOptions options)
         {
             try
             {
@@ -378,7 +545,7 @@ namespace SoundVisualizer.AIModel
                     return;
                 }
 
-                _gunshotBoosterSession = new InferenceSession(path);
+                _gunshotBoosterSession = new InferenceSession(path, options);
                 _gunshotBoosterInputName = _gunshotBoosterSession.InputMetadata.Keys.FirstOrDefault();
                 _gunshotBoosterOutputName = _gunshotBoosterSession.OutputMetadata.Keys.FirstOrDefault();
                 Console.WriteLine($"[GunshotBooster] 로드 완료: {path}");
@@ -392,6 +559,9 @@ namespace SoundVisualizer.AIModel
             }
         }
 
+        private float[]? _boosterInputTensorBuffer;
+        private DenseTensor<float>? _boosterInputTensor;
+
         private bool TryPredictGunshotBoosterScore(float[] yamnetProbs, out float gunshotScore)
         {
             gunshotScore = 0f;
@@ -402,19 +572,24 @@ namespace SoundVisualizer.AIModel
 
             try
             {
-                var input = new DenseTensor<float>(new[] { 1, 521 });
-                for (int i = 0; i < 521; i++)
-                    input[0, i] = yamnetProbs[i];
+                if (_boosterInputTensorBuffer == null)
+                {
+                    _boosterInputTensorBuffer = new float[521];
+                    _boosterInputTensor = new DenseTensor<float>(_boosterInputTensorBuffer, new[] { 1, 521 });
+                }
 
-                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_gunshotBoosterInputName, input) };
+                for (int i = 0; i < 521; i++)
+                    _boosterInputTensorBuffer[i] = yamnetProbs[i];
+
+                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_gunshotBoosterInputName, _boosterInputTensor) };
                 using var results = _gunshotBoosterSession.Run(inputs);
                 var outTensor = string.IsNullOrEmpty(_gunshotBoosterOutputName)
-                    ? results.First().AsEnumerable<float>().ToArray()
-                    : results.First(r => r.Name == _gunshotBoosterOutputName).AsEnumerable<float>().ToArray();
+                    ? results.First().AsTensor<float>()
+                    : results.First(r => r.Name == _gunshotBoosterOutputName).AsTensor<float>();
                 if (outTensor.Length < 1)
                     return false;
 
-                gunshotScore = outTensor[0];
+                gunshotScore = outTensor.GetValue(0);
                 return true;
             }
             catch
@@ -422,6 +597,9 @@ namespace SoundVisualizer.AIModel
                 return false;
             }
         }
+
+        private float[]? _coarseInputTensorBuffer;
+        private DenseTensor<float>? _coarseInputTensor;
 
         private bool TryPredictDangerScoreFromDistilledHead(float[] yamnetProbs, out float dangerScore)
         {
@@ -433,18 +611,24 @@ namespace SoundVisualizer.AIModel
 
             try
             {
-                var input = new DenseTensor<float>(new[] { 1, 521 });
-                for (int i = 0; i < 521; i++)
-                    input[0, i] = yamnetProbs[i];
+                if (_coarseInputTensorBuffer == null)
+                {
+                    _coarseInputTensorBuffer = new float[521];
+                    _coarseInputTensor = new DenseTensor<float>(_coarseInputTensorBuffer, new[] { 1, 521 });
+                }
 
-                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_coarseHeadInputName, input) };
+                for (int i = 0; i < 521; i++)
+                    _coarseInputTensorBuffer[i] = yamnetProbs[i];
+
+                var inputs = new[] { NamedOnnxValue.CreateFromTensor(_coarseHeadInputName, _coarseInputTensor) };
                 using var results = _coarseHeadSession.Run(inputs);
                 var outTensor = string.IsNullOrEmpty(_coarseHeadOutputName)
-                    ? results.First().AsEnumerable<float>().ToArray()
-                    : results.First(r => r.Name == _coarseHeadOutputName).AsEnumerable<float>().ToArray();
+                    ? results.First().AsTensor<float>()
+                    : results.First(r => r.Name == _coarseHeadOutputName).AsTensor<float>();
                 if (outTensor.Length < 3)
                     return false;
-                dangerScore = outTensor[0];
+
+                dangerScore = outTensor.GetValue(0);
                 return true;
             }
             catch
@@ -453,22 +637,46 @@ namespace SoundVisualizer.AIModel
             }
         }
 
-        /// <summary>
-        /// top-k 클래스의 확률을 coarse별로 합산하여 가장 높은 coarse를 반환합니다.
-        /// 예: top-3가 Plop 32% > Siren 30% > Alarm 25%이면 danger(55%) > ambient(32%) → danger.
-        /// </summary>
-        private string VoteCoarseFromTopK(float[] probs, int k)
+        // Top-5 데이터를 한 번의 패스로 계산하는 최적화 메서드 (0-allocation)
+        private void ComputeTop5(float[] probs, int[] outIndices, float[] outProbs)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0) return "ambient";
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
-
-            float dangerSum = 0f, speechSum = 0f, ambientSum = 0f;
-            foreach (int i in topIndices)
+            for (int i = 0; i < 5; i++)
             {
-                string c = YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]);
+                outIndices[i] = -1;
+                outProbs[i] = -1f;
+            }
+
+            int n = Math.Min(probs.Length, _classNames.Length);
+            for (int i = 0; i < n; i++)
+            {
                 float p = probs[i];
+                for (int j = 0; j < 5; j++)
+                {
+                    if (p > outProbs[j])
+                    {
+                        for (int k = 4; k > j; k--)
+                        {
+                            outProbs[k] = outProbs[k - 1];
+                            outIndices[k] = outIndices[k - 1];
+                        }
+                        outProbs[j] = p;
+                        outIndices[j] = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private string VoteCoarseFromTop5(int[] topIndices, float[] topProbs, int k)
+        {
+            float dangerSum = 0f, speechSum = 0f, ambientSum = 0f;
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
+            {
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                string c = YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]);
+                float p = topProbs[idx];
                 if (c == "danger") dangerSum += p;
                 else if (c == "speech") speechSum += p;
                 else ambientSum += p;
@@ -479,54 +687,46 @@ namespace SoundVisualizer.AIModel
             return "ambient";
         }
 
-        private float SumCoarseProbabilityFromTopK(float[] probs, int k, string targetCoarse)
+        private float SumCoarseProbabilityFromTop5(int[] topIndices, float[] topProbs, int k, string targetCoarse)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0 || k <= 0)
-                return 0f;
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
             float sum = 0f;
-            foreach (int i in topIndices)
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
             {
+                int i = topIndices[idx];
+                if (i < 0) continue;
                 if (YamnetThreeClassMapper.MapDisplayNameToCoarse(_classNames[i]) == targetCoarse)
-                    sum += probs[i];
+                    sum += topProbs[idx];
             }
             return sum;
         }
 
-        private float SumGunshotProbabilityFromTopK(float[] probs, int k)
+        private float SumGunshotProbabilityFromTop5(int[] topIndices, float[] topProbs, int k)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0 || k <= 0)
-                return 0f;
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
             float sum = 0f;
-            foreach (int i in topIndices)
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
             {
-                string name = _classNames[i].ToLowerInvariant();
-                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
-                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun"))
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                string name = _classNames[i];
+                if (IsGunshotKeyword(name))
                 {
-                    sum += probs[i];
+                    sum += topProbs[idx];
                 }
             }
             return sum;
         }
 
-        private bool HasGunshotCueInTopK(float[] probs, int k)
+        private bool HasGunshotCueInTop5(int[] topIndices, int k)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0 || k <= 0)
-                return false;
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
-            foreach (int i in topIndices)
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
             {
-                string name = _classNames[i].ToLowerInvariant();
-                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
-                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun"))
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                string name = _classNames[i];
+                if (IsGunshotKeyword(name))
                 {
                     return true;
                 }
@@ -534,84 +734,142 @@ namespace SoundVisualizer.AIModel
             return false;
         }
 
-        private bool HasStrongDangerCueInTopK(float[] probs, int k)
+        private bool HasStrongDangerCueInTop5(int[] topIndices, int k)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0 || k <= 0)
-                return false;
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
-            foreach (int i in topIndices)
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
             {
-                string name = _classNames[i].ToLowerInvariant();
-                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
-                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
-                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker") ||
-                    name.Contains("siren") || name.Contains("alarm"))
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                string name = _classNames[i];
+                if (IsStrongDangerKeyword(name))
                 {
                     return true;
                 }
             }
-
             return false;
         }
 
-        private bool HasCriticalDangerCueInTopK(float[] probs, int k)
+        private bool HasCriticalDangerCueInTop5(int[] topIndices, int k)
         {
-            int n = Math.Min(probs.Length, _classNames.Length);
-            if (n == 0 || k <= 0)
-                return false;
-
-            var topIndices = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
-            foreach (int i in topIndices)
+            int limit = Math.Min(5, k);
+            for (int idx = 0; idx < limit; idx++)
             {
-                string name = _classNames[i].ToLowerInvariant();
-                if (name.Contains("gunshot") || name.Contains("gunfire") || name.Contains("machine gun") ||
-                    name.Contains("artillery") || name.Contains("fusillade") || name.Contains("cap gun") ||
-                    name.Contains("explosion") || name.Contains("fireworks") || name.Contains("firecracker"))
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                string name = _classNames[i];
+                if (IsCriticalDangerKeyword(name))
                 {
                     return true;
                 }
             }
-
             return false;
+        }
+
+        private static bool IsGunshotKeyword(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            return name.Contains("gunshot", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("gunfire", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("machine gun", StringComparison.OrdinalIgnoreCase) ||
+                   name.Contains("artillery", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("fusillade", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("cap gun", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsSpeechLikeDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            var s = display.ToLowerInvariant();
+            return s.Contains("speech") || s.Contains("conversation") || s.Contains("narration") ||
+                   s.Contains("speaking") || s.Contains("babbling") || s.Contains("whisper") ||
+                   s.Contains("singing") || s.Contains("choir") || s.Contains("laughter") ||
+                   s.Contains("crying") || s.Contains("sobbing") || s.Contains("shout");
+        }
+
+        private static bool IsSilenceLikeDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            var s = display.ToLowerInvariant();
+            return s.Contains("silence") || s.Contains("quiet") || s.Contains("background noise");
+        }
+
+        /// <summary>게임 BGM·효과음 레이어로 총소리가 가려지는 top-1 패턴 (말소리 제외).</summary>
+        private static bool IsGameMixMaskDisplay(string display)
+        {
+            if (string.IsNullOrEmpty(display)) return false;
+            if (IsSpeechLikeDisplay(display) || IsSilenceLikeDisplay(display)) return false;
+            if (YamnetThreeClassMapper.IsGenericSoundEffectLabel(display)) return true;
+            var s = display.ToLowerInvariant();
+            return s.Contains("music") || s.Contains("video game");
+        }
+
+        private static bool TryPickBestGunshotDisplay(float[] probs, string[] classNames, out int index, out float prob)
+        {
+            index = -1;
+            prob = 0f;
+            int n = Math.Min(probs.Length, classNames.Length);
+            for (int i = 0; i < n; i++)
+            {
+                if (!IsGunshotKeyword(classNames[i])) continue;
+                if (probs[i] > prob)
+                {
+                    prob = probs[i];
+                    index = i;
+                }
+            }
+            return index >= 0;
+        }
+
+        private static bool IsStrongDangerKeyword(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            return IsGunshotKeyword(name) ||
+                   name.Contains("explosion", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("fireworks", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("firecracker", StringComparison.OrdinalIgnoreCase) ||
+                   name.Contains("siren", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("alarm", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsCriticalDangerKeyword(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            return IsGunshotKeyword(name) ||
+                   name.Contains("explosion", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("fireworks", StringComparison.OrdinalIgnoreCase) || 
+                   name.Contains("firecracker", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsCriticalDangerEvent(in InferenceResult r)
         {
-            string display = r.YamnetDisplayName?.ToLowerInvariant() ?? "";
-            string top = r.TopKSummary?.ToLowerInvariant() ?? "";
-            return ContainsCriticalDangerKeyword(display) || ContainsCriticalDangerKeyword(top);
+            string display = r.YamnetDisplayName ?? "";
+            string top = r.TopKSummary ?? "";
+            return IsCriticalDangerKeyword(display) || IsCriticalDangerKeyword(top);
         }
 
-        private static bool ContainsCriticalDangerKeyword(string s)
+        private string FormatTop5SoftmaxLabels(int[] topIndices, float[] topProbs, int k)
         {
-            if (string.IsNullOrWhiteSpace(s))
-                return false;
-            return s.Contains("gunshot") || s.Contains("gunfire") || s.Contains("machine gun") ||
-                   s.Contains("artillery") || s.Contains("fusillade") || s.Contains("cap gun") ||
-                   s.Contains("explosion") || s.Contains("fireworks") || s.Contains("firecracker");
-        }
-
-        private string FormatTopKSoftmaxLabels(float[] probs, int k)
-        {
-            if (probs.Length == 0 || k <= 0 || _classNames.Length != probs.Length)
-                return string.Empty;
-
-            int n = Math.Min(probs.Length, _classNames.Length);
-            var order = Enumerable.Range(0, n).OrderByDescending(i => probs[i]).Take(k);
-            return string.Join(" > ", order.Select(i => $"{_classNames[i]} {probs[i] * 100f:F1}%"));
+            int limit = Math.Min(5, k);
+            var sb = new System.Text.StringBuilder();
+            for (int idx = 0; idx < limit; idx++)
+            {
+                int i = topIndices[idx];
+                if (i < 0) continue;
+                if (sb.Length > 0) sb.Append(" > ");
+                sb.Append(_classNames[i]).Append(' ').Append((topProbs[idx] * 100f).ToString("F1")).Append('%');
+            }
+            return sb.ToString();
         }
 
         /// <summary>
-        /// top-1이 “Sound effect”일 때, 총·폭발 등 danger 세부 클래스가 상위 softmax에 있으면 그쪽을 채택합니다.
-        /// (게임/영상 총소리가 Gunshot 대신 Sound effect로만 나오는 현상 완화)
+        /// top-1이 음악·Sound effect 등 게임 믹스에 가려질 때, 521클래스 중 danger(총·폭발) 후보를 찾습니다.
         /// </summary>
-        private void PreferDangerWhenTopIsGenericSoundEffect(float[] probs, ref int maxIndex, ref float conf, ref string display)
+        private void PreferDangerWhenTopIsMaskedByGameMix(float[] probs, ref int maxIndex, ref float conf, ref string display)
         {
             if (maxIndex < 0 || maxIndex >= _classNames.Length || probs.Length != _classNames.Length)
                 return;
-            if (!YamnetThreeClassMapper.IsGenericSoundEffectLabel(display))
+            if (!IsGameMixMaskDisplay(display))
                 return;
 
             int bestDangerIdx = -1;
@@ -641,7 +899,7 @@ namespace SoundVisualizer.AIModel
             display = _classNames[bestDangerIdx];
         }
 
-        /// <summary>log-mel 텐서 통계(FFT/멜 실험 시 비교용). Visual Studio 출력 창에서 확인.</summary>
+        /// <summary>log-mel 텐서 통계(FFT/멜 실험 시 비교용).</summary>
         private static void LogLogMelTensorStats(float[] logMel)
         {
             if (logMel.Length == 0) return;
@@ -671,48 +929,51 @@ namespace SoundVisualizer.AIModel
                 $"[YAMNet logMel] shape=[1,1,{TimeFrames},{MelBins}] (time×mel) n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
         }
 
-        private static float[] Softmax(float[] logits)
+        private float[] Softmax(float[] logits)
         {
             if (logits.Length == 0)
                 return Array.Empty<float>();
 
+            if (_softmaxBuffer == null) _softmaxBuffer = new float[logits.Length];
+
             float max = logits.Max();
-            var exp = new float[logits.Length];
             double sum = 0;
             for (int i = 0; i < logits.Length; i++)
             {
-                exp[i] = MathF.Exp(logits[i] - max);
-                sum += exp[i];
+                _softmaxBuffer[i] = MathF.Exp(logits[i] - max);
+                sum += _softmaxBuffer[i];
             }
 
             if (sum <= 0 || double.IsNaN(sum))
             {
                 float inv = 1f / logits.Length;
                 for (int i = 0; i < logits.Length; i++)
-                    exp[i] = inv;
-                return exp;
+                    _softmaxBuffer[i] = inv;
+                return _softmaxBuffer;
             }
 
             for (int i = 0; i < logits.Length; i++)
-                exp[i] = (float)(exp[i] / sum);
+                _softmaxBuffer[i] = (float)(_softmaxBuffer[i] / sum);
 
-            return exp;
+            return _softmaxBuffer;
         }
 
         /// <summary>
-        /// UI 방향 표시는 다채널 그대로 두고, 분류용 모노만 냅니다.
-        /// 7.1에서 유튜브·스테레오 믹스는 FL/FR에만 실리고 FC가 거의 0인 경우가 많아, FC만 쓰면 침묵처럼 보입니다.
-        /// 샘플마다 FC와 (FL+FR)/2의 제곱 에너지 비율로 블렌딩합니다.
-        /// 채널 순서: FL,FR,FC,LFE,SL,SR,BL,BR.
+        /// rawAudioData(멀티채널 float)를 모노 float으로 다운믹스합니다.
+        /// 반환된 배열은 ArrayPool에서 빌린 것이므로 사용 후 반드시 ArrayPool<float>.Shared.Return으로 반환해야 합니다.
         /// </summary>
-        private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels)
+        private static float[] DownmixToMono(byte[] rawAudioData, int bytesRecorded, int channels, out int actualFrames)
         {
             int floatCount = bytesRecorded / 4;
             if (channels <= 0 || floatCount < channels)
+            {
+                actualFrames = 0;
                 return Array.Empty<float>();
+            }
 
             int frames = floatCount / channels;
-            float[] monoAudio = new float[frames];
+            actualFrames = frames;
+            float[] monoAudio = ArrayPool<float>.Shared.Rent(frames);
 
             if (channels == 8)
             {
@@ -748,54 +1009,40 @@ namespace SoundVisualizer.AIModel
         }
 
         /// <summary>
-        /// 루프백 등 실시간 모노 float을 YAMNet이 기대하는 16kHz로 맞춥니다. (WAV 테스트 경로는 <see cref="WavAudioLoader"/>와 동일하게 WDL 리샘플)
+        /// 고속 0-allocation 선형 보간 리샘플러
         /// </summary>
-        private static float[] ResampleMonoFloatTo16k(float[] mono, int sourceSampleRate)
+        private void ResampleMonoFloatTo16kCustom(float[] source, int sourceLength, int sourceSampleRate, float[] destination)
         {
-            if (mono.Length == 0)
-                return Array.Empty<float>();
-
-            if (sourceSampleRate <= 0)
-                sourceSampleRate = DefaultCaptureSampleRate;
-
+            int destLength = destination.Length;
             if (sourceSampleRate == SampleRate)
-                return mono;
-
-            ISampleProvider provider = new FloatArraySampleProvider(mono, sourceSampleRate);
-            provider = new WdlResamplingSampleProvider(provider, SampleRate);
-
-            var chunk = new float[4096];
-            var list = new List<float>(mono.Length * SampleRate / sourceSampleRate + 64);
-            int read;
-            while ((read = provider.Read(chunk, 0, chunk.Length)) > 0)
             {
-                for (int i = 0; i < read; i++)
-                    list.Add(chunk[i]);
+                int copyLen = Math.Min(sourceLength, destLength);
+                Array.Copy(source, 0, destination, 0, copyLen);
+                if (copyLen < destLength)
+                {
+                    Array.Clear(destination, copyLen, destLength - copyLen);
+                }
+                return;
             }
 
-            return list.ToArray();
-        }
-
-        private sealed class FloatArraySampleProvider : ISampleProvider
-        {
-            private readonly float[] _data;
-            private int _position;
-
-            public FloatArraySampleProvider(float[] data, int sampleRate)
+            double factor = (double)sourceSampleRate / SampleRate;
+            for (int i = 0; i < destLength; i++)
             {
-                _data = data;
-                WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, 1);
-            }
+                double srcPos = i * factor;
+                int index1 = (int)srcPos;
+                int index2 = index1 + 1;
+                float alpha = (float)(srcPos - index1);
 
-            public WaveFormat WaveFormat { get; }
-
-            public int Read(float[] buffer, int offset, int count)
-            {
-                int available = _data.Length - _position;
-                int toRead = Math.Min(count, available);
-                for (int i = 0; i < toRead; i++)
-                    buffer[offset + i] = _data[_position++];
-                return toRead;
+                if (index1 >= sourceLength)
+                {
+                    destination[i] = 0f;
+                }
+                else
+                {
+                    float val1 = source[index1];
+                    float val2 = (index2 < sourceLength) ? source[index2] : val1;
+                    destination[i] = (1f - alpha) * val1 + alpha * val2;
+                }
             }
         }
 
@@ -806,56 +1053,51 @@ namespace SoundVisualizer.AIModel
         {
             int requiredSamples = RequiredMono16kSamples;
 
-            // 고정 길이로 패딩/트렁케이션(실시간 입력 길이가 매번 달라질 수 있으므로)
-            float[] audio = new float[requiredSamples];
+            if (_preprocessedAudio == null) _preprocessedAudio = new float[requiredSamples];
             int copyLen = Math.Min(monoAudio.Length, requiredSamples);
             if (copyLen > 0)
-                Array.Copy(monoAudio, 0, audio, 0, copyLen);
+                Array.Copy(monoAudio, 0, _preprocessedAudio, 0, copyLen);
+            if (copyLen < requiredSamples)
+                Array.Clear(_preprocessedAudio, copyLen, requiredSamples - copyLen);
 
             int freqBins = (FftSize / 2) + 1;
-            float[] power = new float[freqBins];
-            float[] logMel = new float[TimeFrames * MelBins];
-
-            // FFT 버퍼(복사 최소화 목적)
-            Complex[] fftBuffer = new Complex[FftSize];
+            if (_fftPowerBuffer == null) _fftPowerBuffer = new float[freqBins];
+            if (_logMelSpectrogramBuffer == null) _logMelSpectrogramBuffer = new float[TimeFrames * MelBins];
+            if (_fftComplexBuffer == null) _fftComplexBuffer = new Complex[FftSize];
 
             for (int t = 0; t < TimeFrames; t++)
             {
                 int start = t * HopLength;
 
-                // 1) windowing + zero-padding -> complex buffer 준비
                 for (int i = 0; i < FftSize; i++)
                 {
-                    float sample = (i < WindowLength) ? audio[start + i] * _hannWindow[i] : 0f;
-                    fftBuffer[i] = new Complex(sample, 0f);
+                    float sample = (i < WindowLength) ? _preprocessedAudio[start + i] * _hannWindow[i] : 0f;
+                    _fftComplexBuffer[i] = new Complex(sample, 0f);
                 }
 
-                // 2) FFT
-                FFTInPlace(fftBuffer, _bitReversed);
+                FFTInPlace(_fftComplexBuffer, _bitReversed);
 
-                // 3) power spectrum (magnitude^2)
                 for (int k = 0; k < freqBins; k++)
                 {
-                    var c = fftBuffer[k];
-                    power[k] = (float)(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                    var c = _fftComplexBuffer[k];
+                    _fftPowerBuffer[k] = (float)(c.Real * c.Real + c.Imaginary * c.Imaginary);
                 }
 
-                // 4) mel filterbank -> log
                 for (int mel = 0; mel < MelBins; mel++)
                 {
                     double melSum = 0.0;
                     for (int k = 0; k < freqBins; k++)
                     {
                         float w = _melFilterBank[mel, k];
-                        if (w != 0f) melSum += w * power[k];
+                        if (w != 0f) melSum += w * _fftPowerBuffer[k];
                     }
 
                     float value = (float)Math.Log(melSum + LogEps);
-                    logMel[t * MelBins + mel] = value;
+                    _logMelSpectrogramBuffer[t * MelBins + mel] = value;
                 }
             }
 
-            return logMel;
+            return _logMelSpectrogramBuffer;
         }
 
         private static float[] CreateHannWindow(int length)
@@ -864,7 +1106,6 @@ namespace SoundVisualizer.AIModel
             if (length <= 1) return window;
             for (int n = 0; n < length; n++)
             {
-                // Periodic Hann window: 0.5 - 0.5*cos(2*pi*n/N)
                 window[n] = (float)(0.5 - 0.5 * Math.Cos(2 * Math.PI * n / length));
             }
             return window;
@@ -892,7 +1133,6 @@ namespace SoundVisualizer.AIModel
         {
             int n = buffer.Length;
 
-            // Bit-reversal permutation
             for (int i = 0; i < n; i++)
             {
                 int j = bitReversed[i];
@@ -902,7 +1142,6 @@ namespace SoundVisualizer.AIModel
                 }
             }
 
-            // Iterative Cooley-Tukey radix-2 FFT
             for (int len = 2; len <= n; len <<= 1)
             {
                 double ang = -2 * Math.PI / len;
@@ -935,7 +1174,6 @@ namespace SoundVisualizer.AIModel
             float melMin = hzToMel(fMin);
             float melMax = hzToMel(fMax);
 
-            // melBins + 2 points (edges)
             float[] melPoints = new float[melBins + 2];
             for (int i = 0; i < melPoints.Length; i++)
             {
@@ -951,7 +1189,6 @@ namespace SoundVisualizer.AIModel
                 bin[i] = b;
             }
 
-            // Triangular mel filters
             for (int m = 0; m < melBins; m++)
             {
                 int f0 = bin[m];
@@ -982,7 +1219,7 @@ namespace SoundVisualizer.AIModel
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet_class_map.csv");
             if (!File.Exists(path))
             {
-                Console.WriteLine($"⚠️ yamnet_class_map.csv 없음: {path}");
+                Console.WriteLine($"yamnet_class_map.csv 없음: {path}");
                 return;
             }
 
@@ -991,9 +1228,6 @@ namespace SoundVisualizer.AIModel
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                // yamnet_class_map.csv 형식 차이(2열/3열)를 모두 수용:
-                // - 2열: index,display_name
-                // - 3열: index,mid,display_name
                 var parts = line.Split(',', 3);
                 if (parts.Length < 2)
                     continue;
@@ -1016,11 +1250,23 @@ namespace SoundVisualizer.AIModel
         // 메모리 누수 방지용
         public void Dispose()
         {
-            lock (_captureRingLock)
-                _monoAtCaptureRateRing.Clear();
-            _session?.Dispose();
-            _coarseHeadSession?.Dispose();
-            _gunshotBoosterSession?.Dispose();
+            lock (_inferenceLock)
+            {
+                if (_isDisposed) return;
+                _isDisposed = true;
+
+                lock (_captureRingLock)
+                {
+                    _ringBuffer = null;
+                    _ringHead = 0;
+                    _ringTail = 0;
+                    _ringCount = 0;
+                }
+
+                _session?.Dispose();
+                _coarseHeadSession?.Dispose();
+                _gunshotBoosterSession?.Dispose();
+            }
         }
     }
 }

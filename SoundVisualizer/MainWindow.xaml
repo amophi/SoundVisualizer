@@ -3,39 +3,583 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SoundVisualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
-        Topmost="True" WindowState="Maximized" ShowInTaskbar="False">
+        Topmost="True" WindowState="Maximized" ShowInTaskbar="False"
+        PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
+    
+        <Window.Resources>
+        <!-- Toss Colors -->
+        <SolidColorBrush x:Key="BgColor" Color="#2A2C31"/>
+        <SolidColorBrush x:Key="CardColor" Color="#1E2024"/>
+        <SolidColorBrush x:Key="PrimaryTextColor" Color="#F2F4F6"/>
+        <SolidColorBrush x:Key="SecondaryTextColor" Color="#8B95A1"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#3182F6"/>
+        <SolidColorBrush x:Key="AccentHoverColor" Color="#1B64DA"/>
+        <SolidColorBrush x:Key="DividerColor" Color="#222429"/>
+        <SolidColorBrush x:Key="DangerColor" Color="#E53935"/>
+
+        <!-- Primary Button -->
+        <Style x:Key="TossButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="24,16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource AccentHoverColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#104EAD"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bg" Property="Background" Value="#333A44"/>
+                                <Setter Property="Foreground" Value="#8B95A1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Toss Slider -->
+        <Style x:Key="ModernSliderStyle" TargetType="{x:Type Slider}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Slider}">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="8" Background="#333A44" CornerRadius="4" VerticalAlignment="Center" Margin="10,0"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="{StaticResource AccentColor}" CornerRadius="4,0,0,4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Ellipse Width="24" Height="24" Fill="White" Cursor="Hand">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PinkSliderStyle" TargetType="{x:Type Slider}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Slider}">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="8" Background="#333A44" CornerRadius="4" VerticalAlignment="Center" Margin="10,0"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="{StaticResource DangerColor}" CornerRadius="4,0,0,4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Ellipse Width="24" Height="24" Fill="White" Cursor="Hand">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Toss CheckBox -->
+        <Style x:Key="ModernCheckBoxStyle" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter VerticalAlignment="Center" Margin="0,0,14,0"/>
+                            <Grid Width="26" Height="26" VerticalAlignment="Center">
+                                <Border x:Name="CheckBg" Background="#333A44" CornerRadius="8" BorderThickness="0"/>
+                                <Path x:Name="CheckMark" Data="M 7 13 L 11 17 L 19 9" Stroke="White" StrokeThickness="3.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
+                            </Grid>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBg" Property="Background" Value="{StaticResource AccentColor}"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Toss ComboBox -->
+        <Style x:Key="ModernComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Background" Value="#F2F4F6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border x:Name="Bg" CornerRadius="10" Background="{TemplateBinding Background}">
+                                            <Path x:Name="Arrow" Fill="#111111" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" Data="M0,0 L10,0 L5,6 Z"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Left" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border x:Name="DropDownBorder" Background="#FFFFFF" BorderThickness="1" BorderBrush="#E5E8EB" CornerRadius="10" Margin="0,6,0,0" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="4" Opacity="0.1"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="6,8" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="8" Margin="0,2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#F2F4F6"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#E5E8EB"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     
     <Grid x:Name="MainGrid">
         <!-- 시스템 상태 메시지 (상단 고정) -->
         <Border x:Name="StatusBorder" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,50,0,0" 
-                Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False">
-            <TextBlock x:Name="StatusText" Foreground="White" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료"/>
+                Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False" Visibility="Collapsed">
+            <TextBlock x:Name="StatusText" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료" TextAlignment="Center"/>
         </Border>
 
         <!-- 통합 파도 (하나의 연속적인 둘레 웨이브) -->
-        <Path x:Name="UnifiedWave" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6"/>
+        <Path x:Name="UnifiedWave" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6">
+            <Path.Effect>
+                <DropShadowEffect x:Name="WaveGlowEffect" Color="White" BlurRadius="25" ShadowDepth="0" Opacity="0"/>
+            </Path.Effect>
+        </Path>
 
         <!-- AI 라벨 (화면 정중앙) -->
         <Border x:Name="AILabelBorder" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False">
-            <TextBlock x:Name="AILabelText" Foreground="White" FontSize="26" 
-                       FontWeight="Bold" Text="SoundVisualizer 대기 중..."/>
+                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False" Visibility="Collapsed">
+            <TextBlock x:Name="AILabelText" Foreground="{StaticResource PrimaryTextColor}" FontSize="26" 
+                       FontWeight="Bold" Text=""/>
         </Border>
 
         <!-- FPS 카운터 (디버그용, 우상단) -->
         <Border x:Name="FpsBorder" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,50,20,0" 
-                Background="#60000000" CornerRadius="5" Padding="8,4" IsHitTestVisible="False">
+                Background="#60000000" CornerRadius="5" Padding="8,4" IsHitTestVisible="False" Visibility="Collapsed">
             <TextBlock x:Name="FpsText" Foreground="#80FFFFFF" FontSize="11" Text="FPS: --"/>
         </Border>
 
         <!-- 모드 설정 UI (우하단) -->
         <StackPanel x:Name="ModeUIStack" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,20,20" IsHitTestVisible="False">
             <Border Background="#80000000" CornerRadius="5" Padding="12,8" Margin="0,0,0,8">
-                <TextBlock x:Name="VisualModeText" Foreground="White" FontSize="16" FontWeight="SemiBold" Text="🎨 시각화 모드: [F3] 패드 모드 (Pad)"/>
+                <TextBlock x:Name="VisualModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="시각화 모드: [F3] 패드 모드 (Pad)"/>
+            </Border>
+            <Border Background="#80000000" CornerRadius="5" Padding="12,8" Margin="0,0,0,8">
+                <TextBlock x:Name="StereoModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="채널 확장 모드: [F2] 7.1 서라운드"/>
             </Border>
             <Border Background="#80000000" CornerRadius="5" Padding="12,8">
-                <TextBlock x:Name="StereoModeText" Foreground="White" FontSize="16" FontWeight="SemiBold" Text="🔊 채널 확장 모드: [F2] 7.1 서라운드"/>
+                <TextBlock x:Name="EditModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="실시간 오버레이: [F4] 설정 열기/닫기"/>
             </Border>
         </StackPanel>
+
+        <!-- 실시간 오버레이 편집 모드 패널 (F4) -->
+        <Grid x:Name="EditOverlayGrid" Visibility="Collapsed" Background="#F22A2C31">
+            <!-- 가이드라인 인터랙션 영역 -->
+            <Canvas x:Name="GuidelineCanvas" Background="Transparent" MouseDown="GuidelineCanvas_MouseDown" MouseMove="GuidelineCanvas_MouseMove" MouseUp="GuidelineCanvas_MouseUp">
+                <!-- 사각형 가이드라인 (파도 / 패드 / 외곽선 모드) -->
+                <Border x:Name="RectGuideline" BorderBrush="{StaticResource DangerColor}" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#E53935" BlurRadius="15" ShadowDepth="0"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType="Thumb">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Grid.Resources>
+                        <!-- 영역 명칭 및 크기값 제거 (화면 상단으로 이동됨) -->
+                        
+                        <!-- 크기 조절용 4개 모서리 Thumb (드래그 감지) -->
+                        <Thumb x:Name="ResizeHandle_NW" Width="14" Height="14" Background="{StaticResource AccentColor}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_NE" Width="14" Height="14" Background="{StaticResource AccentColor}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_SW" Width="14" Height="14" Background="{StaticResource AccentColor}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <Thumb x:Name="ResizeHandle_SE" Width="14" Height="14" Background="{StaticResource AccentColor}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                    </Grid>
+                </Border>
+
+                <!-- 원형 가이드라인 (원형 모드용) -->
+                <Grid x:Name="CircleGuideline" Visibility="Collapsed">
+                    <!-- 기본 뼈대 점선 원 (내경) -->
+                    <Ellipse x:Name="CircleBaseShape" Stroke="{StaticResource AccentColor}" StrokeThickness="2" StrokeDashArray="3,3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#3182F6" BlurRadius="10" ShadowDepth="0"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <!-- 최대 돌출 상한선 원 (외경) -->
+                    <Ellipse x:Name="CircleMaxShape" Stroke="{StaticResource DangerColor}" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#E53935" BlurRadius="15" ShadowDepth="0"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <!-- 원형 모드 라벨 (중앙 고정) -->
+                    <Border Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{StaticResource DividerColor}" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock x:Name="CircleRadiusLabel" Text="기본 반경: 40" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock x:Name="CircleIntensityLabel" Text="파도 크기: 50%" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Canvas>
+
+            <!-- 사각형 가이드라인 라벨 (화면 상단 고정) -->
+            <Border x:Name="RectGuidelineLabelBox" Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,0" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" Visibility="Collapsed" IsHitTestVisible="False">
+                <StackPanel>
+                    <TextBlock x:Name="RectModeLabel" Text="파도 한계선" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock x:Name="RectSizeLabel" Text="파도 크기: 50%" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 스팀 오버레이 테마의 좌측 설정 패널 -->
+            <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="380" Background="{StaticResource BgColor}" BorderBrush="{StaticResource DividerColor}" BorderThickness="0,0,1,0">
+                <Grid Margin="25,40,25,40">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 상단 헤더 -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                        <TextBlock Text="Sound Visualizer" Foreground="{StaticResource AccentColor}" FontSize="10" FontWeight="Heavy"/>
+                        <TextBlock Text="실시간 오버레이 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="24" FontWeight="ExtraBold" Margin="0,5,0,0"/>
+                        <Border Height="2" Margin="0,15,0,0" Background="{StaticResource DividerColor}"/>
+                    </StackPanel>
+
+                    <!-- 스크롤 가능한 컨트롤 셋 -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="0,0,5,0">
+                            <!-- 드래그 도움말 알림 -->
+                            <Border Background="#10E53935" CornerRadius="8" Padding="12" BorderBrush="#30E53935" BorderThickness="1" Margin="0,0,0,20">
+                                <TextBlock x:Name="DragTipText" Text="화면에 표시된 가이드 라인을 마우스 드래그하여 오버레이 파도의 높이 한계선 및 중앙 크기를 실시간 조절할 수 있습니다!" Foreground="#FFCDD2" FontSize="12" TextWrapping="Wrap" LineHeight="18"/>
+                            </Border>
+
+                            <!-- 실시간 모드 전환 영역 -->
+                            <StackPanel Margin="0,0,0,20">
+                                <TextBlock Text="표현 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <ComboBox x:Name="CmbEditPanelVisualMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelVisualMode_SelectionChanged" Margin="0,0,0,12">
+                                    <ComboBoxItem Content="파도"/>
+                                    <ComboBoxItem Content="패드"/>
+                                    <ComboBoxItem Content="원형"/>
+                                    <ComboBoxItem Content="외곽선"/>
+                                </ComboBox>
+                                
+                                <TextBlock Text="사운드 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <ComboBox x:Name="CmbEditPanelSoundMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelSoundMode_SelectionChanged">
+                                    <ComboBoxItem Content="2 채널"/>
+                                    <ComboBoxItem Content="5.1 채널"/>
+                                    <ComboBoxItem Content="7.1 채널"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- 최대 프레임 설정 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="최대 프레임" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelTargetFpsValueText" Text="144 FPS" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelTargetFpsSlider" Minimum="30" Maximum="240" Value="144" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 1: 파도 속도 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="속도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelSpeedValueText" Text="20" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelSpeedSlider" Minimum="1" Maximum="100" Value="20" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 2: 파도 민감성 -->
+                            <StackPanel Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="민감도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelSensitivityValueText" Text="15" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelSensitivitySlider" Minimum="0" Maximum="100" Value="15" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 3: 투명도 -->
+                            <StackPanel x:Name="EditPanelOpacityPanel" Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelOpacityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelOpacitySlider" Minimum="0" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정 4: 크기 -->
+                            <StackPanel x:Name="EditPanelIntensityPanel" Margin="0,0,0,18">
+                                <Grid>
+                                    <TextBlock Text="크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="EditPanelIntensityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Slider x:Name="EditPanelIntensitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                            </StackPanel>
+
+                            <!-- 설정: 세기 투명도 표현 (크기 고정) 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,0,0,15" Background="{StaticResource CardColor}">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="세기 투명도 표현" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
+                                    </Grid>
+                                    <StackPanel x:Name="EditPanelOpacityFixedSizePanel" Margin="0,15,0,0">
+                                        <Grid>
+                                            <TextBlock x:Name="EditPanelOpacityFixedSizeLabel" Text="파도 크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityFixedSizeValueText" Text="30%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelOpacityFixedSizeSlider" Minimum="10" Maximum="100" Value="30" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                    <StackPanel x:Name="EditPanelOpacityFixedMaxOpacityPanel" Margin="0,10,0,0">
+                                        <Grid>
+                                            <TextBlock Text="최대 투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityFixedMaxOpacityValueText" Text="0%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelOpacityFixedMaxOpacitySlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 4: 글로우(광원) 설정 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="광원 효과" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <CheckBox x:Name="EditPanelGlowCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelGlow_Changed" Unchecked="EditPanelGlow_Changed"/>
+                                    </Grid>
+                                    <StackPanel x:Name="EditPanelGlowIntensityPanel" Margin="0,15,0,0" Visibility="Collapsed">
+                                        <Grid>
+                                            <TextBlock Text="광원 세기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelGlowValueText" Text="0%" Foreground="{StaticResource DangerColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Slider x:Name="EditPanelGlowSlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource PinkSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 5: 소리 분류 표시 설정 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
+                                <StackPanel>
+                                    <TextBlock Text="소리 분류 표시" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    <!-- 환경음 -->
+                                    <Grid Margin="0,0,0,12">
+                                        <CheckBox x:Name="EditPanelShowAmbientCheckBox" Content="환경음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowAmbient_Changed" Unchecked="EditPanelShowAmbient_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelAmbientColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Ambient">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                    <!-- 말소리 -->
+                                    <Grid Margin="0,0,0,12">
+                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="말소리 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelSpeechColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Speech">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                    <!-- 강조음 -->
+                                    <Grid>
+                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="강조음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Button x:Name="EditPanelDangerColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Danger">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 6: 단축키 설정 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
+                                <StackPanel>
+                                    <TextBlock Text="단축키 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="표현 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F3"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="사운드 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F2"/>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <TextBlock Text="오버레이 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F4"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 설정 7: 고급 설정 카드 -->
+                            <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
+                                <StackPanel>
+                                    <TextBlock Text="고급 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <Grid>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="개발자 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock Text="디버그 정보 및 오디오 상태 표시" Foreground="{StaticResource SecondaryTextColor}" FontSize="10" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="EditPanelAdminCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelAdmin_Changed" Unchecked="EditPanelAdmin_Changed"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- 하단 종료 안내 및 오버레이 종료 버튼 -->
+                    <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                        <Border Background="#103182F6" BorderBrush="#303182F6" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Border Background="{StaticResource AccentColor}" CornerRadius="3" Padding="6,2" VerticalAlignment="Center">
+                                    <TextBlock x:Name="EditPanelHotkeyText" Text="F4" Foreground="Black" FontWeight="Bold" FontSize="12"/>
+                                </Border>
+                                <TextBlock Text=" 키를 누르면 설정 저장 후 닫힘" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Button x:Name="BtnCloseOverlay" Content="오버레이 실행 종료" Foreground="White" Background="#E53935" Padding="20,15" FontSize="14" FontWeight="Bold" Cursor="Hand" Click="BtnCloseOverlay_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.8"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

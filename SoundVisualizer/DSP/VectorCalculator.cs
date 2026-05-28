@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SoundVisualizer.DSP
 {
@@ -11,9 +11,8 @@ namespace SoundVisualizer.DSP
 
         public (double L, double R, double F, double B, bool IsActive) CalculateDirection(byte[] rawAudioData, int bytesRecorded, int channelCount = 8)
         {
-            int floatCount = bytesRecorded / 4;
-            float[] samples = new float[floatCount];
-            Buffer.BlockCopy(rawAudioData, 0, samples, 0, bytesRecorded);
+            // MemoryMarshal.Cast를 활용하여 힙 복사 없이 직접 byte 배열을 float span으로 다룸 (GC Free)
+            ReadOnlySpan<float> samples = MemoryMarshal.Cast<byte, float>(rawAudioData.AsSpan(0, bytesRecorded));
 
             float frontLeft = 0, frontRight = 0, center = 0;
             float backLeft = 0, backRight = 0;
@@ -31,11 +30,11 @@ namespace SoundVisualizer.DSP
                 if (channelCount >= 8)
                 {
                     center = Math.Max(center, Math.Abs(samples[i + 2]));
-                    // 인덱스 4,5: 사이드(Side) / 6,7: 백(Back)으로 매핑 순서 조정 (일반적인 7.1 가상화 엔진 기준)
-                    sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 4]));
-                    sideRight = Math.Max(sideRight, Math.Abs(samples[i + 5]));
-                    backLeft = Math.Max(backLeft, Math.Abs(samples[i + 6]));
-                    backRight = Math.Max(backRight, Math.Abs(samples[i + 7]));
+                    // 일반적인 7.1 채널 매핑: 4,5(Back) / 6,7(Side)
+                    backLeft = Math.Max(backLeft, Math.Abs(samples[i + 4]));
+                    backRight = Math.Max(backRight, Math.Abs(samples[i + 5]));
+                    sideLeft = Math.Max(sideLeft, Math.Abs(samples[i + 6]));
+                    sideRight = Math.Max(sideRight, Math.Abs(samples[i + 7]));
                 }
                 else if (channelCount == 2)
                 {
@@ -44,7 +43,15 @@ namespace SoundVisualizer.DSP
                 }
             }
 
-            float maxVolume = new[] { frontLeft, frontRight, center, backLeft, backRight, sideLeft, sideRight }.Max();
+            // LINQ .Max() 사용으로 생기는 배열 생성 가비지 방지를 위해 stack 비교문으로 대체 (GC Free)
+            float maxVolume = frontLeft;
+            if (frontRight > maxVolume) maxVolume = frontRight;
+            if (center > maxVolume) maxVolume = center;
+            if (backLeft > maxVolume) maxVolume = backLeft;
+            if (backRight > maxVolume) maxVolume = backRight;
+            if (sideLeft > maxVolume) maxVolume = sideLeft;
+            if (sideRight > maxVolume) maxVolume = sideRight;
+
             if (maxVolume < 0.01f) return (0, 0, 0, 0, false);
 
             double L = frontLeft + sideLeft + backLeft;
@@ -62,9 +69,8 @@ namespace SoundVisualizer.DSP
 
         public (float FL, float FR, float FC, float BL, float BR, float SL, float SR, float LFE) CalculateVolumes(byte[] rawAudioData, int bytesRecorded, int channelCount = 8)
         {
-            int floatCount = bytesRecorded / 4;
-            float[] samples = new float[floatCount];
-            Buffer.BlockCopy(rawAudioData, 0, samples, 0, bytesRecorded);
+            // MemoryMarshal.Cast를 활용하여 힙 복사 없이 직접 byte 배열을 float span으로 다룸 (GC Free)
+            ReadOnlySpan<float> samples = MemoryMarshal.Cast<byte, float>(rawAudioData.AsSpan(0, bytesRecorded));
 
             float fl = 0, fr = 0, fc = 0, lfe = 0;
             float bl = 0, br = 0, sl = 0, sr = 0;
@@ -81,11 +87,22 @@ namespace SoundVisualizer.DSP
                 {
                     fc = Math.Max(fc, Math.Abs(samples[i + 2]));
                     lfe = Math.Max(lfe, Math.Abs(samples[i + 3]));
-                    // 매핑 순서: 4,5(Side) / 6,7(Back)
-                    sl = Math.Max(sl, Math.Abs(samples[i + 4]));
-                    sr = Math.Max(sr, Math.Abs(samples[i + 5]));
-                    bl = Math.Max(bl, Math.Abs(samples[i + 6]));
-                    br = Math.Max(br, Math.Abs(samples[i + 7]));
+                    // 일반적인 7.1 채널 매핑: 4,5(Back) / 6,7(Side)
+                    bl = Math.Max(bl, Math.Abs(samples[i + 4]));
+                    br = Math.Max(br, Math.Abs(samples[i + 5]));
+                    sl = Math.Max(sl, Math.Abs(samples[i + 6]));
+                    sr = Math.Max(sr, Math.Abs(samples[i + 7]));
+                }
+                else if (channelCount == 6)
+                {
+                    // 5.1 채널 (FL, FR, FC, LFE, BL/SL, BR/SR)
+                    fc = Math.Max(fc, Math.Abs(samples[i + 2]));
+                    lfe = Math.Max(lfe, Math.Abs(samples[i + 3]));
+                    // 5.1에서는 서라운드 채널(4, 5번 인덱스)을 후면(측면 겸용)으로 매핑
+                    bl = Math.Max(bl, Math.Abs(samples[i + 4]));
+                    br = Math.Max(br, Math.Abs(samples[i + 5]));
+                    sl = Math.Max(sl, Math.Abs(samples[i + 4])); // 사이드쪽으로도 파형이 나오게 복사
+                    sr = Math.Max(sr, Math.Abs(samples[i + 5])); // 동일
                 }
                 else if (channelCount == 2)
                 {

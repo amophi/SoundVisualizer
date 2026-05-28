@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using SoundVisualizer.CoreAudio; 
@@ -18,6 +19,15 @@ namespace SoundVisualizer
     {
         private bool _wasStereoHotkeyPressed = false;
         private bool _wasVisualHotkeyPressed = false;
+        private bool _wasEditHotkeyPressed = false;
+        private bool _isEditMode = false;
+
+        private bool _isDraggingCircleRadius = false;
+        private bool _isDraggingCircleIntensity = false;
+        private bool _isDraggingRectIntensity = false;
+        private Point _rectDragStartPos;
+        private double _rectDragStartIntensity;
+
 
         private AudioCaptureEngine? _captureEngine;
         private AudioRouter? _audioRouter;
@@ -29,19 +39,58 @@ namespace SoundVisualizer
         private double _distFL = 0.125, _distFR = 0.125, _distFC = 0.125, _distBL = 0.125, _distBR = 0.125, _distSL = 0.125, _distSR = 0.125, _distLFE = 0.125;
         private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
-        private string _currentLabel = "SoundVisualizer 대기 중...";
+        private string _currentLabel = "";
         private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+        private volatile int _lastSourceChannels = 0;  // 현재 소스 채널 수 (실시간)
+
+        // WPF UI 속성 갱신 및 가비지 최소화용 캐시 필드
+        private string? _cachedColorDangerHex;
+        private string? _cachedColorSpeechHex;
+        private string? _cachedColorAmbientHex;
+        private SolidColorBrush? _dangerBrush;
+        private SolidColorBrush? _speechBrush;
+        private SolidColorBrush? _ambientBrush;
+
+        private Color _cachedActiveColor = Colors.Transparent;
+        private int _cachedVisualModeForBrush = -1;
+
+        private string _cachedVisualModeText = "";
+        private string _cachedStereoModeText = "";
+        private Brush? _cachedStereoModeForeground = null;
+        private string _cachedFpsText = "";
+
+        private Visibility _cachedAILabelBorderVisibility = Visibility.Collapsed;
+        private string _cachedAILabelText = "";
+        private Brush? _cachedAILabelForeground = null;
+        private Visibility _cachedUnifiedWaveVisibility = Visibility.Collapsed;
+
+        private Visibility _cachedStatusBorderVisibility = Visibility.Collapsed;
+        private Visibility _cachedFpsBorderVisibility = Visibility.Collapsed;
+        private Visibility _cachedModeUIStackVisibility = Visibility.Collapsed;
         
+        // YAMNet 추론 스로틀링 제어 필드
+        private readonly object _aiLock = new();
+        private volatile bool _isPredicting = false;
+        private long _lastPredictTimeTicks = 0;
+        private const long AI_PREDICT_INTERVAL_MS = 250; // YAMNet 추론 주기 (250ms)
+
         // 시각화 모듈 (Strategy Pattern)
-        private IVisualizerMode[] _visualizers = new IVisualizerMode[2];
+        private IVisualizerMode[] _visualizers = new IVisualizerMode[4];
+        
+        // 렌더링 최적화를 위한 재사용 객체
+        private VisualizerContext _renderContext = new VisualizerContext();
+        private double[] _channelDepths = new double[8];
+        private double[] _channelDists = new double[8];
         
         public Action? OnSettingsChangedFromHotkey;
 
-        private Thread? _renderThread;
-        private volatile bool _renderRunning;
-        private const double TARGET_FPS = 144.0;
-        private const double FRAME_INTERVAL_MS = 1000.0 / TARGET_FPS;
+        private readonly Stopwatch _renderStopwatch = new();
+        private double _lastRenderTimeMs = 0;
+        private long _lastChannelCountTick = 0;
+        private long _lastHotkeyCheckTick = 0;
+        private long _lastHudUpdateTick = 0;
+        private bool _forceUpdateHUDTexts = true;
         
         private int _frameCount;
         private double _currentFps;
@@ -52,14 +101,23 @@ namespace SoundVisualizer
         public MainWindow()
         {
             InitializeComponent();
+            LoadSettingsToEditPanel(); // UI 초기화 직후 설정값을 미리 반영하여, 지연된 레이아웃 패스에서 기본값(50)이 이벤트를 발생시켜도 올바른 값이 유지되도록 함
+            _isUpdatingEditPanelSliders = false;
             ApplyClickThroughMagic();
             BootSequence();
             StartHighFpsRenderLoop();
 
             this.Closed += (s, e) =>
             {
-                _renderRunning = false;
-                _captureEngine?.StopCapture();
+                CompositionTarget.Rendering -= OnCompositionTargetRendering;
+                
+                if (_captureEngine != null)
+                {
+                    _captureEngine.OnAudioDataAvailable -= HandleAudioDataAsync;
+                    _captureEngine.StopCapture();
+                }
+                
+                _audioRouter?.StopRouting();
                 _soundAI?.Dispose();
             };
         }
@@ -68,11 +126,27 @@ namespace SoundVisualizer
         {
             _visualizers[0] = new WaveVisualizer();
             _visualizers[1] = new PadVisualizer();
+            _visualizers[2] = new CircleRippleVisualizer();
+            _visualizers[3] = new OutlineVisualizer();
 
             _vectorCalc = new VectorCalculator();
             _soundAI = new SoundClassifier();
             _captureEngine = new AudioCaptureEngine();
             _audioRouter = new AudioRouter();
+
+            _captureEngine.OnChannelsChanged += (s, currentChannels) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    int autoSoundMode = currentChannels >= 8 ? 2 : (currentChannels >= 6 ? 1 : 0);
+                    if (AppSettings.SoundMode != autoSoundMode)
+                    {
+                        AppSettings.SoundMode = autoSoundMode;
+                        AppSettings.Save();
+                        OnSettingsChangedFromHotkey?.Invoke(); // UI 업데이트 트리거
+                    }
+                });
+            };
 
             _captureEngine.OnAudioDataAvailable += HandleAudioDataAsync;
             _captureEngine.StartCapture();
@@ -82,12 +156,12 @@ namespace SoundVisualizer
                 int channels = _captureEngine.CaptureFormat.Channels;
                 if (channels != 8)
                 {
-                    StatusText.Text = $"⚠ 경고: 현재 {channels}채널(스테레오) 모드입니다. 레이더 기능을 위해 7.1채널 설정이 필요합니다.";
+                    StatusText.Text = $"PC 오디오 설정: {channels}ch (스테레오)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.Orange;
                 }
                 else
                 {
-                    StatusText.Text = "✅ 8채널(7.1) 사운드 엔진 정상 가동 중";
+                    StatusText.Text = "PC 오디오 설정: 8ch (7.1)\n소스: 대기 중...";
                     StatusText.Foreground = Brushes.LimeGreen;
                 }
                 _audioRouter.StartRouting(_captureEngine.CaptureFormat);
@@ -99,74 +173,123 @@ namespace SoundVisualizer
         // ==========================================
         private void StartHighFpsRenderLoop()
         {
-            _renderRunning = true;
             _fpsStopwatch.Start();
+            _renderStopwatch.Start();
+            CompositionTarget.Rendering += OnCompositionTargetRendering;
+        }
 
-            _renderThread = new Thread(() =>
+        private void OnCompositionTargetRendering(object? sender, EventArgs e)
+        {
+            double targetFps = Math.Max(30.0, AppSettings.TargetFps);
+            double frameIntervalMs = 1000.0 / targetFps;
+
+            double now = _renderStopwatch.Elapsed.TotalMilliseconds;
+            double elapsed = now - _lastRenderTimeMs;
+
+            if (elapsed >= frameIntervalMs)
             {
-                var sw = new Stopwatch();
-                sw.Start();
-                double lastFrameTime = 0;
-
-                while (_renderRunning)
-                {
-                    double now = sw.Elapsed.TotalMilliseconds;
-                    double elapsed = now - lastFrameTime;
-
-                    if (elapsed >= FRAME_INTERVAL_MS)
-                    {
-                        lastFrameTime = now - (elapsed % FRAME_INTERVAL_MS);
-                        try
-                        {
-                            Dispatcher.Invoke(RenderFrame, System.Windows.Threading.DispatcherPriority.Send);
-                        }
-                        catch { break; }
-                    }
-                    else
-                    {
-                        double remaining = FRAME_INTERVAL_MS - elapsed;
-                        if (remaining > 2) Thread.Sleep(1);
-                        else Thread.SpinWait(100);
-                    }
-                }
-            });
-            _renderThread.IsBackground = true;
-            _renderThread.Priority = ThreadPriority.AboveNormal;
-            _renderThread.Start();
+                _lastRenderTimeMs = now - (elapsed % frameIntervalMs);
+                RenderFrame();
+            }
         }
 
         private void RenderFrame()
         {
-            // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
-            bool isVisualHotkeyPressed = (GetAsyncKeyState(AppSettings.VisualModeHotkey) & 0x8000) != 0;
-            if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
+            long nowTicks = Environment.TickCount64;
+
+            // 1. 핫키 체크 스로틀링 (약 30Hz - CPU 사용량 감소 및 P/Invoke 부하 최소화)
+            if (nowTicks - _lastHotkeyCheckTick >= 33)
             {
-                AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
-                AppSettings.Save();
-                OnSettingsChangedFromHotkey?.Invoke();
-                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                _lastHotkeyCheckTick = nowTicks;
+
+                // 실시간 오버레이 편집 모드 토글
+                bool isEditHotkeyPressed = IsHotkeyPressed(AppSettings.EditModeKeyBind);
+                if (isEditHotkeyPressed && !_wasEditHotkeyPressed)
+                {
+                    ToggleEditMode(!_isEditMode);
+                }
+                _wasEditHotkeyPressed = isEditHotkeyPressed;
+
+                // F3 키: 시각화 모드(Wave/Pad) 실시간 전환
+                bool isVisualHotkeyPressed = IsHotkeyPressed(AppSettings.VisualModeKeyBind);
+                if (isVisualHotkeyPressed && !_wasVisualHotkeyPressed)
+                {
+                    AppSettings.VisualMode = (AppSettings.VisualMode + 1) % _visualizers.Length;
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+                    _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                    _forceUpdateHUDTexts = true;
+
+                    if (_isEditMode)
+                    {
+                        LoadSettingsToEditPanel();
+                        UpdateGuidelinePositions();
+                    }
+                }
+                _wasVisualHotkeyPressed = isVisualHotkeyPressed;
+
+                // F2 키: 스테레오 확장 모드 실시간 전환
+                bool isStereoHotkeyPressed = IsHotkeyPressed(AppSettings.StereoUpmixKeyBind);
+                if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
+                {
+                    AppSettings.SoundMode = (AppSettings.SoundMode + 1) % 3;
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+                    _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
+                    _forceUpdateHUDTexts = true;
+                    
+                    if (_isEditMode)
+                    {
+                        LoadSettingsToEditPanel();
+                    }
+                }
+                _wasStereoHotkeyPressed = isStereoHotkeyPressed;
             }
-            _wasVisualHotkeyPressed = isVisualHotkeyPressed;
 
-            VisualModeText.Text = AppSettings.VisualMode == 0 
-                ? "🎨 시각화 모드: [F3] 파도 모드 (Wave)" 
-                : "🎨 시각화 모드: [F3] 패드 모드 (Pad)";
-
-            // F2 키: 스테레오 확장 모드 실시간 전환
-            bool isStereoHotkeyPressed = (GetAsyncKeyState(AppSettings.StereoUpmixHotkey) & 0x8000) != 0;
-            if (isStereoHotkeyPressed && !_wasStereoHotkeyPressed)
+            // 2. UI 텍스트 문자열 할당 최소화 (500ms마다 또는 강제 업데이트 필요 시에만 수행)
+            if (nowTicks - _lastHudUpdateTick >= 500 || _forceUpdateHUDTexts)
             {
-                AppSettings.IsStereoUpmixMode = !AppSettings.IsStereoUpmixMode;
-                AppSettings.Save();
-                OnSettingsChangedFromHotkey?.Invoke();
-                _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
-            }
-            _wasStereoHotkeyPressed = isStereoHotkeyPressed;
+                _lastHudUpdateTick = nowTicks;
+                _forceUpdateHUDTexts = false;
 
-            StereoModeText.Text = AppSettings.IsStereoUpmixMode 
-                ? "🎧 채널 모드: [F2] 스테레오 전용 [L / R]" 
-                : "🔊 채널 모드: [F2] 7.1 서라운드";
-            StereoModeText.Foreground = AppSettings.IsStereoUpmixMode ? Brushes.Cyan : Brushes.White;
+                string visualKeyName = GetKeysName(AppSettings.VisualModeKeyBind);
+                string targetVisualModeText = AppSettings.VisualMode == 0 
+                    ? $"시각화 모드: [{visualKeyName}] 파도 모드 (Wave)" 
+                    : AppSettings.VisualMode == 1
+                        ? $"시각화 모드: [{visualKeyName}] 패드 모드 (Pad)"
+                        : AppSettings.VisualMode == 2
+                            ? $"시각화 모드: [{visualKeyName}] 원형 모드 (Circle)"
+                            : $"시각화 모드: [{visualKeyName}] 외곽선 모드 (Outline)";
+                if (_cachedVisualModeText != targetVisualModeText)
+                {
+                    _cachedVisualModeText = targetVisualModeText;
+                    VisualModeText.Text = targetVisualModeText;
+                }
+
+                string stereoKeyName = GetKeysName(AppSettings.StereoUpmixKeyBind);
+                string targetStereoModeText = AppSettings.SoundMode == 0 
+                    ? $"사운드 모드: [{stereoKeyName}] 2 채널" 
+                    : (AppSettings.SoundMode == 1 ? $"사운드 모드: [{stereoKeyName}] 5.1 채널" : $"사운드 모드: [{stereoKeyName}] 7.1 채널");
+                Brush targetStereoForeground = AppSettings.SoundMode == 0 ? Brushes.Cyan : (AppSettings.SoundMode == 1 ? Brushes.Gold : Brushes.White);
+
+                if (_cachedStereoModeText != targetStereoModeText)
+                {
+                    _cachedStereoModeText = targetStereoModeText;
+                    StereoModeText.Text = targetStereoModeText;
+                }
+                if (_cachedStereoModeForeground != targetStereoForeground)
+                {
+                    _cachedStereoModeForeground = targetStereoForeground;
+                    StereoModeText.Foreground = targetStereoForeground;
+                }
+
+                string editKeyName = GetKeysName(AppSettings.EditModeKeyBind);
+                string targetEditModeText = $"실시간 오버레이: [{editKeyName}] 설정 열기/닫기";
+                if (EditModeText != null && EditModeText.Text != targetEditModeText)
+                {
+                    EditModeText.Text = targetEditModeText;
+                }
+            }
 
             _frameCount++;
             double fpsElapsed = _fpsStopwatch.Elapsed.TotalSeconds;
@@ -175,7 +298,13 @@ namespace SoundVisualizer
                 _currentFps = _frameCount / fpsElapsed;
                 _frameCount = 0;
                 _fpsStopwatch.Restart();
-                FpsText.Text = $"FPS: {_currentFps:F0}";
+                
+                string targetFpsText = $"FPS: {_currentFps:F0}";
+                if (_cachedFpsText != targetFpsText)
+                {
+                    _cachedFpsText = targetFpsText;
+                    FpsText.Text = targetFpsText;
+                }
             }
 
             _animationTime += 0.035;
@@ -220,82 +349,150 @@ namespace SoundVisualizer
             {
                 if (AppSettings.IsAdminMode)
                 {
-                    AILabelBorder.Visibility = Visibility.Visible;
-                    AILabelText.Text = _currentLabel;
-                    AILabelText.Foreground = new SolidColorBrush(activeColor);
+                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Visible);
+                    
+                    if (_cachedAILabelText != _currentLabel)
+                    {
+                        _cachedAILabelText = _currentLabel;
+                        AILabelText.Text = _currentLabel;
+                    }
+
+                    SolidColorBrush activeBrush = GetBrushForLabel(_currentLabel);
+                    if (_cachedAILabelForeground != activeBrush)
+                    {
+                        _cachedAILabelForeground = activeBrush;
+                        AILabelText.Foreground = activeBrush;
+                    }
                 }
                 else
                 {
-                    AILabelBorder.Visibility = Visibility.Collapsed;
+                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
                 }
-                UnifiedWave.Visibility = Visibility.Visible;
+                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Visible);
             }
             else
             {
-                AILabelBorder.Visibility = Visibility.Collapsed;
-                UnifiedWave.Visibility = Visibility.Collapsed;
+                SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Collapsed);
             }
 
-            if (DateTime.Now < _modeUIVisibleUntil)
-                ModeUIStack.Visibility = Visibility.Visible;
-            else
-                ModeUIStack.Visibility = Visibility.Collapsed;
+            Visibility targetModeUIStackVisibility = (DateTime.Now < _modeUIVisibleUntil && !_isEditMode) ? Visibility.Visible : Visibility.Collapsed;
+            SetVisibilityIfChanged(ModeUIStack, ref _cachedModeUIStackVisibility, targetModeUIStackVisibility);
 
             if (AppSettings.IsAdminMode)
             {
-                StatusBorder.Visibility = Visibility.Visible;
-                FpsBorder.Visibility = Visibility.Visible;
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Visible);
             }
             else
             {
-                StatusBorder.Visibility = Visibility.Collapsed;
-                FpsBorder.Visibility = Visibility.Collapsed;
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
             }
 
             double w = this.ActualWidth;
             double h = this.ActualHeight;
             if (w == 0 || h == 0) return;
 
-            // VisualizerContext 설정 (Intensity 100일때 기존 대비 2배 효과를 주기 위해 * 6.0)
-            double baseDepth = 450.0 * (Math.Max(0.0, AppSettings.WaveIntensity * 6.0) / 100.0);
-            double[] channelDepths;
+            // VisualizerContext 설정 (Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)
+            double maxBaseDepthRender = Math.Min(w, h) / 2.0 - 10;
+            if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
             
-            if (AppSettings.IsStereoUpmixMode)
+            bool useOpacity = AppSettings.IntensityAsOpacity;
+            double currentIntensity = useOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+            double baseDepth = maxBaseDepthRender * (Math.Max(0.0, currentIntensity) / 100.0);
+            
+            if (AppSettings.SoundMode == 0)
             {
                 // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
-                channelDepths = new double[]
-                {
-                    0, 0, baseDepth * _smoothFR, 0,
-                    0, 0, baseDepth * _smoothFL, 0
-                };
+                _channelDepths[0] = 0;
+                _channelDepths[1] = 0;
+                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFR));
+                _channelDepths[3] = 0;
+                _channelDepths[4] = 0;
+                _channelDepths[5] = 0;
+                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFL));
+                _channelDepths[7] = 0;
             }
             else
             {
                 double phantomBC = (_smoothBL + _smoothBR) / 2.0;
-                channelDepths = new double[]
-                {
-                    baseDepth * _smoothFC, baseDepth * _smoothFR, baseDepth * _smoothSR, baseDepth * _smoothBR,
-                    baseDepth * phantomBC, baseDepth * _smoothBL, baseDepth * _smoothSL, baseDepth * _smoothFL
-                };
+                double phantomDistBC = (_distBL + _distBR) / 2.0;
+                
+                _channelDepths[0] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFC * 4.0) : _smoothFC));
+                _channelDepths[1] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFR * 4.0) : _smoothFR));
+                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSR * 4.0) : _smoothSR));
+                _channelDepths[3] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBR * 4.0) : _smoothBR));
+                _channelDepths[4] = Math.Min(baseDepth, baseDepth * (useOpacity ? (phantomDistBC * 4.0) : phantomBC));
+                _channelDepths[5] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBL * 4.0) : _smoothBL));
+                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSL * 4.0) : _smoothSL));
+                _channelDepths[7] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFL * 4.0) : _smoothFL));
             }
 
-            var context = new VisualizerContext
-            {
-                Width = w,
-                Height = h,
-                ChannelDepths = channelDepths,
-                ChannelDists = new double[] { _distFC, _distFR, _distSR, _distBR, _distLFE, _distBL, _distSL, _distFL },
-                TotalVolume = (float)totalTarget,
-                AnimationTime = _animationTime
-            };
+            _channelDists[0] = _distFC;
+            _channelDists[1] = _distFR;
+            _channelDists[2] = _distSR;
+            _channelDists[3] = _distBR;
+            _channelDists[4] = _distLFE;
+            _channelDists[5] = _distBL;
+            _channelDists[6] = _distSL;
+            _channelDists[7] = _distFL;
+
+            _renderContext.Width = w;
+            _renderContext.Height = h;
+            _renderContext.BaseDepth = baseDepth;
+            _renderContext.ChannelDepths = _channelDepths;
+            _renderContext.ChannelDists = _channelDists;
+            _renderContext.TotalVolume = (float)totalTarget;
+            _renderContext.AnimationTime = _animationTime;
 
             // 선택된 렌더러(Wave 또는 Pad)에게 그리기 위임
             int modeIndex = (AppSettings.VisualMode >= 0 && AppSettings.VisualMode < _visualizers.Length) ? AppSettings.VisualMode : 0;
             var currentVisualizer = _visualizers[modeIndex];
 
-            UnifiedWave.Data = currentVisualizer.GenerateGeometry(context);
-            UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
-            UnifiedWave.Opacity = AppSettings.VisualOpacity / 100.0;
+            UnifiedWave.Data = currentVisualizer.GenerateGeometry(_renderContext);
+            
+            if (_cachedActiveColor != activeColor || _cachedVisualModeForBrush != modeIndex || UnifiedWave.Fill == null)
+            {
+                _cachedActiveColor = activeColor;
+                _cachedVisualModeForBrush = modeIndex;
+                
+                if (modeIndex == 3)
+                {
+                    UnifiedWave.Fill = Brushes.Transparent;
+                    UnifiedWave.Stroke = currentVisualizer.GetFillBrush(activeColor);
+                    UnifiedWave.StrokeThickness = 4.0;
+                }
+                else
+                {
+                    UnifiedWave.Fill = currentVisualizer.GetFillBrush(activeColor);
+                    UnifiedWave.Stroke = null;
+                    UnifiedWave.StrokeThickness = 0;
+                }
+            }
+            
+            if (AppSettings.IntensityAsOpacity)
+            {
+                double maxOpacity = Math.Max(0.0, AppSettings.OpacityFixedMaxOpacity) / 100.0;
+                double volumeFactor = Math.Max(0.0, Math.Min(1.0, _smoothTotal / 2.5));
+                UnifiedWave.Opacity = maxOpacity * volumeFactor;
+            }
+            else
+            {
+                double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
+                UnifiedWave.Opacity = baseOpacity;
+            }
+
+            if (AppSettings.IsGlowMode)
+            {
+                WaveGlowEffect.Color = activeColor;
+                WaveGlowEffect.Opacity = Math.Min(1.0, AppSettings.GlowIntensity / 100.0 * 1.6); 
+                WaveGlowEffect.BlurRadius = Math.Max(1.0, AppSettings.GlowIntensity * 0.5); 
+            }
+            else
+            {
+                WaveGlowEffect.Opacity = 0;
+            }
 
             _targetFL *= 0.87f;
             _targetFR *= 0.87f;
@@ -305,36 +502,177 @@ namespace SoundVisualizer
             _targetSL *= 0.87f;
             _targetSR *= 0.87f;
             _targetLFE *= 0.87f;
+
+            if (_isEditMode)
+            {
+                UpdateGuidelinePositions();
+            }
         }
 
-        private async void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
+        private void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
         {
             if (_audioRouter == null || _vectorCalc == null || _soundAI == null) return;
 
             byte[] rawData = e.Buffer;
-            int bytesRecorded = rawData.Length;
+            int bytesRecorded = e.BytesRecorded;
+            int channels = e.Channels;
 
-            await Task.Run(() =>
+            // 1. 오디오 라우팅, 실시간 활성 채널 파악, 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
+            _audioRouter.OnDataReceived(this, rawData);
+            
+            long currentTick = Environment.TickCount64;
+            if (currentTick - _lastChannelCountTick >= 500)
             {
-                _audioRouter.OnDataReceived(this, rawData);
-                var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, e.Channels);
-                
-                // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
-                // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
-                if (AppSettings.IsStereoUpmixMode)
-                {
-                    sl = fl; bl = fl;
-                    sr = fr; br = fr;
-                }
+                _lastChannelCountTick = currentTick;
+                _lastSourceChannels = CountActiveChannels(rawData, channels);
+            }
+            
+            var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, channels);
+            
+            // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
+            // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
+            if (AppSettings.SoundMode == 0)
+            {
+                sl = fl; bl = fl;
+                sr = fr; br = fr;
+            }
 
-                _targetFL = fl; _targetFR = fr; _targetFC = fc;
-                _targetBL = bl; _targetBR = br;
-                _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
-                _currentLabel = _soundAI.PredictSoundType(rawData, bytesRecorded, e.Channels);
-            });
+            // 렌더 스레드가 참조할 볼륨 변수를 즉시 갱신 (지연 시간 0)
+            _targetFL = fl; _targetFR = fr; _targetFC = fc;
+            _targetBL = bl; _targetBR = br;
+            _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
+
+            // YAMNet 실시간 링 버퍼에 데이터를 끊김 없이 모노 다운믹스하여 적재 (데이터의 연속성 및 정확도 보존)
+            int sampleRate = _captureEngine?.CaptureFormat?.SampleRate ?? SoundClassifier.DefaultCaptureSampleRate;
+            _soundAI.IngestAudio(rawData, bytesRecorded, channels, sampleRate);
+
+            // 2. AI 추론 스로틀링 (250ms 간격으로 백그라운드 스레드풀에서 무거운 ONNX 추론 실행)
+            long nowTicks = Environment.TickCount64;
+            long elapsedMs = nowTicks - _lastPredictTimeTicks;
+
+            if (elapsedMs >= AI_PREDICT_INTERVAL_MS && !_isPredicting)
+            {
+                lock (_aiLock)
+                {
+                    if (!_isPredicting)
+                    {
+                        _isPredicting = true;
+                        _lastPredictTimeTicks = nowTicks;
+
+                        Task.Run(() =>
+                        {
+                            try
+                            {
+                                // 링 버퍼에 안전하게 축적된 데이터에서 추론 진행
+                                string prediction = _soundAI.PredictSoundType(sampleRate);
+
+                                // 이전 값과 다를 때만 UI 스레드에 디스패칭하여 가비지 및 컨텍스트 스위칭 최소화
+                                if (_currentLabel != prediction)
+                                {
+                                    // UI 프레임 렌더링에 부정적인 영향을 미치지 않도록 Background 우선순위로 라벨 업데이트
+                                    Dispatcher.InvokeAsync(() =>
+                                    {
+                                        _currentLabel = prediction;
+                                    }, System.Windows.Threading.DispatcherPriority.Background);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"[YAMNet Background Error] {ex.Message}");
+                            }
+                            finally
+                            {
+                                _isPredicting = false;
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// float32 멀티채널 버퍼에서 실제로 신호가 있는 채널 수를 반환합니다.
+        /// WASAPI는 소스가 2ch여도 장치 포맷(8ch)으로 패딩하므로,
+        /// 무음(절댓값 합산이 임계값 미만)인 채널은 제외합니다.
+        /// </summary>
+        private static int CountActiveChannels(byte[] buffer, int totalChannels)
+        {
+            const float threshold = 1e-6f;
+            const int bytesPerSample = 4; // float32
+            int frames = buffer.Length / (totalChannels * bytesPerSample);
+            if (frames == 0) return totalChannels;
+
+            // 채널별 RMS 계산 (전체 프레임의 일부만 샘플링)
+            int step = Math.Max(1, frames / 200);
+            var rms = new double[totalChannels];
+            int count = 0;
+            for (int i = 0; i < frames; i += step)
+            {
+                int baseOffset = i * totalChannels * bytesPerSample;
+                for (int ch = 0; ch < totalChannels; ch++)
+                {
+                    float s = BitConverter.ToSingle(buffer, baseOffset + ch * bytesPerSample);
+                    rms[ch] += s * s;
+                }
+                count++;
+            }
+
+            int active = 0;
+            for (int ch = 0; ch < totalChannels; ch++)
+            {
+                if (Math.Sqrt(rms[ch] / count) > threshold)
+                    active++;
+            }
+            return active > 0 ? active : totalChannels;
         }
 
 
+
+        private void SetVisibilityIfChanged(UIElement element, ref Visibility cachedValue, Visibility newValue)
+        {
+            if (cachedValue != newValue)
+            {
+                cachedValue = newValue;
+                element.Visibility = newValue;
+            }
+        }
+
+        private void UpdateCachedBrushesIfNeeded()
+        {
+            string dangerHex = AppSettings.ColorDanger;
+            string speechHex = AppSettings.ColorSpeech;
+            string ambientHex = AppSettings.ColorAmbient;
+
+            if (_dangerBrush == null || _cachedColorDangerHex != dangerHex)
+            {
+                _cachedColorDangerHex = dangerHex;
+                var brush = new SolidColorBrush(ParseColor(dangerHex));
+                brush.Freeze();
+                _dangerBrush = brush;
+            }
+            if (_speechBrush == null || _cachedColorSpeechHex != speechHex)
+            {
+                _cachedColorSpeechHex = speechHex;
+                var brush = new SolidColorBrush(ParseColor(speechHex));
+                brush.Freeze();
+                _speechBrush = brush;
+            }
+            if (_ambientBrush == null || _cachedColorAmbientHex != ambientHex)
+            {
+                _cachedColorAmbientHex = ambientHex;
+                var brush = new SolidColorBrush(ParseColor(ambientHex));
+                brush.Freeze();
+                _ambientBrush = brush;
+            }
+        }
+
+        private SolidColorBrush GetBrushForLabel(string label)
+        {
+            UpdateCachedBrushesIfNeeded();
+            if (label.Contains("danger")) return _dangerBrush!;
+            if (label.Contains("speech")) return _speechBrush!;
+            return _ambientBrush!;
+        }
 
         private Color ParseColor(string hex)
         {
@@ -402,5 +740,764 @@ namespace SoundVisualizer
         [DllImport("user32.dll")] static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
         [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         [DllImport("user32.dll")] static extern short GetAsyncKeyState(int vKey);
+
+        private bool IsHotkeyPressed(System.Collections.Generic.List<int> keys)
+        {
+            if (keys == null || keys.Count == 0) return false;
+            foreach (int key in keys)
+            {
+                if ((GetAsyncKeyState(key) & 0x8000) == 0) return false;
+            }
+            return true;
+        }
+
+        private string GetKeysName(System.Collections.Generic.List<int> codes)
+        {
+            if (codes == null || codes.Count == 0) return "없음";
+            System.Collections.Generic.List<string> names = new System.Collections.Generic.List<string>();
+            foreach (var code in codes)
+            {
+                var key = System.Windows.Input.KeyInterop.KeyFromVirtualKey(code);
+                string keyName = key.ToString();
+                if (keyName.Contains("System")) keyName = "Alt"; 
+                else if (keyName.StartsWith("Left")) keyName = keyName.Substring(4);
+                else if (keyName.StartsWith("Right")) keyName = "R" + keyName.Substring(5);
+                names.Add(keyName);
+            }
+            return string.Join(" + ", names);
+        }
+
+        // ==========================================
+        // 실시간 오버레이 편집 모드 (F4) 핵심 비하인드 로직
+        // ==========================================
+        private void ToggleEditMode(bool enable)
+        {
+            _isEditMode = enable;
+            var hwnd = new WindowInteropHelper(this).Handle;
+            int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+
+            if (_isEditMode)
+            {
+                // WS_EX_TRANSPARENT를 제거하여 오버레이가 마우스 입력을 받게 함
+                extendedStyle &= ~WS_EX_TRANSPARENT;
+                SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle);
+
+                EditOverlayGrid.Visibility = Visibility.Visible;
+
+                LoadSettingsToEditPanel();
+                UpdateGuidelinePositions();
+
+                // 오버레이 창 활성화 및 마우스 포커싱
+                this.Activate();
+                this.Focus();
+            }
+            else
+            {
+                // WS_EX_TRANSPARENT를 복구하여 오버레이를 마우스 관통 상태로 돌려놓음
+                extendedStyle |= WS_EX_TRANSPARENT;
+                SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle);
+
+                EditOverlayGrid.Visibility = Visibility.Collapsed;
+
+                _isDraggingCircleRadius = false;
+                _isDraggingCircleIntensity = false;
+
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
+            }
+        }
+
+        private bool _isUpdatingEditPanelSliders = true;
+
+        private void LoadSettingsToEditPanel()
+        {
+            _isUpdatingEditPanelSliders = true;
+
+            // 콤보박스 선택 상태 동기화
+            if (CmbEditPanelVisualMode != null)
+                CmbEditPanelVisualMode.SelectedIndex = AppSettings.VisualMode;
+            if (CmbEditPanelSoundMode != null)
+                CmbEditPanelSoundMode.SelectedIndex = AppSettings.SoundMode;
+
+            EditPanelSpeedSlider.Value = AppSettings.WavePositionSpeed;
+            EditPanelSpeedValueText.Text = $"{AppSettings.WavePositionSpeed:F0}";
+
+            EditPanelSensitivitySlider.Value = AppSettings.WaveSensitivity * 4.0;
+            EditPanelSensitivityValueText.Text = $"{AppSettings.WaveSensitivity * 4.0:F0}";
+
+            EditPanelOpacitySlider.Value = 100.0 - AppSettings.VisualOpacity;
+            EditPanelOpacityValueText.Text = $"{100.0 - AppSettings.VisualOpacity:F0}%";
+
+            if (EditPanelIntensitySlider != null)
+            {
+                EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                if (EditPanelIntensityAsOpacityCheckBox != null)
+                {
+                    EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
+                    bool isOpacity = AppSettings.IntensityAsOpacity;
+
+                    if (EditPanelIntensityPanel != null)
+                    {
+                        EditPanelIntensityPanel.IsEnabled = !isOpacity;
+                        EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+                    }
+                    
+                    if (EditPanelOpacityPanel != null)
+                    {
+                        EditPanelOpacityPanel.IsEnabled = !isOpacity;
+                        EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+                    }
+
+                    if (EditPanelOpacityFixedSizePanel != null)
+                    {
+                        EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
+                        EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+                        
+                        if (EditPanelOpacityFixedSizeLabel != null)
+                        {
+                            string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                            EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+                        }
+                        
+                        EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                        EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                    }
+
+                    if (EditPanelOpacityFixedMaxOpacityPanel != null)
+                    {
+                        EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
+                        EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
+                        
+                        EditPanelOpacityFixedMaxOpacitySlider.Value = 100.0 - AppSettings.OpacityFixedMaxOpacity;
+                        EditPanelOpacityFixedMaxOpacityValueText.Text = $"{100.0 - AppSettings.OpacityFixedMaxOpacity:F0}%";
+                    }
+                }
+            }
+
+            EditPanelGlowCheckBox.IsChecked = AppSettings.IsGlowMode;
+            EditPanelGlowIntensityPanel.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
+
+            EditPanelGlowSlider.Value = AppSettings.GlowIntensity;
+            EditPanelGlowValueText.Text = $"{AppSettings.GlowIntensity:F0}%";
+
+            // 소리 분류 표시 설정 바인딩
+            if (EditPanelShowAmbientCheckBox != null)
+                EditPanelShowAmbientCheckBox.IsChecked = AppSettings.ShowAmbient;
+            if (EditPanelShowSpeechCheckBox != null)
+                EditPanelShowSpeechCheckBox.IsChecked = AppSettings.ShowSpeech;
+            if (EditPanelShowDangerCheckBox != null)
+                EditPanelShowDangerCheckBox.IsChecked = AppSettings.ShowDanger;
+
+            // 색상 버튼 배경색 설정
+            if (EditPanelAmbientColorBtn != null)
+                EditPanelAmbientColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorAmbient));
+            if (EditPanelSpeechColorBtn != null)
+                EditPanelSpeechColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorSpeech));
+            if (EditPanelDangerColorBtn != null)
+                EditPanelDangerColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorDanger));
+
+            // 단축키 설정 바인딩
+            
+            if (BtnEditPanelVisualHotkey != null)
+                BtnEditPanelVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
+            if (BtnEditPanelSoundModeHotkey != null)
+                BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
+            if (BtnEditPanelEditHotkey != null)
+                BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
+            
+            if (EditPanelHotkeyText != null)
+                EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
+
+            // 고급 설정 바인딩
+            if (EditPanelTargetFpsSlider != null)
+            {
+                EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
+                EditPanelTargetFpsValueText.Text = $"{AppSettings.TargetFps:F0} FPS";
+            }
+
+            if (EditPanelAdminCheckBox != null)
+                EditPanelAdminCheckBox.IsChecked = AppSettings.IsAdminMode;
+
+            _isUpdatingEditPanelSliders = false;
+        }
+
+        private void CmbEditPanelVisualMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+
+            AppSettings.VisualMode = CmbEditPanelVisualMode.SelectedIndex;
+            AppSettings.Save();
+
+            if (EditPanelOpacityFixedSizeLabel != null)
+            {
+                string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
+                EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+            }
+
+            // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
+            UpdateGuidelinePositions();
+
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void CmbEditPanelSoundMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+
+            AppSettings.SoundMode = CmbEditPanelSoundMode.SelectedIndex;
+            AppSettings.Save();
+
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+
+            if (sender == EditPanelSpeedSlider)
+            {
+                AppSettings.WavePositionSpeed = EditPanelSpeedSlider.Value;
+                EditPanelSpeedValueText.Text = $"{EditPanelSpeedSlider.Value:F0}";
+            }
+            else if (sender == EditPanelSensitivitySlider)
+            {
+                AppSettings.WaveSensitivity = EditPanelSensitivitySlider.Value / 4.0;
+                EditPanelSensitivityValueText.Text = $"{EditPanelSensitivitySlider.Value:F0}";
+                OnSettingsChangedFromHotkey?.Invoke();
+            }
+            else if (sender == EditPanelOpacitySlider)
+            {
+                AppSettings.VisualOpacity = 100.0 - EditPanelOpacitySlider.Value;
+                EditPanelOpacityValueText.Text = $"{EditPanelOpacitySlider.Value:F0}%";
+                UnifiedWave.Opacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
+            }
+            else if (sender == EditPanelIntensitySlider)
+            {
+                AppSettings.WaveIntensity = EditPanelIntensitySlider.Value;
+                EditPanelIntensityValueText.Text = $"{EditPanelIntensitySlider.Value:F0}%";
+                UpdateGuidelinePositions();
+            }
+            else if (sender == EditPanelOpacityFixedSizeSlider)
+            {
+                AppSettings.OpacityFixedSize = EditPanelOpacityFixedSizeSlider.Value;
+                EditPanelOpacityFixedSizeValueText.Text = $"{EditPanelOpacityFixedSizeSlider.Value:F0}%";
+                UpdateGuidelinePositions();
+            }
+            else if (sender == EditPanelOpacityFixedMaxOpacitySlider)
+            {
+                AppSettings.OpacityFixedMaxOpacity = 100.0 - EditPanelOpacityFixedMaxOpacitySlider.Value;
+                EditPanelOpacityFixedMaxOpacityValueText.Text = $"{EditPanelOpacityFixedMaxOpacitySlider.Value:F0}%";
+            }
+            else if (sender == EditPanelGlowSlider)
+            {
+                AppSettings.GlowIntensity = EditPanelGlowSlider.Value;
+                EditPanelGlowValueText.Text = $"{EditPanelGlowSlider.Value:F0}%";
+            }
+            else if (sender == EditPanelTargetFpsSlider)
+            {
+                AppSettings.TargetFps = EditPanelTargetFpsSlider.Value;
+                EditPanelTargetFpsValueText.Text = $"{EditPanelTargetFpsSlider.Value:F0} FPS";
+            }
+
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelIntensityAsOpacity_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.IntensityAsOpacity = EditPanelIntensityAsOpacityCheckBox.IsChecked ?? false;
+            bool isOpacity = AppSettings.IntensityAsOpacity;
+
+            if (EditPanelIntensityPanel != null)
+            {
+                EditPanelIntensityPanel.IsEnabled = !isOpacity;
+                EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+            }
+
+            if (EditPanelOpacityPanel != null)
+            {
+                EditPanelOpacityPanel.IsEnabled = !isOpacity;
+                EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
+            }
+
+            if (EditPanelOpacityFixedSizePanel != null)
+            {
+                EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
+                EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
+            }
+
+            if (EditPanelOpacityFixedMaxOpacityPanel != null)
+            {
+                EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
+                EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
+            }
+
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelGlow_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+
+            AppSettings.IsGlowMode = EditPanelGlowCheckBox.IsChecked == true;
+            EditPanelGlowIntensityPanel.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
+
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelShowAmbient_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.ShowAmbient = EditPanelShowAmbientCheckBox.IsChecked ?? true;
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelShowSpeech_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.ShowSpeech = EditPanelShowSpeechCheckBox.IsChecked ?? true;
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelShowDanger_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.ShowDanger = EditPanelShowDangerCheckBox.IsChecked ?? true;
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelColorBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                string type = btn.Tag?.ToString() ?? "";
+                string currentColorHex = "#FFFFFF";
+
+                if (type == "Ambient") currentColorHex = AppSettings.ColorAmbient;
+                else if (type == "Speech") currentColorHex = AppSettings.ColorSpeech;
+                else if (type == "Danger") currentColorHex = AppSettings.ColorDanger;
+
+                var dialog = new ColorPickerWindow(currentColorHex);
+                dialog.Owner = this;
+                if (dialog.ShowDialog() == true)
+                {
+                    string hex = dialog.SelectedHexColor;
+
+                    if (type == "Ambient") AppSettings.ColorAmbient = hex;
+                    else if (type == "Speech") AppSettings.ColorSpeech = hex;
+                    else if (type == "Danger") AppSettings.ColorDanger = hex;
+
+                    AppSettings.Save();
+
+                    // 버튼 배경색 즉시 변경
+                    System.Windows.Media.Color newMediaColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+                    btn.Background = new SolidColorBrush(newMediaColor);
+
+                    // 런처 등 외부 프로그램에 즉각 실시간 동조 반영
+                    OnSettingsChangedFromHotkey?.Invoke();
+                }
+            }
+        }
+
+        private void BtnCloseOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private string? _bindingTarget = null;
+        private System.Collections.Generic.HashSet<int> _currentlyHeldKeys = new System.Collections.Generic.HashSet<int>();
+        private System.Collections.Generic.HashSet<int> _maxKeysInCurrentBinding = new System.Collections.Generic.HashSet<int>();
+
+        private void BtnEditPanelHotkey_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == BtnEditPanelVisualHotkey) StartBinding("Visual");
+            else if (sender == BtnEditPanelSoundModeHotkey) StartBinding("Sound");
+            else if (sender == BtnEditPanelEditHotkey) StartBinding("Edit");
+        }
+
+        private void StartBinding(string target)
+        {
+            _bindingTarget = target;
+            _currentlyHeldKeys.Clear();
+            _maxKeysInCurrentBinding.Clear();
+            string msg = AppSettings.Language == "KOR" ? "키 누르기.. (ESC 취소)" : "Press key.. (ESC cancel)";
+            if (target == "Visual") BtnEditPanelVisualHotkey.Content = msg;
+            else if (target == "Sound") BtnEditPanelSoundModeHotkey.Content = msg;
+            else if (target == "Edit") BtnEditPanelEditHotkey.Content = msg;
+        }
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                if (e.Key == System.Windows.Input.Key.Escape)
+                {
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToEditPanel();
+                    e.Handled = true;
+                    return;
+                }
+
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Add(vKey);
+                _maxKeysInCurrentBinding.Add(vKey);
+                
+                string currentStr = GetKeysName(new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding));
+                if (_bindingTarget == "Visual") BtnEditPanelVisualHotkey.Content = currentStr;
+                else if (_bindingTarget == "Sound") BtnEditPanelSoundModeHotkey.Content = currentStr;
+                else if (_bindingTarget == "Edit") BtnEditPanelEditHotkey.Content = currentStr;
+
+                e.Handled = true;
+            }
+        }
+
+        private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_bindingTarget != null)
+            {
+                int vKey = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key);
+                _currentlyHeldKeys.Remove(vKey);
+
+                if (_currentlyHeldKeys.Count == 0 && _maxKeysInCurrentBinding.Count > 0)
+                {
+                    var keysToSave = new System.Collections.Generic.List<int>(_maxKeysInCurrentBinding);
+                    
+                    if (_bindingTarget == "Visual") AppSettings.VisualModeKeyBind = keysToSave;
+                    else if (_bindingTarget == "Sound") AppSettings.StereoUpmixKeyBind = keysToSave;
+                    else if (_bindingTarget == "Edit") AppSettings.EditModeKeyBind = keysToSave;
+
+                    if (_bindingTarget == "Edit" && EditPanelHotkeyText != null) EditPanelHotkeyText.Text = GetKeysName(keysToSave);
+
+                    AppSettings.Save();
+                    OnSettingsChangedFromHotkey?.Invoke();
+
+                    _bindingTarget = null;
+                    _currentlyHeldKeys.Clear();
+                    _maxKeysInCurrentBinding.Clear();
+                    LoadSettingsToEditPanel();
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void EditPanelAdmin_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            AppSettings.IsAdminMode = EditPanelAdminCheckBox.IsChecked ?? false;
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void UpdateGuidelinePositions()
+        {
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            if (w == 0 || h == 0) return;
+
+            int visualMode = AppSettings.VisualMode;
+
+            if (visualMode == 0 || visualMode == 1 || visualMode == 3)
+            {
+                RectGuideline.Visibility = Visibility.Visible;
+                if (RectGuidelineLabelBox != null) RectGuidelineLabelBox.Visibility = Visibility.Visible;
+                CircleGuideline.Visibility = Visibility.Collapsed;
+
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
+                double displayBaseDepth = Math.Min(baseDepth, maxBaseDepth);
+
+                double rectLeft = displayBaseDepth;
+                double rectTop = displayBaseDepth;
+                double rectWidth = w - 2 * displayBaseDepth;
+                double rectHeight = h - 2 * displayBaseDepth;
+
+                if (rectWidth < 10) rectWidth = 10;
+                if (rectHeight < 10) rectHeight = 10;
+
+                Canvas.SetLeft(RectGuideline, rectLeft);
+                Canvas.SetTop(RectGuideline, rectTop);
+                RectGuideline.Width = rectWidth;
+                RectGuideline.Height = rectHeight;
+
+                string modeName = visualMode == 1 ? "패드" : visualMode == 3 ? "외곽선" : "파도";
+                double displayIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
+                if (RectModeLabel != null) RectModeLabel.Text = $"{modeName} 한계선";
+                if (RectSizeLabel != null) RectSizeLabel.Text = $"{modeName} 크기: {displayIntensity:F0}%";
+            }
+            else if (visualMode == 2)
+            {
+                RectGuideline.Visibility = Visibility.Collapsed;
+                if (RectGuidelineLabelBox != null) RectGuidelineLabelBox.Visibility = Visibility.Collapsed;
+                CircleGuideline.Visibility = Visibility.Visible;
+
+                double cx = w / 2.0;
+                double cy = h / 2.0;
+
+                double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
+                double baseRadius = Math.Min(w, h) * radiusRatio;
+
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
+                double maxRadius = baseRadius + baseDepth * 0.35;
+
+                Canvas.SetLeft(CircleGuideline, 0);
+                Canvas.SetTop(CircleGuideline, 0);
+                CircleGuideline.Width = w;
+                CircleGuideline.Height = h;
+
+                CircleBaseShape.Width = baseRadius * 2;
+                CircleBaseShape.Height = baseRadius * 2;
+                Canvas.SetLeft(CircleBaseShape, cx - baseRadius);
+                Canvas.SetTop(CircleBaseShape, cy - baseRadius);
+
+                CircleMaxShape.Width = maxRadius * 2;
+                CircleMaxShape.Height = maxRadius * 2;
+                Canvas.SetLeft(CircleMaxShape, cx - maxRadius);
+                Canvas.SetTop(CircleMaxShape, cy - maxRadius);
+
+                double displayIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
+                CircleRadiusLabel.Text = $"기본 반경: {AppSettings.CircleRadius:F0}";
+                CircleIntensityLabel.Text = $"한계 크기: {displayIntensity:F0}%";
+            }
+        }
+
+        private void ResizeHandle_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            if (w == 0 || h == 0) return;
+
+            Point mousePos = System.Windows.Input.Mouse.GetPosition(GuidelineCanvas);
+            System.Windows.Controls.Primitives.Thumb? thumb = sender as System.Windows.Controls.Primitives.Thumb;
+            if (thumb == null) return;
+
+            double baseDepth = 0;
+            if (thumb.Name == "ResizeHandle_NW")
+                baseDepth = Math.Min(mousePos.X, mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_NE")
+                baseDepth = Math.Min(w - mousePos.X, mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_SW")
+                baseDepth = Math.Min(mousePos.X, h - mousePos.Y);
+            else if (thumb.Name == "ResizeHandle_SE")
+                baseDepth = Math.Min(w - mousePos.X, h - mousePos.Y);
+
+            if (baseDepth < 0) baseDepth = 0;
+
+            double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+            if (maxBaseDepth < 10) maxBaseDepth = 10;
+            double intensity = (baseDepth / maxBaseDepth) * 100.0;
+
+            if (AppSettings.IntensityAsOpacity)
+            {
+                double opSize = intensity * 2.0;
+                if (opSize < 10.0) opSize = 10.0;
+                if (opSize > 100.0) opSize = 100.0;
+                AppSettings.OpacityFixedSize = opSize;
+                if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+            }
+            else
+            {
+                if (intensity < 10.0) intensity = 10.0;
+                if (intensity > 100.0) intensity = 100.0;
+                AppSettings.WaveIntensity = intensity;
+                if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+            }
+
+            UpdateGuidelinePositions();
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void GuidelineCanvas_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!_isEditMode) return;
+
+            if (AppSettings.VisualMode == 2)
+            {
+                double w = this.ActualWidth;
+                double h = this.ActualHeight;
+                double cx = w / 2.0;
+                double cy = h / 2.0;
+
+                Point clickPos = e.GetPosition(GuidelineCanvas);
+
+                double dist = Math.Sqrt(Math.Pow(clickPos.X - cx, 2) + Math.Pow(clickPos.Y - cy, 2));
+
+                double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
+                double baseRadius = Math.Min(w, h) * radiusRatio;
+
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double currentIntensity = AppSettings.IntensityAsOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
+                double baseDepth = maxBaseDepth * (currentIntensity / 100.0);
+                double maxRadius = baseRadius + baseDepth * 0.35;
+
+                double distToBase = Math.Abs(dist - baseRadius);
+                double distToMax = Math.Abs(dist - maxRadius);
+
+                if (distToBase < distToMax)
+                {
+                    _isDraggingCircleRadius = true;
+                    _isDraggingCircleIntensity = false;
+                    GuidelineCanvas.CaptureMouse();
+                }
+                else
+                {
+                    _isDraggingCircleIntensity = true;
+                    _isDraggingCircleRadius = false;
+                    GuidelineCanvas.CaptureMouse();
+                }
+            }
+            else
+            {
+                _isDraggingRectIntensity = true;
+                _rectDragStartPos = e.GetPosition(GuidelineCanvas);
+                _rectDragStartIntensity = AppSettings.IntensityAsOpacity ? AppSettings.OpacityFixedSize : AppSettings.WaveIntensity;
+                GuidelineCanvas.CaptureMouse();
+            }
+        }
+
+        private void GuidelineCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!_isEditMode) return;
+
+            if (_isDraggingCircleRadius || _isDraggingCircleIntensity)
+            {
+                double w = this.ActualWidth;
+                double h = this.ActualHeight;
+                double cx = w / 2.0;
+                double cy = h / 2.0;
+
+                Point mousePos = e.GetPosition(GuidelineCanvas);
+                double dist = Math.Sqrt(Math.Pow(mousePos.X - cx, 2) + Math.Pow(mousePos.Y - cy, 2));
+
+                if (_isDraggingCircleRadius)
+                {
+                    double maxMinWh = Math.Min(w, h);
+                    if (maxMinWh > 0)
+                    {
+                        double radiusRatio = dist / maxMinWh;
+                        double circleRadius = ((radiusRatio - 0.05) / 0.35) * 90.0 + 10.0;
+
+                        if (circleRadius < 10.0) circleRadius = 10.0;
+                        if (circleRadius > 100.0) circleRadius = 100.0;
+
+                        AppSettings.CircleRadius = circleRadius;
+                    }
+                }
+                else if (_isDraggingCircleIntensity)
+                {
+                    double radiusRatio = 0.05 + (AppSettings.CircleRadius - 10.0) / 90.0 * 0.35;
+                    double baseRadius = Math.Min(w, h) * radiusRatio;
+
+                    double baseDepth = (dist - baseRadius) / 0.35;
+                    if (baseDepth < 0) baseDepth = 0;
+
+                    double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                    if (maxBaseDepth < 10) maxBaseDepth = 10;
+                    double intensity = (baseDepth / maxBaseDepth) * 100.0;
+
+                    if (AppSettings.IntensityAsOpacity)
+                    {
+                        double opSize = intensity * 2.0;
+                        if (opSize < 0.0) opSize = 0.0;
+                        if (opSize > 100.0) opSize = 100.0;
+                        AppSettings.OpacityFixedSize = opSize;
+                        if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                        if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                    }
+                    else
+                    {
+                        if (intensity < 0.0) intensity = 0.0;
+                        if (intensity > 100.0) intensity = 100.0;
+                        AppSettings.WaveIntensity = intensity;
+                        if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                        if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                    }
+                }
+
+                UpdateGuidelinePositions();
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
+            }
+            else if (_isDraggingRectIntensity)
+            {
+                double w = this.ActualWidth;
+                double h = this.ActualHeight;
+                if (w == 0 || h == 0) return;
+
+                Point mousePos = e.GetPosition(GuidelineCanvas);
+
+                double distLeft = _rectDragStartPos.X;
+                double distRight = w - _rectDragStartPos.X;
+                double distTop = _rectDragStartPos.Y;
+                double distBottom = h - _rectDragStartPos.Y;
+
+                double minDist = Math.Min(Math.Min(distLeft, distRight), Math.Min(distTop, distBottom));
+
+                double baseDepth = 0;
+                if (minDist == distLeft) baseDepth = mousePos.X;
+                else if (minDist == distRight) baseDepth = w - mousePos.X;
+                else if (minDist == distTop) baseDepth = mousePos.Y;
+                else baseDepth = h - mousePos.Y;
+
+                if (baseDepth < 0) baseDepth = 0;
+
+                double maxBaseDepth = Math.Min(w, h) / 2.0 - 10;
+                if (maxBaseDepth < 10) maxBaseDepth = 10;
+                double intensity = (baseDepth / maxBaseDepth) * 100.0;
+
+                if (AppSettings.IntensityAsOpacity)
+                {
+                    double opSize = intensity * 2.0;
+                    if (opSize < 10.0) opSize = 10.0;
+                    if (opSize > 100.0) opSize = 100.0;
+                    AppSettings.OpacityFixedSize = opSize;
+                    if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+                    if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = $"{AppSettings.OpacityFixedSize:F0}%";
+                }
+                else
+                {
+                    if (intensity < 10.0) intensity = 10.0;
+                    if (intensity > 100.0) intensity = 100.0;
+                    AppSettings.WaveIntensity = intensity;
+                    if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
+                    if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = $"{AppSettings.WaveIntensity:F0}%";
+                }
+
+                UpdateGuidelinePositions();
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
+            }
+        }
+
+        private void GuidelineCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_isDraggingCircleRadius || _isDraggingCircleIntensity || _isDraggingRectIntensity)
+            {
+                _isDraggingCircleRadius = false;
+                _isDraggingCircleIntensity = false;
+                _isDraggingRectIntensity = false;
+                GuidelineCanvas.ReleaseMouseCapture();
+                AppSettings.Save();
+                OnSettingsChangedFromHotkey?.Invoke();
+            }
+        }
     }
 }
