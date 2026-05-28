@@ -75,7 +75,7 @@ namespace SoundVisualizer.AIModel
         private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
-        private const float DangerExitFastConfidence = 0.29f;
+        private const float DangerPreviewConfidence = 0.42f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -215,16 +215,24 @@ namespace SoundVisualizer.AIModel
 #if DEBUG
                 LogClassificationDebugThrottled(in r, threshold);
 #endif
+                bool useDangerPreview =
+                    _confirmedCoarse != "danger" &&
+                    r.MeetsThreshold &&
+                    r.CoarseClass == "danger" &&
+                    r.Confidence >= DangerPreviewConfidence;
 
                 ApplyCoarseHysteresis(in r);
 
-                string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
+                string displayName = useDangerPreview ? r.YamnetDisplayName : _confirmedDisplay;
+                string coarseName = useDangerPreview ? "danger" : _confirmedCoarse;
+                float confidence = useDangerPreview ? r.Confidence : _confirmedConfidence;
+                string translatedName = YamnetThreeClassMapper.TranslateToKorean(displayName);
                 string resultText;
 
-                if (_confirmedConfidence < threshold)
-                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+                if (confidence < threshold)
+                    resultText = $"{translatedName} | {coarseName} | {confidence * 100f:F1}% (저신뢰)";
                 else
-                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
+                    resultText = $"{translatedName} | {coarseName} | {confidence * 100f:F1}%";
 
                 _lastPredictResult = resultText;
                 return resultText;
@@ -279,11 +287,6 @@ namespace SoundVisualizer.AIModel
             }
 
             int requiredStreak = newCoarse == "danger" ? DangerHysteresisThreshold : CoarseHysteresisThreshold;
-            // danger -> non-danger 전환은 완전히 풀지 않고, 신뢰도가 충분할 때만 1프레임 빠르게 이탈 허용
-            if (_confirmedCoarse == "danger" && newCoarse != "danger" && r.Confidence >= DangerExitFastConfidence)
-            {
-                requiredStreak = 1;
-            }
             if (_candidateStreak >= requiredStreak)
             {
                 _confirmedCoarse = newCoarse;
