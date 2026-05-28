@@ -15,7 +15,7 @@
 
 <br/>
 
-> **SoundVisualizer** captures real-time system audio and translates it into beautiful, dynamic graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (like in-game gunshots).
+> **SoundVisualizer** captures real-time system audio and translates it into beautiful, dynamic graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
 
 ---
 
@@ -36,21 +36,29 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 
 ## ✨ Key Features
 
-### 🎨 Diverse Visualizer Modes
-- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as smooth curves that dynamically scale their internal paths based on intensity.
-- ⭕ **Circle Ripple Mode (`CircleRippleVisualizer`)**: Creates an outward-expanding ripple and ring effect to emphasize audio impact and beats.
-- 🎛 **Pad Mode (`PadVisualizer`)**: Displays the frequency spectrum and intensity responses across different grid pad layouts.
+### 🎨 Diverse Visualizer Modes (Upgraded)
+- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as smooth, flowing curves that dynamically scale based on intensity.
+- ⭕ **Circle Mode (`CircleVisualizer`)**: Creates a shimmering circular equalizer and pulse beats based on center Core Radius and frequency.
+- 🎛 **Pad Mode (`PadVisualizer`)**: Displays frequency spectrum responses across spatial grid pad directions (2.0 / 5.1 / 7.1).
+- 🔲 **Outline Mode (`OutlineVisualizer`)**: Emphasizes border neon lighting waves running around the frame edges for immersive effects.
 
-### 🎮 High-Performance Gaming Overlay
-- **Click-Through & Transparent**: The overlay seamlessly sits on top of full-screen games or applications without blocking mouse inputs.
-- **Zero Stuttering**: Optimized rendering via **WPF Native Composition**. Memory allocations per frame have been minimized to drastically reduce Garbage Collection (GC) overhead.
+### 🎮 Real-Time Overlay Editor (F4 Key)
+- **Interactive Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
+- **On-Screen Control Panel**: Tweak colors, sensitivity, speeds, glows, and AI speech labels dynamically via the overlay control panel.
+
+### ⚡ Seamless Hotkey Control
+- Backstage hotkeys (**F2** for Sound Mode, **F3** for Visual Mode, **F4** for Overlay Editor) allow you to toggle modes instantly without minimizing your active fullscreen games.
+
+### 🔊 Advanced Multi-Channel Audio Support
+- **Hardware-Aware Design**: Automatically detects and adjusts configurations for **2.0 Stereo**, **5.1 Surround**, and **7.1 Surround** channels.
+- **Virtual 7.1 Surround Support**: Detailed guides and links for setting up virtual audio tools (like **VB-CABLE**) to experience immersive 7.1 surround sound overlays even on stereo-only setups.
 
 ### 🤖 AI Sound Classification (ONNX & YAMNet)
-- **Deep Learning Integration**: Embedded `SoundClassifier` model detects and categorizes specific audio events natively via ONNX Runtime.
-- **Transfer Learning Customization**: Includes custom Python scripts (`tools/transfer_learning`) to train a custom model (`three_class_score_head`, `gunshot_booster`) on top of YAMNet to dramatically improve specific sound classification accuracy.
+- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels specific audio events (Ambient, Speech, and Danger/Gunshots) natively.
+- **Distinctive Visual Cues**: Assign custom UI colors to each category for instant intuitive recognition.
 
-### ⚙️ Developer UI & Launcher
-- Features a modern `LauncherWindow` to seamlessly manage visualization settings (color, sensitivity, mode toggles) and access tools effortlessly.
+### 🌐 Global Multi-Language Support (8 Languages)
+- Fully localized with complete support for **Korean, English, Japanese, Chinese, Spanish, French, German, and Russian**.
 
 ---
 
@@ -60,9 +68,9 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 <summary><b>Click to expand</b></summary>
 
 - **Framework / UI**: C#, WPF (.NET 9.0/10.0)
-- **Audio Capture & DSP**: CoreAudio API, Real-time Fast Fourier Transform (FFT) signal processing
-- **AI & Machine Learning**: Python (training scripts), ONNX Runtime, YAMNet
-- **Architecture**: Decoupled rendering and audio-capture threads, object-oriented visualizer modules (`IVisualizerMode`)
+- **Audio Capture & DSP**: WASAPI Loopback Capture (via NAudio), Real-time Fast Fourier Transform (FFT) signal processing
+- **AI & Machine Learning**: Python (training scripts), ONNX Runtime, YAMNet (transfer-learned)
+- **Aesthetics & Performance**: High-efficiency double-buffered rendering pipelines minimizing GC allocations (GC-Free implementations).
 </details>
 
 ---
@@ -73,40 +81,42 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 SoundVisualizer/
 ├── AIModel/          # ONNX models (YAMNet, boosters) and C# SoundClassifier
 ├── CoreAudio/        # System audio capture pipeline (AudioCaptureEngine)
-├── DSP/              # Digital Signal Processing (FFT, Vector calculations)
-├── Visualizers/      # Visualizer implementations (Wave, CircleRipple, Pad)
+├── DSP/              # Digital Signal Processing (FFT, VectorCalculator)
+├── Visualizers/      # Visualizer implementations (Wave, Pad, Circle, Outline)
 ├── AppSettings.cs    # Global application and visualizer configuration
-├── LauncherWindow.xaml # Settings launcher interface
-└── MainWindow.xaml     # The actual transparent overlay window
-
-tools/
-└── transfer_learning/ # Python scripts for audio preprocessing and custom ONNX model training
+├── LauncherWindow.xaml # Settings launcher and localization management
+└── MainWindow.xaml     # The actual transparent overlay window and real-time editor
 ```
+
+## 🚀 Installation & Running
+
+### 💻 For General Users (Quick Start via Releases)
+No installation required! SoundVisualizer is distributed as a portable standalone package.
+
+1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
+2. Download the latest `SoundVisualizer.zip` release.
+3. Extract the downloaded `.zip` archive to any folder on your PC.
+4. Double-click **`SoundVisualizer.exe`** to open the Launcher Settings.
+5. Choose your preferred language, customize the configurations, and click **Start** to launch the overlay!
 
 ---
 
-## 🚀 Getting Started
+### 🛠️ For Developers (Build from Source)
+If you wish to modify, contribute, or build the application from source:
 
-### Prerequisites
+#### Prerequisites
 - Windows 10 / 11
-- Visual Studio 2022
-- .NET 9.0/10.0 SDK
+- Visual Studio 2022 (with .NET Desktop Development workload)
+- .NET 9.0 / 10.0 SDK
 
-### Quick Start (Portable Release)
-1. Go to the **Releases** tab on GitHub: [Latest Release](https://github.com/amophi/SoundVisualizer/releases).
-2. Download the latest portable `.zip` file.
-3. Extract the contents to a folder of your choice.
-4. Double-click `SoundVisualizer.exe` to run. The `LauncherWindow` will appear.
-5. Select your preferred visualizer mode, adjust the settings, and click **Start** to launch the overlay.
-
-### Build from Source
-1. Clone this repository:
+#### Build Steps
+1. Clone the repository:
    ```bash
    git clone https://github.com/amophi/SoundVisualizer.git
    ```
-2. Open the `SoundVisualizer.slnx` solution file in Visual Studio.
-3. Build the solution (`Ctrl + Shift + B`).
-4. Press `F5` to run.
+2. Open the `SoundVisualizer.slnx` solution file in Visual Studio 2022.
+3. Build the solution in Release or Debug mode (`Ctrl + Shift + B`).
+4. Press `F5` to execute the launcher.
 
 ---
 
