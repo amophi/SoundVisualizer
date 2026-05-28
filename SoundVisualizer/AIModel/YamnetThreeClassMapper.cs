@@ -65,8 +65,30 @@ namespace SoundVisualizer.AIModel
             return "ambient";
         }
 
+        /// <summary>
+        /// 실험용: 총성이 Plop / Gargling / 비·물 계열로 top-1 나올 때 coarse를 danger로 올림.
+        /// 전이학습·booster와 무관, <see cref="MapDisplayNameToCoarse"/>만 영향.
+        /// </summary>
+        private static bool MatchesTemporaryGunshotProxyDanger(string s)
+        {
+            if (s.Contains("plop"))
+                return true;
+            if (s.Contains("gargling"))
+                return true;
+            // "rain" 단독 contains는 Train(기차) 오탐 → 비·물 YAMNet 라벨만
+            if (s == "rain" || s.Contains("raindrop") || s.Contains("rain on surface"))
+                return true;
+            if (s == "water" || s.Contains("ocean") || s.Contains("waves") || s.Contains("surf") ||
+                s.Contains("waterfall"))
+                return true;
+            return false;
+        }
+
         private static bool MatchesDanger(string s)
         {
+            if (MatchesTemporaryGunshotProxyDanger(s))
+                return true;
+
             // 발소리, 총·폭발, 경적/사이렌·비상 차량, 폭죽 등
             if (s.Contains("footstep") || s.Contains("footsteps"))
                 return true;
