@@ -75,6 +75,8 @@ namespace SoundVisualizer.AIModel
         private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
+        /// <summary>danger→non-danger: booster 미재채택·충분 신뢰 시에만 이탈 1프레임 (총 직후 잔향/BGM).</summary>
+        private const float DangerExitRelaxedConfidence = 0.27f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -288,6 +290,14 @@ namespace SoundVisualizer.AIModel
             }
 
             int requiredStreak = newCoarse == "danger" ? DangerHysteresisThreshold : CoarseHysteresisThreshold;
+            if (_confirmedCoarse == "danger" &&
+                newCoarse != "danger" &&
+                !r.AdoptedDangerFromBooster &&
+                r.Confidence >= DangerExitRelaxedConfidence)
+            {
+                requiredStreak = 1;
+            }
+
             if (_candidateStreak >= requiredStreak)
             {
                 _confirmedCoarse = newCoarse;
