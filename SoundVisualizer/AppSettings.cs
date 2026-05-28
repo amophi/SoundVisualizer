@@ -183,6 +183,9 @@ namespace SoundVisualizer
 
                         if (data.OutlineMode != null) OutlineMode = data.OutlineMode;
                         else OutlineMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
+
+                        int maxRate = GetMonitorRefreshRate();
+                        if (TargetFps > maxRate) TargetFps = maxRate;
                     }
                 }
             }
@@ -230,6 +233,35 @@ namespace SoundVisualizer
                 File.WriteAllText(SettingsFilePath, json);
             }
             catch { }
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr GetDC(IntPtr hWnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        private static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
+        private const int VREFRESH = 116;
+
+        public static int GetMonitorRefreshRate()
+        {
+            IntPtr hDC = GetDC(IntPtr.Zero);
+            try
+            {
+                int rate = GetDeviceCaps(hDC, VREFRESH);
+                return rate > 0 ? rate : 60; // 디바이스 주사율 질의 실패 시 안전하게 60Hz 리턴
+            }
+            catch
+            {
+                return 60;
+            }
+            finally
+            {
+                ReleaseDC(IntPtr.Zero, hDC);
+            }
         }
 
         private class SettingsData

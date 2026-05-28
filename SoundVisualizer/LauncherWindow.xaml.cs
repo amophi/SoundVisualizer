@@ -230,6 +230,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "도움말";
                 TxtHelp1Title.Text = "사운드 모드";
                 TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 만약 7.1 출력 장치가 없다면 ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE 가상 드라이버";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "를 설치하고 출력장치를 7.1채널로 설정한다면 7.1 서라운드 사운드를 사용하여 오버레이를 표현할 수 있습니다.";
                 TxtHelp2Title.Text = "실시간 커스텀 단축키 제어";
                 TxtHelp2Desc.Text = "설정 탭에서 핫키 버튼을 클릭한 뒤, 단일 키 또는 복합 키 조합(예: Ctrl + Shift + A)을 눌러 자유롭게 단축키를 변경할 수 있습니다. 백그라운드에서 지정된 단축키를 누르면 실시간으로 모드가 즉시 전환됩니다.";
                 TxtHelp3Title.Text = "오버레이 실시간 편집 모드";
@@ -246,6 +249,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "말소리 표시";
                     ChkShowDanger.Content = "강조음 표시";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "더 알아보기";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 저장소 및 프로젝트 기여";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub 저장소 방문하기";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "English")
@@ -345,6 +353,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Help";
                 TxtHelp1Title.Text = "Sound Mode";
                 TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, set the 'Sound Mode' appropriately in the settings.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 If you do not have a 7.1 output device, you can install the ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE Virtual Driver";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " and configure the output device to 7.1 channels to display the overlay using 7.1 surround sound.";
                 TxtHelp2Title.Text = "Real-time Custom Hotkeys";
                 TxtHelp2Desc.Text = "You can freely customize hotkeys by clicking the button in the settings and pressing a single key or combination (e.g., Ctrl + Shift + A). Pressing these hotkeys in the background will switch modes instantly.";
                 TxtHelp3Title.Text = "Overlay Real-time Edit Mode";
@@ -361,6 +372,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Show Speech Sounds";
                     ChkShowDanger.Content = "Show Danger Sounds";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Learn More";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub Repository & Contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer is an open-source project, and its source code is publicly available on GitHub. You can participate in the project by reporting bugs, suggesting features, and contributing to development. Click the button below to visit the official GitHub repository!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visit GitHub Repository";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "日本語")
@@ -449,6 +465,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "ヘルプ";
                 TxtHelp1Title.Text = "サウンドモード";
                 TxtHelp1Desc.Text = "正常な方向性(レーダー)動作のためには、Windowsのサウンド設定で出力デバイスが「5.1 サラウンド」(6チャンネル)または「7.1 サラウンド」(8チャンネル)に構成されている必要があります。通常のステレオ(2チャンネル)環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「サウンドモード」を適切に設定してください。";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 7.1出力デバイスがない場合は、";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE仮想ドライバー";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "をインストールし、出力デバイスを7.1チャンネルに設定すると、7.1サラウンドサウンドを使用してオーバーレイを表示できます。";
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
@@ -465,6 +484,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "音声の表示";
                     ChkShowDanger.Content = "強調音の表示";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "詳細情報";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHubリポジトリとプロジェクト貢献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer는 오픈ソースプロジェクトであり、ソースコードはGitHubで公開されています。バグ報告、機能提案、開発への貢献を通じて、プロジェクトに参加できます。下のボタンをクリックして、公式GitHubリポジトリにアクセスしてください！";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHubリポジトリにアクセス";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "中文")
@@ -552,6 +576,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "帮助";
                 TxtHelp1Title.Text = "声音模式";
                 TxtHelp1Desc.Text = "为了使方向性(雷达)正常工作，在Windows声音设置中，输出设备必须配置为“5.1 环绕声”(6声道)或“7.1 环绕声”(8声道)。在普通立体声(2声道)环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中正确设置“声音模式”。";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 如果您没有 7.1 输出设备，可以进入 ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE 虚拟音频驱动";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " 安装 7.1 虚拟驱动，并将输出设备设置为 7.1 声道，即可使用 7.1 环绕声显示悬浮窗。";
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
@@ -568,6 +595,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "显示语音";
                     ChkShowDanger.Content = "显示强调音";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "了解更多";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 仓库与项目贡献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer 是一个开源项目，其源代码已在 GitHub 上公开。您可以通过报告错误、提出功能建议和参与开发来共同建设该项目。点击下方按钮访问官方 GitHub 仓库！";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "访问 GitHub 仓库";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Español")
@@ -655,6 +687,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Ayuda";
                 TxtHelp1Title.Text = "Modo de Sonido";
                 TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 5.1' (6 canales) o 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, ajuste el 'Modo de Sonido' correctamente en la configuración.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si no tienes un dispositivo de salida 7.1, puedes instalar el ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "Controlador Virtual VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " y configurar el dispositivo de salida en 7.1 canales para mostrar la superposición utilizando sonido envolvente 7.1.";
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
@@ -671,6 +706,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Mostrar voz";
                     ChkShowDanger.Content = "Mostrar sonido de peligro";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Saber más";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Repositorio de GitHub y contribución";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer es un proyecto de código abierto y su código fuente está disponible públicamente en GitHub. Puedes participar en el proyecto informando errores, sugiriendo características y contribuyendo al desarrollo. ¡Haz clic en el botón de abajo para visitar el repositorio oficial de GitHub!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visitar el repositorio de GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Français")
@@ -758,6 +798,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Aide";
                 TxtHelp1Title.Text = "Mode Sonore";
                 TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 5.1' (6 canaux) ou 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, réglez correctement le 'Mode Sonore' dans les paramètres.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si vous n'avez pas de périphérique de sortie 7.1, vous pouvez installer le ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "pilote virtuel VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " et configurer le périphérique de sortie sur 7.1 canaux pour afficher la superposition à l'aide du son surround 7.1.";
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
@@ -774,6 +817,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Afficher la voix";
                     ChkShowDanger.Content = "Afficher les sons de danger";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "En savoir plus";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Dépôt GitHub et contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer est un projet open-source, et son code source est disponible publiquement sur GitHub. Vous pouvez participer au projet en signalant des bogues, en suggérant des fonctionnalités et en contribuant au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel !";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visiter le dépôt GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Deutsch")
@@ -861,6 +909,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Hilfe";
                 TxtHelp1Title.Text = "Sound-Modus";
                 TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '5.1 Surround' (6 Kanäle) oder '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, stellen Sie den 'Sound-Modus' in den Einstellungen richtig ein.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Wenn Sie kein 7.1-Ausgabegerät haben, können Sie den ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "virtuellen VB-CABLE-Treiber";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " installieren und das Ausgabegerät auf 7.1 Kanäle konfigurieren, um das Overlay mit 7.1 Surround-Sound anzuzeigen.";
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
@@ -877,6 +928,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Sprache anzeigen";
                     ChkShowDanger.Content = "Gefahrentöne anzeigen";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Mehr erfahren";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub-Repository & Projektbeitrag";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer ist ein Open-Source-Projekt und sein Quellcode ist öffentlich auf GitHub verfügbar. Sie können sich am Projekt beteiligen, indem Sie Fehler melden, Funktionen vorschlagen und zur Entwicklung beitragen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub-Repository besuchen";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Русский")
@@ -964,6 +1020,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Помощь";
                 TxtHelp1Title.Text = "Режим звука";
                 TxtHelp1Desc.Text = "Для правильной работы направления (радара) устройство вывода звука Windows должно быть настроено как «5.1 Surround» (6 каналов) или «7.1 Surround» (8 каналов). В стандартной стереосреде (2 канала) визуализация может отображаться только слева/справа. Чтобы компенсировать это, установите «Режим звука» должным образом в настройках.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Если у вас нет устройства вывода 7.1, вы можете установить ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "виртуальный драйвер VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " и настроить устройство вывода на 7.1-канальный режим, чтобы отображать оверлей с использованием объемного звука 7.1.";
                 TxtHelp2Title.Text = "Горячие клавиши в реальном времени";
                 TxtHelp2Desc.Text = "Даже когда оверлей находится на экране, вы можете нажимать назначенные горячие клавиши (по умолчанию F2, F3) в фоновом режиме, чтобы мгновенно переключать формы и режимы.";
                 TxtHelp3Title.Text = "Как закрыть оверлей";
@@ -980,6 +1039,11 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Показывать речь";
                     ChkShowDanger.Content = "Показывать звуки опасности";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Подробнее";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Репозиторий GitHub и вклад в проект";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "SoundVisualizer — это проект с открытым исходным кодом, исходный код которого общедоступен на GitHub. Вы можете принять участие в проекте, сообщая об ошибках, предлагая новые функции и внося свой вклад в разработку. Нажмите кнопку ниже, чтобы посетить официальный репозиторий GitHub!";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Посетить репозиторий GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
         }
@@ -1185,6 +1249,7 @@ namespace SoundVisualizer
             // 4. Common settings
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
+            SldTargetFps.Maximum = AppSettings.GetMonitorRefreshRate();
             SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
 
@@ -1747,6 +1812,39 @@ namespace SoundVisualizer
         public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
         {
             CheckAndApplyDeviceChannels();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = e.Uri.AbsoluteUri,
+                    UseShellExecute = true
+                });
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"링크를 열 수 없습니다: {ex.Message}");
+            }
+        }
+
+        private void BtnMoreInfoGithub_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/amophi/SoundVisualizer",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"링크를 열 수 없습니다: {ex.Message}");
+            }
         }
     }
 }

@@ -241,7 +241,7 @@
         <!-- 통합 파도 (하나의 연속적인 둘레 웨이브) -->
         <Path x:Name="UnifiedWave" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Opacity="0.6">
             <Path.Effect>
-                <DropShadowEffect x:Name="WaveGlowEffect" Color="White" BlurRadius="25" ShadowDepth="0" Opacity="0"/>
+                <DropShadowEffect x:Name="WaveGlowEffect" Color="White" BlurRadius="25" ShadowDepth="0" Opacity="0" RenderingBias="Performance"/>
             </Path.Effect>
         </Path>
 
