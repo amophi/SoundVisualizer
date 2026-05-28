@@ -216,13 +216,24 @@ namespace SoundVisualizer.AIModel
 #endif
                 ApplyCoarseHysteresis(in r);
 
-                string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
+                // booster가 danger로 올린 프레임은 UI만 즉시 반영, 확정 상태는 히스테리시스 유지
+                bool useBoosterDangerPreview =
+                    _confirmedCoarse != "danger" &&
+                    r.AdoptedDangerFromBooster &&
+                    r.CoarseClass == "danger" &&
+                    r.MeetsThreshold;
+
+                string displayForUi = useBoosterDangerPreview ? r.YamnetDisplayName : _confirmedDisplay;
+                string coarseForUi = useBoosterDangerPreview ? "danger" : _confirmedCoarse;
+                float confidenceForUi = useBoosterDangerPreview ? r.Confidence : _confirmedConfidence;
+
+                string translatedName = YamnetThreeClassMapper.TranslateToKorean(displayForUi);
                 string resultText;
 
-                if (_confirmedConfidence < threshold)
-                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
+                if (confidenceForUi < threshold)
+                    resultText = $"{translatedName} | {coarseForUi} | {confidenceForUi * 100f:F1}% (저신뢰)";
                 else
-                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
+                    resultText = $"{translatedName} | {coarseForUi} | {confidenceForUi * 100f:F1}%";
 
                 _lastPredictResult = resultText;
                 return resultText;
@@ -484,7 +495,8 @@ namespace SoundVisualizer.AIModel
             bool ok = coarseConf >= effectiveThreshold;
             string? topK = FormatTop5SoftmaxLabels(_topKIndices, _topKProbs, 3);
 
-            return new InferenceResult(maxIndex, display, coarseConf, coarse, ok, inferMs, topK);
+            return new InferenceResult(
+                maxIndex, display, coarseConf, coarse, ok, inferMs, topK, adoptedDangerFromBooster);
         }
 
         private void TryLoadDistilledCoarseHead(SessionOptions options)

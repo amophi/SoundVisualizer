@@ -12,7 +12,8 @@ namespace SoundVisualizer.AIModel
             string coarseClass,
             bool meetsThreshold,
             double inferenceTimeMs,
-            string? topKSummary = null)
+            string? topKSummary = null,
+            bool adoptedDangerFromBooster = false)
         {
             YamnetClassIndex = yamnetClassIndex;
             YamnetDisplayName = yamnetDisplayName;
@@ -21,6 +22,7 @@ namespace SoundVisualizer.AIModel
             MeetsThreshold = meetsThreshold;
             InferenceTimeMs = inferenceTimeMs;
             TopKSummary = topKSummary;
+            AdoptedDangerFromBooster = adoptedDangerFromBooster;
         }
 
         public int YamnetClassIndex { get; }
@@ -33,5 +35,7 @@ namespace SoundVisualizer.AIModel
         public double InferenceTimeMs { get; }
         /// <summary>디버그용 softmax 상위 k개 요약 문자열.</summary>
         public string? TopKSummary { get; }
+        /// <summary>이번 프레임에서 gunshot booster가 danger 채택했는지.</summary>
+        public bool AdoptedDangerFromBooster { get; }
     }
 }
