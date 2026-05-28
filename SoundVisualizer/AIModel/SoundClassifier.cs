@@ -75,7 +75,6 @@ namespace SoundVisualizer.AIModel
         private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
-        private const float DangerPreviewConfidence = 0.42f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
@@ -215,24 +214,15 @@ namespace SoundVisualizer.AIModel
 #if DEBUG
                 LogClassificationDebugThrottled(in r, threshold);
 #endif
-                bool useDangerPreview =
-                    _confirmedCoarse != "danger" &&
-                    r.MeetsThreshold &&
-                    r.CoarseClass == "danger" &&
-                    r.Confidence >= DangerPreviewConfidence;
-
                 ApplyCoarseHysteresis(in r);
 
-                string displayName = useDangerPreview ? r.YamnetDisplayName : _confirmedDisplay;
-                string coarseName = useDangerPreview ? "danger" : _confirmedCoarse;
-                float confidence = useDangerPreview ? r.Confidence : _confirmedConfidence;
-                string translatedName = YamnetThreeClassMapper.TranslateToKorean(displayName);
+                string translatedName = YamnetThreeClassMapper.TranslateToKorean(_confirmedDisplay);
                 string resultText;
 
-                if (confidence < threshold)
-                    resultText = $"{translatedName} | {coarseName} | {confidence * 100f:F1}% (저신뢰)";
+                if (_confirmedConfidence < threshold)
+                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}% (저신뢰)";
                 else
-                    resultText = $"{translatedName} | {coarseName} | {confidence * 100f:F1}%";
+                    resultText = $"{translatedName} | {_confirmedCoarse} | {_confirmedConfidence * 100f:F1}%";
 
                 _lastPredictResult = resultText;
                 return resultText;
