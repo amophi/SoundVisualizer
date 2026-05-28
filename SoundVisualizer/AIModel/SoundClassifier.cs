@@ -75,7 +75,7 @@ namespace SoundVisualizer.AIModel
         private const int CoarseHysteresisThreshold = 2;
         private const int DangerHysteresisThreshold = 1;
         private const float DangerImmediateSwitchConfidence = 0.28f;
-        private const float DangerExitFastConfidence = 0.32f;
+        private const float DangerExitFastConfidence = 0.29f;
         private string _confirmedCoarse = "ambient";
         private string _confirmedDisplay = "";
         private float _confirmedConfidence;
