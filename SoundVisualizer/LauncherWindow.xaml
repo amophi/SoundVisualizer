@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="SoundVisualizer.LauncherWindow"
-        Title="SoundVisualizer Launcher" Height="650" Width="800"
+        Title="Sound Visualizer Launcher" Height="650" Width="800"
         WindowStartupLocation="CenterScreen" 
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         MouseLeftButtonDown="Window_MouseLeftButtonDown" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp" FontFamily="Malgun Gothic, Segoe UI">
@@ -101,12 +101,11 @@
             <Setter Property="Foreground" Value="{StaticResource SecondaryTextColor}"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Grid Background="Transparent" Margin="0,0,24,0">
+                        <Grid Background="Transparent" Margin="0,0,24,0" Cursor="Hand">
                             <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="0,0,0,12"/>
                             <Border x:Name="Indicator" Height="3" Background="Transparent" VerticalAlignment="Bottom" CornerRadius="1.5"/>
                         </Grid>
@@ -362,7 +361,7 @@
             <Grid Grid.Row="0" Margin="24,24,24,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <TextBlock x:Name="TxtLanguageLabel" Text="Language" Foreground="{StaticResource SecondaryTextColor}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox x:Name="CmbLanguage" Style="{StaticResource TossComboBox}" Width="120" Padding="12,8" FontSize="14" SelectionChanged="CmbLanguage_SelectionChanged">
+                    <ComboBox x:Name="CmbLanguage" Style="{StaticResource TossComboBox}" Width="120" Padding="12,8" FontSize="14" SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
                         <ComboBoxItem Content="한국어" IsSelected="True"/>
                         <ComboBoxItem Content="English"/>
                         <ComboBoxItem Content="日本語"/>
@@ -417,7 +416,7 @@
                 <TabItem x:Name="TabHome" Header="홈">
                     <Grid>
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="20,0">
-                            <TextBlock x:Name="TxtHomeTitle" Text="SoundVisualizer" FontSize="36" FontWeight="Black" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
+                            <TextBlock x:Name="TxtHomeTitle" Text="Sound Visualizer" FontSize="36" FontWeight="Black" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
                             <TextBlock x:Name="TxtHomeDesc" Text="보이지 않던 소리를 화면에 그려냅니다.&#xA;게이밍부터 영화 감상까지 새로운 경험을 시작하세요." 
                                        FontSize="16" Foreground="{StaticResource SecondaryTextColor}" LineHeight="26" Margin="0,0,0,24"/>
 
@@ -428,7 +427,7 @@
                                 <TextBlock x:Name="TxtStatus" Text="상태: 실행 대기 중" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextColor}" VerticalAlignment="Center"/>
                             </StackPanel>
 
-                            <Grid>
+                            <Grid Margin="0,0,0,24">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="16"/>
@@ -460,7 +459,7 @@
                                                 <TextBlock x:Name="TxtVisualModeLabel" Text="표현 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
                                                 <TextBlock x:Name="TxtVisualModeDesc" Text="화면에 그려질 그래픽의 기본 형태를 선택합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
-                                            <ComboBox Grid.Column="1" x:Name="CmbVisualMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed">
+                                            <ComboBox Grid.Column="1" x:Name="CmbVisualMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
                                                 <ComboBoxItem x:Name="CmbVisualModeWave" Content="파도"/>
                                                 <ComboBoxItem x:Name="CmbVisualModePad" Content="패드"/>
                                                 <ComboBoxItem x:Name="CmbVisualModeCircle" Content="원형"/>
@@ -479,7 +478,7 @@
                                                 <TextBlock x:Name="TxtSoundModeLabel" Text="사운드 모드" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
                                                 <TextBlock x:Name="TxtSoundModeDesc" Text="스피커 환경에 맞는 사운드 채널을 선택합니다.&#x0a;2채널 환경은 '2 채널', 서라운드 환경은 '5.1 채널' 또는 '7.1 채널'을 선택하세요." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
-                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed">
+                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource TossComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
                                                 <ComboBoxItem x:Name="CmbSoundMode2" Content="2 채널"/>
                                                 <ComboBoxItem x:Name="CmbSoundMode51" Content="5.1 채널"/>
                                                 <ComboBoxItem x:Name="CmbSoundMode71" Content="7.1 채널"/>
@@ -496,7 +495,7 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <TextBlock x:Name="TxtTargetFpsLabel" Text="최대 프레임" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtTargetFpsDesc" Text="오버레이 애니메이션이 그려지는 최대 프레임 속도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                                                <TextBlock x:Name="TxtTargetFpsDesc" Text="그래픽이 그려지는 최대 프레임 속도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,16,0"/>
                                             </StackPanel>
                                             <Slider Grid.Column="1" x:Name="SldTargetFps" Style="{StaticResource TossSlider}" Minimum="30" Maximum="240" Value="144" VerticalAlignment="Center" ValueChanged="Setting_Changed" Margin="0,0,16,0"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtTargetFps" Text="{Binding Value, ElementName=SldTargetFps, StringFormat='{}{0:F0} FPS'}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
@@ -512,25 +511,17 @@
                                 <!-- 파도 모드 설정 -->
                             <Expander x:Name="ExpanderWave" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderWaveTitle" Text="파도 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                    <TextBlock x:Name="TxtExpanderWaveTitle" Text="파도 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
                                 </Expander.Header>
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelWave" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityWave" Text="{Binding Value, ElementName=SldIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescWave" Text="파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        <StackPanel Margin="0,24,0,0">
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
-                                                <TextBlock x:Name="TxtIntensityAsOpacityLabelWave" Text="세기 투명도 표현" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkIntensityAsOpacityWave" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <StackPanel Margin="0,0,0,24">
+                                            <StackPanel Margin="0,0,0,16">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelWave" Text="크기 고정" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox x:Name="ChkIntensityAsOpacityWave" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                                </StackPanel>
+                                                <TextBlock x:Name="TxtIntensityAsOpacityDescWave" Text="세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
@@ -542,7 +533,7 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeWave" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeWave" Text="{Binding Value, ElementName=SldOpacityFixedSizeWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescWave" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                                            <TextBlock x:Name="TxtOpacityFixedSizeDescWave" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="170"/>
@@ -553,10 +544,36 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityWave" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtIntensityAsOpacityDescWave" Text="그래픽의 크기는 고정된 채 소리에 따라 투명도가 변하게 됩니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescWave" Text="소리에 비례하여 나타날 최대 투명도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                         </StackPanel>
+
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                                <TextBlock x:Name="TxtIntensityLabelWave" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="SldIntensityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                                <TextBlock Grid.Column="2" x:Name="TxtIntensityWave" Text="{Binding Value, ElementName=SldIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescWave" Text="파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelWave" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityWave" Text="{Binding Value, ElementName=SldOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescWave" Text="파도의 투명도를 조절하여 그래픽 뒤의 게임이나 화면 비침 정도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
                                     <StackPanel Margin="0,0,0,24">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -585,20 +602,6 @@
                                         <TextBlock x:Name="TxtSensitivityDescWave" Text="작은 데시벨 소리에도 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelWave" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityWave" Text="{Binding Value, ElementName=SldOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescWave" Text="파도의 투명도를 조절하여 오버레이 뒤의 게임이나 화면 비침 정도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -613,33 +616,26 @@
                                             <Slider Grid.Column="1" x:Name="SldGlowIntensityWave" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityWave" Text="{Binding Value, ElementName=SldGlowIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescWave" Text="파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtGlowModeDescWave" Text="파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.&#xA;주의: GPU 리소스를 추가로 사용합니다" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
+                                    <Button x:Name="BtnResetWave" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnResetWave_Click"/>
                                 </StackPanel>
                             </Expander>
 
                             <!-- 패드 모드 설정 -->
                             <Expander x:Name="ExpanderPad" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderPadTitle" Text="패드 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                    <TextBlock x:Name="TxtExpanderPadTitle" Text="패드 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
                                 </Expander.Header>
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelPad" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityPad" Text="{Binding Value, ElementName=SldIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescPad" Text="사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        <StackPanel Margin="0,24,0,0">
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
-                                                <TextBlock x:Name="TxtIntensityAsOpacityLabelPad" Text="세기 투명도 표현" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkIntensityAsOpacityPad" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <StackPanel Margin="0,0,0,24">
+                                            <StackPanel Margin="0,0,0,16">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelPad" Text="크기 고정" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox x:Name="ChkIntensityAsOpacityPad" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                                </StackPanel>
+                                                <TextBlock x:Name="TxtIntensityAsOpacityDescPad" Text="세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
@@ -651,7 +647,7 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedSizePad" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizePad" Text="{Binding Value, ElementName=SldOpacityFixedSizePad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescPad" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                                            <TextBlock x:Name="TxtOpacityFixedSizeDescPad" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="170"/>
@@ -662,8 +658,34 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityPad" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtIntensityAsOpacityDescPad" Text="그래픽의 크기는 고정된 채 소리에 따라 투명도가 변하게 됩니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescPad" Text="소리에 비례하여 나타날 최대 투명도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                         </StackPanel>
+
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelPad" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityPad" Text="{Binding Value, ElementName=SldIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescPad" Text="사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelPad" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityPad" Text="{Binding Value, ElementName=SldOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescPad" Text="패드 그래픽의 불투명도를 조정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -694,20 +716,6 @@
                                         <TextBlock x:Name="TxtSensitivityDescPad" Text="패드가 소리를 더 잘 포착하여 더 큰 폭으로 도드라지게 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelPad" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityPad" Text="{Binding Value, ElementName=SldOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescPad" Text="패드 그래픽의 불투명도를 조정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -722,33 +730,26 @@
                                             <Slider Grid.Column="1" x:Name="SldGlowIntensityPad" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityPad" Text="{Binding Value, ElementName=SldGlowIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescPad" Text="패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtGlowModeDescPad" Text="패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다.&#xA;주의: GPU 리소스를 추가로 사용합니다" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
+                                    <Button x:Name="BtnResetPad" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnResetPad_Click"/>
                                 </StackPanel>
                             </Expander>
 
                             <!-- 원형 모드 설정 -->
                             <Expander x:Name="ExpanderCircle" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderCircleTitle" Text="원형 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                    <TextBlock x:Name="TxtExpanderCircleTitle" Text="원형 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
                                 </Expander.Header>
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelCircle" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityCircle" Text="{Binding Value, ElementName=SldIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescCircle" Text="사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        <StackPanel Margin="0,24,0,0">
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
-                                                <TextBlock x:Name="TxtIntensityAsOpacityLabelCircle" Text="세기 투명도 표현" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkIntensityAsOpacityCircle" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <StackPanel Margin="0,0,0,24">
+                                            <StackPanel Margin="0,0,0,16">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelCircle" Text="크기 고정" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox x:Name="ChkIntensityAsOpacityCircle" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                                </StackPanel>
+                                                <TextBlock x:Name="TxtIntensityAsOpacityDescCircle" Text="세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
@@ -760,7 +761,7 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeCircle" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeCircle" Text="{Binding Value, ElementName=SldOpacityFixedSizeCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescCircle" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                                            <TextBlock x:Name="TxtOpacityFixedSizeDescCircle" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="170"/>
@@ -771,8 +772,34 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityCircle" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtIntensityAsOpacityDescCircle" Text="그래픽의 크기는 고정된 채 소리에 따라 투명도가 변하게 됩니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescCircle" Text="소리에 비례하여 나타날 최대 투명도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                         </StackPanel>
+
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelCircle" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityCircle" Text="{Binding Value, ElementName=SldIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescCircle" Text="사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelCircle" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityCircle" Text="{Binding Value, ElementName=SldOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescCircle" Text="원형 그래픽의 불투명도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
@@ -810,20 +837,6 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="50"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelCircle" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityCircle" Text="{Binding Value, ElementName=SldOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescCircle" Text="원형 그래픽의 불투명도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
                                             <TextBlock x:Name="TxtCircleRadiusLabel" Text="원 크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
                                             <Slider Grid.Column="1" x:Name="SldCircleRadius" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="40" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtCircleRadius" Text="{Binding Value, ElementName=SldCircleRadius, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
@@ -845,33 +858,26 @@
                                             <Slider Grid.Column="1" x:Name="SldGlowIntensityCircle" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityCircle" Text="{Binding Value, ElementName=SldGlowIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescCircle" Text="원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtGlowModeDescCircle" Text="원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다.&#xA;주의: GPU 리소스를 추가로 사용합니다" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
+                                    <Button x:Name="BtnResetCircle" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnResetCircle_Click"/>
                                 </StackPanel>
                             </Expander>
 
                             <!-- 외곽선 모드 설정 -->
                             <Expander x:Name="ExpanderOutline" Style="{StaticResource TossExpander}">
                                 <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderOutlineTitle" Text="외곽선 모드 설정" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
+                                    <TextBlock x:Name="TxtExpanderOutlineTitle" Text="외곽선 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
                                 </Expander.Header>
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelOutline" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityOutline" Text="{Binding Value, ElementName=SldIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescOutline" Text="외곽선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        <StackPanel Margin="0,24,0,0">
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
-                                                <TextBlock x:Name="TxtIntensityAsOpacityLabelOutline" Text="세기 투명도 표현" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkIntensityAsOpacityOutline" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <StackPanel Margin="0,0,0,24">
+                                            <StackPanel Margin="0,0,0,16">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelOutline" Text="크기 고정" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox x:Name="ChkIntensityAsOpacityOutline" Style="{StaticResource TossCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                                </StackPanel>
+                                                <TextBlock x:Name="TxtIntensityAsOpacityDescOutline" Text="세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                             </StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
@@ -883,7 +889,7 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeOutline" Style="{StaticResource TossSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeOutline" Text="{Binding Value, ElementName=SldOpacityFixedSizeOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescOutline" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                                            <TextBlock x:Name="TxtOpacityFixedSizeDescOutline" Text="투명도가 변할 기준이 되는 고정 크기를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
                                             <Grid Margin="0,0,0,8">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="170"/>
@@ -894,10 +900,36 @@
                                                 <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                                 <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityOutline" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <TextBlock x:Name="TxtIntensityAsOpacityDescOutline" Text="그래픽의 크기는 고정된 채 소리에 따라 투명도가 변하게 됩니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescOutline" Text="소리에 비례하여 나타날 최대 투명도를 설정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                         </StackPanel>
+
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtIntensityLabelOutline" Text="크기" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldIntensityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityOutline" Text="{Binding Value, ElementName=SldIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtIntensityDescOutline" Text="외곽선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     
+                                    <StackPanel Margin="0,0,0,24">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="50"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock x:Name="TxtOpacityLabelOutline" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Slider Grid.Column="1" x:Name="SldOpacityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
+                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityOutline" Text="{Binding Value, ElementName=SldOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtOpacityDescOutline" Text="외곽선 파도의 투명도를 조절하여 그래픽 뒤의 게임이나 화면 비침 정도를 결정합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
                                     <StackPanel Margin="0,0,0,24">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -926,20 +958,6 @@
                                         <TextBlock x:Name="TxtSensitivityDescOutline" Text="작은 데시벨 소리에도 외곽선 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelOutline" Text="투명도" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityOutline" Text="{Binding Value, ElementName=SldOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescOutline" Text="외곽선 파도의 투명도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -954,8 +972,9 @@
                                             <Slider Grid.Column="1" x:Name="SldGlowIntensityOutline" Style="{StaticResource TossSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
                                             <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityOutline" Text="{Binding Value, ElementName=SldGlowIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescOutline" Text="외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="TxtGlowModeDescOutline" Text="외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.&#xA;주의: GPU 리소스를 추가로 사용합니다" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
+                                    <Button x:Name="BtnResetOutline" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnResetOutline_Click"/>
                                 </StackPanel>
                             </Expander>
                             </StackPanel>
@@ -967,12 +986,12 @@
                                     <StackPanel Margin="0,0,0,16">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock x:Name="TxtColorSettingsLabelAmbient" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorAmbient" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="{x:Type Button}">
@@ -987,12 +1006,12 @@
                                     <StackPanel Margin="0,0,0,16">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock x:Name="TxtColorSettingsLabelSpeech" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorSpeech" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="{x:Type Button}">
@@ -1007,12 +1026,12 @@
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock x:Name="TxtColorSettingsLabelDanger" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorDanger" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="{x:Type Button}">
@@ -1023,6 +1042,8 @@
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
+
+                                    <Button x:Name="BtnResetSoundClassification" Content="기본값으로 되돌리기" Style="{StaticResource TossSecondaryButton}" Margin="0,16,0,0" Click="BtnResetSoundClassification_Click"/>
                                 </StackPanel>
                             </Border>
 
@@ -1031,42 +1052,54 @@
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtVisualHotkeyLabel" Text="표현 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Button Grid.Column="1" Grid.ColumnSpan="2" x:Name="BtnVisualHotkey" MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource TossButton}" Content="F3" Click="BtnVisualHotkey_Click"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtVisualHotkeyLabel" Text="표현 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtVisualHotkeyDesc" Text="실행 중 형태를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtHotkeyLabelStereo" Text="핫키 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnVisualHotkey" MinWidth="140" Style="{StaticResource TossButton}" Content="F3" Click="BtnVisualHotkey_Click"/>
+                                            </StackPanel>
                                         </Grid>
-                                        <TextBlock x:Name="TxtVisualHotkeyDesc" Text="실행 중 형태를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSoundModeHotkeyLabel" Text="사운드 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Button Grid.Column="1" Grid.ColumnSpan="2" x:Name="BtnSoundModeHotkey" MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource TossButton}" Content="F2" Click="BtnSoundModeHotkey_Click"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtSoundModeHotkeyLabel" Text="사운드 모드 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtSoundModeHotkeyDesc" Text="실행 중 사운드 모드를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtHotkeyLabelVisual" Text="핫키 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnSoundModeHotkey" MinWidth="140" Style="{StaticResource TossButton}" Content="F2" Click="BtnSoundModeHotkey_Click"/>
+                                            </StackPanel>
                                         </Grid>
-                                        <TextBlock x:Name="TxtSoundModeHotkeyDesc" Text="실행 중 사운드 모드를 실시간으로 변경할 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtEditHotkeyLabel" Text="오버레이 전환" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Button Grid.Column="1" Grid.ColumnSpan="2" x:Name="BtnEditHotkey" MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource TossButton}" Content="F4" Click="BtnEditHotkey_Click"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtEditHotkeyLabel" Text="오버레이 설정" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <TextBlock x:Name="TxtEditHotkeyDesc" Text="오버레이 편집 화면을 표시하거나 닫는 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtHotkeyLabelOverlay" Text="핫키 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button x:Name="BtnEditHotkey" MinWidth="140" Style="{StaticResource TossButton}" Content="F4" Click="BtnEditHotkey_Click"/>
+                                            </StackPanel>
                                         </Grid>
-                                        <TextBlock x:Name="TxtEditHotkeyDesc" Text="오버레이 편집 화면을 표시하거나 닫는 단축키입니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -1085,6 +1118,18 @@
                                         </StackPanel>
                                         <CheckBox Grid.Column="1" x:Name="ChkAdminMode" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </Grid>
+
+                                    <Grid Margin="0,16,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock x:Name="TxtAutoMinimizeLabel" Text="실행 시 런처 최소화" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="TxtAutoMinimizeDesc" Text="오버레이 실행 시 이 런처 창을 자동으로 최소화합니다." FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <CheckBox Grid.Column="1" x:Name="ChkAutoMinimizeOnLaunch" Style="{StaticResource TossCheckBox}" Content="켜기" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -1102,14 +1147,29 @@
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp1Title" Text="사운드 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
                                     <TextBlock x:Name="TxtHelp1Desc" Text="정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요." 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="TxtHelp1Tip" FontSize="14" Foreground="#FF9E3A" LineHeight="22" TextWrapping="Wrap">
+                                        <Run x:Name="TxtHelp1TipPrefix" Text="💡 만약 7.1 출력 장치가 없다면 "/>
+                                        <Hyperlink NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF9E3A">
+                                            <Run x:Name="TxtHelp1TipLink" Text="VB-CABLE 가상 드라이버"/>
+                                        </Hyperlink>
+                                        <Run x:Name="TxtHelp1TipSuffix" Text="를 설치하고 출력장치를 7.1채널로 설정한다면 7.1 서라운드 사운드를 사용하여 오버레이를 표현할 수 있습니다."/>
+                                    </TextBlock>
                                 </StackPanel>
                             </Border>
 
                             <Border Style="{StaticResource TossCard}">
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp2Title" Text="실시간 단축키 제어" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp2Desc" Text="오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 지정된 단축키(기본 F2, F3)를 누르면 실시간으로 형태와 모드가 즉시 전환됩니다." 
+                                    <TextBlock x:Name="TxtHelp2Desc" Text="오버레이가 화면에 떠 있는 상태에서도, 백그라운드에서 단축키를 사용하여 실시간으로 모드나 편집 형태를 전환할 수 있습니다. (기본 단축키는 단축키 설정 탭에서 변경 가능)" 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel>
+                                    <TextBlock x:Name="TxtHelp6Title" Text="크기 고정 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="TxtHelp6Desc" Text="크기 고정 모드는 소리의 크기에 비례하는 투명도를 활용하여 그래픽 크기를 고정시키는 설정입니다. 시각화 그래픽의 크기를 일정하게 유지하면서도 소리에 반응하는 모습을 보고 싶을 때 유용합니다." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>
@@ -1135,6 +1195,22 @@
                                     <TextBlock x:Name="TxtHelp5Title" Text="개발자 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
                                     <TextBlock x:Name="TxtHelp5Desc" Text="개발자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다." 
                                                FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- 더 알아보기 탭 -->
+                <TabItem x:Name="TabMoreInfo" Header="더 알아보기">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
+                        <StackPanel>
+                            <Border Style="{StaticResource TossCard}">
+                                <StackPanel Margin="0,8">
+                                    <TextBlock x:Name="TxtMoreInfoTitle" Text="GitHub 저장소 및 프로젝트 기여" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="TxtMoreInfoDesc" Text="Sound Visualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다." 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,24"/>
+                                    <Button x:Name="BtnMoreInfoGithub" Content="GitHub 저장소 방문하기" Style="{StaticResource TossButton}" HorizontalAlignment="Left" Padding="28,14" Click="BtnMoreInfoGithub_Click"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

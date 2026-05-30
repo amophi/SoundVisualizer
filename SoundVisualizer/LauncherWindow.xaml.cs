@@ -137,10 +137,19 @@ namespace SoundVisualizer
             if (CmbLanguage.SelectedItem is ComboBoxItem item)
             {
                 SetLanguage(item.Content.ToString());
+                AppSettings.Save();
             }
         }
 
-        private void SetLanguage(string lang)
+        private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (sender is System.Windows.Controls.ComboBox comboBox && !comboBox.IsDropDownOpen)
+            {
+                e.Handled = true;
+            }
+        }
+
+        public void SetLanguage(string lang)
         {
             if (lang == "한국어") lang = "KOR";
             AppSettings.Language = lang;
@@ -148,14 +157,14 @@ namespace SoundVisualizer
             if (lang == "KOR")
             {
                 TabHome.Header = "홈";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 영화 감상까지 새로운 경험을 시작하세요.";
                 if (BtnLaunch != null) BtnLaunch.Content = "실행";
                 if (BtnStop != null) BtnStop.Content = "실행 종료";
                 TabSettings.Header = "설정";
                 
                 // Wave Mode Settings
-                TxtExpanderWaveTitle.Text = "파도 모드 설정";
+                TxtExpanderWaveTitle.Text = "파도 모드";
                 TxtIntensityLabelWave.Text = "크기";
                 TxtIntensityDescWave.Text = "파도의 위아래 높이와 전체적인 볼륨감을 조절합니다.";
                 TxtSpeedLabelWave.Text = "속도";
@@ -163,12 +172,12 @@ namespace SoundVisualizer
                 TxtSensitivityLabelWave.Text = "민감도";
                 TxtSensitivityDescWave.Text = "작은 데시벨 소리에도 파도가 얼마나 민감하게 반응하여 출렁일지 조절합니다.";
                 TxtOpacityLabelWave.Text = "투명도";
-                TxtOpacityDescWave.Text = "파도의 투명도를 조절하여 오버레이 뒤의 게임이나 화면 비침 정도를 결정합니다.";
+                TxtOpacityDescWave.Text = "파도의 투명도를 조절하여 그래픽 뒤의 게임이나 화면 비침 정도를 결정합니다.";
                 TxtGlowModeLabelWave.Text = "광원";
-                TxtGlowModeDescWave.Text = "파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.";
+                TxtGlowModeDescWave.Text = "파도 외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.\n주의: GPU 리소스를 추가로 사용합니다";
 
                 // Pad Mode Settings
-                TxtExpanderPadTitle.Text = "패드 모드 설정";
+                TxtExpanderPadTitle.Text = "패드 모드";
                 TxtIntensityLabelPad.Text = "크기";
                 TxtIntensityDescPad.Text = "사운드 반응 시 패드의 두께와 가로 영역 넓이를 조절합니다.";
                 TxtSpeedLabelPad.Text = "속도";
@@ -178,10 +187,10 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "투명도";
                 TxtOpacityDescPad.Text = "패드 그래픽의 불투명도를 조정합니다.";
                 TxtGlowModeLabelPad.Text = "광원";
-                TxtGlowModeDescPad.Text = "패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다.";
+                TxtGlowModeDescPad.Text = "패드 주변에 부드러운 아우라 형식의 광원 효과를 부여합니다.\n주의: GPU 리소스를 추가로 사용합니다";
 
                 // Circle Mode Settings
-                TxtExpanderCircleTitle.Text = "원형 모드 설정";
+                TxtExpanderCircleTitle.Text = "원형 모드";
                 TxtIntensityLabelCircle.Text = "크기";
                 TxtIntensityDescCircle.Text = "사운드가 울릴 때 원형 이퀄라이저의 돌출 진폭 스케일을 조절합니다.";
                 TxtSpeedLabelCircle.Text = "속도";
@@ -193,9 +202,9 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "원 크기";
                 TxtCircleRadiusDesc.Text = "원형 모드에서 가운데 중심부의 지름(반지름) 크기를 개별 조절합니다.";
                 TxtGlowModeLabelCircle.Text = "광원";
-                TxtGlowModeDescCircle.Text = "원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다.";
+                TxtGlowModeDescCircle.Text = "원형 이퀄라이저의 테두리를 따라 반짝이는 글로우 후광을 만듭니다.\n주의: GPU 리소스를 추가로 사용합니다";
                 // Outline Mode Settings
-                TxtExpanderOutlineTitle.Text = "외곽선 모드 설정";
+                TxtExpanderOutlineTitle.Text = "외곽선 모드";
                 TxtIntensityLabelOutline.Text = "크기";
                 TxtIntensityDescOutline.Text = "외곽선 파도의 위아래 높이와 전체적인 볼륨감을 조절합니다.";
                 TxtSpeedLabelOutline.Text = "속도";
@@ -205,7 +214,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "투명도";
                 TxtOpacityDescOutline.Text = "외곽선 파도의 투명도를 조절합니다.";
                 TxtGlowModeLabelOutline.Text = "광원";
-                TxtGlowModeDescOutline.Text = "외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.";
+                TxtGlowModeDescOutline.Text = "외곽선에 은은하게 빛나는 네온 광원을 입히고 그 강도를 조절합니다.\n주의: GPU 리소스를 추가로 사용합니다";
                 TxtModeSettings.Text = "모드 설정";
                 TxtVisualModeLabel.Text = "표현 모드";
                 TxtVisualModeDesc.Text = "화면에 그려질 그래픽의 형태를 선택합니다.";
@@ -220,7 +229,7 @@ namespace SoundVisualizer
                 TxtVisualHotkeyDesc.Text = "실행 중 형태를 실시간으로 변경할 단축키입니다.";
                 TxtSoundModeHotkeyLabel.Text = "사운드 모드 전환";
                 TxtSoundModeHotkeyDesc.Text = "실행 중 사운드 모드를 실시간으로 변경할 단축키입니다.";
-                TxtEditHotkeyLabel.Text = "오버레이 전환";
+                TxtEditHotkeyLabel.Text = "오버레이 설정";
                 TxtEditHotkeyDesc.Text = "오버레이 편집 화면을 표시하거나 닫는 단축키입니다.";
                 TxtAdminSettings.Text = "고급 설정";
                 TxtAdminModeLabel.Text = "개발자 모드";
@@ -230,6 +239,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "도움말";
                 TxtHelp1Title.Text = "사운드 모드";
                 TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 만약 7.1 출력 장치가 없다면 ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE 가상 드라이버";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "를 설치하고 출력장치를 7.1채널로 설정한다면 7.1 서라운드 사운드를 사용하여 오버레이를 표현할 수 있습니다.";
                 TxtHelp2Title.Text = "실시간 커스텀 단축키 제어";
                 TxtHelp2Desc.Text = "설정 탭에서 핫키 버튼을 클릭한 뒤, 단일 키 또는 복합 키 조합(예: Ctrl + Shift + A)을 눌러 자유롭게 단축키를 변경할 수 있습니다. 백그라운드에서 지정된 단축키를 누르면 실시간으로 모드가 즉시 전환됩니다.";
                 TxtHelp3Title.Text = "오버레이 실시간 편집 모드";
@@ -246,12 +258,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "말소리 표시";
                     ChkShowDanger.Content = "강조음 표시";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "더 알아보기";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 저장소 및 프로젝트 기여";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub 저장소 방문하기";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "English")
             {
                 TabHome.Header = "Home";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "Visualize the unseen sounds.\nStart a new experience from gaming to movies.";
                 if (BtnLaunch != null) BtnLaunch.Content = "Start";
                 if (BtnStop != null) BtnStop.Content = "Stop";
@@ -345,6 +362,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Help";
                 TxtHelp1Title.Text = "Sound Mode";
                 TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, set the 'Sound Mode' appropriately in the settings.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 If you do not have a 7.1 output device, you can install the ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE Virtual Driver";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " and configure the output device to 7.1 channels to display the overlay using 7.1 surround sound.";
                 TxtHelp2Title.Text = "Real-time Custom Hotkeys";
                 TxtHelp2Desc.Text = "You can freely customize hotkeys by clicking the button in the settings and pressing a single key or combination (e.g., Ctrl + Shift + A). Pressing these hotkeys in the background will switch modes instantly.";
                 TxtHelp3Title.Text = "Overlay Real-time Edit Mode";
@@ -361,12 +381,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Show Speech Sounds";
                     ChkShowDanger.Content = "Show Danger Sounds";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Learn More";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub Repository & Contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer is an open-source project, and its source code is publicly available on GitHub. You can participate in the project by reporting bugs, suggesting features, and contributing to development. Click the button below to visit the official GitHub repository! Also, you can check and download the latest version updates from the Releases tab on GitHub.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visit GitHub Repository";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "日本語")
             {
                 TabHome.Header = "ホーム";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "見えない音を画面に描きます。\nゲームから映画鑑賞まで、新しい体験を始めましょう。";
                 if (BtnLaunch != null) BtnLaunch.Content = "開始";
                 if (BtnStop != null) BtnStop.Content = "停止";
@@ -449,6 +474,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "ヘルプ";
                 TxtHelp1Title.Text = "サウンドモード";
                 TxtHelp1Desc.Text = "正常な方向性(レーダー)動作のためには、Windowsのサウンド設定で出力デバイスが「5.1 サラウンド」(6チャンネル)または「7.1 サラウンド」(8チャンネル)に構成されている必要があります。通常のステレオ(2チャンネル)環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「サウンドモード」を適切に設定してください。";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 7.1出力デバイスがない場合は、";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE仮想ドライバー";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "をインストールし、出力デバイスを7.1チャンネルに設定すると、7.1サラウンドサウンドを使用してオーバーレイを表示できます。";
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
@@ -465,12 +493,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "音声の表示";
                     ChkShowDanger.Content = "強調音の表示";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "詳細情報";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHubリポジトリとプロジェクト貢献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizerはオープンソースプロジェクトであり、ソースコードはGitHubで公開されています。バグ報告、機能提案、開発への貢献を通じて、プロジェクトに参加できます。下のボタンをクリックして、公式GitHubリポジトリにアクセスしてください！また、GitHubのReleasesタブから最新バージョンのアップデートを確認してダウンロードすることもできます。";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHubリポジトリにアクセス";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "中文")
             {
                 TabHome.Header = "主页";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "将看不见的声音描绘在屏幕上。\n从游戏到观影，开始全新的体验。";
                 if (BtnLaunch != null) BtnLaunch.Content = "开始";
                 if (BtnStop != null) BtnStop.Content = "停止";
@@ -552,6 +585,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "帮助";
                 TxtHelp1Title.Text = "声音模式";
                 TxtHelp1Desc.Text = "为了使方向性(雷达)正常工作，在Windows声音设置中，输出设备必须配置为“5.1 环绕声”(6声道)或“7.1 环绕声”(8声道)。在普通立体声(2声道)环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中正确设置“声音模式”。";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 如果您没有 7.1 输出设备，可以进入 ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "VB-CABLE 虚拟音频驱动";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " 安装 7.1 虚拟驱动，并将输出设备设置为 7.1 声道，即可使用 7.1 环绕声显示悬浮窗。";
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
@@ -568,12 +604,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "显示语音";
                     ChkShowDanger.Content = "显示强调音";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "了解更多";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 仓库与项目贡献";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer 是一个开源项目，其源代码已在 GitHub 上公开。您可以通过提交漏洞报告、功能建议以及参与开发来加入我们的项目。点击下方按钮即可访问官方 GitHub 仓库！此外，您还可以在 GitHub 的 Releases 选项卡中查看并下载最新版本更新。";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "访问 GitHub 仓库";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Español")
             {
                 TabHome.Header = "Inicio";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "Visualiza los sonidos invisibles.\nComienza una nueva experiencia, desde los juegos hasta el cine.";
                 if (BtnLaunch != null) BtnLaunch.Content = "Iniciar";
                 if (BtnStop != null) BtnStop.Content = "Detener";
@@ -655,6 +696,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Ayuda";
                 TxtHelp1Title.Text = "Modo de Sonido";
                 TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 5.1' (6 canales) o 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, ajuste el 'Modo de Sonido' correctamente en la configuración.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si no tienes un dispositivo de salida 7.1, puedes instalar el ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "Controlador Virtual VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " y configurar el dispositivo de salida en 7.1 canales para mostrar la superposición utilizando sonido envolvente 7.1.";
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
@@ -671,12 +715,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Mostrar voz";
                     ChkShowDanger.Content = "Mostrar sonido de peligro";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Saber más";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Repositorio de GitHub y contribución";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer es un proyecto de código abierto y su código fuente está disponible en GitHub. Puede participar en el proyecto mediante informes de errores, sugerencias de funciones y contribuciones al desarrollo. ¡Haga clic en el botón a continuación para visitar el repositorio oficial de GitHub! Además, puede consultar y descargar las actualizaciones de la última versión desde la pestaña Releases en GitHub.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visitar el repositorio de GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Français")
             {
                 TabHome.Header = "Accueil";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "Visualisez les sons invisibles.\nCommencez une nouvelle expérience, des jeux aux films.";
                 if (BtnLaunch != null) BtnLaunch.Content = "Démarrer";
                 if (BtnStop != null) BtnStop.Content = "Arrêter";
@@ -758,6 +807,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Aide";
                 TxtHelp1Title.Text = "Mode Sonore";
                 TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 5.1' (6 canaux) ou 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, réglez correctement le 'Mode Sonore' dans les paramètres.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si vous n'avez pas de périphérique de sortie 7.1, vous pouvez installer le ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "pilote virtuel VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " et configurer le périphérique de sortie sur 7.1 canaux pour afficher la superposition à l'aide du son surround 7.1.";
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
@@ -774,12 +826,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Afficher la voix";
                     ChkShowDanger.Content = "Afficher les sons de danger";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "En savoir plus";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Dépôt GitHub et contribution";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer est un projet open-source dont le code source est disponible sur GitHub. Vous pouvez participer au projet via des rapports de bugs, des suggestions de fonctionnalités et des contributions au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel ! De plus, vous pouvez vérifier et télécharger les dernières mises à jour de version depuis l'onglet Releases sur GitHub.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Visiter le dépôt GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Deutsch")
             {
                 TabHome.Header = "Startseite";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "Machen Sie unsichtbare Klänge sichtbar.\nStarten Sie ein neues Erlebnis, von Spielen bis hin zu Filmen.";
                 if (BtnLaunch != null) BtnLaunch.Content = "Starten";
                 if (BtnStop != null) BtnStop.Content = "Stoppen";
@@ -861,6 +918,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Hilfe";
                 TxtHelp1Title.Text = "Sound-Modus";
                 TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '5.1 Surround' (6 Kanäle) oder '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, stellen Sie den 'Sound-Modus' in den Einstellungen richtig ein.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Wenn Sie kein 7.1-Ausgabegerät haben, können Sie den ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "virtuellen VB-CABLE-Treiber";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " installieren und das Ausgabegerät auf 7.1 Kanäle konfigurieren, um das Overlay mit 7.1 Surround-Sound anzuzeigen.";
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
@@ -877,12 +937,17 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Sprache anzeigen";
                     ChkShowDanger.Content = "Gefahrentöne anzeigen";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Mehr erfahren";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub-Repository & Projektbeitrag";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer ist ein Open-Source-Projekt, dessen Quellcode auf GitHub verfügbar ist. Sie können sich durch Fehlerberichte, Funktionsvorschläge und Entwicklungsbeiträge am Projekt beteiligen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen! Außerdem können Sie im Tab Releases auf GitHub nach den neuesten Versionsupdates suchen und diese herunterladen.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "GitHub-Repository besuchen";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
             }
             else if (lang == "Русский")
             {
                 TabHome.Header = "Главная";
-                TxtHomeTitle.Text = "SoundVisualizer";
+                TxtHomeTitle.Text = "Sound Visualizer";
                 TxtHomeDesc.Text = "Визуализируйте невидимые звуки.\nНачните новый опыт, от игр до кино.";
                 if (BtnLaunch != null) BtnLaunch.Content = "Запустить";
                 if (BtnStop != null) BtnStop.Content = "Остановить";
@@ -964,6 +1029,9 @@ namespace SoundVisualizer
                 TabHelp.Header = "Помощь";
                 TxtHelp1Title.Text = "Режим звука";
                 TxtHelp1Desc.Text = "Для правильной работы направления (радара) устройство вывода звука Windows должно быть настроено как «5.1 Surround» (6 каналов) или «7.1 Surround» (8 каналов). В стандартной стереосреде (2 канала) визуализация может отображаться только слева/справа. Чтобы компенсировать это, установите «Режим звука» должным образом в настройках.";
+                if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Если у вас нет устройства вывода 7.1, вы можете установить ";
+                if (TxtHelp1TipLink != null) TxtHelp1TipLink.Text = "виртуальный драйвер VB-CABLE";
+                if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " и настроить устройство вывода на 7.1-канальный режим, чтобы отображать оверлей с использованием объемного звука 7.1.";
                 TxtHelp2Title.Text = "Горячие клавиши в реальном времени";
                 TxtHelp2Desc.Text = "Даже когда оверлей находится на экране, вы можете нажимать назначенные горячие клавиши (по умолчанию F2, F3) в фоновом режиме, чтобы мгновенно переключать формы и режимы.";
                 TxtHelp3Title.Text = "Как закрыть оверлей";
@@ -980,7 +1048,426 @@ namespace SoundVisualizer
                     ChkShowSpeech.Content = "Показывать речь";
                     ChkShowDanger.Content = "Показывать звуки опасности";
                 }
+                if (TabMoreInfo != null) TabMoreInfo.Header = "Подробнее";
+                if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "Репозиторий GitHub и вклад в проект";
+                if (TxtMoreInfoDesc != null) TxtMoreInfoDesc.Text = "Sound Visualizer — это проект с открытым исходным кодом, исходный код которого общедоступен на GitHub. Вы можете принять участие в проекте, сообщая об ошибках, предлагая новые функции и внося свой вклад в разработку. Нажмите кнопку ниже, чтобы посетить официальный репозиторий GitHub! Кроме того, вы можете проверять и загружать последние обновления со вкладки Releases на GitHub.";
+                if (BtnMoreInfoGithub != null) BtnMoreInfoGithub.Content = "Посетить репозиторий GitHub";
+
                 if (TxtStatus != null) SetStatusUI(_overlayWindow != null);
+            }
+
+            SetExtraLanguageTexts(lang);
+            SetMainComboItems(lang);
+
+            // LauncherWindow uses native language names (e.g. "日本語", "中文"), 
+            // but MainWindow.ApplyLanguage expects English keys (e.g. "Japanese", "Chinese").
+            string overlayLangKey = lang switch
+            {
+                "KOR" => "KOR",
+                "English" => "English",
+                "日本語" => "Japanese",
+                "中文" => "Chinese",
+                "Español" => "Spanish",
+                "Français" => "French",
+                "Deutsch" => "German",
+                "Русский" => "Russian",
+                _ => lang
+            };
+
+            var mw = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+            if (mw != null)
+            {
+                mw.ApplyLanguage(overlayLangKey);
+            }
+        }
+
+        private void SetExtraLanguageTexts(string lang)
+        {
+            SetMainComboItems(lang);
+            
+            if (lang == "KOR")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "최대 프레임";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "그래픽이 그려지는 최대 프레임 속도를 설정합니다.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "모드별 상세 설정";
+                if (BtnResetWave != null) BtnResetWave.Content = "기본값으로 되돌리기";
+                if (BtnResetPad != null) BtnResetPad.Content = "기본값으로 되돌리기";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "기본값으로 되돌리기";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "기본값으로 되돌리기";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "기본값으로 되돌리기";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "색상 설정";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "색상 설정";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "색상 설정";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "핫키 설정";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "핫키 설정";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "핫키 설정";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "실행 시 런처 최소화";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "오버레이 실행 시 이 런처 창을 자동으로 최소화합니다.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "환경음 표시";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "말소리 표시";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "강조음 표시";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "켜기";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "켜기";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "소리에 비례하여 나타날 최대 투명도를 설정합니다.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "소리에 비례하여 나타날 최대 투명도를 설정합니다.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "소리에 비례하여 나타날 최대 투명도를 설정합니다.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "소리에 비례하여 나타날 최대 투명도를 설정합니다.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "최대 투명도";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "최대 투명도";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "최대 투명도";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "최대 투명도";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "크기 고정";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "크기 고정";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "크기 고정";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "크기 고정";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "파도 크기";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "패드 크기";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "원형 크기";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "외곽선 두께";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "투명도가 변할 기준이 되는 고정 크기를 설정합니다.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "투명도가 변할 기준이 되는 고정 크기를 설정합니다.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "투명도가 변할 기준이 되는 고정 크기를 설정합니다.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "투명도가 변할 기준이 되는 고정 크기를 설정합니다.";
+            }
+            else if (lang == "English")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "Target FPS";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "Sets the maximum frame rate for rendering graphics.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "Mode Specific Settings";
+                if (BtnResetWave != null) BtnResetWave.Content = "Reset to Default";
+                if (BtnResetPad != null) BtnResetPad.Content = "Reset to Default";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "Reset to Default";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "Reset to Default";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "Reset to Default";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "Color Setting";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "Color Setting";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "Color Setting";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "Hotkey Setting";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "Hotkey Setting";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "Hotkey Setting";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "Minimize Launcher on Start";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "Automatically minimizes this launcher window when the overlay starts.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "Show Ambient Sounds";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "Show Speech Sounds";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "Show Danger Sounds";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "On";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "On";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "Sets the maximum opacity that will appear in proportion to the sound.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "Sets the maximum opacity that will appear in proportion to the sound.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "Sets the maximum opacity that will appear in proportion to the sound.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "Sets the maximum opacity that will appear in proportion to the sound.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Max Opacity";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Max Opacity";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Max Opacity";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Max Opacity";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "Fixed Size Mode";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "Fixed Size Mode";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "Fixed Size Mode";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "Fixed Size Mode";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "Displays a fixed-size graphic utilizing opacity proportional to the sound intensity.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "Displays a fixed-size graphic utilizing opacity proportional to the sound intensity.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "Displays a fixed-size graphic utilizing opacity proportional to the sound intensity.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "Displays a fixed-size graphic utilizing opacity proportional to the sound intensity.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "Wave Size";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "Pad Size";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "Circle Size";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "Outline Thickness";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "Sets the fixed size that serves as a baseline for opacity changes.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "Sets the fixed size that serves as a baseline for opacity changes.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "Sets the fixed size that serves as a baseline for opacity changes.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "Sets the fixed size that serves as a baseline for opacity changes.";
+            }
+            else if (lang == "日本語")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "最大フレーム";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "グラフィックが描画される最大フレームレートを設定します。";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "モード別詳細設定";
+                if (BtnResetWave != null) BtnResetWave.Content = "デフォルトに戻す";
+                if (BtnResetPad != null) BtnResetPad.Content = "デフォルトに戻す";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "デフォルトに戻す";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "デフォルトに戻す";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "デフォルトに戻す";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "色設定";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "色設定";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "色設定";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "ホットキー設定";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "ホットキー設定";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "ホットキー設定";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "起動時にランチャーを最小化";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "オーバーレイ開始時にこのランチャーウィンドウを自動的に最小化します。";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "環境音を表示";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "話し声を表示";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "強調音を表示";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "オン";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "オン";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "音に比例して表示される最大の不透明度を設定します。";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "音に比例して表示される最大の不透明度を設定します。";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "音に比例して表示される最大の不透明度を設定します。";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "音に比例して表示される最大の不透明度を設定します。";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "最大不透明度";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "固定サイズ";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "固定サイズ";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "固定サイズ";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "固定サイズ";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "音の強度に比例した不透明度を利用して、固定サイズのグラフィックを表示します。";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "音の強度に比例した不透明度を利用して、固定サイズのグラフィックを表示します。";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "音の強度に比例した不透明度を利用して、固定サイズのグラフィックを表示します。";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "音の強度に比例した不透明度を利用して、固定サイズのグラフィックを表示します。";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "波のサイズ";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "パッドのサイズ";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "円のサイズ";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "アウトラインの太さ";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "不透明度が変化する基準となる固定サイズを設定します。";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "不透明度が変化する基準となる固定サイズを設定します。";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "不透明度が変化する基準となる固定サイズを設定します。";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "不透明度が変化する基準となる固定サイズを設定します。";
+            }
+            else if (lang == "中文")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "最大帧数";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "设置绘制图形的最大帧率。";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "各模式详细设置";
+                if (BtnResetWave != null) BtnResetWave.Content = "恢复默认值";
+                if (BtnResetPad != null) BtnResetPad.Content = "恢复默认值";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "恢复默认值";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "恢复默认值";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "恢复默认值";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "颜色设置";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "颜色设置";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "颜色设置";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "快捷键设置";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "快捷键设置";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "快捷键设置";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "启动时最小化启动器";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "启动悬浮窗时自动最小化此启动器窗口。";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "显示环境音";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "显示说话声";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "显示强调音";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "开";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "开";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "设置与声音成比例出现的最大不透明度。";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "设置与声音成比例出现的最大不透明度。";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "设置与声音成比例出现的最大不透明度。";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "设置与声音成比例出现的最大不透明度。";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "最大不透明度";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "最大不透明度";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "固定大小";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "固定大小";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "固定大小";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "固定大小";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "利用与声音强度成比例的不透明度，显示固定大小的图形。";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "利用与声音强度成比例的不透明度，显示固定大小的图形。";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "利用与声音强度成比例的不透明度，显示固定大小的图形。";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "利用与声音强度成比例的不透明度，显示固定大小的图形。";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "波形大小";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "垫大小";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "圆形大小";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "轮廓粗细";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "设置作为不透明度变化基准的固定大小。";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "设置作为不透明度变化基准的固定大小。";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "设置作为不透明度变化基准的固定大小。";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "设置作为不透明度变化基准的固定大小。";
+            }
+            else if (lang == "Español")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "FPS Máximo";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "Establece la velocidad máxima de cuadros para renderizar gráficos.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "Configuraciones específicas del modo";
+                if (BtnResetWave != null) BtnResetWave.Content = "Restablecer a predeterminado";
+                if (BtnResetPad != null) BtnResetPad.Content = "Restablecer a predeterminado";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "Restablecer a predeterminado";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "Restablecer a predeterminado";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "Restablecer a predeterminado";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "Configuración de color";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "Configuración de color";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "Configuración de color";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "Configuración de tecla";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "Configuración de tecla";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "Configuración de tecla";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "Minimizar al inicio";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "Minimiza automáticamente esta ventana del lanzador cuando se inicia la superposición.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "Mostrar Sonido Ambiental";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "Mostrar Voz";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "Mostrar Sonido de Peligro";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "Encendido";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "Encendido";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "Establece la opacidad máxima que aparecerá en proporción al sonido.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "Establece la opacidad máxima que aparecerá en proporción al sonido.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "Establece la opacidad máxima que aparecerá en proporción al sonido.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "Establece la opacidad máxima que aparecerá en proporción al sonido.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Opacidad Máxima";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Opacidad Máxima";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Opacidad Máxima";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Opacidad Máxima";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "Tamaño Fijo";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "Tamaño Fijo";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "Tamaño Fijo";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "Tamaño Fijo";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "Muestra un gráfico de tamaño fijo utilizando una opacidad proporcional a la intensidad del sonido.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "Muestra un gráfico de tamaño fijo utilizando una opacidad proporcional a la intensidad del sonido.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "Muestra un gráfico de tamaño fijo utilizando una opacidad proporcional a la intensidad del sonido.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "Muestra un gráfico de tamaño fijo utilizando una opacidad proporcional a la intensidad del sonido.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "Tamaño de Ola";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "Tamaño de Pad";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "Tamaño de Círculo";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "Grosor de Contorno";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "Establece el tamaño fijo que sirve como base para los cambios de opacidad.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "Establece el tamaño fijo que sirve como base para los cambios de opacidad.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "Establece el tamaño fijo que sirve como base para los cambios de opacidad.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "Establece el tamaño fijo que sirve como base para los cambios de opacidad.";
+            }
+            else if (lang == "Français")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "FPS Maximum";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "Définit la fréquence d'images maximale pour le rendu des graphiques.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "Paramètres spécifiques au mode";
+                if (BtnResetWave != null) BtnResetWave.Content = "Réinitialiser par défaut";
+                if (BtnResetPad != null) BtnResetPad.Content = "Réinitialiser par défaut";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "Réinitialiser par défaut";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "Réinitialiser par défaut";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "Réinitialiser par défaut";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "Paramètre de couleur";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "Paramètre de couleur";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "Paramètre de couleur";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "Raccourci clavier";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "Raccourci clavier";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "Raccourci clavier";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "Minimiser au démarrage";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "Minimise automatiquement cette fenêtre de lanceur lorsque la superposition démarre.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "Afficher le Son Ambiant";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "Afficher la Voix";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "Afficher le Son de Danger";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "Activé";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "Activé";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "Définit l'opacité maximale qui apparaîtra proportionnellement au son.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "Définit l'opacité maximale qui apparaîtra proportionnellement au son.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "Définit l'opacité maximale qui apparaîtra proportionnellement au son.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "Définit l'opacité maximale qui apparaîtra proportionnellement au son.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Opacité Maximale";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Opacité Maximale";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Opacité Maximale";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Opacité Maximale";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "Taille Fixe";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "Taille Fixe";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "Taille Fixe";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "Taille Fixe";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "Affiche un graphique de taille fixe en utilisant une opacité proportionnelle à l'intensité du son.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "Affiche un graphique de taille fixe en utilisant une opacité proportionnelle à l'intensité du son.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "Affiche un graphique de taille fixe en utilisant une opacité proportionnelle à l'intensité du son.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "Affiche un graphique de taille fixe en utilisant une opacité proportionnelle à l'intensité du son.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "Taille de Vague";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "Taille de Pad";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "Taille de Cercle";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "Épaisseur de Contour";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "Définit la taille fixe qui sert de base aux changements d'opacité.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "Définit la taille fixe qui sert de base aux changements d'opacité.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "Définit la taille fixe qui sert de base aux changements d'opacité.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "Définit la taille fixe qui sert de base aux changements d'opacité.";
+            }
+            else if (lang == "Deutsch")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "Max. FPS";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "Legt die maximale Bildrate für das Rendern von Grafiken fest.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "Modusspezifische Einstellungen";
+                if (BtnResetWave != null) BtnResetWave.Content = "Auf Standard zurücksetzen";
+                if (BtnResetPad != null) BtnResetPad.Content = "Auf Standard zurücksetzen";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "Auf Standard zurücksetzen";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "Auf Standard zurücksetzen";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "Auf Standard zurücksetzen";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "Farbeinstellung";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "Farbeinstellung";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "Farbeinstellung";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "Hotkey-Einstellung";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "Hotkey-Einstellung";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "Hotkey-Einstellung";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "Launcher beim Start minimieren";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "Minimiert dieses Launcher-Fenster automatisch, wenn das Overlay startet.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "Umgebungsgeräusche Anzeigen";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "Sprache Anzeigen";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "Gefahrengeräusche Anzeigen";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "Ein";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "Ein";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "Legt die maximale Deckkraft fest, die proportional zum Ton erscheint.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "Legt die maximale Deckkraft fest, die proportional zum Ton erscheint.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "Legt die maximale Deckkraft fest, die proportional zum Ton erscheint.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "Legt die maximale Deckkraft fest, die proportional zum Ton erscheint.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Max. Deckkraft";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Max. Deckkraft";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Max. Deckkraft";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Max. Deckkraft";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "Feste Größe";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "Feste Größe";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "Feste Größe";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "Feste Größe";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "Zeigt eine Grafik mit fester Größe unter Verwendung einer Deckkraft, die proportional zur Schallintensität ist.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "Zeigt eine Grafik mit fester Größe unter Verwendung einer Deckkraft, die proportional zur Schallintensität ist.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "Zeigt eine Grafik mit fester Größe unter Verwendung einer Deckkraft, die proportional zur Schallintensität ist.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "Zeigt eine Grafik mit fester Größe unter Verwendung einer Deckkraft, die proportional zur Schallintensität ist.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "Wellengröße";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "Pad-Größe";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "Kreisgröße";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "Umrissdicke";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "Legt die feste Größe fest, die als Basis für Deckkraftänderungen dient.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "Legt die feste Größe fest, die als Basis für Deckkraftänderungen dient.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "Legt die feste Größe fest, die als Basis für Deckkraftänderungen dient.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "Legt die feste Größe fest, die als Basis für Deckkraftänderungen dient.";
+            }
+            else if (lang == "Русский")
+            {
+                if (TxtTargetFpsLabel != null) TxtTargetFpsLabel.Text = "Макс. FPS";
+                if (TxtTargetFpsDesc != null) TxtTargetFpsDesc.Text = "Устанавливает максимальную частоту кадров для рендеринга графики.";
+                if (TxtModeDetailSettings != null) TxtModeDetailSettings.Text = "Специфические настройки режима";
+                if (BtnResetWave != null) BtnResetWave.Content = "Сбросить по умолчанию";
+                if (BtnResetPad != null) BtnResetPad.Content = "Сбросить по умолчанию";
+                if (BtnResetCircle != null) BtnResetCircle.Content = "Сбросить по умолчанию";
+                if (BtnResetOutline != null) BtnResetOutline.Content = "Сбросить по умолчанию";
+                if (BtnResetSoundClassification != null) BtnResetSoundClassification.Content = "Сбросить по умолчанию";
+                if (TxtColorSettingsLabelAmbient != null) TxtColorSettingsLabelAmbient.Text = "Настройка цвета";
+                if (TxtColorSettingsLabelSpeech != null) TxtColorSettingsLabelSpeech.Text = "Настройка цвета";
+                if (TxtColorSettingsLabelDanger != null) TxtColorSettingsLabelDanger.Text = "Настройка цвета";
+                if (TxtHotkeyLabelStereo != null) TxtHotkeyLabelStereo.Text = "Настройка горячих клавиш";
+                if (TxtHotkeyLabelVisual != null) TxtHotkeyLabelVisual.Text = "Настройка горячих клавиш";
+                if (TxtHotkeyLabelOverlay != null) TxtHotkeyLabelOverlay.Text = "Настройка горячих клавиш";
+                if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "Сворачивать при запуске";
+                if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "Автоматически сворачивает окно лаунчера при запуске оверлея.";
+                if (ChkShowAmbient != null) ChkShowAmbient.Content = "Показывать Фоновые Звуки";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "Показывать Речь";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "Показывать Звуки Опасности";
+                if (ChkAdminMode != null) ChkAdminMode.Content = "Вкл";
+                if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "Вкл";
+                if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "Устанавливает максимальную непрозрачность, которая будет появляться пропорционально звуку.";
+                if (TxtOpacityFixedMaxOpacityDescPad != null) TxtOpacityFixedMaxOpacityDescPad.Text = "Устанавливает максимальную непрозрачность, которая будет появляться пропорционально звуку.";
+                if (TxtOpacityFixedMaxOpacityDescCircle != null) TxtOpacityFixedMaxOpacityDescCircle.Text = "Устанавливает максимальную непрозрачность, которая будет появляться пропорционально звуку.";
+                if (TxtOpacityFixedMaxOpacityDescOutline != null) TxtOpacityFixedMaxOpacityDescOutline.Text = "Устанавливает максимальную непрозрачность, которая будет появляться пропорционально звуку.";
+                if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Макс. Непрозрачность";
+                if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Макс. Непрозрачность";
+                if (TxtOpacityFixedMaxOpacityLabelCircle != null) TxtOpacityFixedMaxOpacityLabelCircle.Text = "Макс. Непрозрачность";
+                if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Макс. Непрозрачность";
+                if (TxtIntensityAsOpacityLabelWave != null) TxtIntensityAsOpacityLabelWave.Text = "Фиксированный Размер";
+                if (TxtIntensityAsOpacityLabelPad != null) TxtIntensityAsOpacityLabelPad.Text = "Фиксированный Размер";
+                if (TxtIntensityAsOpacityLabelCircle != null) TxtIntensityAsOpacityLabelCircle.Text = "Фиксированный Размер";
+                if (TxtIntensityAsOpacityLabelOutline != null) TxtIntensityAsOpacityLabelOutline.Text = "Фиксированный Размер";
+                if (TxtIntensityAsOpacityDescWave != null) TxtIntensityAsOpacityDescWave.Text = "Отображает график фиксированного размера, используя непрозрачность, пропорциональную интенсивности звука.";
+                if (TxtIntensityAsOpacityDescPad != null) TxtIntensityAsOpacityDescPad.Text = "Отображает график фиксированного размера, используя непрозрачность, пропорциональную интенсивности звука.";
+                if (TxtIntensityAsOpacityDescCircle != null) TxtIntensityAsOpacityDescCircle.Text = "Отображает график фиксированного размера, используя непрозрачность, пропорциональную интенсивности звука.";
+                if (TxtIntensityAsOpacityDescOutline != null) TxtIntensityAsOpacityDescOutline.Text = "Отображает график фиксированного размера, используя непрозрачность, пропорциональную интенсивности звука.";
+                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Text = "Размер Волны";
+                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Text = "Размер Пада";
+                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Text = "Размер Круга";
+                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Text = "Толщина Контура";
+                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Text = "Устанавливает фиксированный размер, который служит базой для изменения непрозрачности.";
+                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Text = "Устанавливает фиксированный размер, который служит базой для изменения непрозрачности.";
+                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Text = "Устанавливает фиксированный размер, который служит базой для изменения непрозрачности.";
+                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Text = "Устанавливает фиксированный размер, который служит базой для изменения непрозрачности.";
             }
         }
 
@@ -1028,6 +1515,7 @@ namespace SoundVisualizer
             SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
             SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
@@ -1070,6 +1558,7 @@ namespace SoundVisualizer
             SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
             SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
@@ -1112,6 +1601,7 @@ namespace SoundVisualizer
             SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
             SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
@@ -1155,6 +1645,7 @@ namespace SoundVisualizer
             SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
             SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
             TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
@@ -1185,8 +1676,10 @@ namespace SoundVisualizer
             // 4. Common settings
             CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
             CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
+            SldTargetFps.Maximum = AppSettings.GetMonitorRefreshRate();
             SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
+            if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.IsChecked = AppSettings.AutoMinimizeOnLaunch;
 
             if (BtnVisualHotkey != null) BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
             if (BtnSoundModeHotkey != null) BtnSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
@@ -1380,6 +1873,7 @@ namespace SoundVisualizer
                 SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
                 SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
@@ -1426,6 +1920,7 @@ namespace SoundVisualizer
                 SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
                 SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
@@ -1472,6 +1967,7 @@ namespace SoundVisualizer
                 SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
                 SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
@@ -1519,6 +2015,7 @@ namespace SoundVisualizer
                 SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
                 SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
+            TxtOpacityFixedMaxOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
                 TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
@@ -1560,6 +2057,7 @@ namespace SoundVisualizer
             else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
             else if (sender == SldTargetFps) AppSettings.TargetFps = SldTargetFps.Value;
             else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
+            else if (sender == ChkAutoMinimizeOnLaunch) AppSettings.AutoMinimizeOnLaunch = ChkAutoMinimizeOnLaunch.IsChecked ?? false;
             // Removed old hotkey combo logic
             else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
             else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
@@ -1604,6 +2102,7 @@ namespace SoundVisualizer
             }
 
             _overlayWindow = new MainWindow();
+            _overlayWindow.ApplyLanguage(AppSettings.Language);
             _overlayWindow.OnSettingsChangedFromHotkey = () =>
             {
                 // UI 스레드에서 LoadSettingsToUI 호출 (MainWindow는 이미 UI 스레드에서 이벤트를 발생시킴)
@@ -1624,6 +2123,11 @@ namespace SoundVisualizer
             BtnLaunch.IsEnabled = false;
             BtnStop.IsEnabled = true;
             SetStatusUI(true);
+
+            if (AppSettings.AutoMinimizeOnLaunch)
+            {
+                this.WindowState = WindowState.Minimized;
+            }
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -1632,6 +2136,65 @@ namespace SoundVisualizer
             {
                 _overlayWindow.Close();
             }
+        }
+        private void BtnResetWave_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("파도 모드의 설정을 기본값으로 되돌리시겠습니까?", "설정 초기화", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            AppSettings.WaveMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            _isInitializing = true;
+            LoadSettingsToUI();
+            _isInitializing = false;
+            AppSettings.Save();
+        }
+
+        private void BtnResetPad_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("패드 모드의 설정을 기본값으로 되돌리시겠습니까?", "설정 초기화", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            AppSettings.PadMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            _isInitializing = true;
+            LoadSettingsToUI();
+            _isInitializing = false;
+            AppSettings.Save();
+        }
+
+        private void BtnResetCircle_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("원형 모드의 설정을 기본값으로 되돌리시겠습니까?", "설정 초기화", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            AppSettings.CircleMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            _isInitializing = true;
+            LoadSettingsToUI();
+            _isInitializing = false;
+            AppSettings.Save();
+        }
+
+        private void BtnResetOutline_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("외곽선 모드의 설정을 기본값으로 되돌리시겠습니까?", "설정 초기화", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            AppSettings.OutlineMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+            _isInitializing = true;
+            LoadSettingsToUI();
+            _isInitializing = false;
+            AppSettings.Save();
+        }
+
+        private void BtnResetSoundClassification_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("소리 분류 표시 설정을 기본값으로 되돌리시겠습니까?", "설정 초기화", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            AppSettings.ShowAmbient = true;
+            AppSettings.ShowSpeech = true;
+            AppSettings.ShowDanger = true;
+            AppSettings.ColorAmbient = "#FFFFFFFF";
+            AppSettings.ColorSpeech = "#FFFFFF00";
+            AppSettings.ColorDanger = "#FFFF0000";
+            _isInitializing = true;
+            LoadSettingsToUI();
+            _isInitializing = false;
+            AppSettings.Save();
         }
 
         private void BtnReset_Click(object sender, RoutedEventArgs e)
@@ -1747,6 +2310,84 @@ namespace SoundVisualizer
         public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
         {
             CheckAndApplyDeviceChannels();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = e.Uri.AbsoluteUri,
+                    UseShellExecute = true
+                });
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"링크를 열 수 없습니다: {ex.Message}");
+            }
+        }
+
+        private void BtnMoreInfoGithub_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/amophi/SoundVisualizer",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"링크를 열 수 없습니다: {ex.Message}");
+            }
+        }
+        private void SetMainComboItems(string lang)
+        {
+            string[] visualModes;
+            string[] soundModes;
+
+            switch(lang) {
+                case "KOR": visualModes = new[] { "파도", "패드", "원형", "외곽선" }; soundModes = new[] { "2 채널", "5.1 채널", "7.1 채널" }; break;
+                case "English": visualModes = new[] { "Wave", "Pad", "Circle", "Outline" }; soundModes = new[] { "2 Channel", "5.1 Channel", "7.1 Channel" }; break;
+                case "日本語": visualModes = new[] { "波", "パッド", "円形", "アウトライン" }; soundModes = new[] { "2 チャンネル", "5.1 チャンネル", "7.1 チャンネル" }; break;
+                case "中文": visualModes = new[] { "波浪", "垫子", "圆形", "轮廓" }; soundModes = new[] { "2 声道", "5.1 声道", "7.1 声道" }; break;
+                case "Español": visualModes = new[] { "Onda", "Pad", "Círculo", "Contorno" }; soundModes = new[] { "2 Canales", "5.1 Canales", "7.1 Canales" }; break;
+                case "Français": visualModes = new[] { "Vague", "Pad", "Cercle", "Contour" }; soundModes = new[] { "2 Canaux", "5.1 Canaux", "7.1 Canaux" }; break;
+                case "Deutsch": visualModes = new[] { "Welle", "Pad", "Kreis", "Umriss" }; soundModes = new[] { "2 Kanäle", "5.1 Kanäle", "7.1 Kanäle" }; break;
+                case "Русский": visualModes = new[] { "Волна", "Пэд", "Круг", "Контур" }; soundModes = new[] { "2 Канала", "5.1 Каналов", "7.1 Каналов" }; break;
+                default: return;
+            }
+
+            bool prevInit = _isInitializing;
+            _isInitializing = true;
+
+            if (CmbVisualMode != null)
+            {
+                int prevSel = CmbVisualMode.SelectedIndex;
+                for (int i = 0; i < visualModes.Length && i < CmbVisualMode.Items.Count; i++)
+                    ((System.Windows.Controls.ComboBoxItem)CmbVisualMode.Items[i]).Content = visualModes[i];
+                if (prevSel >= 0)
+                {
+                    CmbVisualMode.SelectedIndex = -1;
+                    CmbVisualMode.SelectedIndex = prevSel;
+                }
+            }
+            if (CmbSoundMode != null)
+            {
+                int prevSel = CmbSoundMode.SelectedIndex;
+                for (int i = 0; i < soundModes.Length && i < CmbSoundMode.Items.Count; i++)
+                    ((System.Windows.Controls.ComboBoxItem)CmbSoundMode.Items[i]).Content = soundModes[i];
+                if (prevSel >= 0)
+                {
+                    CmbSoundMode.SelectedIndex = -1;
+                    CmbSoundMode.SelectedIndex = prevSel;
+                }
+            }
+
+            _isInitializing = prevInit;
         }
     }
 }

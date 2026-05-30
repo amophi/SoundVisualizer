@@ -111,10 +111,11 @@ namespace SoundVisualizer
         public static int EditModeHotkey { get; set; } = 0x73;    
 
         // 7. 현재 언어 설정
-        public static string Language { get; set; } = "KOR";
+        public static string Language { get; set; } = "ENG";
 
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
+        public static bool AutoMinimizeOnLaunch { get; set; } = false;
 
         // 8.6. 렌더링 최대 프레임
         public static double TargetFps { get; set; } = 144.0;
@@ -160,9 +161,10 @@ namespace SoundVisualizer
                         if (data.EditModeKeyBind != null && data.EditModeKeyBind.Count > 0) EditModeKeyBind = data.EditModeKeyBind;
                         else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73 };
 
-                        Language = data.Language ?? "KOR";
+                        Language = data.Language ?? "ENG";
                         
                         IsAdminMode = data.IsAdminMode;
+                        AutoMinimizeOnLaunch = data.AutoMinimizeOnLaunch;
                         if (data.TargetFps >= 30.0) TargetFps = data.TargetFps;
                         ShowAmbient = data.ShowAmbient;
                         ShowSpeech = data.ShowSpeech;
@@ -183,6 +185,9 @@ namespace SoundVisualizer
 
                         if (data.OutlineMode != null) OutlineMode = data.OutlineMode;
                         else OutlineMode = new VisualModeSettings { Intensity = data.WaveIntensity, PositionSpeed = data.WavePositionSpeed, Sensitivity = data.WaveSensitivity, VisualOpacity = data.VisualOpacity, IsGlowMode = data.IsGlowMode, GlowIntensity = data.GlowIntensity, CircleRadius = data.CircleRadius };
+
+                        int maxRate = GetMonitorRefreshRate();
+                        if (TargetFps > maxRate) TargetFps = maxRate;
                     }
                 }
             }
@@ -203,6 +208,7 @@ namespace SoundVisualizer
                     Language = Language,
                     
                     IsAdminMode = IsAdminMode,
+                    AutoMinimizeOnLaunch = AutoMinimizeOnLaunch,
                     TargetFps = TargetFps,
                     ShowAmbient = ShowAmbient,
                     ShowSpeech = ShowSpeech,
@@ -232,6 +238,35 @@ namespace SoundVisualizer
             catch { }
         }
 
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr GetDC(IntPtr hWnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        private static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
+        private const int VREFRESH = 116;
+
+        public static int GetMonitorRefreshRate()
+        {
+            IntPtr hDC = GetDC(IntPtr.Zero);
+            try
+            {
+                int rate = GetDeviceCaps(hDC, VREFRESH);
+                return rate > 0 ? rate : 60; // 디바이스 주사율 질의 실패 시 안전하게 60Hz 리턴
+            }
+            catch
+            {
+                return 60;
+            }
+            finally
+            {
+                ReleaseDC(IntPtr.Zero, hDC);
+            }
+        }
+
         private class SettingsData
         {
             public double WaveIntensity { get; set; } = 50.0;
@@ -255,6 +290,7 @@ namespace SoundVisualizer
             public string Language { get; set; } = "KOR";
             
             public bool IsAdminMode { get; set; } = false;
+            public bool AutoMinimizeOnLaunch { get; set; } = false;
             public double TargetFps { get; set; } = 144.0;
             public bool ShowAmbient { get; set; } = true;
             public bool ShowSpeech { get; set; } = true;

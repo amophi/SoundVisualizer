@@ -23,7 +23,7 @@ namespace SoundVisualizer.CoreAudio
         }
     }
 
-    public class AudioCaptureEngine : IMMNotificationClient
+    public class AudioCaptureEngine : IMMNotificationClient, IDisposable
     {
         private WasapiLoopbackCapture? _captureDevice;
         private MMDeviceEnumerator? _notificationEnumerator;
@@ -164,6 +164,11 @@ namespace SoundVisualizer.CoreAudio
                 _notificationEnumerator = null;
             }
             StopCaptureDevice();
+        }
+
+        public void Dispose()
+        {
+            StopCapture();
         }
 
         private void StopCaptureDevice()
