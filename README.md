@@ -1,5 +1,9 @@
 <div align="center">
 
+[🇺🇸 English](README.md) | [🇰🇷 한국어](README.ko.md)
+
+<br/>
+
 # 🎵 Sound Visualizer
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
@@ -15,7 +19,7 @@
 
 <br/>
 
-> **Sound Visualizer** captures real-time system audio and translates it into beautiful, dynamic graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
+> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
 
 ---
 
@@ -28,19 +32,19 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 - **Leveling the Playing Field in Gaming**: Allows deaf gamers to react to audio-based gameplay mechanics on equal footing by perceiving spatial and event-based sound visually.
 
 ### 🎧 For the General Public & Gamers
-- **Immersive Gameplay & Media**: Elevates the sensory experience of listening to music or playing games through fluid, reactive visual overlays.
-- **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra awareness and faster reaction times in competitive environments.
-- **Desktop Customization**: Adds a sleek, high-tech aesthetic to any stream or dual-monitor setup without hindering PC performance.
+- **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during gaming or media consumption.
+- **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra awareness in competitive environments.
+- **Desktop Customization**: Provides a customizable overlay for streams or desktop setups with minimal performance overhead.
 
 ---
 
 ## ✨ Key Features
 
 ### 🎨 Diverse Visualizer Modes (Upgraded)
-- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as smooth, flowing curves that dynamically scale based on intensity.
-- ⭕ **Circle Mode (`CircleVisualizer`)**: Creates a shimmering circular equalizer and pulse beats based on center Core Radius and frequency.
+- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as curves that dynamically scale based on intensity.
+- ⭕ **Circle Ripple Mode (`CircleRippleVisualizer`)**: Creates a circular equalizer and pulse effects based on center Core Radius and frequency.
 - 🎛 **Pad Mode (`PadVisualizer`)**: Displays frequency spectrum responses across spatial grid pad directions (2.0 / 5.1 / 7.1).
-- 🔲 **Outline Mode (`OutlineVisualizer`)**: Emphasizes border neon lighting waves running around the frame edges for immersive effects.
+- 🔲 **Outline Mode (`OutlineVisualizer`)**: Emphasizes border lighting waves running around the frame edges.
 
 ### 🎮 Real-Time Overlay Editor (F4 Key)
 - **Interactive Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
@@ -78,14 +82,17 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 ## 📁 Directory Structure
 
 ```text
-SoundVisualizer/
-├── AIModel/          # ONNX models (YAMNet, boosters) and C# SoundClassifier
-├── CoreAudio/        # System audio capture pipeline (AudioCaptureEngine)
-├── DSP/              # Digital Signal Processing (FFT, VectorCalculator)
-├── Visualizers/      # Visualizer implementations (Wave, Pad, Circle, Outline)
-├── AppSettings.cs    # Global application and visualizer configuration
-├── LauncherWindow.xaml # Settings launcher and localization management
-└── MainWindow.xaml     # The actual transparent overlay window and real-time editor
+├── SoundVisualizer/      # Main WPF Application
+│   ├── AIModel/          # ONNX models (YAMNet, boosters) and C# SoundClassifier
+│   ├── CoreAudio/        # System audio capture pipeline (AudioCaptureEngine)
+│   ├── DSP/              # Digital Signal Processing (FFT, VectorCalculator)
+│   ├── Visualizers/      # Visualizer implementations (Wave, Pad, CircleRipple, Outline)
+│   ├── AppSettings.cs    # Global application and visualizer configuration
+│   ├── ColorPickerWindow.xaml # Custom color picker for visualizers
+│   ├── LauncherWindow.xaml # Settings launcher and localization management
+│   └── MainWindow.xaml     # The actual transparent overlay window and real-time editor
+└── tools/
+    └── transfer_learning/  # Python scripts for training custom ONNX models
 ```
 
 ## 🚀 Installation & Running
