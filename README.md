@@ -31,7 +31,7 @@ This project serves as a bridge between auditory and visual cues, providing feat
 - **Visualizing Sound**: Translates auditory cues (like footsteps, gunshots, or system alerts) into visual feedback.
 - **Gaming Accessibility**: Allows users to perceive spatial and event-based sound visually.
 
-### 🎧 For the General Public & Gamers
+### 🎧 For Everyone
 - **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during gaming or media consumption.
 - **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra awareness in competitive environments.
 - **Desktop Customization**: Provides a customizable overlay for streams or desktop setups with minimal performance overhead.
