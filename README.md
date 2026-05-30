@@ -40,7 +40,7 @@ This project serves as a bridge between auditory and visual cues, providing feat
 
 ## ✨ Key Features
 
-### 🎨 Diverse Visualizer Modes (Upgraded)
+### 🎨 Diverse Visualizer Modes
 - 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as curves that dynamically scale based on intensity.
 - ⭕ **Circle Ripple Mode (`CircleRippleVisualizer`)**: Creates a circular equalizer and pulse effects based on center Core Radius and frequency.
 - 🎛 **Pad Mode (`PadVisualizer`)**: Displays frequency spectrum responses across spatial grid pad directions (2.0 / 5.1 / 7.1).
