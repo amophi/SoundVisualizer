@@ -76,12 +76,13 @@ namespace SoundVisualizer
         private string _rectModeLabelPrefix = "한계선";
         private string _rectSizeLabelPrefix = "크기: ";
         private string _circleRadiusLabelPrefix = "기본 반경: ";
-        private string _circleIntensityLabelPrefix = "파도 크기: ";
+        private string _circleIntensityLabelPrefix = "원형 크기: ";
         private string _visualModeUIPrefix = "시각화 모드: ";
         private string _stereoModeUIPrefix = "채널 모드: ";
         private string _editModeUIText = "오버레이 설정: ";
         private string[] _visualModeNames = { "파도", "패드", "원형", "외곽선" };
         private string[] _soundModeNames = { "2 채널", "5.1 채널", "7.1 채널" };
+        private string[] _opacityFixedSizeLabels = { "파도 크기", "패드 크기", "원형 크기", "외곽선 두께" };
 
         // YAMNet 추론 스로틀링 제어 필드
         private readonly object _aiLock = new();
@@ -917,8 +918,7 @@ namespace SoundVisualizer
                         
                         if (EditPanelOpacityFixedSizeLabel != null)
                         {
-                            string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
-                            EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+                            EditPanelOpacityFixedSizeLabel.Text = _opacityFixedSizeLabels[AppSettings.VisualMode];
                         }
                         
                         EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
@@ -993,8 +993,7 @@ namespace SoundVisualizer
 
             if (EditPanelOpacityFixedSizeLabel != null)
             {
-                string modeName = AppSettings.VisualMode == 1 ? "패드" : AppSettings.VisualMode == 3 ? "외곽선" : AppSettings.VisualMode == 2 ? "원형" : "파도";
-                EditPanelOpacityFixedSizeLabel.Text = $"{modeName} 크기";
+                EditPanelOpacityFixedSizeLabel.Text = _opacityFixedSizeLabels[AppSettings.VisualMode];
             }
 
             // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
@@ -1596,8 +1595,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "강조음 표시";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " 키를 누르면 설정 저장 후 닫힘";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "오버레이 실행 종료";
-                    _rectModeLabelPrefix = "한계선"; _rectSizeLabelPrefix = "크기: "; _circleRadiusLabelPrefix = "기본 반경: "; _circleIntensityLabelPrefix = "파도 크기: "; _visualModeUIPrefix = "시각화 모드: "; _stereoModeUIPrefix = "채널 모드: "; _editModeUIText = "오버레이 설정: ";
+                    _rectModeLabelPrefix = "한계선"; _rectSizeLabelPrefix = "크기: "; _circleRadiusLabelPrefix = "기본 반경: "; _circleIntensityLabelPrefix = "원형 크기: "; _visualModeUIPrefix = "시각화 모드: "; _stereoModeUIPrefix = "채널 모드: "; _editModeUIText = "오버레이 설정: ";
                     _visualModeNames = new[] { "파도", "패드", "원형", "외곽선" }; _soundModeNames = new[] { "2 채널", "5.1 채널", "7.1 채널" };
+                    _opacityFixedSizeLabels = new[] { "파도 크기", "패드 크기", "원형 크기", "외곽선 두께" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1632,8 +1632,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "Show Danger";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " key to save & close";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "Exit Overlay";
-                    _rectModeLabelPrefix = "Limit"; _rectSizeLabelPrefix = "Size: "; _circleRadiusLabelPrefix = "Base Radius: "; _circleIntensityLabelPrefix = "Wave Size: "; _visualModeUIPrefix = "Visual Mode: "; _stereoModeUIPrefix = "Channel Mode: "; _editModeUIText = "Overlay Settings: ";
+                    _rectModeLabelPrefix = "Limit"; _rectSizeLabelPrefix = "Size: "; _circleRadiusLabelPrefix = "Base Radius: "; _circleIntensityLabelPrefix = "Circle Size: "; _visualModeUIPrefix = "Visual Mode: "; _stereoModeUIPrefix = "Channel Mode: "; _editModeUIText = "Overlay Settings: ";
                     _visualModeNames = new[] { "Wave", "Pad", "Circle", "Outline" }; _soundModeNames = new[] { "2 Channel", "5.1 Channel", "7.1 Channel" };
+                    _opacityFixedSizeLabels = new[] { "Wave Size", "Pad Size", "Circle Size", "Outline Thickness" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1668,8 +1669,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "警告音を表示";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " キーで保存して閉じる";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "オーバーレイ終了";
-                    _rectModeLabelPrefix = "限界線"; _rectSizeLabelPrefix = "サイズ: "; _circleRadiusLabelPrefix = "基本半径: "; _circleIntensityLabelPrefix = "波のサイズ: "; _visualModeUIPrefix = "視覚化モード: "; _stereoModeUIPrefix = "チャンネルモード: "; _editModeUIText = "オーバーレイ設定: ";
+                    _rectModeLabelPrefix = "限界線"; _rectSizeLabelPrefix = "サイズ: "; _circleRadiusLabelPrefix = "基本半径: "; _circleIntensityLabelPrefix = "円のサイズ: "; _visualModeUIPrefix = "視覚化モード: "; _stereoModeUIPrefix = "チャンネルモード: "; _editModeUIText = "オーバーレイ設定: ";
                     _visualModeNames = new[] { "波", "パッド", "円形", "アウトライン" }; _soundModeNames = new[] { "2 チャンネル", "5.1 チャンネル", "7.1 チャンネル" };
+                    _opacityFixedSizeLabels = new[] { "波のサイズ", "パッドのサイズ", "円のサイズ", "アウトラインの太さ" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1704,8 +1706,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "显示强调音";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " 键保存并关闭";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "退出悬浮窗";
-                    _rectModeLabelPrefix = "限制线"; _rectSizeLabelPrefix = "大小: "; _circleRadiusLabelPrefix = "基础半径: "; _circleIntensityLabelPrefix = "波浪大小: "; _visualModeUIPrefix = "可视化模式: "; _stereoModeUIPrefix = "声道模式: "; _editModeUIText = "覆盖设置: ";
+                    _rectModeLabelPrefix = "限制线"; _rectSizeLabelPrefix = "大小: "; _circleRadiusLabelPrefix = "基础半径: "; _circleIntensityLabelPrefix = "圆形大小: "; _visualModeUIPrefix = "可视化模式: "; _stereoModeUIPrefix = "声道模式: "; _editModeUIText = "覆盖设置: ";
                     _visualModeNames = new[] { "波浪", "垫子", "圆形", "轮廓" }; _soundModeNames = new[] { "2 声道", "5.1 声道", "7.1 声道" };
+                    _opacityFixedSizeLabels = new[] { "波浪大小", "背景音面板大小", "圆形大小", "轮廓厚度" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1740,8 +1743,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "Mostrar peligro";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " para guardar y cerrar";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "Salir de superposición";
-                    _rectModeLabelPrefix = "Límite"; _rectSizeLabelPrefix = "Tamaño: "; _circleRadiusLabelPrefix = "Radio Base: "; _circleIntensityLabelPrefix = "Tamaño de Ola: "; _visualModeUIPrefix = "Modo Visual: "; _stereoModeUIPrefix = "Modo de Canal: "; _editModeUIText = "Ajustes de Capa: ";
+                    _rectModeLabelPrefix = "Límite"; _rectSizeLabelPrefix = "Tamaño: "; _circleRadiusLabelPrefix = "Radio Base: "; _circleIntensityLabelPrefix = "Tamaño de Círculo: "; _visualModeUIPrefix = "Modo Visual: "; _stereoModeUIPrefix = "Modo de Canal: "; _editModeUIText = "Ajustes de Capa: ";
                     _visualModeNames = new[] { "Onda", "Pad", "Círculo", "Contorno" }; _soundModeNames = new[] { "2 Canales", "5.1 Canales", "7.1 Canales" };
+                    _opacityFixedSizeLabels = new[] { "Tamaño de Ola", "Tamaño de Pad", "Tamaño de Círculo", "Grosor de Contorno" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1776,8 +1780,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "Afficher danger";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " pour sauver et fermer";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "Quitter la superposition";
-                    _rectModeLabelPrefix = "Limite"; _rectSizeLabelPrefix = "Taille: "; _circleRadiusLabelPrefix = "Rayon de Base: "; _circleIntensityLabelPrefix = "Taille de Vague: "; _visualModeUIPrefix = "Mode Visuel: "; _stereoModeUIPrefix = "Mode de Canal: "; _editModeUIText = "Paramètres: ";
+                    _rectModeLabelPrefix = "Limite"; _rectSizeLabelPrefix = "Taille: "; _circleRadiusLabelPrefix = "Rayon de Base: "; _circleIntensityLabelPrefix = "Taille de Cercle: "; _visualModeUIPrefix = "Mode Visuel: "; _stereoModeUIPrefix = "Mode de Canal: "; _editModeUIText = "Paramètres: ";
                     _visualModeNames = new[] { "Vague", "Pad", "Cercle", "Contour" }; _soundModeNames = new[] { "2 Canaux", "5.1 Canaux", "7.1 Canaux" };
+                    _opacityFixedSizeLabels = new[] { "Taille de Vague", "Taille de Pad", "Taille de Cercle", "Épaisseur de Contour" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1812,8 +1817,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "Gefahr";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " drücken zum Speichern";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "Overlay beenden";
-                    _rectModeLabelPrefix = "Grenze"; _rectSizeLabelPrefix = "Größe: "; _circleRadiusLabelPrefix = "Grundradius: "; _circleIntensityLabelPrefix = "Wellengröße: "; _visualModeUIPrefix = "Visueller Modus: "; _stereoModeUIPrefix = "Kanal-Modus: "; _editModeUIText = "Overlay-Einst: ";
+                    _rectModeLabelPrefix = "Grenze"; _rectSizeLabelPrefix = "Größe: "; _circleRadiusLabelPrefix = "Grundradius: "; _circleIntensityLabelPrefix = "Kreisgröße: "; _visualModeUIPrefix = "Visueller Modus: "; _stereoModeUIPrefix = "Kanal-Modus: "; _editModeUIText = "Overlay-Einst: ";
                     _visualModeNames = new[] { "Welle", "Pad", "Kreis", "Umriss" }; _soundModeNames = new[] { "2 Kanäle", "5.1 Kanäle", "7.1 Kanäle" };
+                    _opacityFixedSizeLabels = new[] { "Wellengröße", "Pad-Größe", "Kreisgröße", "Umrissdicke" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1848,8 +1854,9 @@ namespace SoundVisualizer
                     if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "Показать опасность";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " для сохранения и закрытия";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "Выход из оверлея";
-                    _rectModeLabelPrefix = "Предел"; _rectSizeLabelPrefix = "Размер: "; _circleRadiusLabelPrefix = "Радиус: "; _circleIntensityLabelPrefix = "Размер волны: "; _visualModeUIPrefix = "Визуальный: "; _stereoModeUIPrefix = "Режим канала: "; _editModeUIText = "Настройки: ";
+                    _rectModeLabelPrefix = "Предел"; _rectSizeLabelPrefix = "Размер: "; _circleRadiusLabelPrefix = "Радиус: "; _circleIntensityLabelPrefix = "Размер Круга: "; _visualModeUIPrefix = "Визуальный: "; _stereoModeUIPrefix = "Режим канала: "; _editModeUIText = "Настройки: ";
                     _visualModeNames = new[] { "Волна", "Пэд", "Круг", "Контур" }; _soundModeNames = new[] { "2 Канала", "5.1 Каналов", "7.1 Каналов" };
+                    _opacityFixedSizeLabels = new[] { "Размер Волны", "Размер Панели", "Размер Круга", "Толщина Контура" };
                     SetComboItems(_visualModeNames, _soundModeNames);
                     _forceUpdateHUDTexts = true; UpdateGuidelinePositions();
                     break;
@@ -1867,6 +1874,10 @@ namespace SoundVisualizer
             {
                 for (int i = 0; i < soundModes.Length && i < CmbEditPanelSoundMode.Items.Count; i++)
                     ((System.Windows.Controls.ComboBoxItem)CmbEditPanelSoundMode.Items[i]).Content = soundModes[i];
+            }
+            if (EditPanelOpacityFixedSizeLabel != null)
+            {
+                EditPanelOpacityFixedSizeLabel.Text = _opacityFixedSizeLabels[AppSettings.VisualMode];
             }
         }
         private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)

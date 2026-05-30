@@ -986,10 +986,10 @@
                                     <StackPanel Margin="0,0,0,16">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowAmbient" Content="환경음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                                 <TextBlock x:Name="TxtColorSettingsLabelAmbient" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorAmbient" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
@@ -1006,10 +1006,10 @@
                                     <StackPanel Margin="0,0,0,16">
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowSpeech" Content="말소리 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                                 <TextBlock x:Name="TxtColorSettingsLabelSpeech" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorSpeech" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
@@ -1026,10 +1026,10 @@
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="250"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            <CheckBox x:Name="ChkShowDanger" Content="강조음 표시" Style="{StaticResource TossCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                                 <TextBlock x:Name="TxtColorSettingsLabelDanger" Text="색상 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <Button x:Name="BtnColorDanger" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">

@@ -244,6 +244,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "를 설치하고 출력장치를 7.1채널로 설정한다면 7.1 서라운드 사운드를 사용하여 오버레이를 표현할 수 있습니다.";
                 TxtHelp2Title.Text = "실시간 커스텀 단축키 제어";
                 TxtHelp2Desc.Text = "설정 탭에서 핫키 버튼을 클릭한 뒤, 단일 키 또는 복합 키 조합(예: Ctrl + Shift + A)을 눌러 자유롭게 단축키를 변경할 수 있습니다. 백그라운드에서 지정된 단축키를 누르면 실시간으로 모드가 즉시 전환됩니다.";
+                TxtHelp6Title.Text = "크기 고정 모드";
+                TxtHelp6Desc.Text = "크기 고정 모드는 소리의 크기에 비례하는 투명도를 활용하여 그래픽 크기를 고정시키는 설정입니다. 시각화 그래픽의 크기를 일정하게 유지하면서도 소리에 반응하는 모습을 보고 싶을 때 유용합니다.";
                 TxtHelp3Title.Text = "오버레이 실시간 편집 모드";
                 TxtHelp3Desc.Text = "지정된 단축키(기본 F4)를 누르면 오버레이 편집 모드가 활성화됩니다. 화면에서 직접 마우스를 드래그하여 그래픽의 크기 한계선을 조절할 수 있으며, 팝업된 설정 패널에서 세부 조작이 가능합니다.";
                 TxtHelp4Title.Text = "AI 소리 분석 및 색상";
@@ -288,7 +290,7 @@ namespace SoundVisualizer
                 TxtIntensityAsOpacityDescWave.Text = "Graphic size is fixed and opacity changes based on sound.";
                 if (TxtOpacityFixedMaxOpacityLabelWave != null) TxtOpacityFixedMaxOpacityLabelWave.Text = "Max Opacity";
                 TxtGlowModeLabelWave.Text = "Glow";
-                TxtGlowModeDescWave.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.";
+                TxtGlowModeDescWave.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.\nNote: Uses additional GPU resources.";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "Pad Mode Settings";
@@ -304,7 +306,7 @@ namespace SoundVisualizer
                 TxtIntensityAsOpacityDescPad.Text = "Graphic size is fixed and opacity changes based on sound.";
                 if (TxtOpacityFixedMaxOpacityLabelPad != null) TxtOpacityFixedMaxOpacityLabelPad.Text = "Max Opacity";
                 TxtGlowModeLabelPad.Text = "Glow";
-                TxtGlowModeDescPad.Text = "Gives a soft aura-style glow effect around the pad.";
+                TxtGlowModeDescPad.Text = "Gives a soft aura-style glow effect around the pad.\nNote: Uses additional GPU resources.";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "Circle Mode Settings";
@@ -322,7 +324,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "Circle Radius";
                 TxtCircleRadiusDesc.Text = "Individually adjusts the radius of the center core in circle mode.";
                 TxtGlowModeLabelCircle.Text = "Glow";
-                TxtGlowModeDescCircle.Text = "Creates a shimmering glow aura along the border of the circle equalizer.";
+                TxtGlowModeDescCircle.Text = "Creates a shimmering glow aura along the border of the circle equalizer.\nNote: Uses additional GPU resources.";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "Outline Mode Settings";
                 TxtIntensityLabelOutline.Text = "Intensity";
@@ -337,7 +339,7 @@ namespace SoundVisualizer
                 TxtIntensityAsOpacityDescOutline.Text = "Graphic size is fixed and opacity changes based on sound.";
                 if (TxtOpacityFixedMaxOpacityLabelOutline != null) TxtOpacityFixedMaxOpacityLabelOutline.Text = "Max Opacity";
                 TxtGlowModeLabelOutline.Text = "Glow";
-                TxtGlowModeDescOutline.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.";
+                TxtGlowModeDescOutline.Text = "Applies a soft neon glow to the wave outline and adjusts its intensity.\nNote: Uses additional GPU resources.";
                 TxtModeSettings.Text = "Mode Settings";
                 TxtVisualModeLabel.Text = "Visual Mode";
                 TxtVisualModeDesc.Text = "Selects the shape of the graphics drawn on the screen.";
@@ -367,6 +369,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " and configure the output device to 7.1 channels to display the overlay using 7.1 surround sound.";
                 TxtHelp2Title.Text = "Real-time Custom Hotkeys";
                 TxtHelp2Desc.Text = "You can freely customize hotkeys by clicking the button in the settings and pressing a single key or combination (e.g., Ctrl + Shift + A). Pressing these hotkeys in the background will switch modes instantly.";
+                TxtHelp6Title.Text = "Fixed Size Mode";
+                TxtHelp6Desc.Text = "Fixed Size Mode is a setting that fixes the graphic size by utilizing transparency proportional to the sound volume. It is useful when you want to see it react to sound while keeping the visualization graphic size constant.";
                 TxtHelp3Title.Text = "Overlay Real-time Edit Mode";
                 TxtHelp3Desc.Text = "Press the assigned hotkey (Default F4) to activate the overlay edit mode. You can drag your mouse on the screen to adjust the size limit of the graphics and use the pop-up panel for detailed settings.";
                 TxtHelp4Title.Text = "AI Sound Analysis & Colors";
@@ -408,7 +412,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "不透明度";
                 TxtOpacityDescWave.Text = "波の透明度を調整し、オーバーレイの後ろのゲームや画面の透け具合を決定します。";
                 TxtGlowModeLabelWave.Text = "発光";
-                TxtGlowModeDescWave.Text = "波の輪郭にほのかなネオン光を適用し、その強度を調整します。";
+                TxtGlowModeDescWave.Text = "波の輪郭にほのかなネオン光を適用し、その強度を調整します。\n注意：GPUリソースを追加で使用します。";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "パッドモード設定";
@@ -421,7 +425,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "不透明度";
                 TxtOpacityDescPad.Text = "パッドグラフィックの不透明度を調整します。";
                 TxtGlowModeLabelPad.Text = "発光";
-                TxtGlowModeDescPad.Text = "パッドの周囲に柔らかいオーラ状の光エフェクトを付与します。";
+                TxtGlowModeDescPad.Text = "パッドの周囲に柔らかいオーラ状の光エフェクトを付与します。\n注意：GPUリソースを追加で使用します。";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "円形モード設定";
@@ -436,7 +440,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "円のサイズ";
                 TxtCircleRadiusDesc.Text = "円形モードでの中央中心部の半径サイズを個別に調整します。";
                 TxtGlowModeLabelCircle.Text = "発光";
-                TxtGlowModeDescCircle.Text = "円形イコライザーの縁に沿って輝くグロー後光を作成します。";
+                TxtGlowModeDescCircle.Text = "円形イコライザーの縁に沿って輝くグロー後光を作成します。\n注意：GPUリソースを追加で使用します。";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "外角線モード設定";
                 TxtIntensityLabelOutline.Text = "サイズ";
@@ -448,7 +452,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "不透明度";
                 TxtOpacityDescOutline.Text = "外角線波의透明度を調整します。";
                 TxtGlowModeLabelOutline.Text = "発光";
-                TxtGlowModeDescOutline.Text = "外角線にほのかなネオン光を適用し、その強度を調整します。";
+                TxtGlowModeDescOutline.Text = "外角線にほのかなネオン光を適用し、その強度を調整します。\n注意：GPUリソースを追加で使用します。";
 
                 TxtModeSettings.Text = "モード設定";
                 TxtVisualModeLabel.Text = "表現モード";
@@ -479,6 +483,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = "をインストールし、出力デバイスを7.1チャンネルに設定すると、7.1サラウンドサウンドを使用してオーバーレイを表示できます。";
                 TxtHelp2Title.Text = "リアルタイムショートカットキー制御";
                 TxtHelp2Desc.Text = "オーバーレイが画面に表示されている状態でも、バックグラウンドで指定されたショートカットキー（デフォルト F2、F3）を押すと、リアルタイムで形状とモードが即座に切り替わります。";
+                TxtHelp6Title.Text = "サイズ固定モード";
+                TxtHelp6Desc.Text = "サイズ固定モードは、音の大きさに比例する透明度を利用してグラフィックのサイズを固定する設定です。 視覚化グラフィックのサイズを一定に保ちながらも音に反応する様子を見たいときに便利です。";
                 TxtHelp3Title.Text = "オーバーレイの終了方法";
                 TxtHelp3Desc.Text = "終了するには、ホームタブの「停止」ボタンを押すか、このランチャーウィンドウ上部の ボタンをクリックしてください。";
                 TxtHelp4Title.Text = "AI音声分析と色";
@@ -520,7 +526,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "不透明度";
                 TxtOpacityDescWave.Text = "调整波浪的透明度，决定覆盖层后游戏或屏幕的可见度。";
                 TxtGlowModeLabelWave.Text = "光源";
-                TxtGlowModeDescWave.Text = "在波浪轮廓上应用柔和的霓虹光源并调整其强度。";
+                TxtGlowModeDescWave.Text = "在波浪轮廓上应用柔和的霓虹光源并调整其强度。\n注意：将使用额外的 GPU 资源。";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "面板模式设置";
@@ -533,7 +539,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "不透明度";
                 TxtOpacityDescPad.Text = "调整面板图形的不透明度。";
                 TxtGlowModeLabelPad.Text = "光源";
-                TxtGlowModeDescPad.Text = "在面板周围赋予柔和的光晕效果。";
+                TxtGlowModeDescPad.Text = "在面板周围赋予柔和的光晕效果。\n注意：将使用额外的 GPU 资源。";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "圆形模式设置";
@@ -548,7 +554,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "圆半径";
                 TxtCircleRadiusDesc.Text = "单独调整圆形模式下中心核心的半径大小。";
                 TxtGlowModeLabelCircle.Text = "光源";
-                TxtGlowModeDescCircle.Text = "沿圆形均衡器的边缘创建闪烁的辉光后光。";
+                TxtGlowModeDescCircle.Text = "沿圆形均衡器的边缘创建闪烁的辉光后光。\n注意：将使用额外的 GPU 资源。";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "轮廓线模式设置";
                 TxtIntensityLabelOutline.Text = "大小";
@@ -560,7 +566,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "不透明度";
                 TxtOpacityDescOutline.Text = "调整轮廓线波浪的透明度。";
                 TxtGlowModeLabelOutline.Text = "光源";
-                TxtGlowModeDescOutline.Text = "在轮廓线上应用柔和的霓虹光源并调整其强度。";
+                TxtGlowModeDescOutline.Text = "在轮廓线上应用柔和的霓虹光源并调整其强度。\n注意：将使用额外的 GPU 资源。";
                 TxtModeSettings.Text = "模式设置";
                 TxtVisualModeLabel.Text = "表现模式";
                 TxtVisualModeDesc.Text = "选择在屏幕上绘制的图形的形状。";
@@ -590,6 +596,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " 安装 7.1 虚拟驱动，并将输出设备设置为 7.1 声道，即可使用 7.1 环绕声显示悬浮窗。";
                 TxtHelp2Title.Text = "实时快捷键控制";
                 TxtHelp2Desc.Text = "即使在屏幕上显示悬浮窗，在后台按下指定的快捷键（默认 F2、F3），也会实时立即切换形状和模式。";
+                TxtHelp6Title.Text = "固定大小模式";
+                TxtHelp6Desc.Text = "固定大小模式是利用与声音大小成比例的透明度来固定图形大小的设置。当您希望在保持可视化图形大小不变的同时看到它对声音的反应时，这非常有用。";
                 TxtHelp3Title.Text = "关闭悬浮窗的方法";
                 TxtHelp3Desc.Text = "要关闭，请点击“主页”选项卡中的“停止”，或点击此启动器窗口顶部的 按钮即可一并关闭。";
                 TxtHelp4Title.Text = "AI 声音分析与颜色";
@@ -631,7 +639,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "Opacidad";
                 TxtOpacityDescWave.Text = "Ajusta la opacidad de la ola para determinar la transparencia sobre el fondo.";
                 TxtGlowModeLabelWave.Text = "Brillo";
-                TxtGlowModeDescWave.Text = "Aplica un brillo de neón suave al contorno de la ola y ajusta su intensidad.";
+                TxtGlowModeDescWave.Text = "Aplica un brillo de neón suave al contorno de la ola y ajusta su intensidad.\nNota: Utiliza recursos adicionales de GPU.";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "Ajustes de Modo Pad";
@@ -644,7 +652,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "Opacidad";
                 TxtOpacityDescPad.Text = "Ajusta la opacidad del gráfico del pad.";
                 TxtGlowModeLabelPad.Text = "Brillo";
-                TxtGlowModeDescPad.Text = "Da un efecto de brillo suave estilo aura al pad.";
+                TxtGlowModeDescPad.Text = "Da un efecto de brillo suave estilo aura al pad.\nNota: Utiliza recursos adicionales de GPU.";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "Ajustes de Modo Círculo";
@@ -659,7 +667,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "Radio del Círculo";
                 TxtCircleRadiusDesc.Text = "Ajusta individualmente el tamaño del radio del núcleo en el modo círculo.";
                 TxtGlowModeLabelCircle.Text = "Brillo";
-                TxtGlowModeDescCircle.Text = "Crea un halo de brillo parpadeante a lo largo del ecualizador circular.";
+                TxtGlowModeDescCircle.Text = "Crea un halo de brillo parpadeante a lo largo del ecualizador circular.\nNota: Utiliza recursos adicionales de GPU.";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "Ajustes de Modo Contorno";
                 TxtIntensityLabelOutline.Text = "Intensidad";
@@ -671,7 +679,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "Opacidad";
                 TxtOpacityDescOutline.Text = "Ajusta la opacidad de las olas de contorno.";
                 TxtGlowModeLabelOutline.Text = "Brillo";
-                TxtGlowModeDescOutline.Text = "Aplica un brillo de neón suave al contorno de la ola y ajusta su intensidad.";
+                TxtGlowModeDescOutline.Text = "Aplica un brillo de neón suave al contorno de la ola y ajusta su intensidad.\nNota: Utiliza recursos adicionales de GPU.";
                 TxtModeSettings.Text = "Ajustes de Modo";
                 TxtVisualModeLabel.Text = "Modo visual";
                 TxtVisualModeDesc.Text = "Selecciona la forma de los gráficos en pantalla.";
@@ -701,6 +709,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " y configurar el dispositivo de salida en 7.1 canales para mostrar la superposición utilizando sonido envolvente 7.1.";
                 TxtHelp2Title.Text = "Control de atajos en tiempo real";
                 TxtHelp2Desc.Text = "Incluso con la superposición en pantalla, si presionas los atajos asignados (por defecto F2, F3) en segundo plano, la forma y el modo cambiarán instantáneamente en tiempo real.";
+                TxtHelp6Title.Text = "Modo de Tamaño Fijo";
+                TxtHelp6Desc.Text = "El Modo de Tamaño Fijo es una configuración que fija el tamaño del gráfico utilizando una transparencia proporcional al volumen del sonido. Es útil cuando desea ver cómo reacciona al sonido mientras mantiene constante el tamaño del gráfico de visualización.";
                 TxtHelp3Title.Text = "Cómo cerrar la superposición";
                 TxtHelp3Desc.Text = "Para cerrar, haga clic en 'Detener' en la pestaña Inicio, o haga clic en el botón en la parte superior de esta ventana.";
                 TxtHelp4Title.Text = "Análisis de Sonido AI y Colores";
@@ -742,7 +752,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "Opacité";
                 TxtOpacityDescWave.Text = "Ajuste l'opacité de la vague pour déterminer la transparence sur le fond.";
                 TxtGlowModeLabelWave.Text = "Halo";
-                TxtGlowModeDescWave.Text = "Applique une lueur néon douce au contour de la vague et ajuste son intensité.";
+                TxtGlowModeDescWave.Text = "Applique une lueur néon douce au contour de la vague et ajuste son intensité.\nRemarque : Utilise des ressources GPU supplémentaires.";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "Paramètres du Mode Pad";
@@ -755,7 +765,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "Opacité";
                 TxtOpacityDescPad.Text = "Ajuste l'opacité du graphique du pad.";
                 TxtGlowModeLabelPad.Text = "Halo";
-                TxtGlowModeDescPad.Text = "Donne un effet de lueur douce de type aura autour du pad.";
+                TxtGlowModeDescPad.Text = "Donne un effet de lueur douce de type aura autour du pad.\nRemarque : Utilise des ressources GPU supplémentaires.";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "Paramètres du Mode Cercle";
@@ -770,7 +780,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "Rayon du Cercle";
                 TxtCircleRadiusDesc.Text = "Ajuste individuellement la taille du rayon du noyau dans le mode cercle.";
                 TxtGlowModeLabelCircle.Text = "Halo";
-                TxtGlowModeDescCircle.Text = "Crée une lueur scintillante le long de la bordure de l'égaliseur circulaire.";
+                TxtGlowModeDescCircle.Text = "Crée une lueur scintillante le long de la bordure de l'égaliseur circulaire.\nRemarque : Utilise des ressources GPU supplémentaires.";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "Paramètres du Mode Contour";
                 TxtIntensityLabelOutline.Text = "Taille";
@@ -782,7 +792,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "Opacité";
                 TxtOpacityDescOutline.Text = "Ajuste la transparence de la vague de contour.";
                 TxtGlowModeLabelOutline.Text = "Lueur";
-                TxtGlowModeDescOutline.Text = "Applique une lueur néon douce au contour de la vague et ajuste son intensité.";
+                TxtGlowModeDescOutline.Text = "Applique une lueur néon douce au contour de la vague et ajuste son intensité.\nRemarque : Utilise des ressources GPU supplémentaires.";
                 TxtModeSettings.Text = "Paramètres de Mode";
                 TxtVisualModeLabel.Text = "Mode visuel";
                 TxtVisualModeDesc.Text = "Sélectionne la forme des graphiques dessinés à l'écran.";
@@ -812,6 +822,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " et configurer le périphérique de sortie sur 7.1 canaux pour afficher la superposition à l'aide du son surround 7.1.";
                 TxtHelp2Title.Text = "Contrôle par raccourci en temps réel";
                 TxtHelp2Desc.Text = "Même avec la superposition à l'écran, si vous appuyez sur les raccourcis définis (par défaut F2, F3) en arrière-plan, la forme et le mode changeront instantanément en temps réel.";
+                TxtHelp6Title.Text = "Mode de Taille Fixe";
+                TxtHelp6Desc.Text = "Le Mode de Taille Fixe est un réglage qui fixe la taille du graphique en utilisant une transparence proportionnelle au volume sonore. Il est utile lorsque vous souhaitez le voir réagir au son tout en conservant la taille du graphique de visualisation constante.";
                 TxtHelp3Title.Text = "Comment fermer la superposition";
                 TxtHelp3Desc.Text = "Pour fermer, cliquez sur 'Arrêter' dans l'onglet Accueil, ou cliquez sur le bouton en haut de cette fenêtre.";
                 TxtHelp4Title.Text = "Analyse Sonore IA & Couleurs";
@@ -853,7 +865,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "Deckkraft";
                 TxtOpacityDescWave.Text = "Passt die Wellendeckkraft an, um die Transparenz über dem Hintergrund zu bestimmen.";
                 TxtGlowModeLabelWave.Text = "Leuchten";
-                TxtGlowModeDescWave.Text = "Trägt ein sanftes Neonleuchten auf die Wellenkontur auf und passt die Intensität an.";
+                TxtGlowModeDescWave.Text = "Trägt ein sanftes Neonleuchten auf die Wellenkontur auf und passt die Intensität an.\nHinweis: Verwendet zusätzliche GPU-Ressourcen.";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "Padmodus-Einstellungen";
@@ -866,7 +878,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "Deckkraft";
                 TxtOpacityDescPad.Text = "Passt die Deckkraft der Pad-Grafik an.";
                 TxtGlowModeLabelPad.Text = "Leuchten";
-                TxtGlowModeDescPad.Text = "Erzeugt einen sanften Aura-Lichteffekt um das Pad.";
+                TxtGlowModeDescPad.Text = "Erzeugt einen sanften Aura-Lichteffekt um das Pad.\nHinweis: Verwendet zusätzliche GPU-Ressourcen.";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "Kreismus-Einstellungen";
@@ -881,7 +893,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "Kreisradius";
                 TxtCircleRadiusDesc.Text = "Passt den Radius des inneren Kerns im Kreis-Modus individuell an.";
                 TxtGlowModeLabelCircle.Text = "Leuchten";
-                TxtGlowModeDescCircle.Text = "Erzeugt eine schimmernde Aura entlang des Rands des Kreis-Equalizers.";
+                TxtGlowModeDescCircle.Text = "Erzeugt eine schimmernde Aura entlang des Rands des Kreis-Equalizers.\nHinweis: Verwendet zusätzliche GPU-Ressourcen.";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "Umrissmodus-Einstellungen";
                 TxtIntensityLabelOutline.Text = "Größe";
@@ -893,7 +905,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "Deckkraft";
                 TxtOpacityDescOutline.Text = "Passt die Transparenz der Umrisswelle an.";
                 TxtGlowModeLabelOutline.Text = "Leuchten";
-                TxtGlowModeDescOutline.Text = "Wendet ein sanftes Neonleuchten auf den Wellenumriss an und passt dessen Intensität an.";
+                TxtGlowModeDescOutline.Text = "Wendet ein sanftes Neonleuchten auf den Wellenumriss an und passt dessen Intensität an.\nHinweis: Verwendet zusätzliche GPU-Ressourcen.";
                 TxtModeSettings.Text = "Modus-Einstellungen";
                 TxtVisualModeLabel.Text = "Visueller Modus";
                 TxtVisualModeDesc.Text = "Wählt die Form der auf dem Bildschirm gezeichneten Grafiken aus.";
@@ -923,6 +935,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " installieren und das Ausgabegerät auf 7.1 Kanäle konfigurieren, um das Overlay mit 7.1 Surround-Sound anzuzeigen.";
                 TxtHelp2Title.Text = "Echtzeit-Tastenkombinationssteuerung";
                 TxtHelp2Desc.Text = "Selbst wenn das Overlay auf dem Bildschirm angezeigt wird, ändern sich Form und Modus sofort in Echtzeit, wenn Sie im Hintergrund die zugewiesenen Tastenkombinationen (Standard F2, F3) drücken.";
+                TxtHelp6Title.Text = "Feste Größe Modus";
+                TxtHelp6Desc.Text = "Der Modus Feste Größe ist eine Einstellung, die die Grafikgröße durch Nutzung einer zum Tonvolumen proportionalen Transparenz fixiert. Dies ist nützlich, wenn Sie möchten, dass sie auf den Ton reagiert, während die Größe der Visualisierungsgrafik konstant bleibt.";
                 TxtHelp3Title.Text = "So schließen Sie das Overlay";
                 TxtHelp3Desc.Text = "Zum Schließen klicken Sie auf der Registerkarte 'Startseite' auf 'Stoppen' oder klicken Sie auf die Schaltfläche oben in diesem Fenster.";
                 TxtHelp4Title.Text = "KI-Soundanalyse & Farben";
@@ -964,7 +978,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelWave.Text = "Непрозрачность";
                 TxtOpacityDescWave.Text = "Настраивает прозрачность волны для определения видимости фона.";
                 TxtGlowModeLabelWave.Text = "Свечение";
-                TxtGlowModeDescWave.Text = "Применяет мягкое неоновое свечение к контуру волны и регулирует его интенсивность.";
+                TxtGlowModeDescWave.Text = "Применяет мягкое неоновое свечение к контуру волны и регулирует его интенсивность.\nПримечание: Использует дополнительные ресурсы графического процессора.";
 
                 // Pad Mode Settings
                 TxtExpanderPadTitle.Text = "Настройки режима Панель";
@@ -977,7 +991,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelPad.Text = "Непрозрачность";
                 TxtOpacityDescPad.Text = "Регулирует непрозрачность графики панели.";
                 TxtGlowModeLabelPad.Text = "Свечение";
-                TxtGlowModeDescPad.Text = "Создает мягкое свечение в стиле ауры вокруг панели.";
+                TxtGlowModeDescPad.Text = "Создает мягкое свечение в стиле ауры вокруг панели.\nПримечание: Использует дополнительные ресурсы графического процессора.";
 
                 // Circle Mode Settings
                 TxtExpanderCircleTitle.Text = "Настройки режима Круг";
@@ -992,7 +1006,7 @@ namespace SoundVisualizer
                 TxtCircleRadiusLabel.Text = "Радиус круга";
                 TxtCircleRadiusDesc.Text = "Индивидуально настраивает радиус центрального ядра в режиме круга.";
                 TxtGlowModeLabelCircle.Text = "Свечение";
-                TxtGlowModeDescCircle.Text = "Создает мерцающее свечение по краю кругового эквалайзера.";
+                TxtGlowModeDescCircle.Text = "Создает мерцающее свечение по краю кругового эквалайзера.\nПримечание: Использует дополнительные ресурсы графического процессора.";
                 // Outline Mode Settings
                 TxtExpanderOutlineTitle.Text = "Настройки режима Контур";
                 TxtIntensityLabelOutline.Text = "Размер";
@@ -1004,7 +1018,7 @@ namespace SoundVisualizer
                 TxtOpacityLabelOutline.Text = "Прозрачность";
                 TxtOpacityDescOutline.Text = "Регулирует прозрачность контурной волны.";
                 TxtGlowModeLabelOutline.Text = "Свечение";
-                TxtGlowModeDescOutline.Text = "Применяет мягкое неоновое свечение к контуру волны и регулирует его интенсивность.";
+                TxtGlowModeDescOutline.Text = "Применяет мягкое неоновое свечение к контуру волны и регулирует его интенсивность.\nПримечание: Использует дополнительные ресурсы графического процессора.";
                 TxtModeSettings.Text = "Настройки режима";
                 TxtVisualModeLabel.Text = "Визуальный режим";
                 TxtVisualModeDesc.Text = "Выбирает форму графики, отображаемой на экране.";
@@ -1034,6 +1048,8 @@ namespace SoundVisualizer
                 if (TxtHelp1TipSuffix != null) TxtHelp1TipSuffix.Text = " и настроить устройство вывода на 7.1-канальный режим, чтобы отображать оверлей с использованием объемного звука 7.1.";
                 TxtHelp2Title.Text = "Горячие клавиши в реальном времени";
                 TxtHelp2Desc.Text = "Даже когда оверлей находится на экране, вы можете нажимать назначенные горячие клавиши (по умолчанию F2, F3) в фоновом режиме, чтобы мгновенно переключать формы и режимы.";
+                TxtHelp6Title.Text = "Режим Фиксированного Размера";
+                TxtHelp6Desc.Text = "Режим фиксированного размера — это настройка, которая фиксирует размер графики, используя прозрачность, пропорциональную громкости звука. Это полезно, когда вы хотите видеть, как она реагирует на звук, сохраняя при этом постоянный размер визуализационной графики.";
                 TxtHelp3Title.Text = "Как закрыть оверлей";
                 TxtHelp3Desc.Text = "Чтобы закрыть, нажмите «Остановить» на вкладке Главная или нажмите кнопку в верхней части этого окна запуска.";
                 TxtHelp4Title.Text = "Анализ звука ИИ и цвета";
