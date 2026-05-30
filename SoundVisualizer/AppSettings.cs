@@ -115,6 +115,7 @@ namespace SoundVisualizer
 
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
+        public static bool AutoMinimizeOnLaunch { get; set; } = false;
 
         // 8.6. 렌더링 최대 프레임
         public static double TargetFps { get; set; } = 144.0;
@@ -163,6 +164,7 @@ namespace SoundVisualizer
                         Language = data.Language ?? "KOR";
                         
                         IsAdminMode = data.IsAdminMode;
+                        AutoMinimizeOnLaunch = data.AutoMinimizeOnLaunch;
                         if (data.TargetFps >= 30.0) TargetFps = data.TargetFps;
                         ShowAmbient = data.ShowAmbient;
                         ShowSpeech = data.ShowSpeech;
@@ -206,6 +208,7 @@ namespace SoundVisualizer
                     Language = Language,
                     
                     IsAdminMode = IsAdminMode,
+                    AutoMinimizeOnLaunch = AutoMinimizeOnLaunch,
                     TargetFps = TargetFps,
                     ShowAmbient = ShowAmbient,
                     ShowSpeech = ShowSpeech,
@@ -287,6 +290,7 @@ namespace SoundVisualizer
             public string Language { get; set; } = "KOR";
             
             public bool IsAdminMode { get; set; } = false;
+            public bool AutoMinimizeOnLaunch { get; set; } = false;
             public double TargetFps { get; set; } = 144.0;
             public bool ShowAmbient { get; set; } = true;
             public bool ShowSpeech { get; set; } = true;

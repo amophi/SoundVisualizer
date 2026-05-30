@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎵 SoundVisualizer
+# 🎵 Sound Visualizer
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
 
@@ -15,7 +15,7 @@
 
 <br/>
 
-> **SoundVisualizer** captures real-time system audio and translates it into beautiful, dynamic graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
+> **Sound Visualizer** captures real-time system audio and translates it into beautiful, dynamic graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
 
 ---
 
@@ -91,7 +91,7 @@ SoundVisualizer/
 ## 🚀 Installation & Running
 
 ### 💻 For General Users (Quick Start via Releases)
-No installation required! SoundVisualizer is distributed as a portable standalone package.
+No installation required! Sound Visualizer is distributed as a portable standalone package.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
 2. Download the latest `SoundVisualizer.zip` release.

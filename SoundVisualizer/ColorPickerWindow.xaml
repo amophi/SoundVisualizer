@@ -90,6 +90,52 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ModernSliderStyle" TargetType="{x:Type Slider}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Slider}">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="8" Background="#333A44" CornerRadius="4" VerticalAlignment="Center" Margin="10,0"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="{StaticResource AccentColor}" CornerRadius="4,0,0,4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Border Height="8" Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Ellipse Width="24" Height="24" Fill="White" Cursor="Hand">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="{StaticResource BackgroundColor}" CornerRadius="16" BorderBrush="{StaticResource HoverColor}" BorderThickness="1">
@@ -204,7 +250,7 @@
                             <ColumnDefinition Width="40"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="R" Foreground="#FF5252" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Slider Grid.Column="1" x:Name="SldRed" Minimum="0" Maximum="255" Value="255" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <Slider Grid.Column="1" x:Name="SldRed" Minimum="0" Maximum="255" Value="255" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True" Style="{StaticResource ModernSliderStyle}"/>
                         <TextBlock Grid.Column="2" x:Name="TxtRed" Text="255" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                     </Grid>
 
@@ -215,7 +261,7 @@
                             <ColumnDefinition Width="40"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="G" Foreground="#4CAF50" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Slider Grid.Column="1" x:Name="SldGreen" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <Slider Grid.Column="1" x:Name="SldGreen" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True" Style="{StaticResource ModernSliderStyle}"/>
                         <TextBlock Grid.Column="2" x:Name="TxtGreen" Text="0" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                     </Grid>
 
@@ -226,7 +272,7 @@
                             <ColumnDefinition Width="40"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="B" Foreground="#448AFF" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <Slider Grid.Column="1" x:Name="SldBlue" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True"/>
+                        <Slider Grid.Column="1" x:Name="SldBlue" Minimum="0" Maximum="255" Value="0" VerticalAlignment="Center" ValueChanged="Slider_ValueChanged" IsMoveToPointEnabled="True" Style="{StaticResource ModernSliderStyle}"/>
                         <TextBlock Grid.Column="2" x:Name="TxtBlue" Text="0" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                     </Grid>
                 </StackPanel>
