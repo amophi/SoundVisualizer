@@ -13,23 +13,23 @@
 [![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
 [![ONNX](https://img.shields.io/badge/ONNX-005CED?style=for-the-badge&logo=onnx&logoColor=white)](https://onnxruntime.ai/)
 
-**A High-Performance Audio Visualization & AI Sound Analysis Overlay Engine**
+**An Audio Visualization & AI Sound Analysis Overlay Engine**
 
 </div>
 
 <br/>
 
-> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it is highly optimized for gaming and features an AI sound classifier using YAMNet and ONNX Runtime for intelligent audio event detection (such as gunshots, speech, and ambient sounds).
+> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it features an AI sound classifier using YAMNet and ONNX Runtime for audio event detection (such as gunshots, speech, and ambient sounds).
 
 ---
 
-## 🌟 Social Impact & Benefits
+## 🌟 Use Cases & Applications
 
-This project goes beyond simple aesthetics. It serves as a bridge between the auditory and visual worlds, offering significant benefits across different user groups.
+This project serves as a bridge between auditory and visual cues, providing features for different user groups.
 
 ### 🦻 For the Deaf and Hard of Hearing
-- **Visualizing the Unseen**: Translates critical auditory cues (like footsteps, gunshots in a game, or system alert sounds) into instant visual feedback.
-- **Leveling the Playing Field in Gaming**: Allows deaf gamers to react to audio-based gameplay mechanics on equal footing by perceiving spatial and event-based sound visually.
+- **Visualizing Sound**: Translates auditory cues (like footsteps, gunshots, or system alerts) into visual feedback.
+- **Gaming Accessibility**: Allows users to perceive spatial and event-based sound visually.
 
 ### 🎧 For the General Public & Gamers
 - **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during gaming or media consumption.
@@ -58,8 +58,8 @@ This project goes beyond simple aesthetics. It serves as a bridge between the au
 - **Virtual 7.1 Surround Support**: Detailed guides and links for setting up virtual audio tools (like **VB-CABLE**) to experience immersive 7.1 surround sound overlays even on stereo-only setups.
 
 ### 🤖 AI Sound Classification (ONNX & YAMNet)
-- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels specific audio events (Ambient, Speech, and Danger/Gunshots) natively.
-- **Distinctive Visual Cues**: Assign custom UI colors to each category for instant intuitive recognition.
+- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels specific audio events (Ambient, Speech, and Gunshots) natively.
+- **Visual Cues**: Assign custom UI colors to each category for recognition.
 
 ### 🌐 Global Multi-Language Support (8 Languages)
 - Fully localized with complete support for **Korean, English, Japanese, Chinese, Spanish, French, German, and Russian**.
@@ -135,5 +135,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 <div align="center">
-  <sub>Built with ❤️ for accessible and immersive digital experiences.</sub>
+  <sub>Built for accessibility.</sub>
 </div>
