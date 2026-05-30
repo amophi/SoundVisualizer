@@ -111,7 +111,7 @@ namespace SoundVisualizer
         public static int EditModeHotkey { get; set; } = 0x73;    
 
         // 7. 현재 언어 설정
-        public static string Language { get; set; } = "KOR";
+        public static string Language { get; set; } = "ENG";
 
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
@@ -161,7 +161,7 @@ namespace SoundVisualizer
                         if (data.EditModeKeyBind != null && data.EditModeKeyBind.Count > 0) EditModeKeyBind = data.EditModeKeyBind;
                         else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73 };
 
-                        Language = data.Language ?? "KOR";
+                        Language = data.Language ?? "ENG";
                         
                         IsAdminMode = data.IsAdminMode;
                         AutoMinimizeOnLaunch = data.AutoMinimizeOnLaunch;
