@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -146,13 +146,10 @@ namespace SoundVisualizer.AIModel
 
                 foreach (var kv in _session.InputMetadata)
                 {
-                    Console.WriteLine($"[YAMNet] Input: {kv.Key} | {kv.Value}");
                 }
-                Console.WriteLine("AI 모델(YAMNet) 로딩 완료 (스레딩 최적화 적용)!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"AI 모델 로드 실패: {ex.Message}");
             }
         }
 
@@ -341,8 +338,6 @@ namespace SoundVisualizer.AIModel
 
             string topK = string.IsNullOrEmpty(r.TopKSummary) ? "" : $" | top3: {r.TopKSummary}";
             string lo = r.MeetsThreshold ? "OK" : "저신뢰";
-            Debug.WriteLine(
-                $"[YAMNet 분류] {r.YamnetDisplayName} | coarse={r.CoarseClass} | p={r.Confidence * 100f:F1}% (임계 {threshold * 100f:F0}% {lo}) | {r.InferenceTimeMs:F1}ms{topK}");
         }
 #endif
 
@@ -433,7 +428,6 @@ namespace SoundVisualizer.AIModel
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[YAMNet] Inference failed: {ex}");
                 return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
             finally
@@ -538,21 +532,18 @@ namespace SoundVisualizer.AIModel
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "three_class_score_head.onnx");
                 if (!File.Exists(path))
                 {
-                    Console.WriteLine($"[3ClassHead] 파일 없음, 기존 규칙 경로 사용: {path}");
                     return;
                 }
 
                 _coarseHeadSession = new InferenceSession(path, options);
                 _coarseHeadInputName = _coarseHeadSession.InputMetadata.Keys.FirstOrDefault();
                 _coarseHeadOutputName = _coarseHeadSession.OutputMetadata.Keys.FirstOrDefault();
-                Console.WriteLine($"[3ClassHead] 로드 완료: {path}");
             }
             catch (Exception ex)
             {
                 _coarseHeadSession = null;
                 _coarseHeadInputName = null;
                 _coarseHeadOutputName = null;
-                Console.WriteLine($"[3ClassHead] 로드 실패, 기존 규칙 경로 사용: {ex.Message}");
             }
         }
 
@@ -563,21 +554,18 @@ namespace SoundVisualizer.AIModel
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "gunshot_booster.onnx");
                 if (!File.Exists(path))
                 {
-                    Console.WriteLine($"[GunshotBooster] 파일 없음, 부스터 비활성: {path}");
                     return;
                 }
 
                 _gunshotBoosterSession = new InferenceSession(path, options);
                 _gunshotBoosterInputName = _gunshotBoosterSession.InputMetadata.Keys.FirstOrDefault();
                 _gunshotBoosterOutputName = _gunshotBoosterSession.OutputMetadata.Keys.FirstOrDefault();
-                Console.WriteLine($"[GunshotBooster] 로드 완료: {path}");
             }
             catch (Exception ex)
             {
                 _gunshotBoosterSession = null;
                 _gunshotBoosterInputName = null;
                 _gunshotBoosterOutputName = null;
-                Console.WriteLine($"[GunshotBooster] 로드 실패, 부스터 비활성: {ex.Message}");
             }
         }
 
@@ -947,8 +935,6 @@ namespace SoundVisualizer.AIModel
             if (std < 1e-4f)
                 return;
 
-            Debug.WriteLine(
-                $"[YAMNet logMel] shape=[1,1,{TimeFrames},{MelBins}] (time×mel) n={logMel.Length} min={min:F6} max={max:F6} mean={mean:F6} std={std:F6}");
         }
 
         private float[] Softmax(float[] logits)
@@ -1242,7 +1228,6 @@ namespace SoundVisualizer.AIModel
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AIModel", "yamnet_class_map.csv");
             if (!File.Exists(path))
             {
-                Console.WriteLine($"yamnet_class_map.csv 없음: {path}");
                 return;
             }
 

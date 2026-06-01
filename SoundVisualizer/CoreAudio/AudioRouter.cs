@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using NAudio.Wave;
@@ -27,7 +27,6 @@ namespace SoundVisualizer.CoreAudio
             // → 라우팅 불필요, 즉시 리턴
             if (!defaultDevice.FriendlyName.Contains("cable", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine($"ℹ [{defaultDevice.FriendlyName}] 직접 재생 중 — 라우팅 생략");
                 return;
             }
 
@@ -37,8 +36,6 @@ namespace SoundVisualizer.CoreAudio
             var realSpeaker = allDevices.FirstOrDefault(d => !d.FriendlyName.Contains("cable", StringComparison.OrdinalIgnoreCase));
             if (realSpeaker == null)
             {
-                Console.WriteLine("CABLE 외 출력 장치를 찾을 수 없습니다 — 라우팅 비활성");
-                Console.WriteLine("라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
                 return;
             }
 
@@ -68,7 +65,6 @@ namespace SoundVisualizer.CoreAudio
                     _realSpeakerOut.Init(_bufferedWaveProvider);
                     _realSpeakerOut.Play();
                     string mixMode = (_captureChannels == 8 && _outputChannels == 2) ? " [다운믹스]" : "";
-                    Console.WriteLine($"라우팅 시작: [{realSpeaker.FriendlyName}] (캡처: {_captureChannels}ch → 출력: {_outputChannels}ch{mixMode}, latency: {latency}ms)");
                     return;
                 }
                 catch (Exception ex)
@@ -79,8 +75,6 @@ namespace SoundVisualizer.CoreAudio
                 }
             }
 
-            Console.WriteLine($"오디오 라우팅 초기화 실패: {lastError?.Message}");
-            Console.WriteLine("라우팅 비활성 — 시각화/AI는 정상 동작합니다.");
         }
 
         public void OnDataReceived(object sender, byte[] rawAudioData)
@@ -203,7 +197,6 @@ namespace SoundVisualizer.CoreAudio
                 _realSpeakerOut.Stop();
                 _realSpeakerOut.Dispose();
                 _bufferedWaveProvider = null;
-                Console.WriteLine("오디오 출력 라우팅 중지.");
             }
         }
     }

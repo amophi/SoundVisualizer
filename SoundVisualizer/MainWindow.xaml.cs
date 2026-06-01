@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -601,7 +601,6 @@ namespace SoundVisualizer
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine($"[YAMNet Background Error] {ex.Message}");
                             }
                             finally
                             {
