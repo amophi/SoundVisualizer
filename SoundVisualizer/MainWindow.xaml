@@ -1,4 +1,4 @@
-<Window x:Class="SoundVisualizer.MainWindow"
+﻿<Window x:Class="SoundVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Sound Visualizer" Height="1080" Width="1920"
@@ -7,7 +7,7 @@
         PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
     
         <Window.Resources>
-        <!-- Toss Colors -->
+        <!-- Modern Colors -->
         <SolidColorBrush x:Key="BgColor" Color="#2A2C31"/>
         <SolidColorBrush x:Key="CardColor" Color="#1E2024"/>
         <SolidColorBrush x:Key="PrimaryTextColor" Color="#F2F4F6"/>
@@ -18,7 +18,7 @@
         <SolidColorBrush x:Key="DangerColor" Color="#E53935"/>
 
         <!-- Primary Button -->
-        <Style x:Key="TossButton" TargetType="{x:Type Button}">
+        <Style x:Key="ModernButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="{StaticResource AccentColor}"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontSize" Value="17"/>
@@ -48,7 +48,7 @@
             </Setter>
         </Style>
 
-        <!-- Toss Slider -->
+        <!-- Modern Slider -->
         <Style x:Key="ModernSliderStyle" TargetType="{x:Type Slider}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
@@ -141,7 +141,7 @@
             </Setter>
         </Style>
 
-        <!-- Toss CheckBox -->
+        <!-- Modern CheckBox -->
         <Style x:Key="ModernCheckBoxStyle" TargetType="{x:Type CheckBox}">
             <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
             <Setter Property="FontSize" Value="14"/>
@@ -168,7 +168,7 @@
             </Setter>
         </Style>
 
-        <!-- Toss ComboBox -->
+        <!-- Modern ComboBox -->
         <Style x:Key="ModernComboBoxStyle" TargetType="{x:Type ComboBox}">
             <Setter Property="Foreground" Value="#111111"/>
             <Setter Property="Background" Value="#F2F4F6"/>
@@ -336,7 +336,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 스팀 오버레이 테마의 좌측 설정 패널 -->
+            <!-- 좌측 설정 패널 -->
             <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="380" Background="{StaticResource BgColor}" BorderBrush="{StaticResource DividerColor}" BorderThickness="0,0,1,0">
                 <Grid Margin="25,40,25,40">
                     <Grid.RowDefinitions>
@@ -548,17 +548,17 @@
                                     
                                     <StackPanel Margin="0,0,0,12">
                                         <TextBlock x:Name="EditPanelVisualHotkeyLabel" Text="표현 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F3"/>
+                                        <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F3"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,12">
                                         <TextBlock x:Name="EditPanelSoundModeHotkeyLabel" Text="사운드 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F2"/>
+                                        <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F2"/>
                                     </StackPanel>
 
                                     <StackPanel>
                                         <TextBlock x:Name="EditPanelEditHotkeyLabel" Text="오버레이 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                        <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource TossButton}" Click="BtnEditPanelHotkey_Click" Content="F4"/>
+                                        <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F4"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>

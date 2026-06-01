@@ -17,7 +17,7 @@
         <SolidColorBrush x:Key="AccentColor" Color="#3182F6"/>
         <SolidColorBrush x:Key="HoverColor" Color="#3D3D3D"/>
 
-        <Style x:Key="TossButton" TargetType="{x:Type Button}">
+        <Style x:Key="ModernButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="{StaticResource AccentColor}"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontSize" Value="15"/>
@@ -43,7 +43,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="TossCancelButton" TargetType="{x:Type Button}" BasedOn="{StaticResource TossButton}">
+        <Style x:Key="ModernCancelButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ModernButton}">
             <Setter Property="Background" Value="{StaticResource CardColor}"/>
             <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
             <Setter Property="Template">
@@ -285,8 +285,8 @@
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="취소" Style="{StaticResource TossCancelButton}" Click="BtnCancel_Click"/>
-                <Button Grid.Column="2" Content="적용" Style="{StaticResource TossButton}" Click="BtnApply_Click"/>
+                <Button Grid.Column="0" Content="취소" Style="{StaticResource ModernCancelButton}" Click="BtnCancel_Click"/>
+                <Button Grid.Column="2" Content="적용" Style="{StaticResource ModernButton}" Click="BtnApply_Click"/>
             </Grid>
         </Grid>
     </Border>
