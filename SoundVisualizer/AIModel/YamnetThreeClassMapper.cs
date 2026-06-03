@@ -66,8 +66,8 @@ namespace SoundVisualizer.AIModel
         }
 
         /// <summary>
-        /// 실험용: 총성이 Plop / Gargling / 비·물 계열로 top-1 나올 때 coarse를 danger로 올림.
-        /// 전이학습·booster와 무관, <see cref="MapDisplayNameToCoarse"/>만 영향.
+        /// 실험용: 총성이 Plop / Gargling / 비 계열로 top-1 나올 때 coarse를 danger로 올림.
+        /// Water·Ocean·Waves/surf는 ambient 오탐 가능성으로 제외.
         /// </summary>
         private static bool MatchesTemporaryGunshotProxyDanger(string s)
         {
@@ -75,11 +75,10 @@ namespace SoundVisualizer.AIModel
                 return true;
             if (s.Contains("gargling"))
                 return true;
-            // "rain" 단독 contains는 Train(기차) 오탐 → 비·물 YAMNet 라벨만
+            // "rain" 단독 contains는 Train(기차) 오탐 → 비 YAMNet 라벨만
             if (s == "rain" || s.Contains("raindrop") || s.Contains("rain on surface"))
                 return true;
-            if (s == "water" || s.Contains("ocean") || s.Contains("waves") || s.Contains("surf") ||
-                s.Contains("waterfall"))
+            if (s.Contains("waterfall"))
                 return true;
             return false;
         }
