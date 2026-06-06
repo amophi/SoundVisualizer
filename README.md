@@ -133,7 +133,7 @@ If you wish to modify, contribute, or build the application from source:
 Contributions, bug reports, and feature requests are welcome! When contributing code, please adhere to the existing object-oriented structure (e.g., `IVisualizerMode`) and maintain the zero-allocation rendering principles.
 
 ## 📝 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the AGPL v3 License - see the LICENSE file for details.
 
 ---
 <div align="center">
