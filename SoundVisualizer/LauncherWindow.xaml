@@ -1,4 +1,4 @@
-﻿<Window
+<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="SoundVisualizer.LauncherWindow"
@@ -1143,6 +1143,14 @@
                 <TabItem x:Name="TabHelp" Header="도움말">
                     <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
                         <StackPanel>
+                            <Border Style="{StaticResource ModernCard}">
+                                <StackPanel>
+                                    <TextBlock x:Name="TxtHelp0Title" Text="소리 방향 안내" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
+                                    <TextBlock x:Name="TxtHelp0Desc" Text="소리 방향은 상단이 전방, 하단이 후방 사운드를 나타냅니다. 좌측과 우측은 각각 왼쪽, 오른쪽 사운드를 의미하며 화면 모든 방향에서 나오는 것은 환경음 및 방향성이 없는 소리입니다." 
+                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
                             <Border Style="{StaticResource ModernCard}">
                                 <StackPanel>
                                     <TextBlock x:Name="TxtHelp1Title" Text="사운드 모드" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>

@@ -237,6 +237,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "켜기";
                 BtnReset.Content = "기본값으로 되돌리기";
                 TabHelp.Header = "도움말";
+                TxtHelp0Title.Text = "소리 방향 안내";
+                TxtHelp0Desc.Text = "소리 방향은 상단이 전방, 하단이 후방 사운드를 나타냅니다. 좌측과 우측은 각각 왼쪽, 오른쪽 사운드를 의미하며 화면 모든 방향에서 나오는 것은 환경음 및 방향성이 없는 소리입니다.";
                 TxtHelp1Title.Text = "사운드 모드";
                 TxtHelp1Desc.Text = "정상적인 방향성(레이더) 작동을 위해서는 윈도우 소리 설정에서 출력 장치가 '5.1 서라운드' (6채널) 또는 '7.1 서라운드' (8채널)로 구성되어 있어야 합니다. 일반 스테레오(2채널) 환경인 경우 시각화 그래픽이 좌/우에만 나타날 수 있으며, 이를 보완하려면 설정 탭에서 '사운드 모드'를 알맞게 설정해 주세요.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 만약 7.1 출력 장치가 없다면 ";
@@ -362,6 +364,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "Enable";
                 BtnReset.Content = "Reset to Defaults";
                 TabHelp.Header = "Help";
+                TxtHelp0Title.Text = "Sound Direction";
+                TxtHelp0Desc.Text = "For sound direction, the top represents front audio and the bottom represents rear audio. Left and right correspond to the left and right audio channels respectively, while effects coming from all directions represent ambient or non-directional sounds.";
                 TxtHelp1Title.Text = "Sound Mode";
                 TxtHelp1Desc.Text = "For proper directional (radar) operation, your Windows sound output device must be configured as '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels). In a standard stereo (2-channel) environment, the visualization may only appear on the left/right. To compensate for this, set the 'Sound Mode' appropriately in the settings.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 If you do not have a 7.1 output device, you can install the ";
@@ -476,6 +480,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "オン";
                 BtnReset.Content = "デフォルトに戻す";
                 TabHelp.Header = "ヘルプ";
+                TxtHelp0Title.Text = "音の方向について";
+                TxtHelp0Desc.Text = "音の方向について、上部は前方、下部は後方のサウンドを表します。左と右はそれぞれ左右のサウンドを意味し、画面の全方向から出るエフェクトは環境音や方向性のない音を表します。";
                 TxtHelp1Title.Text = "サウンドモード";
                 TxtHelp1Desc.Text = "正常な方向性(レーダー)動作のためには、Windowsのサウンド設定で出力デバイスが「5.1 サラウンド」(6チャンネル)または「7.1 サラウンド」(8チャンネル)に構成されている必要があります。通常のステレオ(2チャンネル)環境の場合、視覚化グラフィックが左右にのみ表示されることがあります。これを補完するには、設定タブで「サウンドモード」を適切に設定してください。";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 7.1出力デバイスがない場合は、";
@@ -589,6 +595,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "开启";
                 BtnReset.Content = "恢复默认值";
                 TabHelp.Header = "帮助";
+                TxtHelp0Title.Text = "声音方向说明";
+                TxtHelp0Desc.Text = "对于声音方向，顶部表示前方声音，底部表示后方声音。左侧和右侧分别对应左右声道，而来自屏幕所有方向的效果表示环境音或无方向性的声音。";
                 TxtHelp1Title.Text = "声音模式";
                 TxtHelp1Desc.Text = "为了使方向性(雷达)正常工作，在Windows声音设置中，输出设备必须配置为“5.1 环绕声”(6声道)或“7.1 环绕声”(8声道)。在普通立体声(2声道)环境中，可视化图形可能仅显示在左右两侧。要弥补这一点，请在设置选项卡中正确设置“声音模式”。";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 如果您没有 7.1 输出设备，可以进入 ";
@@ -702,6 +710,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "Activar";
                 BtnReset.Content = "Restablecer por defecto";
                 TabHelp.Header = "Ayuda";
+                TxtHelp0Title.Text = "Dirección del Sonido";
+                TxtHelp0Desc.Text = "Para la dirección del sonido, la parte superior representa el audio frontal y la parte inferior representa el audio trasero. La izquierda y la derecha corresponden a los canales de audio izquierdo y derecho respectivamente, mientras que los efectos que provienen de todas las direcciones representan sonidos ambientales o no direccionales.";
                 TxtHelp1Title.Text = "Modo de Sonido";
                 TxtHelp1Desc.Text = "Para que la direccionalidad (radar) funcione correctamente, tu dispositivo de salida de sonido de Windows debe estar configurado como 'Envolvente 5.1' (6 canales) o 'Envolvente 7.1' (8 canales). En un entorno estéreo normal (2 canales), la visualización gráfica puede aparecer solo a la izquierda/derecha. Para compensarlo, ajuste el 'Modo de Sonido' correctamente en la configuración.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si no tienes un dispositivo de salida 7.1, puedes instalar el ";
@@ -815,6 +825,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "Activer";
                 BtnReset.Content = "Réinitialiser";
                 TabHelp.Header = "Aide";
+                TxtHelp0Title.Text = "Direction du Son";
+                TxtHelp0Desc.Text = "Pour la direction du son, le haut représente l'audio avant et le bas représente l'audio arrière. La gauche et la droite correspondent respectivement aux canaux audio gauche et droit, tandis que les effets provenant de toutes les directions représentent les sons ambiants ou non directionnels.";
                 TxtHelp1Title.Text = "Mode Sonore";
                 TxtHelp1Desc.Text = "Pour que la directivité (radar) fonctionne correctement, votre périphérique de sortie audio Windows doit être configuré en 'Surround 5.1' (6 canaux) ou 'Surround 7.1' (8 canaux). Dans un environnement stéréo standard (2 canaux), la visualisation graphique peut n'apparaître qu'à gauche/droite. Pour compenser, réglez correctement le 'Mode Sonore' dans les paramètres.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Si vous n'avez pas de périphérique de sortie 7.1, vous pouvez installer le ";
@@ -928,6 +940,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "Aktivieren";
                 BtnReset.Content = "Auf Standard zurücksetzen";
                 TabHelp.Header = "Hilfe";
+                TxtHelp0Title.Text = "Tonrichtung";
+                TxtHelp0Desc.Text = "Für die Tonrichtung steht oben für den vorderen Ton und unten für den hinteren Ton. Links und rechts entsprechen jeweils dem linken und rechten Audiokanal, während Effekte aus allen Richtungen Umgebungsgeräusche oder nicht direktionale Töne darstellen.";
                 TxtHelp1Title.Text = "Sound-Modus";
                 TxtHelp1Desc.Text = "Damit die Richtwirkung (Radar) richtig funktioniert, muss Ihr Windows-Audioausgabegerät als '5.1 Surround' (6 Kanäle) oder '7.1 Surround' (8 Kanäle) konfiguriert sein. In einer Standard-Stereoumgebung (2 Kanäle) wird die Grafikvisualisierung möglicherweise nur links/rechts angezeigt. Um dies auszugleichen, stellen Sie den 'Sound-Modus' in den Einstellungen richtig ein.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Wenn Sie kein 7.1-Ausgabegerät haben, können Sie den ";
@@ -1041,6 +1055,8 @@ namespace SoundVisualizer
                 ChkAdminMode.Content = "Включить";
                 BtnReset.Content = "Сброс по умолчанию";
                 TabHelp.Header = "Помощь";
+                TxtHelp0Title.Text = "Направление звука";
+                TxtHelp0Desc.Text = "Что касается направления звука, верхняя часть представляет передний звук, а нижняя - задний. Левая и правая стороны соответствуют левому и правому аудиоканалам соответственно, а эффекты, исходящие со всех сторон экрана, представляют окружающие или ненаправленные звуки.";
                 TxtHelp1Title.Text = "Режим звука";
                 TxtHelp1Desc.Text = "Для правильной работы направления (радара) устройство вывода звука Windows должно быть настроено как «5.1 Surround» (6 каналов) или «7.1 Surround» (8 каналов). В стандартной стереосреде (2 канала) визуализация может отображаться только слева/справа. Чтобы компенсировать это, установите «Режим звука» должным образом в настройках.";
                 if (TxtHelp1TipPrefix != null) TxtHelp1TipPrefix.Text = "💡 Если у вас нет устройства вывода 7.1, вы можете установить ";
