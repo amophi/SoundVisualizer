@@ -21,50 +21,50 @@
 
 <br/>
 
-> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it features an AI sound classifier using YAMNet and ONNX Runtime for audio event detection (such as gunshots, speech, and ambient sounds).
+> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it features an AI sound classifier using YAMNet and ONNX Runtime to detect audio events such as danger, speech, and ambient sounds.
 
 ---
 
 ## 🌟 Use Cases & Applications
 
-This project serves as a bridge between auditory and visual cues, providing features for different user groups.
+This project connects auditory cues with visual responses, providing the following features for different user groups:
 
 ### 🦻 For the Deaf and Hard of Hearing
-- **Visualizing Sound**: Translates auditory cues (like footsteps, gunshots, or system alerts) into visual feedback.
-- **Gaming Accessibility**: Allows users to perceive spatial and event-based sound visually.
+- **Visualizing Sound**: Translates hard-to-perceive auditory cues like footsteps, gunshots, or system alerts into visual feedback.
+- **Gaming Accessibility**: Helps visually recognize audio-based gameplay elements (spatial awareness and events).
 
 ### 🎧 For Everyone
-- **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during gaming or media consumption.
-- **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra awareness in competitive environments.
-- **Desktop Customization**: Provides a customizable overlay for streams or desktop setups with minimal performance overhead.
+- **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during music listening or gaming.
+- **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra situational awareness in competitive environments.
+- **Customization**: Provides a custom overlay for streaming or dual-monitor setups with minimal performance overhead.
 
 ---
 
 ## ✨ Key Features
 
 ### 🎨 Diverse Visualizer Modes
-- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waveforms as curves that dynamically scale based on intensity.
-- ⭕ **Circle Ripple Mode (`CircleRippleVisualizer`)**: Creates a circular equalizer and pulse effects based on center Core Radius and frequency.
-- 🎛 **Pad Mode (`PadVisualizer`)**: Displays frequency spectrum responses across spatial grid pad directions (2.0 / 5.1 / 7.1).
-- 🔲 **Outline Mode (`OutlineVisualizer`)**: Emphasizes border lighting waves running around the frame edges.
+- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waves that scale based on the intensity of the sound.
+- ⭕ **Circle Mode (`CircleRippleVisualizer`)**: Renders audio waves spreading circularly outwards from the center of the screen.
+- 🎛 **Pad Mode (`PadVisualizer`)**: Displays sound at fixed points based on 2.0 / 5.1 / 7.1 spatial grid directions.
+- 🔲 **Outline Mode (`OutlineVisualizer`)**: Based on Wave Mode, but excludes filling towards the edges.
 
-### 🎮 Real-Time Overlay Editor (F4 Key)
-- **Interactive Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
-- **On-Screen Control Panel**: Tweak colors, sensitivity, speeds, glows, and AI speech labels dynamically via the overlay control panel.
+### 🎮 Real-Time Overlay Editor (Default F4 Key)
+- **Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
+- **On-Screen Control Panel**: You can dynamically change all settings including colors, sensitivity, speeds, glow effects, and AI speech detection labels via the real-time overlay control panel.
 
 ### ⚡ Seamless Hotkey Control
-- Backstage hotkeys (**F2** for Sound Mode, **F3** for Visual Mode, **F4** for Overlay Editor) allow you to toggle modes instantly without minimizing your active fullscreen games.
+- Supports user-defined hotkeys (**F2**: Change Sound Mode, **F3**: Change Visualizer Mode, **F4**: Toggle Overlay Editor), allowing you to switch modes instantly without minimizing full-screen games.
 
 ### 🔊 Advanced Multi-Channel Audio Support
-- **Hardware-Aware Design**: Automatically detects and adjusts configurations for **2.0 Stereo**, **5.1 Surround**, and **7.1 Surround** channels.
-- **Virtual 7.1 Surround Support**: Detailed guides and links for setting up virtual audio tools (like **VB-CABLE**) to experience immersive 7.1 surround sound overlays even on stereo-only setups.
+- **Hardware-Aware Design**: Automatically detects and adjusts configurations for **2.0 Stereo**, **5.1 Surround**, and **7.1 Surround** channels. Users can also manually set the channels if needed.
+- **Virtual 7.1 Surround Support**: Through virtual audio tool settings like **VB-CABLE**, you can experience immersive 7.1 surround visual overlays even on stereo environments.
 
 ### 🤖 AI Sound Classification (ONNX & YAMNet)
-- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels specific audio events (Ambient, Speech, and Gunshots) natively.
-- **Visual Cues**: Assign custom UI colors to each category for recognition.
+- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels audio events such as Ambient, Speech, and Danger.
+- **Visual Cues**: Assign custom UI colors to each detection category for easy recognition.
 
-### 🌐 Global Multi-Language Support (8 Languages)
-- Fully localized with complete support for **Korean, English, Japanese, Chinese, Spanish, French, German, and Russian**.
+### 🌐 Multi-Language Support (8 Languages)
+- Supports **Korean**, English, Japanese, Chinese, Spanish, French, German, and Russian.
 
 ---
 
@@ -74,9 +74,9 @@ This project serves as a bridge between auditory and visual cues, providing feat
 <summary><b>Click to expand</b></summary>
 
 - **Framework / UI**: C#, WPF (.NET 9.0/10.0)
-- **Audio Capture & DSP**: WASAPI Loopback Capture (via NAudio), Real-time Fast Fourier Transform (FFT) signal processing
-- **AI & Machine Learning**: Python (training scripts), ONNX Runtime, YAMNet (transfer-learned)
-- **Aesthetics & Performance**: High-efficiency double-buffered rendering pipelines minimizing GC allocations (GC-Free implementations).
+- **Audio Capture & DSP (Signal Processing)**: WASAPI Loopback Capture (via NAudio), Real-time Fast Fourier Transform (FFT)
+- **AI & Machine Learning**: Python (model training scripts), ONNX Runtime, YAMNet (transfer learning model)
+- **Graphics & Performance**: High-efficiency double-buffered rendering architecture designed to minimize GC (Garbage Collector) allocation (Zero-allocation) for optimized rendering.
 </details>
 
 ---
@@ -88,30 +88,30 @@ This project serves as a bridge between auditory and visual cues, providing feat
 │   ├── AIModel/          # ONNX models (YAMNet, boosters) and C# SoundClassifier
 │   ├── CoreAudio/        # System audio capture pipeline (AudioCaptureEngine)
 │   ├── DSP/              # Digital Signal Processing (FFT, VectorCalculator)
-│   ├── Visualizers/      # Visualizer implementations (Wave, Pad, CircleRipple, Outline)
-│   ├── AppSettings.cs    # Global application and visualizer configuration
-│   ├── ColorPickerWindow.xaml # Custom color picker for visualizers
-│   ├── LauncherWindow.xaml # Settings launcher and localization management
-│   └── MainWindow.xaml     # The actual transparent overlay window and real-time editor
+│   ├── Visualizers/      # Overlay visualizer class implementations (Wave, Pad, CircleRipple, Outline)
+│   ├── AppSettings.cs    # Global runtime settings for app and visualizers
+│   ├── ColorPickerWindow.xaml  # Custom color picker window for UI rendering
+│   ├── LauncherWindow.xaml     # Initial setup launcher screen (Language, Mode)
+│   └── MainWindow.xaml         # The actual transparent overlay window and real-time rendering editor area
 └── tools/
-    └── transfer_learning/  # Python scripts for training custom ONNX models
+    └── transfer_learning/  # Scripts for creating and transfer learning custom ONNX models
 ```
 
 ## 🚀 Installation & Running
 
 ### 💻 For General Users (Quick Start via Releases)
-No installation required! Sound Visualizer is distributed as a portable standalone package.
+No installation required! Sound Visualizer is provided as a lightweight portable (no-install) open-source package.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
-2. Download the latest `SoundVisualizer.zip` release.
-3. Extract the downloaded `.zip` archive to any folder on your PC.
-4. Double-click **`SoundVisualizer.exe`** to open the Launcher Settings.
-5. Choose your preferred language, customize the configurations, and click **Start** to launch the overlay!
+2. Download the latest `SoundVisualizer.zip` file published.
+3. Extract the downloaded `.zip` file to any folder on your PC.
+4. Double-click **`SoundVisualizer.exe`** to open the launcher screen.
+5. Choose your preferred localization language, finish settings, and click **Start** to run the overlay.
 
 ---
 
 ### 🛠️ For Developers (Build from Source)
-If you wish to modify, contribute, or build the application from source:
+Follow these steps to build from source to modify the code or contribute a patch.
 
 #### Prerequisites
 - Windows 10 / 11
@@ -124,16 +124,16 @@ If you wish to modify, contribute, or build the application from source:
    git clone https://github.com/amophi/SoundVisualizer.git
    ```
 2. Open the `SoundVisualizer.slnx` solution file in Visual Studio 2022.
-3. Build the solution in Release or Debug mode (`Ctrl + Shift + B`).
-4. Press `F5` to execute the launcher.
+3. Build the solution in Release or Debug mode according to your environment (`Ctrl + Shift + B`).
+4. Press `F5` to execute the environment window launcher.
 
 ---
 
 ## 🤝 Contributing
-Contributions, bug reports, and feature requests are welcome! When contributing code, please adhere to the existing object-oriented structure (e.g., `IVisualizerMode`) and maintain the zero-allocation rendering principles.
+Code contributions, bug reports, and new design feature proposals are all welcome as nourishment to grow together! When contributing code, please adhere to the existing object-oriented design structure (e.g., `IVisualizerMode`), and especially follow the performance guide principles to minimize memory overhead (Zero-allocation) occurring during rendering.
 
-## 📝 License
-This project is licensed under the AGPL v3 License - see the LICENSE file for details.
+## 📝 Software License Policy
+This project can be freely distributed and modified under the AGPL v3 License - see the core LICENSE file for details.
 
 ---
 <div align="center">
