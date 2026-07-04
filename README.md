@@ -135,6 +135,8 @@ Code contributions, bug reports, and new design feature proposals are all welcom
 ## 📝 Software License Policy
 This project can be freely distributed and modified under the AGPL v3 License - see the core LICENSE file for details.
 
+Please refer to the [NOTICE.md](NOTICE.md) file for the licenses and source information of third-party libraries and AI models used in this project.
+
 ---
 <div align="center">
   <sub>Built for accessibility.</sub>
