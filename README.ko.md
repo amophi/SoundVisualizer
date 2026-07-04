@@ -79,6 +79,31 @@
 
 ---
 
+## 🏗️ 아키텍처 흐름도 (Architecture)
+
+```mermaid
+graph TD
+    subgraph Audio Pipeline
+        A["시스템 오디오 출력"] -->|"WASAPI 루프백"| B("AudioCaptureEngine")
+        B -->|"Raw PCM 데이터"| C{"Fast Fourier Transform"}
+    end
+
+    subgraph AI Classification
+        C -->|"Mel-Spectrogram"| D["ONNX Runtime"]
+        D -->|"YAMNet 모델"| E("SoundClassifier")
+        E -->|"클래스 확률 계산"| F(("감지된 이벤트: 환경음 / 음성 / 위험음"))
+    end
+
+    subgraph UI Rendering
+        C -->|"주파수 데이터"| G["VectorCalculator"]
+        F --> H["시각화 모드"]
+        G --> H
+        H -->|"Zero-Allocation"| I["WPF 투명 오버레이 UI"]
+    end
+```
+
+---
+
 ## 📁 디렉토리 구조
 
 ```text

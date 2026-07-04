@@ -81,6 +81,31 @@ This project connects auditory cues with visual responses, providing the followi
 
 ---
 
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    subgraph Audio Pipeline
+        A["System Audio Output"] -->|"WASAPI Loopback"| B("AudioCaptureEngine")
+        B -->|"Raw PCM Data"| C{"Fast Fourier Transform"}
+    end
+
+    subgraph AI Classification
+        C -->|"Mel-Spectrogram"| D["ONNX Runtime"]
+        D -->|"YAMNet Model"| E("SoundClassifier")
+        E -->|"Class Scores"| F(("Detected Event: Ambient / Speech / Danger"))
+    end
+
+    subgraph UI Rendering
+        C -->|"Frequency Data"| G["VectorCalculator"]
+        F --> H["Visualizer Modes"]
+        G --> H
+        H -->|"Zero-Allocation"| I["WPF Transparent Overlay"]
+    end
+```
+
+---
+
 ## 📁 Directory Structure
 
 ```text
