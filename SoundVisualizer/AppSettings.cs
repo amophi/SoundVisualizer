@@ -282,9 +282,9 @@ namespace SoundVisualizer
             public bool IsGlowMode { get; set; } = false;
             public double GlowIntensity { get; set; } = 0.0;
             public double OpacityFixedMaxOpacity { get; set; } = 100.0;
-            public List<int> StereoUpmixKeyBind { get; set; }
-            public List<int> VisualModeKeyBind { get; set; }
-            public List<int> EditModeKeyBind { get; set; }
+            public List<int> StereoUpmixKeyBind { get; set; } = new List<int>();
+            public List<int> VisualModeKeyBind { get; set; } = new List<int>();
+            public List<int> EditModeKeyBind { get; set; } = new List<int>();
             
             // 구버전 호환
             public int StereoUpmixHotkey { get; set; } = 0x71; 
@@ -302,10 +302,10 @@ namespace SoundVisualizer
             public string ColorSpeech { get; set; } = "#FFFFFF00";
             public string ColorDanger { get; set; } = "#FFFF0000";
 
-            public VisualModeSettings WaveMode { get; set; }
-            public VisualModeSettings PadMode { get; set; }
-            public VisualModeSettings CircleMode { get; set; }
-            public VisualModeSettings OutlineMode { get; set; }
+            public VisualModeSettings WaveMode { get; set; } = new VisualModeSettings();
+            public VisualModeSettings PadMode { get; set; } = new VisualModeSettings();
+            public VisualModeSettings CircleMode { get; set; } = new VisualModeSettings();
+            public VisualModeSettings OutlineMode { get; set; } = new VisualModeSettings();
         }
     }
 }

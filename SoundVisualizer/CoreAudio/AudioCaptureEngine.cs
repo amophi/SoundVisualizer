@@ -176,7 +176,7 @@ namespace SoundVisualizer.CoreAudio
                     _captureDevice = null;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
@@ -207,7 +207,7 @@ namespace SoundVisualizer.CoreAudio
                     StartCaptureDevice();
                 }
                 catch (OperationCanceledException) { }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
             });

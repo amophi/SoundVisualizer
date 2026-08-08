@@ -130,7 +130,7 @@ namespace SoundVisualizer
             // Ensure language-specific texts are applied on startup
             if (CmbLanguage.SelectedItem is ComboBoxItem initialItem)
             {
-                SetLanguage(initialItem.Content.ToString());
+                SetLanguage(initialItem.Content?.ToString() ?? "KOR");
             }
         }
 
@@ -139,7 +139,7 @@ namespace SoundVisualizer
             if (_isInitializing) return;
             if (CmbLanguage.SelectedItem is ComboBoxItem item)
             {
-                SetLanguage(item.Content.ToString());
+                SetLanguage(item.Content?.ToString() ?? "KOR");
                 AppSettings.Save();
             }
         }

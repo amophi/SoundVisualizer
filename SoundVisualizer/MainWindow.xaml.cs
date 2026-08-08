@@ -602,7 +602,7 @@ namespace SoundVisualizer
                                     }, System.Windows.Threading.DispatcherPriority.Background);
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                             }
                             finally

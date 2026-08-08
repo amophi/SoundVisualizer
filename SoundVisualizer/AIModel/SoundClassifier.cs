@@ -18,14 +18,14 @@ namespace SoundVisualizer.AIModel
 {
     public class SoundClassifier : IDisposable
     {
-        private InferenceSession _session;
+        private InferenceSession? _session;
         private InferenceSession? _coarseHeadSession;
         private string? _coarseHeadInputName;
         private string? _coarseHeadOutputName;
         private InferenceSession? _gunshotBoosterSession;
         private string? _gunshotBoosterInputName;
         private string? _gunshotBoosterOutputName;
-        private string[] _classNames; // YAMNet의 521개 소리 이름 목록
+        private string[] _classNames = Array.Empty<string>(); // YAMNet의 521개 소리 이름 목록
 
         // YAMNet: 16kHz mono → log-mel, 일반적으로 time × mel = 96 × 64
         // ONNX 입력 shape [1, 1, 96, 64] = [batch, ch, time_frames, mel_bins]
@@ -152,7 +152,7 @@ namespace SoundVisualizer.AIModel
                 {
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -385,7 +385,7 @@ namespace SoundVisualizer.AIModel
 
         private void CopyRingTailRightPadded(float[] destination, int count)
         {
-            if (destination == null || count <= 0)
+            if (destination == null || count <= 0 || _ringBuffer == null)
                 return;
 
             int take = Math.Min(_ringCount, count);
@@ -430,7 +430,7 @@ namespace SoundVisualizer.AIModel
                 using var results = _session.Run(inputs);
                 logits = results.First().AsEnumerable<float>().ToArray();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new InferenceResult(-1, "AI 에러", 0f, "ambient", false, 0);
             }
@@ -543,7 +543,7 @@ namespace SoundVisualizer.AIModel
                 _coarseHeadInputName = _coarseHeadSession.InputMetadata.Keys.FirstOrDefault();
                 _coarseHeadOutputName = _coarseHeadSession.OutputMetadata.Keys.FirstOrDefault();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _coarseHeadSession = null;
                 _coarseHeadInputName = null;
@@ -565,7 +565,7 @@ namespace SoundVisualizer.AIModel
                 _gunshotBoosterInputName = _gunshotBoosterSession.InputMetadata.Keys.FirstOrDefault();
                 _gunshotBoosterOutputName = _gunshotBoosterSession.OutputMetadata.Keys.FirstOrDefault();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _gunshotBoosterSession = null;
                 _gunshotBoosterInputName = null;

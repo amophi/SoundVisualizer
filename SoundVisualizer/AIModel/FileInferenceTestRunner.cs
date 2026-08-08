@@ -109,7 +109,7 @@ namespace SoundVisualizer.AIModel
             {
                 total++;
                 string fileName = Path.GetFileName(f);
-                string expected = TryParseExpectedCoarseFromFileName(fileName);
+                string? expected = TryParseExpectedCoarseFromFileName(fileName);
 
                 float[] mono = WavAudioLoader.LoadMono16kHz(f);
                 InferenceResult r = classifier.PredictFromMono16k(mono, confidenceThreshold);
@@ -127,10 +127,11 @@ namespace SoundVisualizer.AIModel
                     labeled++;
                     if (isCorrect) correct++;
                     if (isAccepted && isCorrect) acceptedCorrect++;
-                    AddConfusion(confusion, expected, r.CoarseClass);
+                    if (expected != null)
+                        AddConfusion(confusion, expected, r.CoarseClass);
                 }
 
-                string expectedText = hasExpected ? expected : "n/a";
+                string expectedText = hasExpected ? (expected ?? "n/a") : "n/a";
                 string status = hasExpected ? (isCorrect ? "OK" : "MISS") : "SKIP";
                 string acceptMark = isAccepted ? "accepted" : "rejected";
                 Console.WriteLine(
@@ -150,7 +151,7 @@ namespace SoundVisualizer.AIModel
             PrintConfusionMatrix(confusion);
         }
 
-        private static string TryParseExpectedCoarseFromFileName(string fileName)
+        private static string? TryParseExpectedCoarseFromFileName(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 return null;
