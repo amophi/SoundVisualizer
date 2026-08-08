@@ -1,3 +1,7 @@
+# Copyright (C) 2026 amophi (SoundVisualizer Contributors)
+# This file is part of SoundVisualizer.
+# SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+
 """YAMNet 정합 최소 전처리: 16k/mono + 약한 fade + DC offset 제거."""
 
 from __future__ import annotations

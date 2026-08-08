@@ -1,3 +1,6 @@
+// Copyright (C) 2026 amophi (SoundVisualizer Contributors)
+// This file is part of SoundVisualizer.
+// SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 using System.Windows;
 
 [assembly: ThemeInfo(
@@ -8,3 +11,4 @@ using System.Windows;
                                                 //(used if a resource is not found in the page,
                                                 // app, or any theme specific resource dictionaries)
 )]
+

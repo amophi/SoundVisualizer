@@ -6,7 +6,7 @@
 
 <br/>
 
-# 🎵 Sound Visualizer
+# Sound Visualizer
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
 
@@ -25,55 +25,55 @@
 
 ---
 
-## 🌟 Use Cases & Applications
+## Use Cases & Applications
 
 This project connects auditory cues with visual responses, providing the following features for different user groups:
 
-### 🦻 For the Deaf and Hard of Hearing
+### For the Deaf and Hard of Hearing
 - **Visualizing Sound**: Translates hard-to-perceive auditory cues like footsteps, gunshots, or system alerts into visual feedback.
 - **Gaming Accessibility**: Helps visually recognize audio-based gameplay elements (spatial awareness and events).
 
-### 🎧 For Everyone
+### For Everyone
 - **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during music listening or gaming.
 - **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra situational awareness in competitive environments.
 - **Customization**: Provides a custom overlay for streaming or dual-monitor setups with minimal performance overhead.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🎨 Diverse Visualizer Modes
-- 🌊 **Wave Mode (`WaveVisualizer`)**: Renders audio waves that scale based on the intensity of the sound.
-- ⭕ **Circle Mode (`CircleRippleVisualizer`)**: Renders audio waves spreading circularly outwards from the center of the screen.
-- 🎛 **Pad Mode (`PadVisualizer`)**: Displays sound at fixed points based on 2.0 / 5.1 / 7.1 spatial grid directions.
-- 🔲 **Outline Mode (`OutlineVisualizer`)**: Based on Wave Mode, but excludes filling towards the edges.
+### Diverse Visualizer Modes
+- **Wave Mode (`WaveVisualizer`)**: Renders audio waves that scale based on the intensity of the sound.
+- **Circle Mode (`CircleRippleVisualizer`)**: Renders audio waves spreading circularly outwards from the center of the screen.
+- **Pad Mode (`PadVisualizer`)**: Displays sound at fixed points based on 2.0 / 5.1 / 7.1 spatial grid directions.
+- **Outline Mode (`OutlineVisualizer`)**: Based on Wave Mode, but excludes filling towards the edges.
 
-### 🎮 Real-Time Overlay Editor (Default F4 Key)
+### Real-Time Overlay Editor (Default F4 Key)
 - **Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
 - **On-Screen Control Panel**: You can dynamically change all settings including colors, sensitivity, speeds, glow effects, and AI speech detection labels via the real-time overlay control panel.
 
-### ⚡ Seamless Hotkey Control
+### Seamless Hotkey Control
 - Supports user-defined hotkeys (**F2**: Change Sound Mode, **F3**: Change Visualizer Mode, **F4**: Toggle Overlay Editor), allowing you to switch modes instantly without minimizing full-screen games.
 
-### 🔊 Advanced Multi-Channel Audio Support
+### Advanced Multi-Channel Audio Support
 - **Hardware-Aware Design**: Automatically detects and adjusts configurations for **2.0 Stereo**, **5.1 Surround**, and **7.1 Surround** channels. Users can also manually set the channels if needed.
 - **Virtual 7.1 Surround Support**: Through virtual audio tool settings like **VB-CABLE**, you can experience immersive 7.1 surround visual overlays even on stereo environments.
 
-### 🤖 AI Sound Classification (ONNX & YAMNet)
-- **Real-Time Classification**: Embedded `SoundClassifier` model detects and labels audio events such as Ambient, Speech, and Danger.
-- **Visual Cues**: Assign custom UI colors to each detection category for easy recognition.
+### AI Sound Classification (ONNX & YAMNet)
+- **Real-Time Classification**: The embedded `SoundClassifier` model, leveraging custom transfer-learned models (`three_class_score_head`, `gunshot_booster`) based on YAMNet, accurately detects and labels audio events such as Ambient, Speech, Danger, and Gunshots.
+- **Visual Cues**: Assign custom UI colors and independent maximum opacity settings to each detection category for easy and intuitive recognition.
 
-### 🌐 Multi-Language Support (8 Languages)
+### Multi-Language Support (8 Languages)
 - Supports **Korean**, English, Japanese, Chinese, Spanish, French, German, and Russian.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 <details>
 <summary><b>Click to expand</b></summary>
 
-- **Framework / UI**: C#, WPF (.NET 9.0/10.0)
+- **Framework / UI**: C#, WPF (.NET 10.0)
 - **Audio Capture & DSP (Signal Processing)**: WASAPI Loopback Capture (via NAudio), Real-time Fast Fourier Transform (FFT)
 - **AI & Machine Learning**: Python (model training scripts), ONNX Runtime, YAMNet (transfer learning model)
 - **Graphics & Performance**: High-efficiency double-buffered rendering architecture designed to minimize GC (Garbage Collector) allocation (Zero-allocation) for optimized rendering.
@@ -81,7 +81,7 @@ This project connects auditory cues with visual responses, providing the followi
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```text
 ├── SoundVisualizer/      # Main WPF Application
@@ -97,9 +97,9 @@ This project connects auditory cues with visual responses, providing the followi
     └── transfer_learning/  # Scripts for creating and transfer learning custom ONNX models
 ```
 
-## 🚀 Installation & Running
+## Installation & Running
 
-### 💻 For General Users (Quick Start via Releases)
+### For General Users (Quick Start via Releases)
 No installation required! Sound Visualizer is provided as a lightweight portable (no-install) open-source package.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
@@ -110,13 +110,13 @@ No installation required! Sound Visualizer is provided as a lightweight portable
 
 ---
 
-### 🛠️ For Developers (Build from Source)
+### For Developers (Build from Source)
 Follow these steps to build from source to modify the code or contribute a patch.
 
 #### Prerequisites
 - Windows 10 / 11
 - Visual Studio 2022 (with .NET Desktop Development workload)
-- .NET 9.0 / 10.0 SDK
+- .NET 10.0 SDK
 
 #### Build Steps
 1. Clone the repository:
@@ -129,13 +129,13 @@ Follow these steps to build from source to modify the code or contribute a patch
 
 ---
 
-## 🤝 Contributing
+## Contributing
 Code contributions, bug reports, and new design feature proposals are all welcome as nourishment to grow together! When contributing code, please adhere to the existing object-oriented design structure (e.g., `IVisualizerMode`), and especially follow the performance guide principles to minimize memory overhead (Zero-allocation) occurring during rendering.
 
-## 📝 Software License Policy
+## Software License Policy
 This project can be freely distributed and modified under the AGPL v3 License - see the core LICENSE file for details.
 
-Please refer to the [NOTICE.md](NOTICE.md) file for the licenses and source information of third-party libraries and AI models used in this project.
+Please refer to the [THIRD_PARTY.md](THIRD_PARTY.md) file for the licenses and source information of third-party libraries and AI models used in this project.
 
 ---
 <div align="center">
