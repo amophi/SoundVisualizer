@@ -1,5 +1,3 @@
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-
 <div align="center">
 
 [English](README.md) | [한국어](README.ko.md)
@@ -10,134 +8,127 @@
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![WPF](https://img.shields.io/badge/WPF-blue?style=for-the-badge&logo=windows)](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/)
 [![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 [![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
 [![ONNX](https://img.shields.io/badge/ONNX-005CED?style=for-the-badge&logo=onnx&logoColor=white)](https://onnxruntime.ai/)
 
-**An Audio Visualization & AI Sound Analysis Overlay Engine**
+**Real-Time Audio Visualization & AI Sound Analysis Overlay Engine**
 
 </div>
 
 <br/>
 
-> **Sound Visualizer** captures real-time system audio and translates it into graphical overlays. Built with WPF, it features an AI sound classifier using YAMNet and ONNX Runtime to detect audio events such as danger, speech, and ambient sounds.
+> **Sound Visualizer** is a desktop application that captures real-time system audio and translates it into an intuitive, transparent graphical overlay. 
+Going beyond simple waveform rendering, it integrates an AI sound classifier powered by **YAMNet** and **ONNX Runtime** to instantly identify the type of sound playing (ambient, speech, danger) and provide adaptive visual feedback.
 
 ---
 
-## Use Cases & Applications
-
-This project connects auditory cues with visual responses, providing the following features for different user groups:
-
-### For the Deaf and Hard of Hearing
-- **Visualizing Sound**: Translates hard-to-perceive auditory cues like footsteps, gunshots, or system alerts into visual feedback.
-- **Gaming Accessibility**: Helps visually recognize audio-based gameplay elements (spatial awareness and events).
-
-### For Everyone
-- **Gameplay & Media Overlay**: Provides real-time visual overlays for audio output during music listening or gaming.
-- **Tactical Advantage in Gaming**: Visually pinpoints the frequency and intensity of sounds, providing extra situational awareness in competitive environments.
-- **Customization**: Provides a custom overlay for streaming or dual-monitor setups with minimal performance overhead.
+## 📖 Table of Contents
+- [Background & Objectives](#-background--objectives)
+- [Key Features](#-key-features)
+- [System & AI Architecture](#-system--ai-architecture)
+- [Installation & Quick Start](#-installation--quick-start)
+- [Build Guide (For Developers)](#-build-guide-for-developers)
+- [Team Members](#-team-members)
+- [License](#-license)
 
 ---
 
-## Key Features
+## 🎯 Background & Objectives
 
-### Diverse Visualizer Modes
-- **Wave Mode (`WaveVisualizer`)**: Renders audio waves that scale based on the intensity of the sound.
-- **Circle Mode (`CircleRippleVisualizer`)**: Renders audio waves spreading circularly outwards from the center of the screen.
-- **Pad Mode (`PadVisualizer`)**: Displays sound at fixed points based on 2.0 / 5.1 / 7.1 spatial grid directions.
-- **Outline Mode (`OutlineVisualizer`)**: Based on Wave Mode, but excludes filling towards the edges.
+### Enhancing Media Accessibility for the Deaf and Hard of Hearing
+Modern media content, including YouTube, OTT, and gaming, relies heavily on spatial audio to maximize immersion. However, this creates a severe barrier for the deaf and hard of hearing. Traditional subtitle systems only deliver dialogue, completely omitting crucial acoustic information such as **sound direction, footsteps, or urgent sound effects (e.g., gunshots).**
+Sound Visualizer was created to break down these barriers by **visualizing the intensity, classification, and spatial direction of invisible sounds.** Our primary goal is to resolve this information asymmetry and guarantee an equal, fully accessible media consumption environment for everyone.
 
-### Real-Time Overlay Editor (Default F4 Key)
-- **Drag & Resize**: Activate editor mode by pressing **F4**. You can directly drag the boundaries of guidelines on the screen to resize limits of graphics in real-time.
-- **On-Screen Control Panel**: You can dynamically change all settings including colors, sensitivity, speeds, glow effects, and AI speech detection labels via the real-time overlay control panel.
-
-### Seamless Hotkey Control
-- Supports user-defined hotkeys (**F2**: Change Sound Mode, **F3**: Change Visualizer Mode, **F4**: Toggle Overlay Editor), allowing you to switch modes instantly without minimizing full-screen games.
-
-### Advanced Multi-Channel Audio Support
-- **Hardware-Aware Design**: Automatically detects and adjusts configurations for **2.0 Stereo**, **5.1 Surround**, and **7.1 Surround** channels. Users can also manually set the channels if needed.
-- **Virtual 7.1 Surround Support**: Through virtual audio tool settings like **VB-CABLE**, you can experience immersive 7.1 surround visual overlays even on stereo environments.
-
-### AI Sound Classification (ONNX & YAMNet)
-- **Real-Time Classification**: The embedded `SoundClassifier` model, leveraging custom transfer-learned models (`three_class_score_head`, `gunshot_booster`) based on YAMNet, accurately detects and labels audio events such as Ambient, Speech, Danger, and Gunshots.
-- **Visual Cues**: Assign custom UI colors and independent maximum opacity settings to each detection category for easy and intuitive recognition.
-
-### Multi-Language Support (8 Languages)
-- Supports **Korean**, English, Japanese, Chinese, Spanish, French, German, and Russian.
+### Expanding Utility for All Users
+This overlay technology is also highly beneficial for gamers, providing a **tactical visual indicator (situational awareness)** in competitive environments. Additionally, it serves as a perfect alternative for users consuming media in public or silent environments where audio output is restricted.
 
 ---
 
-## Tech Stack
+## ✨ Key Features
 
-<details>
-<summary><b>Click to expand</b></summary>
+### 1. Diverse Spatial and Intensity Visualizer Modes
+We provide 4 unique rendering modes that intuitively map sound intensity and direction (supporting 2.0, 5.1, and 7.1 channels):
+- **Wave Mode**: Renders dynamic audio waves along the screen edges that fluctuate based on intensity.
+- **Circle Mode**: Radiates circular ripples outward from the center of the screen.
+- **Pad Mode**: Displays glowing pads anchored to specific spatial grid directions.
+- **Outline Mode**: A minimalist variation of Wave mode, glowing only the thin borders to minimize screen occlusion.
 
-- **Framework / UI**: C#, WPF (.NET 10.0)
-- **Audio Capture & DSP (Signal Processing)**: WASAPI Loopback Capture (via NAudio), Real-time Fast Fourier Transform (FFT)
-- **AI & Machine Learning**: Python (model training scripts), ONNX Runtime, YAMNet (transfer learning model)
-- **Graphics & Performance**: High-efficiency double-buffered rendering architecture designed to minimize GC (Garbage Collector) allocation (Zero-allocation) for optimized rendering.
-</details>
+### 2. On-Screen Real-Time Editor (F4)
+Modify settings instantly while in a full-screen application or game without minimizing the window.
+- **F2 / F3 Hotkeys**: Switch between AI sound modes and visualization modes on the fly.
+- **Editor Mode (F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, and AI detection sensitivities directly from the pop-up control panel.
+
+### 3. Hardware-Aware Multi-Channel Support
+- Automatically detects the system's audio configuration (Stereo, 5.1, 7.1 Surround) and accurately maps the sound's origin (Front/Back/Left/Right) to produce a 3D visual effect on a 2D screen.
+
+### 4. Real-Time AI Sound Classification (ONNX & YAMNet)
+- **3-Class Detection**: Analyzes all incoming audio into `Ambient`, `Speech`, and `Danger` categories. Each category triggers independent, customizable UI colors and dynamic opacity changes.
+- **Gunshot Booster**: An auxiliary, highly-sensitive model designed specifically to ensure critical warning sounds (like gunshots in games/movies) are never missed.
+
+### 5. Comprehensive Localization
+- Fully supports 8 languages: English, Korean, Japanese, Chinese, Spanish, French, German, and Russian.
 
 ---
 
-## Directory Structure
+## ⚙️ System & AI Architecture
 
-```text
-├── SoundVisualizer/      # Main WPF Application
-│   ├── AIModel/          # ONNX models (YAMNet, boosters) and C# SoundClassifier
-│   ├── CoreAudio/        # System audio capture pipeline (AudioCaptureEngine)
-│   ├── DSP/              # Digital Signal Processing (FFT, VectorCalculator)
-│   ├── Visualizers/      # Overlay visualizer class implementations (Wave, Pad, CircleRipple, Outline)
-│   ├── AppSettings.cs    # Global runtime settings for app and visualizers
-│   ├── ColorPickerWindow.xaml  # Custom color picker window for UI rendering
-│   ├── LauncherWindow.xaml     # Initial setup launcher screen (Language, Mode)
-│   └── MainWindow.xaml         # The actual transparent overlay window and real-time rendering editor area
-└── tools/
-    └── transfer_learning/  # Scripts for creating and transfer learning custom ONNX models
-```
+The project is rigorously engineered for high-performance, real-time background processing with minimal system overhead.
 
-## Installation & Running
+* **Core Audio API (WASAPI)**: Loopback captures system-wide audio with zero latency.
+* **DSP & FFT Computation**: High-speed frequency transformation calculations run entirely on a background audio thread multiple times per second.
+* **Zero-Allocation Rendering**: The WPF/C# rendering loop is designed to minimize Garbage Collector (GC) allocation, entirely preventing frame drops.
+* **ONNX Inference Pipeline**: Audio is converted to 16kHz mono, processed into Log-mel spectrograms, and fed into a custom-trained YAMNet model via the `Microsoft.ML.OnnxRuntime` engine for instantaneous classification.
 
-### For General Users (Quick Start via Releases)
-No installation required! Sound Visualizer is provided as a lightweight portable (no-install) open-source package.
+---
+
+## 🚀 Installation & Quick Start
+
+Sound Visualizer is provided as a lightweight, **portable (no-install)** open-source package.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
-2. Download the latest `SoundVisualizer.zip` file published.
-3. Extract the downloaded `.zip` file to any folder on your PC.
-4. Double-click **`SoundVisualizer.exe`** to open the launcher screen.
-5. Choose your preferred localization language, finish settings, and click **Start** to run the overlay.
+2. Download and extract the latest `SoundVisualizer.zip` file to any location on your PC.
+3. Run **`SoundVisualizer.exe`**.
+4. Configure your initial settings and language in the launcher, then click **Start** to activate the overlay.
 
 ---
 
-### For Developers (Build from Source)
-Follow these steps to build from source to modify the code or contribute a patch.
+## 🛠 Build Guide (For Developers)
 
-#### Prerequisites
-- Windows 10 / 11
-- Visual Studio 2022 (with .NET Desktop Development workload)
-- .NET 10.0 SDK
+To build from source to modify the code or contribute to the project:
 
-#### Build Steps
-1. Clone the repository:
+1. **Prerequisites**: Windows 10/11, Visual Studio 2022 (with .NET Desktop Development workload), and .NET 10.0 SDK.
+2. **Clone the repository**:
    ```bash
    git clone https://github.com/amophi/SoundVisualizer.git
    ```
-2. Open the `SoundVisualizer.slnx` solution file in Visual Studio 2022.
-3. Build the solution in Release or Debug mode according to your environment (`Ctrl + Shift + B`).
-4. Press `F5` to execute the environment window launcher.
+3. Open the `SoundVisualizer.slnx` solution file in Visual Studio 2022.
+4. Select `Release` or `Debug` configuration, build (`Ctrl + Shift + B`), and press `F5` to run.
 
 ---
 
-## Contributing
-Code contributions, bug reports, and new design feature proposals are all welcome as nourishment to grow together! When contributing code, please adhere to the existing object-oriented design structure (e.g., `IVisualizerMode`), and especially follow the performance guide principles to minimize memory overhead (Zero-allocation) occurring during rendering.
+## 👥 Team Members
 
-## Software License Policy
-This project can be freely distributed and modified under the AGPL v3 License - see the core LICENSE file for details.
+This project was developed as a university open-source software project by Team 5:
 
-Please refer to the [THIRD_PARTY.md](THIRD_PARTY.md) file for the licenses and source information of third-party libraries and AI models used in this project.
+| Name | Role & Key Responsibilities |
+| :---: | :--- |
+| **Dohwan Kim** (Leader) | Project Management, Core WPF Transparent Overlay Architecture, UI/UX Design & Localization, Final Reporting |
+| **Sungjin Kim** | WASAPI Low-Latency Audio Capture Engine, DSP (FFT) Pipeline, High-Speed Thread Optimization |
+| **Garam Park** | AI Real-Time Audio Classification Pipeline, YAMNet 3-Class Transfer Learning, Gunshot Booster Development |
+| **Suhyun Yang** | UI/UX Research, AI Audio Dataset Collection, Accessibility Surveys & User Testing |
 
 ---
+
+## 📄 License
+
+Sound Visualizer is distributed under the **AGPL v3** license to encourage a virtuous cycle in the open-source community. Anyone is welcome to modify the code and share custom UI themes or streaming plugins. See the [LICENSE](LICENSE) file for more information.
+
+For licensing and copyright information regarding third-party libraries (NAudio, ONNX Runtime, etc.) and AI models used in this project, please refer to the [THIRD_PARTY.md](THIRD_PARTY.md) file.
+
+<br/>
 <div align="center">
-  <sub>Built for accessibility.</sub>
+  <b>Built for Accessibility.</b>
 </div>
