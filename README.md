@@ -109,19 +109,6 @@ To build from source to modify the code or contribute to the project:
 
 ---
 
-## 👥 Team Members
-
-This project was developed as a university open-source software project by Team 5:
-
-| Name | Role & Key Responsibilities |
-| :---: | :--- |
-| **Dohwan Kim** (Leader) | Project Management, Core WPF Transparent Overlay Architecture, UI/UX Design & Localization, Final Reporting |
-| **Sungjin Kim** | WASAPI Low-Latency Audio Capture Engine, DSP (FFT) Pipeline, High-Speed Thread Optimization |
-| **Garam Park** | AI Real-Time Audio Classification Pipeline, YAMNet 3-Class Transfer Learning, Gunshot Booster Development |
-| **Suhyun Yang** | UI/UX Research, AI Audio Dataset Collection, Accessibility Surveys & User Testing |
-
----
-
 ## 📄 License
 
 Sound Visualizer is distributed under the **AGPL v3** license to encourage a virtuous cycle in the open-source community. Anyone is welcome to modify the code and share custom UI themes or streaming plugins. See the [LICENSE](LICENSE) file for more information.
