@@ -58,7 +58,7 @@ We provide 4 unique rendering modes that intuitively map sound intensity and dir
 
 ### 2. On-Screen Real-Time Editor (F4)
 Modify settings instantly while in a full-screen application or game without minimizing the window.
-- **F2 / F3 Hotkeys**: Switch between AI sound modes and visualization modes on the fly.
+- **F2 / F3 Hotkeys**: Switch between sound modes and visualization modes on the fly.
 - **Editor Mode (F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, and AI detection sensitivities directly from the pop-up control panel.
 
 ### 3. Hardware-Aware Multi-Channel Support
