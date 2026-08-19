@@ -20,7 +20,7 @@
 
 <br/>
 
-> **Sound Visualizer** is a desktop application that captures real-time system audio and translates it into an intuitive, transparent graphical overlay. 
+> **Sound Visualizer** is a desktop application that captures real-time system audio and translates its direction, intensity, and meaning into a graphical overlay. 
 Going beyond simple waveform rendering, it integrates an AI sound classifier powered by **YAMNet** and **ONNX Runtime** to instantly identify the type of sound playing (ambient, speech, danger) and provide adaptive visual feedback.
 
 ---
@@ -58,8 +58,8 @@ We provide 4 unique rendering modes that intuitively map sound intensity and dir
 
 ### 2. On-Screen Real-Time Editor (F4)
 Modify settings instantly while in a full-screen application or game without minimizing the window.
-- **F2 / F3 Hotkeys**: Switch between sound modes and visualization modes on the fly.
-- **Editor Mode (F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, and AI detection sensitivities directly from the pop-up control panel.
+- **F2 / F3 Hotkeys**: Switch between sound modes and visualization modes on the fly. Hotkeys can be customized.
+- **Editor Mode (Default F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, AI detection sensitivities, and all other settings directly from the pop-up control panel.
 
 ### 3. Hardware-Aware Multi-Channel Support
 - Automatically detects the system's audio configuration (Stereo, 5.1, 7.1 Surround) and accurately maps the sound's origin (Front/Back/Left/Right) to produce a 3D visual effect on a 2D screen.
