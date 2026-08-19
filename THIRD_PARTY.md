@@ -12,7 +12,7 @@ This project (`SoundVisualizer`) uses the following third-party open-source libr
 | 6 | numpy | >=1.22.0 | BSD-3-Clause | github.com/numpy/numpy | 배열 및 수학 연산 / 라이브러리로 불러 씀 |
 | 7 | librosa | >=0.10.1 | ISC License | github.com/librosa/librosa | 오디오 스펙트로그램 전처리 / 라이브러리로 불러 씀 |
 | 8 | soundfile | >=0.12.1 | BSD-3-Clause | github.com/bastibe/python-soundfile | 오디오 파일 입출력 / 라이브러리로 불러 씀 |
-| 9 | tf2onnx | >=1.14.0 | MIT License | github.com/onnx/tensorflow-onnx | TF 모델을 ONNX로 변환 / 실행 파일 호출 방식으로 사용 |
+| 9 | tf2onnx | >=1.14.0 | Apache-2.0 | github.com/onnx/tensorflow-onnx | TF 모델을 ONNX로 변환 / 실행 파일 호출 방식으로 사용 |
 | 10 | onnx | >=1.12.0 | Apache-2.0 | github.com/onnx/onnx | ONNX 포맷 지원 / 라이브러리로 불러 씀 |
 | 11 | onnxruntime (Python) | >=1.18.0 | MIT License | github.com/microsoft/onnxruntime | 학습 결과물 검증 / 라이브러리로 불러 씀 |
 
