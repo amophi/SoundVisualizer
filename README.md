@@ -54,7 +54,7 @@ We provide 4 unique rendering modes that intuitively map sound intensity and dir
 - **Wave Mode**: Renders dynamic audio waves along the screen edges that fluctuate based on intensity.
 - **Circle Mode**: Radiates circular ripples outward from the center of the screen.
 - **Pad Mode**: Displays glowing pads anchored to specific spatial grid directions.
-- **Outline Mode**: A minimalist variation of Wave mode, glowing only the thin borders to minimize screen occlusion.
+- **Outline Mode**: A minimalist variation of Wave mode, showing only the thin borders of the wave to minimize screen occlusion.
 
 ### 2. On-Screen Real-Time Editor (F4)
 Modify settings instantly while in a full-screen application or game without minimizing the window.
