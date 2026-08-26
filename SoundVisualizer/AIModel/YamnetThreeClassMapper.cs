@@ -30,7 +30,7 @@ namespace SoundVisualizer.AIModel
             if (s.Contains("alarm") || s.Contains("smoke detector")) return "사이렌";
             if (s.Contains("police car") || s.Contains("ambulance") || s.Contains("fire engine") || s.Contains("fire truck")) return "사이렌";
 
-            if (s.Contains("speech") || s.Contains("conversation") || s.Contains("narration") || s.Contains("speaking") || s.Contains("babbling")) return "사람 목소리";
+            if (s.Contains("speech") || s.Contains("conversation") || s.Contains("narration") || s.Contains("speaking") || s.Contains("babbling")) return "대화음";
             if (s.Contains("shout") || s.Contains("screaming") || s.Contains("yell") || s.Contains("laughter") || s.Contains("crying") || s.Contains("sobbing")) return "사람 소리";
             if (s.Contains("music")) return "음악";
             if (s.Contains("wind") || s.Contains("rustling leaves")) return "바람 소리";
@@ -118,7 +118,7 @@ namespace SoundVisualizer.AIModel
 
         private static bool MatchesSpeech(string s)
         {
-            // 대화·발화·웃음·울음·노래 등 사람 목소리 계열
+            // 대화·발화·웃음·울음·노래 등 대화음 계열
             if (s.Contains("speech") || s.Contains("conversation") || s.Contains("narration"))
                 return true;
             if (s.Contains("speaking") || s.Contains("babbling"))

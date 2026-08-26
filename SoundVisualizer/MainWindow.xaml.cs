@@ -1593,8 +1593,8 @@ namespace SoundVisualizer
                     if (DragTipText != null) DragTipText.Text = "화면에 표시된 가이드 라인을 마우스 드래그하여 오버레이 파도의 높이 한계선 및 중앙 크기를 실시간 조절할 수 있습니다!";
                     if (EditPanelGlowIntensityLabel != null) EditPanelGlowIntensityLabel.Text = "광원 세기";
                     if (EditPanelShowAmbientCheckBox != null) EditPanelShowAmbientCheckBox.Content = "환경음 표시";
-                    if (EditPanelShowSpeechCheckBox != null) EditPanelShowSpeechCheckBox.Content = "말소리 표시";
-                    if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "강조음 표시";
+                    if (EditPanelShowSpeechCheckBox != null) EditPanelShowSpeechCheckBox.Content = "대화음 표시";
+                    if (EditPanelShowDangerCheckBox != null) EditPanelShowDangerCheckBox.Content = "위협음 표시";
                     if (EditPanelSaveAndCloseDesc != null) EditPanelSaveAndCloseDesc.Text = " 키를 누르면 설정 저장 후 닫힘";
                     if (BtnCloseOverlay != null) BtnCloseOverlay.Content = "오버레이 실행 종료";
                     _rectModeLabelPrefix = "한계선"; _rectSizeLabelPrefix = "크기: "; _circleRadiusLabelPrefix = "기본 반경: "; _circleIntensityLabelPrefix = "원형 크기: "; _visualModeUIPrefix = "시각화 모드: "; _stereoModeUIPrefix = "채널 모드: "; _editModeUIText = "오버레이 설정: ";

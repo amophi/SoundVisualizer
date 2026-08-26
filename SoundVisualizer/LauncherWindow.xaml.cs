@@ -254,7 +254,7 @@ namespace SoundVisualizer
                 TxtHelp3Title.Text = "오버레이 실시간 편집 모드";
                 TxtHelp3Desc.Text = "지정된 단축키(기본 F4)를 누르면 오버레이 편집 모드가 활성화됩니다. 화면에서 직접 마우스를 드래그하여 그래픽의 크기 한계선을 조절할 수 있으며, 팝업된 설정 패널에서 세부 조작이 가능합니다.";
                 TxtHelp4Title.Text = "AI 소리 분석 및 색상";
-                TxtHelp4Desc.Text = "AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 말소리, 강조음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다.";
+                TxtHelp4Desc.Text = "AI가 실시간으로 소리의 종류를 분석하여 화면에 라벨과 색상으로 표시합니다. 설정에서 각 소리 종류(환경음, 대화음, 위협음)별로 고유한 색상을 지정하여 직관적으로 구분할 수 있습니다.";
                 TxtHelp5Title.Text = "개발자 모드";
                 TxtHelp5Desc.Text = "개발자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.";
                 
@@ -262,8 +262,8 @@ namespace SoundVisualizer
                 {
                     TxtAIDisplaySettings.Text = "소리 분류 표시";
                     ChkShowAmbient.Content = "환경음 표시";
-                    ChkShowSpeech.Content = "말소리 표시";
-                    ChkShowDanger.Content = "강조음 표시";
+                    ChkShowSpeech.Content = "대화음 표시";
+                    ChkShowDanger.Content = "위협음 표시";
                 }
                 if (TabMoreInfo != null) TabMoreInfo.Header = "더 알아보기";
                 if (TxtMoreInfoTitle != null) TxtMoreInfoTitle.Text = "GitHub 저장소 및 프로젝트 기여";
@@ -1139,8 +1139,8 @@ namespace SoundVisualizer
                 if (TxtAutoMinimizeLabel != null) TxtAutoMinimizeLabel.Text = "실행 시 런처 최소화";
                 if (TxtAutoMinimizeDesc != null) TxtAutoMinimizeDesc.Text = "오버레이 실행 시 이 런처 창을 자동으로 최소화합니다.";
                 if (ChkShowAmbient != null) ChkShowAmbient.Content = "환경음 표시";
-                if (ChkShowSpeech != null) ChkShowSpeech.Content = "말소리 표시";
-                if (ChkShowDanger != null) ChkShowDanger.Content = "강조음 표시";
+                if (ChkShowSpeech != null) ChkShowSpeech.Content = "대화음 표시";
+                if (ChkShowDanger != null) ChkShowDanger.Content = "위협음 표시";
                 if (ChkAdminMode != null) ChkAdminMode.Content = "켜기";
                 if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.Content = "켜기";
                 if (TxtOpacityFixedMaxOpacityDescWave != null) TxtOpacityFixedMaxOpacityDescWave.Text = "소리에 비례하여 나타날 최대 투명도를 설정합니다.";

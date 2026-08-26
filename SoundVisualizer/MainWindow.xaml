@@ -1,4 +1,4 @@
-﻿<Window x:Class="SoundVisualizer.MainWindow"
+<Window x:Class="SoundVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Sound Visualizer" Height="1080" Width="1920"
@@ -510,9 +510,9 @@
                                             </Button>
                                         </StackPanel>
                                     </Grid>
-                                    <!-- 말소리 -->
+                                    <!-- 대화음 -->
                                     <Grid Margin="0,0,0,12">
-                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="말소리 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
+                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="대화음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <TextBlock x:Name="EditPanelSpeechColorLabel" Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                             <Button x:Name="EditPanelSpeechColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Speech">
@@ -524,9 +524,9 @@
                                             </Button>
                                         </StackPanel>
                                     </Grid>
-                                    <!-- 강조음 -->
+                                    <!-- 위협음 -->
                                     <Grid>
-                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="강조음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
+                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="위협음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <TextBlock x:Name="EditPanelDangerColorLabel" Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                             <Button x:Name="EditPanelDangerColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Danger">
