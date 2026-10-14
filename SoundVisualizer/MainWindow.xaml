@@ -1,6 +1,7 @@
 <Window x:Class="SoundVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:SoundVisualizer.Localization"
         Title="Sound Visualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
         Topmost="True" WindowState="Maximized" ShowInTaskbar="False"
@@ -236,7 +237,7 @@
         <!-- 시스템 상태 메시지 (상단 고정) -->
         <Border x:Name="StatusBorder" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,50,0,0" 
                 Background="#60000000" CornerRadius="5" Padding="10,5" IsHitTestVisible="False" Visibility="Collapsed">
-            <TextBlock x:Name="StatusText" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="SemiBold" Text="시스템 준비 완료" TextAlignment="Center"/>
+            <TextBlock x:Name="StatusText" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="SemiBold" Text="{l:Loc hud.status.ready}" TextAlignment="Center"/>
         </Border>
 
         <!-- 통합 파도 (하나의 연속적인 둘레 웨이브) -->
@@ -262,13 +263,13 @@
         <!-- 모드 설정 UI (우하단) -->
         <StackPanel x:Name="ModeUIStack" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,20,20" IsHitTestVisible="False">
             <Border Background="#80000000" CornerRadius="5" Padding="12,8" Margin="0,0,0,8">
-                <TextBlock x:Name="VisualModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="시각화 모드: [F3] 패드 모드 (Pad)"/>
+                <TextBlock x:Name="VisualModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold"/>
             </Border>
             <Border Background="#80000000" CornerRadius="5" Padding="12,8" Margin="0,0,0,8">
-                <TextBlock x:Name="StereoModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="채널 확장 모드: [F2] 7.1 서라운드"/>
+                <TextBlock x:Name="StereoModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold"/>
             </Border>
             <Border Background="#80000000" CornerRadius="5" Padding="12,8">
-                <TextBlock x:Name="EditModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold" Text="오버레이 설정: [F4] 열기/닫기"/>
+                <TextBlock x:Name="EditModeText" Foreground="{StaticResource PrimaryTextColor}" FontSize="16" FontWeight="SemiBold"/>
             </Border>
         </StackPanel>
 
@@ -322,8 +323,8 @@
                     <!-- 원형 모드 라벨 (중앙 고정) -->
                     <Border Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{StaticResource DividerColor}" BorderThickness="1">
                         <StackPanel>
-                            <TextBlock x:Name="CircleRadiusLabel" Text="기본 반경: 40" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
-                            <TextBlock x:Name="CircleIntensityLabel" Text="파도 크기: 50%" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="CircleRadiusLabel" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock x:Name="CircleIntensityLabel" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -332,14 +333,14 @@
             <!-- 사각형 가이드라인 라벨 (화면 상단 고정) -->
             <Border x:Name="RectGuidelineLabelBox" Background="#C0000000" CornerRadius="6" Padding="12,8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,0" BorderBrush="{StaticResource DividerColor}" BorderThickness="1" Visibility="Collapsed" IsHitTestVisible="False">
                 <StackPanel>
-                    <TextBlock x:Name="RectModeLabel" Text="파도 한계선" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock x:Name="RectSizeLabel" Text="파도 크기: 50%" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="RectModeLabel" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock x:Name="RectSizeLabel" Foreground="{StaticResource DangerColor}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
 
-            <!-- 좌측 설정 패널 -->
+            <!-- 좌측 설정 패널. 오른쪽에서 왼쪽으로 쓰는 언어면 패널 내용만 뒤집는다(가이드라인과 그래픽은 그대로 둔다). -->
             <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="380" Background="{StaticResource BgColor}" BorderBrush="{StaticResource DividerColor}" BorderThickness="0,0,1,0">
-                <Grid Margin="25,40,25,40">
+                <Grid Margin="25,40,25,40" FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -351,21 +352,12 @@
                         <Grid>
                             <StackPanel HorizontalAlignment="Left">
                                 <TextBlock Text="Sound Visualizer" Foreground="{StaticResource AccentColor}" FontSize="10" FontWeight="Heavy"/>
-                                <TextBlock x:Name="EditPanelTitle" Text="오버레이 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="24" FontWeight="ExtraBold" Margin="0,5,0,0"/>
+                                <TextBlock x:Name="EditPanelTitle" Text="{l:Loc editor.title}" Foreground="{StaticResource PrimaryTextColor}" FontSize="24" FontWeight="ExtraBold" Margin="0,5,0,0"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,15,0,5">
-                                    <TextBlock Text="Language" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Height="30" Padding="10,0"
+                                    <TextBlock Text="{l:Loc common.language}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" Height="30" Padding="10,0"
                                               Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" 
-                                              SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
-                                        <ComboBoxItem Content="한국어" Tag="KOR"/>
-                                        <ComboBoxItem Content="English" Tag="English"/>
-                                        <ComboBoxItem Content="日本語" Tag="Japanese"/>
-                                        <ComboBoxItem Content="中文" Tag="Chinese"/>
-                                        <ComboBoxItem Content="Español" Tag="Spanish"/>
-                                        <ComboBoxItem Content="Français" Tag="French"/>
-                                        <ComboBoxItem Content="Deutsch" Tag="German"/>
-                                        <ComboBoxItem Content="Русский" Tag="Russian"/>
-                                    </ComboBox>
+                                              SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -377,7 +369,7 @@
                         <StackPanel Margin="0,0,5,0">
                             <!-- 드래그 도움말 알림 -->
                             <Border Background="#10E53935" CornerRadius="8" Padding="12" BorderBrush="#30E53935" BorderThickness="1" Margin="0,0,0,20">
-                                <TextBlock x:Name="DragTipText" Text="화면에 표시된 가이드 라인을 마우스 드래그하여 오버레이 파도의 높이 한계선 및 중앙 크기를 실시간 조절할 수 있습니다!" Foreground="#FFCDD2" FontSize="12" TextWrapping="Wrap" LineHeight="18"/>
+                                <TextBlock x:Name="DragTipText" Text="{l:Loc editor.drag_tip}" Foreground="#FFCDD2" FontSize="12" TextWrapping="Wrap" LineHeight="18"/>
                             </Border>
 
                             <!-- 기본 설정 블럭 -->
@@ -385,26 +377,26 @@
                                 <StackPanel>
                                     <!-- 실시간 모드 전환 영역 -->
                                     <StackPanel Margin="0,0,0,20">
-                                        <TextBlock x:Name="EditPanelVisualModeLabel" Text="표현 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="EditPanelVisualModeLabel" Text="{l:Loc settings.visual_mode.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
                                         <ComboBox x:Name="CmbEditPanelVisualMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelVisualMode_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel" Margin="0,0,0,12">
-                                            <ComboBoxItem Content="파도"/>
-                                            <ComboBoxItem Content="패드"/>
-                                            <ComboBoxItem Content="원형"/>
-                                            <ComboBoxItem Content="외곽선"/>
+                                            <ComboBoxItem Content="{l:Loc settings.mode.wave}"/>
+                                            <ComboBoxItem Content="{l:Loc settings.mode.pad}"/>
+                                            <ComboBoxItem Content="{l:Loc settings.mode.circle}"/>
+                                            <ComboBoxItem Content="{l:Loc settings.mode.outline}"/>
                                         </ComboBox>
                                         
-                                        <TextBlock x:Name="EditPanelSoundModeLabel" Text="사운드 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="EditPanelSoundModeLabel" Text="{l:Loc settings.sound_mode.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="Bold" Margin="0,0,0,6"/>
                                         <ComboBox x:Name="CmbEditPanelSoundMode" Style="{StaticResource ModernComboBoxStyle}" ItemContainerStyle="{StaticResource ModernComboBoxItemStyle}" SelectionChanged="CmbEditPanelSoundMode_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
-                                            <ComboBoxItem Content="2 채널"/>
-                                            <ComboBoxItem Content="5.1 채널"/>
-                                            <ComboBoxItem Content="7.1 채널"/>
+                                            <ComboBoxItem Content="{l:Loc settings.channels.2}"/>
+                                            <ComboBoxItem Content="{l:Loc settings.channels.5_1}"/>
+                                            <ComboBoxItem Content="{l:Loc settings.channels.7_1}"/>
                                         </ComboBox>
                                     </StackPanel>
 
                                     <!-- 최대 프레임 설정 -->
                                     <StackPanel>
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelMaxFpsLabel" Text="최대 프레임" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelMaxFpsLabel" Text="{l:Loc settings.max_fps.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelTargetFpsValueText" Text="144 FPS" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelTargetFpsSlider" Minimum="30" Maximum="240" Value="144" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -418,20 +410,20 @@
                                     <!-- 크기 고정 -->
                                     <StackPanel Margin="0,0,0,15">
                                         <Grid Margin="0,0,0,6">
-                                            <TextBlock x:Name="EditPanelIntensityAsOpacityLabel" Text="크기 고정" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="EditPanelIntensityAsOpacityLabel" Text="{l:Loc settings.size_lock.title}" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
                                             <CheckBox x:Name="EditPanelIntensityAsOpacityCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelIntensityAsOpacity_Changed" Unchecked="EditPanelIntensityAsOpacity_Changed"/>
                                         </Grid>
-                                        <TextBlock x:Name="EditPanelIntensityAsOpacityDesc" Text="세기에 비례하는 투명도를 활용하여 고정된 크기의 그래픽을 보여줍니다." Foreground="{StaticResource SecondaryTextColor}" FontSize="11" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="EditPanelIntensityAsOpacityDesc" Text="{l:Loc settings.size_lock.desc}" Foreground="{StaticResource SecondaryTextColor}" FontSize="11" TextWrapping="Wrap"/>
                                         <StackPanel x:Name="EditPanelOpacityFixedSizePanel" Margin="0,0,0,18">
                                             <Grid>
-                                                <TextBlock x:Name="EditPanelOpacityFixedSizeLabel" Text="파도 크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="EditPanelOpacityFixedSizeLabel" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
                                                 <TextBlock x:Name="EditPanelOpacityFixedSizeValueText" Text="30%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
                                             </Grid>
                                             <Slider x:Name="EditPanelOpacityFixedSizeSlider" Minimum="10" Maximum="100" Value="30" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
                                         </StackPanel>
                                         <StackPanel x:Name="EditPanelOpacityFixedMaxOpacityPanel" Margin="0,0,0,18">
                                             <Grid>
-                                                <TextBlock x:Name="EditPanelMaxOpacityLabel" Text="최대 투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="EditPanelMaxOpacityLabel" Text="{l:Loc settings.max_opacity.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
                                                 <TextBlock x:Name="EditPanelOpacityFixedMaxOpacityValueText" Text="0%" Foreground="{StaticResource AccentColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
                                             </Grid>
                                             <Slider x:Name="EditPanelOpacityFixedMaxOpacitySlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -441,7 +433,7 @@
                                     <!-- 설정 4: 크기 -->
                                     <StackPanel x:Name="EditPanelIntensityPanel" Margin="0,0,0,18">
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelIntensityLabel" Text="크기" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelIntensityLabel" Text="{l:Loc settings.size.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelIntensityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelIntensitySlider" Minimum="10" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -450,7 +442,7 @@
                                     <!-- 설정 3: 투명도 -->
                                     <StackPanel x:Name="EditPanelOpacityPanel" Margin="0,0,0,18">
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelOpacityLabel" Text="투명도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelOpacityLabel" Text="{l:Loc settings.opacity.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelOpacityValueText" Text="50%" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelOpacitySlider" Minimum="0" Maximum="100" Value="50" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -459,7 +451,7 @@
                                     <!-- 설정 1: 파도 속도 -->
                                     <StackPanel Margin="0,0,0,18">
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelSpeedLabel" Text="속도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelSpeedLabel" Text="{l:Loc settings.speed.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelSpeedValueText" Text="20" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelSpeedSlider" Minimum="1" Maximum="100" Value="20" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -468,7 +460,7 @@
                                     <!-- 설정 2: 파도 민감성 -->
                                     <StackPanel Margin="0,0,0,0">
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelSensitivityLabel" Text="민감도" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelSensitivityLabel" Text="{l:Loc settings.sensitivity.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelSensitivityValueText" Text="15" Foreground="{StaticResource AccentColor}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelSensitivitySlider" Minimum="0" Maximum="100" Value="15" Margin="0,8,0,0" Style="{StaticResource ModernSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -480,12 +472,12 @@
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
                                 <StackPanel>
                                     <Grid>
-                                        <TextBlock x:Name="EditPanelGlowModeLabel" Text="광원 효과" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="EditPanelGlowModeLabel" Text="{l:Loc editor.glow}" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
                                         <CheckBox x:Name="EditPanelGlowCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelGlow_Changed" Unchecked="EditPanelGlow_Changed"/>
                                     </Grid>
                                     <StackPanel x:Name="EditPanelGlowIntensityPanel" Margin="0,15,0,0" Visibility="Collapsed">
                                         <Grid>
-                                            <TextBlock x:Name="EditPanelGlowIntensityLabel" Text="광원 세기" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelGlowIntensityLabel" Text="{l:Loc editor.glow_strength}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
                                             <TextBlock x:Name="EditPanelGlowValueText" Text="0%" Foreground="{StaticResource DangerColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <Slider x:Name="EditPanelGlowSlider" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0" Style="{StaticResource PinkSliderStyle}" ValueChanged="EditPanelSlider_ValueChanged"/>
@@ -496,12 +488,12 @@
                             <!-- 설정 5: 소리 분류 표시 설정 카드 -->
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
                                 <StackPanel>
-                                    <TextBlock x:Name="EditPanelAIDisplayLabel" Text="소리 분류 표시" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    <TextBlock x:Name="EditPanelAIDisplayLabel" Text="{l:Loc settings.section.sound_types}" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
                                     <!-- 환경음 -->
                                     <Grid Margin="0,0,0,12">
-                                        <CheckBox x:Name="EditPanelShowAmbientCheckBox" Content="환경음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowAmbient_Changed" Unchecked="EditPanelShowAmbient_Changed"/>
+                                        <CheckBox x:Name="EditPanelShowAmbientCheckBox" Content="{l:Loc settings.show_ambient}" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowAmbient_Changed" Unchecked="EditPanelShowAmbient_Changed"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock x:Name="EditPanelAmbientColorLabel" Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <TextBlock x:Name="EditPanelAmbientColorLabel" Text="{l:Loc editor.color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                             <Button x:Name="EditPanelAmbientColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Ambient">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -513,9 +505,9 @@
                                     </Grid>
                                     <!-- 대화음 -->
                                     <Grid Margin="0,0,0,12">
-                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="대화음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
+                                        <CheckBox x:Name="EditPanelShowSpeechCheckBox" Content="{l:Loc settings.show_speech}" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock x:Name="EditPanelSpeechColorLabel" Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <TextBlock x:Name="EditPanelSpeechColorLabel" Text="{l:Loc editor.color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                             <Button x:Name="EditPanelSpeechColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Speech">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -527,9 +519,9 @@
                                     </Grid>
                                     <!-- 위협음 -->
                                     <Grid>
-                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="위협음 표시" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
+                                        <CheckBox x:Name="EditPanelShowDangerCheckBox" Content="{l:Loc settings.show_danger}" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock x:Name="EditPanelDangerColorLabel" Text="색상" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <TextBlock x:Name="EditPanelDangerColorLabel" Text="{l:Loc editor.color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                             <Button x:Name="EditPanelDangerColorBtn" Width="50" Height="22" Cursor="Hand" Click="EditPanelColorBtn_Click" Tag="Danger">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="{x:Type Button}">
@@ -545,20 +537,20 @@
                             <!-- 설정 6: 단축키 설정 카드 -->
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
                                 <StackPanel>
-                                    <TextBlock x:Name="EditPanelHotkeySettingsLabel" Text="단축키 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
+                                    <TextBlock x:Name="EditPanelHotkeySettingsLabel" Text="{l:Loc editor.hotkeys}" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,15"/>
                                     
                                     <StackPanel Margin="0,0,0,12">
-                                        <TextBlock x:Name="EditPanelVisualHotkeyLabel" Text="표현 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="EditPanelVisualHotkeyLabel" Text="{l:Loc settings.hotkey.visual.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
                                         <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F3"/>
                                     </StackPanel>
 
                                     <StackPanel Margin="0,0,0,12">
-                                        <TextBlock x:Name="EditPanelSoundModeHotkeyLabel" Text="사운드 모드 전환" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="EditPanelSoundModeHotkeyLabel" Text="{l:Loc settings.hotkey.sound.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
                                         <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F2"/>
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <TextBlock x:Name="EditPanelEditHotkeyLabel" Text="오버레이 설정" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="EditPanelEditHotkeyLabel" Text="{l:Loc settings.hotkey.edit.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
                                         <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource ModernButton}" Click="BtnEditPanelHotkey_Click" Content="F4"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -567,11 +559,11 @@
                             <!-- 설정 7: 고급 설정 카드 -->
                             <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,5,0,15" Background="{StaticResource CardColor}">
                                 <StackPanel>
-                                    <TextBlock x:Name="EditPanelAdminSettingsLabel" Text="고급 설정" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+                                    <TextBlock x:Name="EditPanelAdminSettingsLabel" Text="{l:Loc settings.section.advanced}" Foreground="{StaticResource PrimaryTextColor}" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
                                     <Grid>
                                         <StackPanel VerticalAlignment="Center">
-                                            <TextBlock x:Name="EditPanelAdminModeLabel" Text="개발자 모드" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
-                                            <TextBlock x:Name="EditPanelAdminModeDesc" Text="디버그 정보 및 오디오 상태 표시" Foreground="{StaticResource SecondaryTextColor}" FontSize="10" Margin="0,2,0,0"/>
+                                            <TextBlock x:Name="EditPanelAdminModeLabel" Text="{l:Loc settings.developer_mode.title}" Foreground="{StaticResource SecondaryTextColor}" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="EditPanelAdminModeDesc" Text="{l:Loc editor.developer_mode_desc}" Foreground="{StaticResource SecondaryTextColor}" FontSize="10" Margin="0,2,0,0"/>
                                         </StackPanel>
                                         <CheckBox x:Name="EditPanelAdminCheckBox" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" Checked="EditPanelAdmin_Changed" Unchecked="EditPanelAdmin_Changed"/>
                                     </Grid>
@@ -588,11 +580,11 @@
                                 <Border Background="{StaticResource AccentColor}" CornerRadius="3" Padding="6,2" VerticalAlignment="Center">
                                     <TextBlock x:Name="EditPanelHotkeyText" Text="F4" Foreground="Black" FontWeight="Bold" FontSize="12"/>
                                 </Border>
-                                <TextBlock x:Name="EditPanelSaveAndCloseDesc" Text=" 키를 누르면 설정 저장 후 닫힘" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBlock x:Name="EditPanelSaveAndCloseDesc" Text="{l:Loc editor.save_close_hint}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="12,0,0,0"/>
                             </StackPanel>
                         </Border>
                         
-                        <Button x:Name="BtnCloseOverlay" Content="오버레이 실행 종료" Foreground="White" Background="#E53935" Padding="20,15" FontSize="14" FontWeight="Bold" Cursor="Hand" Click="BtnCloseOverlay_Click">
+                        <Button x:Name="BtnCloseOverlay" Content="{l:Loc editor.close_overlay}" Foreground="White" Background="#E53935" Padding="20,15" FontSize="14" FontWeight="Bold" Cursor="Hand" Click="BtnCloseOverlay_Click">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8">

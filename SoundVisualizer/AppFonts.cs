@@ -16,10 +16,14 @@ namespace SoundVisualizer
 
         private static readonly Uri BaseUri = new("pack://application:,,,/");
 
-        public static void Apply(string? languageKey)
+        /// <summary>화면 언어 코드에 맞는 글꼴로 앱 전체 글꼴을 바꾼다.</summary>
+        public static void Apply(string languageCode)
         {
             if (Application.Current == null) return;
-            Application.Current.Resources[ResourceKey] = new FontFamily(BaseUri, UiFontChain.FamilyListFor(languageKey));
+            Application.Current.Resources[ResourceKey] = FamilyFor(languageCode);
         }
+
+        /// <summary>그 언어의 글꼴 순서. 언어 콤보가 언어 이름마다 따로 쓴다.</summary>
+        public static FontFamily FamilyFor(string languageCode) => new(BaseUri, UiFontChain.FamilyListFor(languageCode));
     }
 }

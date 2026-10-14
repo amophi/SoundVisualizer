@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer.CoreAudio
 {
@@ -78,7 +79,7 @@ namespace SoundVisualizer.CoreAudio
 
                     if (devices.Count == 0)
                     {
-                        string msg = "출력 장치를 찾을 수 없습니다.";
+                        string msg = Loc.Get("audio.error.no_device");
                         OnCaptureError?.Invoke(this, msg);
                         return;
                     }
@@ -125,7 +126,7 @@ namespace SoundVisualizer.CoreAudio
 
                         if (args.Exception != null)
                         {
-                            string msg = $"캡처 비정상 종료: {args.Exception.Message}";
+                            string msg = Loc.Format("audio.error.capture_stopped", args.Exception.Message);
                             OnCaptureError?.Invoke(this, msg);
                         }
                         else
@@ -139,7 +140,7 @@ namespace SoundVisualizer.CoreAudio
                 catch (Exception ex)
                 {
                     _isCapturing = false;
-                    string msg = $"캡처 엔진 시작 실패: {ex.Message}";
+                    string msg = Loc.Format("audio.error.capture_start_failed", ex.Message);
                     AppLog.Warn("capture", "캡처 장치를 열지 못했습니다.", ex);
                     OnCaptureError?.Invoke(this, msg);
                 }

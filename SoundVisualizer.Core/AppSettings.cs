@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer
 {
@@ -119,8 +120,9 @@ namespace SoundVisualizer
         public static int VisualModeHotkey { get; set; } = DefaultVisualModeKey;
         public static int EditModeHotkey { get; set; } = DefaultEditModeKey;
 
-        // 7. 현재 언어 설정
-        public static string Language { get; set; } = "ENG";
+        // 7. 화면 언어 설정. "system"(Windows 화면 언어를 따름) 또는 언어 코드("ko", "zh-Hans" 등). 새로 설치하면 system 이다.
+        public const string DefaultLanguage = UiLanguages.SystemCode;
+        public static string Language { get; set; } = DefaultLanguage;
 
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
@@ -184,8 +186,9 @@ namespace SoundVisualizer
                         if (data.EditModeKeyBind != null && data.EditModeKeyBind.Count > 0) EditModeKeyBind = data.EditModeKeyBind;
                         else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : DefaultEditModeKey };
 
-                        Language = data.Language ?? "ENG";
-                        
+                        // 예전 판은 언어 이름("日本語")이나 약어("KOR")를 적었다. 읽을 때 코드로 옮기고, 다음 저장부터 코드로 쓴다.
+                        Language = UiLanguages.NormalizeSetting(data.Language);
+
                         IsAdminMode = data.IsAdminMode;
                         AutoMinimizeOnLaunch = data.AutoMinimizeOnLaunch;
                         if (data.TargetFps >= 30.0) TargetFps = data.TargetFps;
@@ -404,7 +407,8 @@ namespace SoundVisualizer
             public int StereoUpmixHotkey { get; set; } = 0x71; 
             public int VisualModeHotkey { get; set; } = 0x72;  
             public int EditModeHotkey { get; set; } = 0x73;
-            public string Language { get; set; } = "KOR";
+            // JSON 이름은 예전 그대로 Language 다. 언어 항목이 없던 아주 예전 설정 파일은 한국어로 읽던 그대로 둔다.
+            public string? Language { get; set; } = "KOR";
             
             public bool IsAdminMode { get; set; } = false;
             public bool AutoMinimizeOnLaunch { get; set; } = false;

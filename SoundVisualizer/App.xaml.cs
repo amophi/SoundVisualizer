@@ -4,6 +4,7 @@
 using System.Configuration;
 using System.Data;
 using System.Windows;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer
 {
@@ -24,7 +25,9 @@ namespace SoundVisualizer
             }
 
             AppSettings.Load();
-            AppFonts.Apply(AppSettings.Language);
+
+            // 첫 창을 띄우기 전에 화면 언어와 그 글꼴을 정한다. 창의 {l:Loc} 바인딩이 처음부터 이 언어로 읽힌다.
+            Loc.Apply(AppSettings.Language);
         }
 
         protected override void OnExit(ExitEventArgs e)

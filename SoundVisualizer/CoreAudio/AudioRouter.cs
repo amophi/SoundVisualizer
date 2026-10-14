@@ -67,7 +67,6 @@ namespace SoundVisualizer.CoreAudio
                     _realSpeakerOut = new WasapiOut(realSpeaker, AudioClientShareMode.Shared, false, latency);
                     _realSpeakerOut.Init(_bufferedWaveProvider);
                     _realSpeakerOut.Play();
-                    string mixMode = (_captureChannels == 8 && _outputChannels == 2) ? " [다운믹스]" : "";
                     return;
                 }
                 catch (Exception ex)

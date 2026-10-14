@@ -22,7 +22,7 @@ public sealed class AppSettingsTests : IDisposable
     {
         AppSettings.SettingsFilePath = _path;
         AppSettings.ResetToDefaults();
-        AppSettings.Language = "KOR";
+        AppSettings.Language = "ko";
     }
 
     public void Dispose()
@@ -43,7 +43,7 @@ public sealed class AppSettingsTests : IDisposable
         AppSettings.CircleRadius = 90;
         AppSettings.ColorDanger = "#FF00FF00";
         AppSettings.IsAdminMode = true;
-        AppSettings.Language = "日本語";
+        AppSettings.Language = "ja";
 
         AppSettings.ResetToDefaults();
 
@@ -54,7 +54,7 @@ public sealed class AppSettingsTests : IDisposable
         Assert.Equal(40.0, AppSettings.CircleMode.CircleRadius);
         Assert.Equal(AppSettings.DefaultColorDanger, AppSettings.ColorDanger);
         Assert.False(AppSettings.IsAdminMode);
-        Assert.Equal("日本語", AppSettings.Language);
+        Assert.Equal("ja", AppSettings.Language);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public sealed class AppSettingsTests : IDisposable
 
         Assert.Equal(new[] { 120 }, AppSettings.VisualModeKeyBind);
         Assert.Equal(new[] { AppSettings.DefaultSoundModeKey }, AppSettings.StereoUpmixKeyBind);
-        Assert.Equal("Deutsch", AppSettings.Language);
+        Assert.Equal("de", AppSettings.Language); // 예전 판의 언어 이름은 코드로 옮겨 읽는다
     }
 
     [Fact]
@@ -136,5 +136,73 @@ public sealed class AppSettingsTests : IDisposable
         {
             Assert.Equal(JsonSerializer.Serialize(fresh), JsonSerializer.Serialize(mode));
         }
+    }
+
+    [Fact]
+    public void 새로_설치하면_Windows_화면_언어를_따른다()
+    {
+        Assert.Equal("system", AppSettings.DefaultLanguage);
+    }
+
+    [Fact]
+    public void 언어는_예전과_같은_이름의_항목에_코드로_저장한다()
+    {
+        AppSettings.Language = "zh-Hant";
+        AppSettings.SaveNow();
+
+        using (var doc = JsonDocument.Parse(File.ReadAllText(_path)))
+        {
+            Assert.Equal("zh-Hant", doc.RootElement.GetProperty("Language").GetString());
+        }
+
+        AppSettings.Language = "ko";
+        AppSettings.Load();
+        Assert.Equal("zh-Hant", AppSettings.Language);
+    }
+
+    [Theory]
+    [InlineData("KOR", "ko")]
+    [InlineData("English", "en")]
+    [InlineData("ENG", "en")]
+    [InlineData("日本語", "ja")]
+    [InlineData("中文", "zh-Hans")]
+    [InlineData("Español", "es")]
+    [InlineData("Français", "fr")]
+    [InlineData("Русский", "ru")]
+    [InlineData("system", "system")]
+    [InlineData("pt-BR", "pt-BR")]
+    public void 예전_언어_값은_읽을_때_코드로_옮기고_다음_저장부터_코드로_쓴다(string stored, string expected)
+    {
+        File.WriteAllText(_path, JsonSerializer.Serialize(new { Language = stored }));
+
+        AppSettings.Load();
+        Assert.Equal(expected, AppSettings.Language);
+
+        AppSettings.SaveNow();
+        using var doc = JsonDocument.Parse(File.ReadAllText(_path));
+        Assert.Equal(expected, doc.RootElement.GetProperty("Language").GetString());
+    }
+
+    [Fact]
+    public void 언어_항목이_없는_아주_예전_설정은_한국어로_읽는다()
+    {
+        File.WriteAllText(_path, """{ "VisualMode": 1 }""");
+
+        AppSettings.Load();
+
+        Assert.Equal("ko", AppSettings.Language);
+    }
+
+    [Theory]
+    [InlineData("""{ "Language": "Klingon" }""")]
+    [InlineData("""{ "Language": null }""")]
+    [InlineData("""{ "Language": "" }""")]
+    public void 읽을_수_없는_언어_값은_Windows_화면_언어를_따른다(string json)
+    {
+        File.WriteAllText(_path, json);
+
+        AppSettings.Load();
+
+        Assert.Equal("system", AppSettings.Language);
     }
 }
