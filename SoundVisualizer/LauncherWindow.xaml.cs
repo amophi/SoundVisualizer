@@ -156,6 +156,7 @@ namespace SoundVisualizer
         {
             if (lang == "한국어") lang = "KOR";
             AppSettings.Language = lang;
+            AppFonts.Apply(lang);
 
             if (lang == "KOR")
             {

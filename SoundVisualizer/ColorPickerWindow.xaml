@@ -7,7 +7,7 @@
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        FontFamily="Malgun Gothic, Segoe UI">
+        FontFamily="{DynamicResource AppFontFamily}">
 
     <Window.Resources>
         <SolidColorBrush x:Key="BackgroundColor" Color="#1E1E1E"/>

@@ -5,7 +5,7 @@
         Title="Sound Visualizer Launcher" Height="650" Width="800"
         WindowStartupLocation="CenterScreen" 
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp" FontFamily="Malgun Gothic, Segoe UI">
+        MouseLeftButtonDown="Window_MouseLeftButtonDown" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp" FontFamily="{DynamicResource AppFontFamily}">
 
     <Window.Resources>
         <!-- Modern Colors -->

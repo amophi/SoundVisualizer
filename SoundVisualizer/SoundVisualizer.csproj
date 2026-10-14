@@ -19,6 +19,11 @@
     <Content Include="SoundVisualizer.ico" />
   </ItemGroup>
 
+  <!-- Pretendard (SIL OFL 1.1). 글꼴은 실행 파일에 넣고, OFL 은 글꼴과 함께 배포해야 하므로 라이선스 파일을 출력 폴더에 둔다. -->
+  <ItemGroup>
+    <Resource Include="Fonts\Pretendard-*.otf" />
+    <None Include="Fonts\Pretendard-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />

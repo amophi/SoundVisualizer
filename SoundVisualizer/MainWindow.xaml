@@ -4,7 +4,8 @@
         Title="Sound Visualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
         Topmost="True" WindowState="Maximized" ShowInTaskbar="False"
-        PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
+        PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp"
+        FontFamily="{DynamicResource AppFontFamily}">
     
         <Window.Resources>
         <!-- Modern Colors -->

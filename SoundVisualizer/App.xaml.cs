@@ -14,6 +14,7 @@ namespace SoundVisualizer
         {
             base.OnStartup(e);
             AppSettings.Load();
+            AppFonts.Apply(AppSettings.Language);
         }
 
         protected override void OnExit(ExitEventArgs e)
