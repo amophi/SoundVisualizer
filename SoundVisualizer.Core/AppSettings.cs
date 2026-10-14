@@ -174,6 +174,9 @@ namespace SoundVisualizer
         private static System.Threading.Timer? _saveTimer;
         private static bool _savePending;
 
+        /// <summary>지금 표현 모드(<see cref="VisualMode"/>)의 설정. 오버레이 엔진이 프레임마다 읽는다.</summary>
+        public static VisualModeSettings CurrentModeSettings => GetCurrentModeSettings();
+
         private static VisualModeSettings GetCurrentModeSettings()
         {
             if (VisualMode == 0) return WaveMode;

@@ -17,6 +17,7 @@ using SoundVisualizer.CoreAudio;
 using SoundVisualizer.DSP;
 using SoundVisualizer.Ai;
 using SoundVisualizer.Localization;
+using SoundVisualizer.Rendering;
 using SoundVisualizer.Ui;
 using SoundVisualizer.Visualizers;
 
@@ -48,17 +49,13 @@ namespace SoundVisualizer
         private static YamnetClassMap? _classMap;
         private static readonly string ModelDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "AIModel");
 
-        // 전체 볼륨 및 위치 분포 관련 변수
-        private double _smoothTotal;
-        private double _distFL = 0.125, _distFR = 0.125, _distFC = 0.125, _distBL = 0.125, _distBR = 0.125, _distSL = 0.125, _distSR = 0.125, _distLFE = 0.125;
-        private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
-        // 렌더 스레드만 쓴다. 캡처 스레드는 _peaks 에 넣고, 렌더 루프가 프레임마다 가져와 여기에 옮긴다.
-        private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
+        // 캡처 스레드는 _peaks 에 넣고, 렌더 루프가 프레임마다 가져가 엔진에 넘긴다.
+        // 엔진(전체 크기·방향 분포·깊이의 스무딩)은 렌더 스레드만 쓴다.
         private readonly PeakAccumulator _peaks = new();
         private readonly float[] _peakFrame = new float[PeakAccumulator.ChannelCount];
+        private readonly VisualizerEngine _engine = new();
         private SoundType _currentType = SoundType.Ambient;
         private AiClassificationResult? _labelTextSource; // 개발자 모드 라벨을 마지막으로 만든 결과(같으면 문자열을 다시 만들지 않는다)
-        private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
 
         // WPF UI 속성 갱신 및 가비지 최소화용 캐시 필드
@@ -337,47 +334,14 @@ namespace SoundVisualizer
                 }
             }
 
-            _animationTime += 0.035;
-
-            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 이전 값을 그대로 두고 아래에서 줄인다.
-            if (_peaks.TryTake(_peakFrame))
-            {
-                _targetFL = _peakFrame[0]; _targetFR = _peakFrame[1]; _targetFC = _peakFrame[2]; _targetBL = _peakFrame[3];
-                _targetBR = _peakFrame[4]; _targetSL = _peakFrame[5]; _targetSR = _peakFrame[6]; _targetLFE = _peakFrame[7];
-            }
-
-            float totalTarget = _targetFL + _targetFR + _targetFC + _targetBL + _targetBR + _targetSL + _targetSR + _targetLFE;
-
-            // 민감성(떨림): 전체 사운드 볼륨 크기를 따라가는 스무딩 팩터 (즉각적인 떨림)
-            float sfTremor = (float)(Math.Max(0.1, AppSettings.WaveSensitivity) / 100.0);
-            if (sfTremor > 1.0f) sfTremor = 1.0f;
-            _smoothTotal += (totalTarget - _smoothTotal) * sfTremor;
-
-            // 위치 변화 속도: 소리가 어디서 나는지 분포 채널 비율을 쫓아가는 팩터 (좌우 이동)
-            float sfPosition = (float)(Math.Max(0.1, AppSettings.WavePositionSpeed) / 100.0);
-            if (sfPosition > 1.0f) sfPosition = 1.0f;
-
-            if (totalTarget > 0.0001f)
-            {
-                _distFL += ((_targetFL / totalTarget) - _distFL) * sfPosition;
-                _distFR += ((_targetFR / totalTarget) - _distFR) * sfPosition;
-                _distFC += ((_targetFC / totalTarget) - _distFC) * sfPosition;
-                _distBL += ((_targetBL / totalTarget) - _distBL) * sfPosition;
-                _distBR += ((_targetBR / totalTarget) - _distBR) * sfPosition;
-                _distSL += ((_targetSL / totalTarget) - _distSL) * sfPosition;
-                _distSR += ((_targetSR / totalTarget) - _distSR) * sfPosition;
-                _distLFE += ((_targetLFE / totalTarget) - _distLFE) * sfPosition;
-            }
-
-            // 부드러워진 전체 볼륨 크기 * 부드러워진 각 채널의 비율
-            _smoothFL = _smoothTotal * _distFL;
-            _smoothFR = _smoothTotal * _distFR;
-            _smoothFC = _smoothTotal * _distFC;
-            _smoothBL = _smoothTotal * _distBL;
-            _smoothBR = _smoothTotal * _distBR;
-            _smoothSL = _smoothTotal * _distSL;
-            _smoothSR = _smoothTotal * _distSR;
-            _smoothLFE = _smoothTotal * _distLFE;
+            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
+            // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
+            bool tookPeaks = _peaks.TryTake(_peakFrame);
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            _engine.SetSurfaceSize(w, h);
+            _engine.Tick(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
+                AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode);
 
             // AI 결과는 프레임마다 한 번만 읽고, 이 프레임의 판단은 모두 그 한 결과로 한다.
             var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
@@ -436,61 +400,32 @@ namespace SoundVisualizer
                 SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
             }
 
-            double w = this.ActualWidth;
-            double h = this.ActualHeight;
             if (w == 0 || h == 0) return;
 
-            // VisualizerContext 설정 (Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)
-            double maxBaseDepthRender = Math.Min(w, h) / 2.0 - 10;
-            if (maxBaseDepthRender < 10) maxBaseDepthRender = 10;
-            
-            bool useOpacity = AppSettings.IntensityAsOpacity;
-            double currentIntensity = useOpacity ? (AppSettings.OpacityFixedSize / 2.0) : AppSettings.WaveIntensity;
-            double baseDepth = maxBaseDepthRender * (Math.Max(0.0, currentIntensity) / 100.0);
-            
-            if (AppSettings.SoundMode == 0)
-            {
-                // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
-                _channelDepths[0] = 0;
-                _channelDepths[1] = 0;
-                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFR));
-                _channelDepths[3] = 0;
-                _channelDepths[4] = 0;
-                _channelDepths[5] = 0;
-                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? 1.0 : _smoothFL));
-                _channelDepths[7] = 0;
-            }
-            else
-            {
-                double phantomBC = (_smoothBL + _smoothBR) / 2.0;
-                double phantomDistBC = (_distBL + _distBR) / 2.0;
-                
-                _channelDepths[0] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFC * 4.0) : _smoothFC));
-                _channelDepths[1] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFR * 4.0) : _smoothFR));
-                _channelDepths[2] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSR * 4.0) : _smoothSR));
-                _channelDepths[3] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBR * 4.0) : _smoothBR));
-                _channelDepths[4] = Math.Min(baseDepth, baseDepth * (useOpacity ? (phantomDistBC * 4.0) : phantomBC));
-                _channelDepths[5] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distBL * 4.0) : _smoothBL));
-                _channelDepths[6] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distSL * 4.0) : _smoothSL));
-                _channelDepths[7] = Math.Min(baseDepth, baseDepth * (useOpacity ? (_distFL * 4.0) : _smoothFL));
-            }
+            // 깊이(Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)는 엔진이 정했다.
+            // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
+            _engine.Depths.CopyTo(_channelDepths);
 
-            _channelDists[0] = _distFC;
-            _channelDists[1] = _distFR;
-            _channelDists[2] = _distSR;
-            _channelDists[3] = _distBR;
-            _channelDists[4] = _distLFE;
-            _channelDists[5] = _distBL;
-            _channelDists[6] = _distSL;
-            _channelDists[7] = _distFL;
+            // 분포(캡처 순서 FL, FR, FC, BL, BR, SL, SR, LFE)를 둘레 자리 순서로 옮긴다. 하단 가운데 자리에는 LFE 를 둔다.
+            var dist = _engine.Distribution;
+            _channelDists[0] = dist[2];
+            _channelDists[1] = dist[1];
+            _channelDists[2] = dist[6];
+            _channelDists[3] = dist[4];
+            _channelDists[4] = dist[7];
+            _channelDists[5] = dist[3];
+            _channelDists[6] = dist[5];
+            _channelDists[7] = dist[0];
 
             _renderContext.Width = w;
             _renderContext.Height = h;
-            _renderContext.BaseDepth = baseDepth;
+            _renderContext.BaseDepth = _engine.BaseDepth;
             _renderContext.ChannelDepths = _channelDepths;
             _renderContext.ChannelDists = _channelDists;
-            _renderContext.TotalVolume = (float)totalTarget;
-            _renderContext.AnimationTime = _animationTime;
+            _engine.PadThickness.CopyTo(_renderContext.PadThickness);
+            _engine.CircleDepths.CopyTo(_renderContext.CircleDepths);
+            _renderContext.TotalVolume = _engine.TotalTarget;
+            _renderContext.AnimationTime = _engine.AnimationTime;
 
             // 선택된 렌더러(Wave 또는 Pad)에게 그리기 위임
             int modeIndex = (AppSettings.VisualMode >= 0 && AppSettings.VisualMode < _visualizers.Length) ? AppSettings.VisualMode : 0;
@@ -538,7 +473,7 @@ namespace SoundVisualizer
             if (AppSettings.IntensityAsOpacity)
             {
                 double maxOpacity = Math.Max(0.0, AppSettings.OpacityFixedMaxOpacity) / 100.0;
-                double volumeFactor = Math.Max(0.0, Math.Min(1.0, _smoothTotal / 2.5));
+                double volumeFactor = Math.Max(0.0, Math.Min(1.0, _engine.SmoothTotal / 2.5));
                 UnifiedWave.Opacity = maxOpacity * volumeFactor;
             }
             else
@@ -546,17 +481,6 @@ namespace SoundVisualizer
                 double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
                 UnifiedWave.Opacity = baseOpacity;
             }
-
-
-
-            _targetFL *= 0.87f;
-            _targetFR *= 0.87f;
-            _targetFC *= 0.87f;
-            _targetBL *= 0.87f;
-            _targetBR *= 0.87f;
-            _targetSL *= 0.87f;
-            _targetSR *= 0.87f;
-            _targetLFE *= 0.87f;
 
             if (_isEditMode)
             {

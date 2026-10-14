@@ -19,6 +19,9 @@ namespace SoundVisualizer.Visualizers
         // 0:TopCenter, 1:TopRight, 2:RightCenter, 3:BottomRight, 4:BottomCenter, 5:BottomLeft, 6:LeftCenter, 7:TopLeft
         public double[] ChannelDepths { get; set; } = new double[8];
         public double[] ChannelDists { get; set; } = new double[8];
+        // 패드 두께와 원형 깊이. 둘 다 깊이를 한 번 더 부드럽게 따라간 값이고, 엔진(VisualizerEngine)이 시간에 맞춰 움직인다.
+        public double[] PadThickness { get; set; } = new double[8];
+        public double[] CircleDepths { get; set; } = new double[8];
         public float TotalVolume { get; set; }
         public double AnimationTime { get; set; }
     }

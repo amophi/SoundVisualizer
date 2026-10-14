@@ -10,8 +10,7 @@ namespace SoundVisualizer.Visualizers
     public class CircleRippleVisualizer : IVisualizerMode
     {
         private const int N = 64; // 원을 그릴 점의 해상도 최적화 (기존 120 -> 64)
-        private readonly double[] _recentTargets = new double[8];
-        
+
         // 매 프레임 가비지 할당을 없애기 위해 포인트 배열 캐싱 (GC Free)
         private readonly Point[] _outerPts = new Point[N];
         private readonly Point[] _innerPts = new Point[N];
@@ -33,19 +32,14 @@ namespace SoundVisualizer.Visualizers
             // FillRule.EvenOdd를 활용해서 바깥쪽 영역과 안쪽 원의 겹치는 부분을 뚫리게 만듭니다.
             geometry.FillRule = FillRule.EvenOdd;
 
+            // 자리마다 원이 부푸는 깊이. 파도 깊이를 줄여 부드럽게 따라가는 움직임은 엔진(VisualizerEngine)이 시간에 맞춰 계산한다.
+            double[] depths = context.CircleDepths;
+
             bool isAnyVisible = false;
-            
-            for (int i = 0; i < 8; i++) 
+
+            for (int i = 0; i < 8; i++)
             {
-                double targetVal = context.ChannelDepths[i];
-
-                // 파도 모드 대비 스케일 조절
-                double target = targetVal * 0.35;
-                if (target > h * 0.4) target = h * 0.4; // 폭주 방지용 최댓값 설정
-
-                // 부드러운 애니메이션
-                _recentTargets[i] += (target - _recentTargets[i]) * 0.25;
-                if (_recentTargets[i] > 1.0) isAnyVisible = true;
+                if (depths[i] > 1.0) { isAnyVisible = true; break; }
             }
 
             if (!isAnyVisible) return Geometry.Empty;
@@ -60,7 +54,7 @@ namespace SoundVisualizer.Visualizers
                     double mappedIndex = (angle / (2 * Math.PI)) * 8.0 + 2.0;
                     if (mappedIndex >= 8.0) mappedIndex -= 8.0; // 0~8 범위 내로 유지
 
-                    double depth = GetInterpolatedDepth(_recentTargets, mappedIndex);
+                    double depth = GetInterpolatedDepth(depths, mappedIndex);
                     
                     // 정방향 깊이만 반영하여 꿀렁거림 제거
                     double r = baseRadius + depth;
