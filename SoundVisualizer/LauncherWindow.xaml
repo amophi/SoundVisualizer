@@ -3,1194 +3,318 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="SoundVisualizer.LauncherWindow"
         xmlns:l="clr-namespace:SoundVisualizer.Localization"
+        xmlns:ui="clr-namespace:SoundVisualizer.Ui"
         Title="{l:Loc launcher.window_title}" Height="650" Width="800"
-        WindowStartupLocation="CenterScreen" 
+        WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         MouseLeftButtonDown="Window_MouseLeftButtonDown" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp" FontFamily="{DynamicResource AppFontFamily}">
 
-    <Window.Resources>
-        <!-- Modern Colors -->
-        <SolidColorBrush x:Key="BgColor" Color="#2A2C31"/>
-        <SolidColorBrush x:Key="CardColor" Color="#1E2024"/>
-        <SolidColorBrush x:Key="PrimaryTextColor" Color="#F2F4F6"/>
-        <SolidColorBrush x:Key="SecondaryTextColor" Color="#8B95A1"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#3182F6"/>
-        <SolidColorBrush x:Key="AccentHoverColor" Color="#1B64DA"/>
-        <SolidColorBrush x:Key="DividerColor" Color="#222429"/>
-
-        <!-- Primary Button -->
-        <Style x:Key="ModernButton" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="FontSize" Value="17"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="24,16"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="14">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource AccentHoverColor}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#104EAD"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bg" Property="Background" Value="#333A44"/>
-                                <Setter Property="Foreground" Value="#8B95A1"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ModernDangerButton" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="#E53935"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="FontSize" Value="17"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="24,16"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="14">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#EF5350"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#C62828"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bg" Property="Background" Value="#333A44"/>
-                                <Setter Property="Foreground" Value="#8B95A1"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ModernSecondaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ModernButton}">
-            <Setter Property="Background" Value="#333A44"/>
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#454D59"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Card Style -->
-        <Style x:Key="ModernCard" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="{StaticResource CardColor}"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Padding" Value="24"/>
-            <Setter Property="Margin" Value="0,0,0,16"/>
-        </Style>
-
-        <!-- Minimalist TabControl -->
-        <Style TargetType="{x:Type TabItem}">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryTextColor}"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Grid Background="Transparent" Margin="0,0,24,0" Cursor="Hand">
-                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="0,0,0,12"/>
-                            <Border x:Name="Indicator" Height="3" Background="Transparent" VerticalAlignment="Bottom" CornerRadius="1.5"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
-                                <Setter TargetName="Indicator" Property="Background" Value="{StaticResource PrimaryTextColor}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern Slider -->
-        <Style x:Key="ModernSlider" TargetType="{x:Type Slider}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Slider}">
-                        <Grid VerticalAlignment="Center">
-                            <Border Height="8" Background="#333A44" CornerRadius="4" VerticalAlignment="Center" Margin="10,0"/>
-                            <Track x:Name="PART_Track">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
-                                        <RepeatButton.Template>
-                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                                <Border Height="8" Background="{StaticResource AccentColor}" CornerRadius="4,0,0,4"/>
-                                            </ControlTemplate>
-                                        </RepeatButton.Template>
-                                    </RepeatButton>
-                                </Track.DecreaseRepeatButton>
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
-                                        <RepeatButton.Template>
-                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                                <Border Height="8" Background="Transparent"/>
-                                            </ControlTemplate>
-                                        </RepeatButton.Template>
-                                    </RepeatButton>
-                                </Track.IncreaseRepeatButton>
-                                <Track.Thumb>
-                                    <Thumb>
-                                        <Thumb.Template>
-                                            <ControlTemplate TargetType="{x:Type Thumb}">
-                                                <Ellipse Width="24" Height="24" Fill="White">
-                                                    <Ellipse.Effect>
-                                                        <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3"/>
-                                                    </Ellipse.Effect>
-                                                </Ellipse>
-                                            </ControlTemplate>
-                                        </Thumb.Template>
-                                    </Thumb>
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern CheckBox -->
-        <Style x:Key="ModernCheckBox" TargetType="{x:Type CheckBox}">
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Width="26" Height="26" VerticalAlignment="Center">
-                                <Border x:Name="CheckBg" Background="#333A44" CornerRadius="8" BorderThickness="0"/>
-                                <Path x:Name="CheckMark" Data="M 7 13 L 11 17 L 19 9" Stroke="White" StrokeThickness="3.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
-                            </Grid>
-                            <ContentPresenter VerticalAlignment="Center" Margin="14,0,0,0"/>
-                        </StackPanel>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="CheckBg" Property="Background" Value="{StaticResource AccentColor}"/>
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern CheckBox (Right) -->
-        <Style x:Key="ModernCheckBoxRight" TargetType="{x:Type CheckBox}">
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <StackPanel Orientation="Horizontal">
-                            <ContentPresenter VerticalAlignment="Center" Margin="0,0,14,0"/>
-                            <Grid Width="26" Height="26" VerticalAlignment="Center">
-                                <Border x:Name="CheckBg" Background="#333A44" CornerRadius="8" BorderThickness="0"/>
-                                <Path x:Name="CheckMark" Data="M 7 13 L 11 17 L 19 9" Stroke="White" StrokeThickness="3.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
-                            </Grid>
-                        </StackPanel>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="CheckBg" Property="Background" Value="{StaticResource AccentColor}"/>
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern ComboBox -->
-        <Style x:Key="ModernComboBox" TargetType="{x:Type ComboBox}">
-            <Setter Property="Foreground" Value="#111111"/>
-            <Setter Property="Background" Value="#F2F4F6"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBox}">
-                        <Grid>
-                            <ToggleButton x:Name="ToggleButton" Grid.Column="2" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" ClickMode="Press">
-                                <ToggleButton.Template>
-                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                        <Border x:Name="Bg" CornerRadius="10" Background="{TemplateBinding Background}">
-                                            <Path x:Name="Arrow" Fill="#111111" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0" Data="M0,0 L10,0 L5,6 Z"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </ToggleButton.Template>
-                            </ToggleButton>
-                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Left" TextElement.Foreground="{TemplateBinding Foreground}"/>
-                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                <Border x:Name="DropDownBorder" Background="#FFFFFF" BorderThickness="1" BorderBrush="#E5E8EB" CornerRadius="10" Margin="0,6,0,0" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="4" Opacity="0.1"/>
-                                    </Border.Effect>
-                                    <ScrollViewer Margin="6,8" SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="{x:Type ComboBoxItem}">
-            <Setter Property="Foreground" Value="#111111"/>
-            <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
-                        <Border x:Name="Bg" Background="Transparent" CornerRadius="8" Margin="0,2">
-                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#F2F4F6"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#E5E8EB"/>
-                                <Setter Property="Foreground" Value="#3182F6"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern Expander Style -->
-        <Style x:Key="ModernExpander" TargetType="{x:Type Expander}">
-            <Setter Property="Background" Value="{StaticResource CardColor}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Margin" Value="0,0,0,16"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Expander}">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="24" BorderBrush="#222429" BorderThickness="1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition x:Name="ContentRow" Height="0"/>
-                                </Grid.RowDefinitions>
-                                
-                                <!-- Header Button -->
-                                <ToggleButton x:Name="HeaderButton" Grid.Row="0" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Content="{TemplateBinding Header}" Cursor="Hand" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch">
-                                    <ToggleButton.Template>
-                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                            <Grid Background="Transparent">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <!-- Header Content -->
-                                                <ContentPresenter Grid.Column="0" ContentSource="Content" RecognizesAccessKey="True" VerticalAlignment="Center"/>
-                                                <!-- Arrow Indicator -->
-                                                <Path x:Name="Arrow" Grid.Column="1" Fill="{StaticResource SecondaryTextColor}" HorizontalAlignment="Right" VerticalAlignment="Center" Data="M 0,0 L 5,5 L 10,0 Z" RenderTransformOrigin="0.5,0.5" Margin="0,0,8,0">
-                                                    <Path.RenderTransform>
-                                                        <RotateTransform Angle="0"/>
-                                                    </Path.RenderTransform>
-                                                </Path>
-                                            </Grid>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter TargetName="Arrow" Property="RenderTransform">
-                                                        <Setter.Value>
-                                                            <RotateTransform Angle="180"/>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </ToggleButton.Template>
-                                </ToggleButton>
-
-                                <!-- Expandable Content -->
-                                <Border x:Name="ContentBorder" Grid.Row="1" Visibility="Collapsed" Margin="0,16,0,0">
-                                    <ContentPresenter/>
-                                </Border>
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsExpanded" Value="True">
-                                <Setter TargetName="ContentRow" Property="Height" Value="*"/>
-                                <Setter TargetName="ContentBorder" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
-    <!-- Main Window Background. 아랍어처럼 오른쪽에서 왼쪽으로 쓰는 언어면 내용 전체를 뒤집는다. -->
-    <Border CornerRadius="24" Background="{StaticResource BgColor}" BorderBrush="#1C1D22" BorderThickness="1" FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
+    <!-- 서식과 색은 Themes/Theme.xaml(App.xaml 에서 합침)에 있다. 아랍어처럼 오른쪽에서 왼쪽으로 쓰는 언어면 내용 전체를 뒤집는다. -->
+    <Border CornerRadius="24" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1" FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Custom Top Bar -->
+            <!-- 제목줄: 언어 콤보와 최소화·닫기 -->
             <Grid Grid.Row="0" Margin="24,24,24,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <TextBlock x:Name="TxtLanguageLabel" Text="{l:Loc common.language}" Foreground="{StaticResource SecondaryTextColor}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,100,0">
+                    <TextBlock x:Name="TxtLanguageLabel" Style="{StaticResource Text.Caption}" FontSize="14" Margin="0,0,10,0" Text="{l:Loc common.language}"/>
                     <!-- 항목(시스템 기본값 + 18개 언어)은 LanguagePicker 가 채운다 -->
-                    <ComboBox x:Name="CmbLanguage" Style="{StaticResource ModernComboBox}" Width="200" Padding="12,8" FontSize="14" SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel"/>
+                    <ComboBox x:Name="CmbLanguage" Style="{StaticResource ComboField}" Width="200"
+                              AutomationProperties.LabeledBy="{Binding ElementName=TxtLanguageLabel}"
+                              SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-24,-24,0">
-                    <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Width="46" Height="32" 
-                            FontSize="10" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnMinimize_Click">
-                        <Button.Template>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="MinBg" Background="Transparent" CornerRadius="0">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="MinBg" Property="Background" Value="#3D3F45"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                    <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Width="46" Height="32" 
-                            FontSize="10" Foreground="{StaticResource SecondaryTextColor}" Background="Transparent" BorderThickness="0" Click="BtnClose_Click">
-                        <Button.Template>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="CloseBg" Background="Transparent" CornerRadius="0,24,0,0">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="CloseBg" Property="Background" Value="#E81123"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
+                    <Button Style="{StaticResource Button.Chrome}" Content="&#xE921;" Click="BtnMinimize_Click"/>
+                    <Button Style="{StaticResource Button.ChromeClose}" Content="&#xE8BB;" Click="BtnClose_Click"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Tab Control -->
-            <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="24,24,24,0">
+            <TabControl Grid.Row="1" Style="{StaticResource LauncherTabs}" Margin="24,20,24,0">
 
                 <!-- 홈 (실행) 탭 -->
                 <TabItem x:Name="TabHome" Header="{l:Loc launcher.tab.home}">
-                    <Grid>
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="20,0">
-                            <TextBlock x:Name="TxtHomeTitle" Text="Sound Visualizer" FontSize="36" FontWeight="Black" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
-                            <TextBlock x:Name="TxtHomeDesc" Text="{l:Loc launcher.home.desc}" 
-                                       FontSize="16" Foreground="{StaticResource SecondaryTextColor}" LineHeight="26" Margin="0,0,0,24"/>
+                    <StackPanel VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Style="{StaticResource Text.Title}" Margin="0,0,0,12" Text="Sound Visualizer"/>
+                        <TextBlock Style="{StaticResource Text.Lead}" Margin="0,0,0,24" Text="{l:Loc launcher.home.desc}"/>
 
+                        <!-- 상태: 실행 중이면 점만 강조색이 된다(안드로이드 홈과 같다). 색과 글은 SetStatusUI 가 넣는다. -->
+                        <Grid Margin="0,0,0,24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse x:Name="StatusDot" Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center" Fill="{StaticResource SecondaryTextBrush}"/>
+                            <TextBlock x:Name="TxtStatus" Grid.Column="1" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        </Grid>
 
-
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                                <Ellipse x:Name="StatusDot" Width="12" Height="12" Fill="#8B95A1" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="TxtStatus" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextColor}" VerticalAlignment="Center"/>
-                            </StackPanel>
-
-                            <Grid Margin="0,0,0,24">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="16"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Button Grid.Column="0" x:Name="BtnLaunch" Content="{l:Loc launcher.home.start}" Style="{StaticResource ModernButton}" Click="BtnLaunch_Click"/>
-                                <Button Grid.Column="2" x:Name="BtnStop" Content="{l:Loc launcher.home.stop}" Style="{StaticResource ModernDangerButton}" Click="BtnStop_Click" IsEnabled="False"/>
-                            </Grid>
-                        </StackPanel>
-                    </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="BtnLaunch" Style="{StaticResource Button.Primary.Large}" Content="{l:Loc launcher.home.start}" Click="BtnLaunch_Click"/>
+                            <Button x:Name="BtnStop" Grid.Column="2" Style="{StaticResource Button.Stop.Large}" Content="{l:Loc launcher.home.stop}" Click="BtnStop_Click" IsEnabled="False"/>
+                        </Grid>
+                    </StackPanel>
                 </TabItem>
 
-                <!-- 설정 탭 -->
+                <!-- 설정 탭. 순서는 안드로이드 설정 탭과 같다: 모드 → 모드별 상세 → 소리 분류 → (PC 만) 단축키 → 고급. -->
                 <TabItem x:Name="TabSettings" Header="{l:Loc launcher.tab.settings}">
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">
                         <StackPanel Margin="0,0,0,24">
 
-                            <TextBlock x:Name="TxtModeSettings" Text="{l:Loc settings.section.mode}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,16"/>
-
-                            <Border Style="{StaticResource ModernCard}" Margin="0,0,0,24">
+                            <TextBlock Style="{StaticResource Text.Section}" Margin="0,0,0,16" Text="{l:Loc settings.section.mode}"/>
+                            <Border Style="{StaticResource SettingsCard}">
                                 <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtVisualModeLabel" Text="{l:Loc settings.visual_mode.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtVisualModeDesc" Text="{l:Loc settings.visual_mode.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <ComboBox Grid.Column="1" x:Name="CmbVisualMode" Style="{StaticResource ModernComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
-                                                <ComboBoxItem x:Name="CmbVisualModeWave" Content="{l:Loc settings.mode.wave}"/>
-                                                <ComboBoxItem x:Name="CmbVisualModePad" Content="{l:Loc settings.mode.pad}"/>
-                                                <ComboBoxItem x:Name="CmbVisualModeCircle" Content="{l:Loc settings.mode.circle}"/>
-                                                <ComboBoxItem x:Name="CmbVisualModeOutline" Content="{l:Loc settings.mode.outline}"/>
-                                            </ComboBox>
-                                        </Grid>
-                                    </StackPanel>
+                                    <TextBlock x:Name="TxtVisualModeLabel" Style="{StaticResource Text.Label}" Text="{l:Loc settings.visual_mode.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Description}" Margin="0,4,0,12" Text="{l:Loc settings.visual_mode.desc}"/>
+                                    <ui:ChoiceChipList x:Name="ChipsVisualMode" Style="{StaticResource ChoiceChips}" Margin="0,0,0,24"
+                                                       AutomationProperties.LabeledBy="{Binding ElementName=TxtVisualModeLabel}" SelectionChanged="ChoiceChips_SelectionChanged">
+                                        <ListBoxItem Content="{l:Loc settings.mode.wave}"/>
+                                        <ListBoxItem Content="{l:Loc settings.mode.pad}"/>
+                                        <ListBoxItem Content="{l:Loc settings.mode.circle}"/>
+                                        <ListBoxItem Content="{l:Loc settings.mode.outline}"/>
+                                    </ui:ChoiceChipList>
 
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtSoundModeLabel" Text="{l:Loc settings.sound_mode.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtSoundModeDesc" Text="{l:Loc settings.sound_mode.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <ComboBox Grid.Column="1" x:Name="CmbSoundMode" Style="{StaticResource ModernComboBox}" HorizontalAlignment="Right" MinWidth="160" VerticalAlignment="Center" SelectionChanged="Setting_Changed" PreviewMouseWheel="ComboBox_PreviewMouseWheel">
-                                                <ComboBoxItem x:Name="CmbSoundMode2" Content="{l:Loc settings.channels.2}"/>
-                                                <ComboBoxItem x:Name="CmbSoundMode51" Content="{l:Loc settings.channels.5_1}"/>
-                                                <ComboBoxItem x:Name="CmbSoundMode71" Content="{l:Loc settings.channels.7_1}"/>
-                                            </ComboBox>
-                                        </Grid>
-                                    </StackPanel>
+                                    <TextBlock x:Name="TxtSoundModeLabel" Style="{StaticResource Text.Label}" Text="{l:Loc settings.sound_mode.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Description}" Margin="0,4,0,12" Text="{l:Loc settings.sound_mode.desc}"/>
+                                    <ui:ChoiceChipList x:Name="ChipsSoundMode" Style="{StaticResource ChoiceChips}" Margin="0,0,0,24"
+                                                       AutomationProperties.LabeledBy="{Binding ElementName=TxtSoundModeLabel}" SelectionChanged="ChoiceChips_SelectionChanged">
+                                        <ListBoxItem Content="{l:Loc settings.channels.2}"/>
+                                        <ListBoxItem Content="{l:Loc settings.channels.5_1}"/>
+                                        <ListBoxItem Content="{l:Loc settings.channels.7_1}"/>
+                                    </ui:ChoiceChipList>
 
-                                    <StackPanel Margin="0,24,0,0">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="150"/>
-                                                <ColumnDefinition Width="80"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtTargetFpsLabel" Text="{l:Loc settings.max_fps.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtTargetFpsDesc" Text="{l:Loc settings.max_fps.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,16,0"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldTargetFps" Style="{StaticResource ModernSlider}" Minimum="30" Maximum="240" Value="144" VerticalAlignment="Center" ValueChanged="Setting_Changed" Margin="0,0,16,0"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtTargetFps" Text="{Binding Value, ElementName=SldTargetFps, StringFormat='{}{0:F0} FPS'}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </StackPanel>
+                                    <Slider x:Name="SldTargetFps" Style="{StaticResource SliderRow}" Minimum="30" Maximum="240"
+                                            ui:SettingRow.Label="{l:Loc settings.max_fps.title}" ui:SettingRow.Description="{l:Loc settings.max_fps.desc}"
+                                            ui:SettingRow.ValueFormat="{}{0:F0} FPS" ValueChanged="Setting_Changed"/>
                                 </StackPanel>
                             </Border>
 
-                            <TextBlock x:Name="TxtModeDetailSettings" Text="{l:Loc settings.section.mode_detail}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,16"/>
+                            <TextBlock Style="{StaticResource Text.Section}" Text="{l:Loc settings.section.mode_detail}"/>
 
-                            <!-- 모드 상세 설정 아코디언들을 묶는 전용 컨테이너 (동적 정렬 대상) -->
+                            <!-- 모드 카드들. 고른 모드의 카드가 펼쳐져 맨 위로 온다(UpdateExpanderStates).
+                                 카드 안 순서는 안드로이드와 같다: 크기 고정 → (고정 크기, 최대 진하기) / (크기, [반지름], 진하기) → 속도 → 민감도 → 광원.
+                                 크기 고정을 켜면 크기·진하기 대신 고정 크기·최대 진하기를 쓴다. 지금 먹지 않는 쪽은 흐리게 남기지 않고 접는다. -->
                             <StackPanel x:Name="PanelModeExpanders">
-                                <!-- 파도 모드 설정 -->
-                            <Expander x:Name="ExpanderWave" Style="{StaticResource ModernExpander}">
-                                <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderWaveTitle" Text="{l:Loc settings.mode_card.wave}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
-                                </Expander.Header>
-                                <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <StackPanel Margin="0,0,0,24">
-                                            <StackPanel Margin="0,0,0,16">
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelWave" Text="{l:Loc settings.size_lock.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <CheckBox x:Name="ChkIntensityAsOpacityWave" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                                </StackPanel>
-                                                <TextBlock x:Name="TxtIntensityAsOpacityDescWave" Text="{l:Loc settings.size_lock.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelWave" Text="{l:Loc settings.fixed_size.wave}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeWave" Style="{StaticResource ModernSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeWave" Text="{Binding Value, ElementName=SldOpacityFixedSizeWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescWave" Text="{l:Loc settings.fixed_size.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedMaxOpacityLabelWave" Text="{l:Loc settings.max_opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityWave" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescWave" Text="{l:Loc settings.max_opacity.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtIntensityLabelWave" Text="{l:Loc settings.size.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <Slider Grid.Column="1" x:Name="SldIntensityWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtIntensityWave" Text="{Binding Value, ElementName=SldIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescWave" Text="{l:Loc settings.size.desc.wave}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                    
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelWave" Text="{l:Loc settings.opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityWave" Text="{Binding Value, ElementName=SldOpacityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescWave" Text="{l:Loc settings.opacity.desc.wave}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSpeedLabelWave" Text="{l:Loc settings.speed.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSpeedWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedWave" Text="{Binding Value, ElementName=SldSpeedWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSpeedDescWave" Text="{l:Loc settings.speed.desc.wave}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSensitivityLabelWave" Text="{l:Loc settings.sensitivity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSensitivityWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityWave" Text="{Binding Value, ElementName=SldSensitivityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDescWave" Text="{l:Loc settings.sensitivity.desc.wave}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
+                                <Expander x:Name="ExpanderWave" Style="{StaticResource ExpanderCard}" Header="{l:Loc settings.mode_card.wave}">
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtGlowModeLabelWave" Text="{l:Loc settings.glow.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkGlowModeWave" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityWave" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityWave" Text="{Binding Value, ElementName=SldGlowIntensityWave, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescWave" Text="{l:Loc settings.glow.desc.wave}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityWave" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.size_lock.title}" ui:SettingRow.Description="{l:Loc settings.size_lock.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedSizeWave" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="10" Maximum="100" ui:SettingRow.Label="{l:Loc settings.fixed_size.wave}" ui:SettingRow.Description="{l:Loc settings.fixed_size.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedMaxOpacityWave" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.max_opacity.title}" ui:SettingRow.Description="{l:Loc settings.max_opacity.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldIntensityWave" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.size.title}" ui:SettingRow.Description="{l:Loc settings.size.desc.wave}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityWave" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.opacity.title}" ui:SettingRow.Description="{l:Loc settings.opacity.desc.wave}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSpeedWave" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.speed.title}" ui:SettingRow.Description="{l:Loc settings.speed.desc.wave}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSensitivityWave" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.sensitivity.title}" ui:SettingRow.Description="{l:Loc settings.sensitivity.desc.wave}" ValueChanged="Setting_Changed"/>
+                                        <CheckBox x:Name="ChkGlowModeWave" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.glow.title}" ui:SettingRow.Description="{l:Loc settings.glow.desc.wave}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldGlowIntensityWave" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc editor.glow_strength}" ValueChanged="Setting_Changed"/>
+                                        <Button x:Name="BtnResetWave" Style="{StaticResource Button.Secondary}" Margin="0,0,0,24" Content="{l:Loc common.reset_defaults}" Click="BtnResetWave_Click"/>
                                     </StackPanel>
-                                    <Button x:Name="BtnResetWave" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnResetWave_Click"/>
-                                </StackPanel>
-                            </Expander>
+                                </Expander>
 
-                            <!-- 패드 모드 설정 -->
-                            <Expander x:Name="ExpanderPad" Style="{StaticResource ModernExpander}">
-                                <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderPadTitle" Text="{l:Loc settings.mode_card.pad}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
-                                </Expander.Header>
-                                <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <StackPanel Margin="0,0,0,24">
-                                            <StackPanel Margin="0,0,0,16">
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelPad" Text="{l:Loc settings.size_lock.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <CheckBox x:Name="ChkIntensityAsOpacityPad" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                                </StackPanel>
-                                                <TextBlock x:Name="TxtIntensityAsOpacityDescPad" Text="{l:Loc settings.size_lock.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelPad" Text="{l:Loc settings.fixed_size.pad}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedSizePad" Style="{StaticResource ModernSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizePad" Text="{Binding Value, ElementName=SldOpacityFixedSizePad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescPad" Text="{l:Loc settings.fixed_size.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedMaxOpacityLabelPad" Text="{l:Loc settings.max_opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityPad" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescPad" Text="{l:Loc settings.max_opacity.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelPad" Text="{l:Loc settings.size.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityPad" Text="{Binding Value, ElementName=SldIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescPad" Text="{l:Loc settings.size.desc.pad}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelPad" Text="{l:Loc settings.opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityPad" Text="{Binding Value, ElementName=SldOpacityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescPad" Text="{l:Loc settings.opacity.desc.pad}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSpeedLabelPad" Text="{l:Loc settings.speed.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSpeedPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedPad" Text="{Binding Value, ElementName=SldSpeedPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSpeedDescPad" Text="{l:Loc settings.speed.desc.pad}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSensitivityLabelPad" Text="{l:Loc settings.sensitivity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSensitivityPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityPad" Text="{Binding Value, ElementName=SldSensitivityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDescPad" Text="{l:Loc settings.sensitivity.desc.pad}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
+                                <Expander x:Name="ExpanderPad" Style="{StaticResource ExpanderCard}" Header="{l:Loc settings.mode_card.pad}">
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtGlowModeLabelPad" Text="{l:Loc settings.glow.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkGlowModePad" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityPad" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityPad" Text="{Binding Value, ElementName=SldGlowIntensityPad, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescPad" Text="{l:Loc settings.glow.desc.pad}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityPad" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.size_lock.title}" ui:SettingRow.Description="{l:Loc settings.size_lock.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedSizePad" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="10" Maximum="100" ui:SettingRow.Label="{l:Loc settings.fixed_size.pad}" ui:SettingRow.Description="{l:Loc settings.fixed_size.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedMaxOpacityPad" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.max_opacity.title}" ui:SettingRow.Description="{l:Loc settings.max_opacity.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldIntensityPad" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.size.title}" ui:SettingRow.Description="{l:Loc settings.size.desc.pad}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityPad" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.opacity.title}" ui:SettingRow.Description="{l:Loc settings.opacity.desc.pad}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSpeedPad" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.speed.title}" ui:SettingRow.Description="{l:Loc settings.speed.desc.pad}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSensitivityPad" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.sensitivity.title}" ui:SettingRow.Description="{l:Loc settings.sensitivity.desc.pad}" ValueChanged="Setting_Changed"/>
+                                        <CheckBox x:Name="ChkGlowModePad" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.glow.title}" ui:SettingRow.Description="{l:Loc settings.glow.desc.pad}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldGlowIntensityPad" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc editor.glow_strength}" ValueChanged="Setting_Changed"/>
+                                        <Button x:Name="BtnResetPad" Style="{StaticResource Button.Secondary}" Margin="0,0,0,24" Content="{l:Loc common.reset_defaults}" Click="BtnResetPad_Click"/>
                                     </StackPanel>
-                                    <Button x:Name="BtnResetPad" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnResetPad_Click"/>
-                                </StackPanel>
-                            </Expander>
+                                </Expander>
 
-                            <!-- 원형 모드 설정 -->
-                            <Expander x:Name="ExpanderCircle" Style="{StaticResource ModernExpander}">
-                                <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderCircleTitle" Text="{l:Loc settings.mode_card.circle}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
-                                </Expander.Header>
-                                <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <StackPanel Margin="0,0,0,24">
-                                            <StackPanel Margin="0,0,0,16">
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelCircle" Text="{l:Loc settings.size_lock.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <CheckBox x:Name="ChkIntensityAsOpacityCircle" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                                </StackPanel>
-                                                <TextBlock x:Name="TxtIntensityAsOpacityDescCircle" Text="{l:Loc settings.size_lock.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelCircle" Text="{l:Loc settings.fixed_size.circle}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeCircle" Style="{StaticResource ModernSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeCircle" Text="{Binding Value, ElementName=SldOpacityFixedSizeCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescCircle" Text="{l:Loc settings.fixed_size.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedMaxOpacityLabelCircle" Text="{l:Loc settings.max_opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityCircle" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescCircle" Text="{l:Loc settings.max_opacity.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelCircle" Text="{l:Loc settings.size.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityCircle" Text="{Binding Value, ElementName=SldIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescCircle" Text="{l:Loc settings.size.desc.circle}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelCircle" Text="{l:Loc settings.opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityCircle" Text="{Binding Value, ElementName=SldOpacityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescCircle" Text="{l:Loc settings.opacity.desc.circle}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSpeedLabelCircle" Text="{l:Loc settings.speed.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSpeedCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedCircle" Text="{Binding Value, ElementName=SldSpeedCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSpeedDescCircle" Text="{l:Loc settings.speed.desc.circle}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSensitivityLabelCircle" Text="{l:Loc settings.sensitivity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSensitivityCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityCircle" Text="{Binding Value, ElementName=SldSensitivityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDescCircle" Text="{l:Loc settings.sensitivity.desc.circle}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtCircleRadiusLabel" Text="{l:Loc settings.radius.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldCircleRadius" Style="{StaticResource ModernSlider}" Minimum="10" Maximum="100" Value="40" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtCircleRadius" Text="{Binding Value, ElementName=SldCircleRadius, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtCircleRadiusDesc" Text="{l:Loc settings.radius.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
+                                <Expander x:Name="ExpanderCircle" Style="{StaticResource ExpanderCard}" Header="{l:Loc settings.mode_card.circle}">
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtGlowModeLabelCircle" Text="{l:Loc settings.glow.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkGlowModeCircle" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityCircle" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityCircle" Text="{Binding Value, ElementName=SldGlowIntensityCircle, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescCircle" Text="{l:Loc settings.glow.desc.circle}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityCircle" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.size_lock.title}" ui:SettingRow.Description="{l:Loc settings.size_lock.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedSizeCircle" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="10" Maximum="100" ui:SettingRow.Label="{l:Loc settings.fixed_size.circle}" ui:SettingRow.Description="{l:Loc settings.fixed_size.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedMaxOpacityCircle" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.max_opacity.title}" ui:SettingRow.Description="{l:Loc settings.max_opacity.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldIntensityCircle" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.size.title}" ui:SettingRow.Description="{l:Loc settings.size.desc.circle}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldCircleRadius" Style="{StaticResource SliderRow}" Minimum="10" Maximum="100" ui:SettingRow.Label="{l:Loc settings.radius.title}" ui:SettingRow.Description="{l:Loc settings.radius.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityCircle" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.opacity.title}" ui:SettingRow.Description="{l:Loc settings.opacity.desc.circle}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSpeedCircle" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.speed.title}" ui:SettingRow.Description="{l:Loc settings.speed.desc.circle}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSensitivityCircle" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.sensitivity.title}" ui:SettingRow.Description="{l:Loc settings.sensitivity.desc.circle}" ValueChanged="Setting_Changed"/>
+                                        <CheckBox x:Name="ChkGlowModeCircle" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.glow.title}" ui:SettingRow.Description="{l:Loc settings.glow.desc.circle}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldGlowIntensityCircle" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc editor.glow_strength}" ValueChanged="Setting_Changed"/>
+                                        <Button x:Name="BtnResetCircle" Style="{StaticResource Button.Secondary}" Margin="0,0,0,24" Content="{l:Loc common.reset_defaults}" Click="BtnResetCircle_Click"/>
                                     </StackPanel>
-                                    <Button x:Name="BtnResetCircle" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnResetCircle_Click"/>
-                                </StackPanel>
-                            </Expander>
+                                </Expander>
 
-                            <!-- 외곽선 모드 설정 -->
-                            <Expander x:Name="ExpanderOutline" Style="{StaticResource ModernExpander}">
-                                <Expander.Header>
-                                    <TextBlock x:Name="TxtExpanderOutlineTitle" Text="{l:Loc settings.mode_card.outline}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}"/>
-                                </Expander.Header>
-                                <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <StackPanel Margin="0,0,0,24">
-                                            <StackPanel Margin="0,0,0,16">
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                                                    <TextBlock x:Name="TxtIntensityAsOpacityLabelOutline" Text="{l:Loc settings.size_lock.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <CheckBox x:Name="ChkIntensityAsOpacityOutline" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                                </StackPanel>
-                                                <TextBlock x:Name="TxtIntensityAsOpacityDescOutline" Text="{l:Loc settings.size_lock.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedSizeLabelOutline" Text="{l:Loc settings.fixed_size.outline}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedSizeOutline" Style="{StaticResource ModernSlider}" Minimum="10" Maximum="100" Value="30" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedSizeOutline" Text="{Binding Value, ElementName=SldOpacityFixedSizeOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedSizeDescOutline" Text="{l:Loc settings.fixed_size.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap" Margin="0,0,0,24"/>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="170"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="50"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock x:Name="TxtOpacityFixedMaxOpacityLabelOutline" Text="{l:Loc settings.max_opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Slider Grid.Column="1" x:Name="SldOpacityFixedMaxOpacityOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                                <TextBlock Grid.Column="2" x:Name="TxtOpacityFixedMaxOpacityOutline" Text="{Binding Value, ElementName=SldOpacityFixedMaxOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            </Grid>
-                                            <TextBlock x:Name="TxtOpacityFixedMaxOpacityDescOutline" Text="{l:Loc settings.max_opacity.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtIntensityLabelOutline" Text="{l:Loc settings.size.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldIntensityOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtIntensityOutline" Text="{Binding Value, ElementName=SldIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtIntensityDescOutline" Text="{l:Loc settings.size.desc.outline}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                    
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtOpacityLabelOutline" Text="{l:Loc settings.opacity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldOpacityOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="60" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtOpacityOutline" Text="{Binding Value, ElementName=SldOpacityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtOpacityDescOutline" Text="{l:Loc settings.opacity.desc.outline}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSpeedLabelOutline" Text="{l:Loc settings.speed.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSpeedOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSpeedOutline" Text="{Binding Value, ElementName=SldSpeedOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSpeedDescOutline" Text="{l:Loc settings.speed.desc.outline}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock x:Name="TxtSensitivityLabelOutline" Text="{l:Loc settings.sensitivity.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" x:Name="SldSensitivityOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="10" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtSensitivityOutline" Text="{Binding Value, ElementName=SldSensitivityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtSensitivityDescOutline" Text="{l:Loc settings.sensitivity.desc.outline}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-
+                                <Expander x:Name="ExpanderOutline" Style="{StaticResource ExpanderCard}" Header="{l:Loc settings.mode_card.outline}">
                                     <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="170"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtGlowModeLabelOutline" Text="{l:Loc settings.glow.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <CheckBox x:Name="ChkGlowModeOutline" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                            </StackPanel>
-                                            <Slider Grid.Column="1" x:Name="SldGlowIntensityOutline" Style="{StaticResource ModernSlider}" Minimum="0" Maximum="100" Value="0" VerticalAlignment="Center" ValueChanged="Setting_Changed"/>
-                                            <TextBlock Grid.Column="2" x:Name="TxtGlowIntensityOutline" Text="{Binding Value, ElementName=SldGlowIntensityOutline, StringFormat=\{0:F0\}}" FontSize="16" Foreground="{StaticResource AccentColor}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <TextBlock x:Name="TxtGlowModeDescOutline" Text="{l:Loc settings.glow.desc.outline}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <CheckBox x:Name="ChkIntensityAsOpacityOutline" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.size_lock.title}" ui:SettingRow.Description="{l:Loc settings.size_lock.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedSizeOutline" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="10" Maximum="100" ui:SettingRow.Label="{l:Loc settings.fixed_size.outline}" ui:SettingRow.Description="{l:Loc settings.fixed_size.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityFixedMaxOpacityOutline" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.max_opacity.title}" ui:SettingRow.Description="{l:Loc settings.max_opacity.desc}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldIntensityOutline" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.size.title}" ui:SettingRow.Description="{l:Loc settings.size.desc.outline}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldOpacityOutline" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.opacity.title}" ui:SettingRow.Description="{l:Loc settings.opacity.desc.outline}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSpeedOutline" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.speed.title}" ui:SettingRow.Description="{l:Loc settings.speed.desc.outline}" ValueChanged="Setting_Changed"/>
+                                        <Slider x:Name="SldSensitivityOutline" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc settings.sensitivity.title}" ui:SettingRow.Description="{l:Loc settings.sensitivity.desc.outline}" ValueChanged="Setting_Changed"/>
+                                        <CheckBox x:Name="ChkGlowModeOutline" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.glow.title}" ui:SettingRow.Description="{l:Loc settings.glow.desc.outline}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Slider x:Name="SldGlowIntensityOutline" Style="{StaticResource SliderRow}" Margin="16,0,0,24" Minimum="0" Maximum="100" ui:SettingRow.Label="{l:Loc editor.glow_strength}" ValueChanged="Setting_Changed"/>
+                                        <Button x:Name="BtnResetOutline" Style="{StaticResource Button.Secondary}" Margin="0,0,0,24" Content="{l:Loc common.reset_defaults}" Click="BtnResetOutline_Click"/>
                                     </StackPanel>
-                                    <Button x:Name="BtnResetOutline" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnResetOutline_Click"/>
-                                </StackPanel>
-                            </Expander>
+                                </Expander>
                             </StackPanel>
 
-                            <TextBlock x:Name="TxtAIDisplaySettings" Text="{l:Loc settings.section.sound_types}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
-
-                            <Border Style="{StaticResource ModernCard}">
+                            <!-- 소리 종류마다 표시 스위치 줄과 색 버튼. 색 버튼은 스위치 줄 밖에 둔다(안에 두면 함께 눌린다). -->
+                            <TextBlock Style="{StaticResource Text.Section}" Text="{l:Loc settings.section.sound_types}"/>
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <StackPanel Margin="0,0,0,16">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowAmbient" Content="{l:Loc settings.show_ambient}" Style="{StaticResource ModernCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtColorSettingsLabelAmbient" Text="{l:Loc settings.set_color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnColorAmbient" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Ambient">
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="{x:Type Button}">
-                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,16">
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowSpeech" Content="{l:Loc settings.show_speech}" Style="{StaticResource ModernCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtColorSettingsLabelSpeech" Text="{l:Loc settings.set_color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnColorSpeech" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Speech">
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="{x:Type Button}">
-                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="ChkShowDanger" Content="{l:Loc settings.show_danger}" Style="{StaticResource ModernCheckBoxRight}" VerticalAlignment="Center" Checked="Setting_Changed" Unchecked="Setting_Changed" Margin="0,0,16,0" HorizontalAlignment="Left"/>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtColorSettingsLabelDanger" Text="{l:Loc settings.set_color}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnColorDanger" Width="80" Height="32" Cursor="Hand" Click="BtnColor_Click" Tag="Danger">
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="{x:Type Button}">
-                                                            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8" BorderThickness="0" />
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <Button x:Name="BtnResetSoundClassification" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnResetSoundClassification_Click"/>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox x:Name="ChkShowAmbient" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_ambient}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Button x:Name="BtnColorAmbient" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Ambient"
+                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_ambient}" Click="BtnColor_Click"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox x:Name="ChkShowSpeech" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_speech}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Button x:Name="BtnColorSpeech" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Speech"
+                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_speech}" Click="BtnColor_Click"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox x:Name="ChkShowDanger" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_danger}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                        <Button x:Name="BtnColorDanger" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Danger"
+                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_danger}" Click="BtnColor_Click"/>
+                                    </Grid>
+                                    <Button x:Name="BtnResetSoundClassification" Style="{StaticResource Button.Secondary}" Content="{l:Loc common.reset_defaults}" Click="BtnResetSoundClassification_Click"/>
                                 </StackPanel>
                             </Border>
 
-                            <TextBlock x:Name="TxtHotkeySettings" Text="{l:Loc settings.section.hotkeys}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
-
-                            <Border Style="{StaticResource ModernCard}">
+                            <TextBlock Style="{StaticResource Text.Section}" Text="{l:Loc settings.section.hotkeys}"/>
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtVisualHotkeyLabel" Text="{l:Loc settings.hotkey.visual.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtVisualHotkeyDesc" Text="{l:Loc settings.hotkey.visual.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtHotkeyLabelStereo" Text="{l:Loc settings.hotkey.set}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnVisualHotkey" MinWidth="140" Style="{StaticResource ModernButton}" Content="F3" Click="BtnVisualHotkey_Click"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <StackPanel Margin="0,0,0,24">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtSoundModeHotkeyLabel" Text="{l:Loc settings.hotkey.sound.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtSoundModeHotkeyDesc" Text="{l:Loc settings.hotkey.sound.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtHotkeyLabelVisual" Text="{l:Loc settings.hotkey.set}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnSoundModeHotkey" MinWidth="140" Style="{StaticResource ModernButton}" Content="F2" Click="BtnSoundModeHotkey_Click"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtEditHotkeyLabel" Text="{l:Loc settings.hotkey.edit.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                                <TextBlock x:Name="TxtEditHotkeyDesc" Text="{l:Loc settings.hotkey.edit.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtHotkeyLabelOverlay" Text="{l:Loc settings.hotkey.set}" Foreground="{StaticResource SecondaryTextColor}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <Button x:Name="BtnEditHotkey" MinWidth="140" Style="{StaticResource ModernButton}" Content="F4" Click="BtnEditHotkey_Click"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <TextBlock x:Name="TxtAdminSettings" Text="{l:Loc settings.section.advanced}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,16,0,16"/>
-                            <Border Style="{StaticResource ModernCard}">
-                                <StackPanel>
+                                    <Grid Margin="0,0,0,24">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                            <TextBlock Style="{StaticResource Text.Label}" Text="{l:Loc settings.hotkey.visual.title}"/>
+                                            <TextBlock Style="{StaticResource Text.Description}" Margin="0,4,0,0" Text="{l:Loc settings.hotkey.visual.desc}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
+                                            <Button x:Name="BtnVisualHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F3"
+                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.visual.title}" Click="BtnVisualHotkey_Click"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,24">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                            <TextBlock Style="{StaticResource Text.Label}" Text="{l:Loc settings.hotkey.sound.title}"/>
+                                            <TextBlock Style="{StaticResource Text.Description}" Margin="0,4,0,0" Text="{l:Loc settings.hotkey.sound.desc}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
+                                            <Button x:Name="BtnSoundModeHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F2"
+                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.sound.title}" Click="BtnSoundModeHotkey_Click"/>
+                                        </StackPanel>
+                                    </Grid>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock x:Name="TxtAdminModeLabel" Text="{l:Loc settings.developer_mode.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                            <TextBlock x:Name="TxtAdminModeDesc" Text="{l:Loc settings.developer_mode.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                            <TextBlock Style="{StaticResource Text.Label}" Text="{l:Loc settings.hotkey.edit.title}"/>
+                                            <TextBlock Style="{StaticResource Text.Description}" Margin="0,4,0,0" Text="{l:Loc settings.hotkey.edit.desc}"/>
                                         </StackPanel>
-                                        <CheckBox Grid.Column="1" x:Name="ChkAdminMode" Style="{StaticResource ModernCheckBox}" Content="{l:Loc common.on}" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                                    </Grid>
-
-                                    <Grid Margin="0,16,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock x:Name="TxtAutoMinimizeLabel" Text="{l:Loc settings.auto_minimize.title}" FontSize="16" Foreground="{StaticResource PrimaryTextColor}" FontWeight="Bold" Margin="0,0,0,8"/>
-                                            <TextBlock x:Name="TxtAutoMinimizeDesc" Text="{l:Loc settings.auto_minimize.desc}" FontSize="13" Foreground="{StaticResource SecondaryTextColor}" TextWrapping="Wrap"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
+                                            <Button x:Name="BtnEditHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F4"
+                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.edit.title}" Click="BtnEditHotkey_Click"/>
                                         </StackPanel>
-                                        <CheckBox Grid.Column="1" x:Name="ChkAutoMinimizeOnLaunch" Style="{StaticResource ModernCheckBox}" Content="{l:Loc common.on}" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
 
-                            <Button x:Name="BtnReset" Content="{l:Loc common.reset_defaults}" Style="{StaticResource ModernSecondaryButton}" Margin="0,16,0,0" Click="BtnReset_Click"/>
+                            <TextBlock Style="{StaticResource Text.Section}" Text="{l:Loc settings.section.advanced}"/>
+                            <Border Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <CheckBox x:Name="ChkAdminMode" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.developer_mode.title}" ui:SettingRow.Description="{l:Loc settings.developer_mode.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                    <CheckBox x:Name="ChkAutoMinimizeOnLaunch" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.auto_minimize.title}" ui:SettingRow.Description="{l:Loc settings.auto_minimize.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                </StackPanel>
+                            </Border>
 
+                            <Button x:Name="BtnReset" Style="{StaticResource Button.Secondary}" Margin="0,8,0,0" Content="{l:Loc common.reset_defaults}" Click="BtnReset_Click"/>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- 안내 탭 -->
+                <!-- 도움말 탭 -->
                 <TabItem x:Name="TabHelp" Header="{l:Loc launcher.tab.help}">
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">
                         <StackPanel>
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp0Title" Text="{l:Loc help.direction.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp0Desc" Text="{l:Loc help.direction.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.direction.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.direction.body}"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp1Title" Text="{l:Loc help.sound_mode.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp1Desc" Text="{l:Loc help.sound_mode.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.sound_mode.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Margin="0,0,0,12" Text="{l:Loc help.sound_mode.body}"/>
                                     <!-- help.sound_mode.tip 의 {0} 자리에 링크가 온다. 앞뒤 글은 UpdateHelpTip 이 넣는다. 요소 사이 공백이 글자가 되지 않게 붙여 쓴다. -->
-                                    <TextBlock x:Name="TxtHelp1Tip" FontSize="14" Foreground="#FF9E3A" LineHeight="22" TextWrapping="Wrap"><Run x:Name="TxtHelp1TipPrefix"/><Hyperlink NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF9E3A"><Run x:Name="TxtHelp1TipLink" Text="{l:Loc help.sound_mode.tip_link}"/></Hyperlink><Run x:Name="TxtHelp1TipSuffix"/></TextBlock>
+                                    <TextBlock x:Name="TxtHelp1Tip" Style="{StaticResource Text.Warning}"><Run x:Name="TxtHelp1TipPrefix"/><Hyperlink Style="{StaticResource Link}" NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate"><Run x:Name="TxtHelp1TipLink" Text="{l:Loc help.sound_mode.tip_link}"/></Hyperlink><Run x:Name="TxtHelp1TipSuffix"/></TextBlock>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp2Title" Text="{l:Loc help.hotkeys.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp2Desc" Text="{l:Loc help.hotkeys.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.hotkeys.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.hotkeys.body}"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp6Title" Text="{l:Loc help.size_lock.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp6Desc" Text="{l:Loc help.size_lock.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.size_lock.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.size_lock.body}"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp3Title" Text="{l:Loc help.editor.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp3Desc" Text="{l:Loc help.editor.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.editor.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.editor.body}"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp4Title" Text="{l:Loc help.ai.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp4Desc" Text="{l:Loc help.ai.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.ai.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.ai.body}"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource ModernCard}">
+                            <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock x:Name="TxtHelp5Title" Text="{l:Loc help.developer.title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,8"/>
-                                    <TextBlock x:Name="TxtHelp5Desc" Text="{l:Loc help.developer.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap"/>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.developer.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.developer.body}"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -1199,14 +323,13 @@
 
                 <!-- 더 알아보기 탭 -->
                 <TabItem x:Name="TabMoreInfo" Header="{l:Loc launcher.tab.more_info}">
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="0,16,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">
                         <StackPanel>
-                            <Border Style="{StaticResource ModernCard}">
-                                <StackPanel Margin="0,8">
-                                    <TextBlock x:Name="TxtMoreInfoTitle" Text="{l:Loc more_info.title}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryTextColor}" Margin="0,0,0,12"/>
-                                    <TextBlock x:Name="TxtMoreInfoDesc" Text="{l:Loc more_info.body}" 
-                                               FontSize="15" Foreground="{StaticResource SecondaryTextColor}" LineHeight="24" TextWrapping="Wrap" Margin="0,0,0,24"/>
-                                    <Button x:Name="BtnMoreInfoGithub" Content="{l:Loc more_info.github_button}" Style="{StaticResource ModernButton}" HorizontalAlignment="Left" Padding="28,14" Click="BtnMoreInfoGithub_Click"/>
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc more_info.title}"/>
+                                    <TextBlock Style="{StaticResource Text.Body}" Margin="0,0,0,24" Text="{l:Loc more_info.body}"/>
+                                    <Button x:Name="BtnMoreInfoGithub" Style="{StaticResource Button.Primary}" HorizontalAlignment="Left" Content="{l:Loc more_info.github_button}" Click="BtnMoreInfoGithub_Click"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -1216,5 +339,3 @@
         </Grid>
     </Border>
 </Window>
-
-

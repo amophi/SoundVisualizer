@@ -21,9 +21,23 @@ namespace SoundVisualizer
         private System.Collections.Generic.HashSet<int> _currentlyHeldKeys = new System.Collections.Generic.HashSet<int>();
         private System.Collections.Generic.HashSet<int> _maxKeysInCurrentBinding = new System.Collections.Generic.HashSet<int>();
 
+        // 네 모드 카드의 설정 칸. 카드마다 모양이 같아 이 표 하나로 읽고 쓴다(순서는 AppSettings.VisualMode 번호와 같다).
+        private readonly ModeControls[] _modes;
+
         public LauncherWindow()
         {
             InitializeComponent();
+            _modes = new[]
+            {
+                new ModeControls(() => AppSettings.WaveMode, ChkIntensityAsOpacityWave, SldOpacityFixedSizeWave, SldOpacityFixedMaxOpacityWave,
+                    SldIntensityWave, SldOpacityWave, SldSpeedWave, SldSensitivityWave, ChkGlowModeWave, SldGlowIntensityWave, null),
+                new ModeControls(() => AppSettings.PadMode, ChkIntensityAsOpacityPad, SldOpacityFixedSizePad, SldOpacityFixedMaxOpacityPad,
+                    SldIntensityPad, SldOpacityPad, SldSpeedPad, SldSensitivityPad, ChkGlowModePad, SldGlowIntensityPad, null),
+                new ModeControls(() => AppSettings.CircleMode, ChkIntensityAsOpacityCircle, SldOpacityFixedSizeCircle, SldOpacityFixedMaxOpacityCircle,
+                    SldIntensityCircle, SldOpacityCircle, SldSpeedCircle, SldSensitivityCircle, ChkGlowModeCircle, SldGlowIntensityCircle, SldCircleRadius),
+                new ModeControls(() => AppSettings.OutlineMode, ChkIntensityAsOpacityOutline, SldOpacityFixedSizeOutline, SldOpacityFixedMaxOpacityOutline,
+                    SldIntensityOutline, SldOpacityOutline, SldSpeedOutline, SldSensitivityOutline, ChkGlowModeOutline, SldGlowIntensityOutline, null),
+            };
             InitializeUI();
             Loc.Instance.LanguageChanged += OnLanguageChanged;
             
@@ -171,198 +185,19 @@ namespace SoundVisualizer
 
         private void SetStatusUI(bool isRunning)
         {
-            if (isRunning)
-            {
-                TxtStatus.Text = Loc.Get("launcher.status.running");
-                TxtStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(49, 130, 246)); // #3182F6
-                StatusDot.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(49, 130, 246));
-            }
-            else
-            {
-                TxtStatus.Text = Loc.Get("launcher.status.idle");
-                TxtStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(139, 149, 161)); // #8B95A1
-                StatusDot.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(139, 149, 161));
-            }
+            TxtStatus.Text = isRunning ? Loc.Get("launcher.status.running") : Loc.Get("launcher.status.idle");
+            // 실행 중이면 상태 점만 강조색이 된다(안드로이드 홈과 같다). 글자는 늘 보조 글자색이다.
+            StatusDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, isRunning ? "AccentBrush" : "SecondaryTextBrush");
         }
 
         private void LoadSettingsToUI()
         {
-            // 1. Wave Mode Load
-            SldIntensityWave.Value = AppSettings.WaveMode.Intensity;
-            ChkIntensityAsOpacityWave.IsChecked = AppSettings.WaveMode.IntensityAsOpacity;
-            SldOpacityFixedSizeWave.Value = AppSettings.WaveMode.OpacityFixedSize;
-            SldOpacityFixedMaxOpacityWave.Value = 100.0 - AppSettings.WaveMode.OpacityFixedMaxOpacity;
-            
-            bool waveOpacity = AppSettings.WaveMode.IntensityAsOpacity;
-            SldOpacityFixedSizeWave.IsEnabled = waveOpacity;
-            SldOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
-            SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            
-            SldIntensityWave.IsEnabled = !waveOpacity;
-            SldIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtIntensityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtIntensityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            
-            SldOpacityWave.IsEnabled = !waveOpacity;
-            SldOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtOpacityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            TxtOpacityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-            SldSpeedWave.Value = AppSettings.WaveMode.PositionSpeed;
-            SldSensitivityWave.Value = AppSettings.WaveMode.Sensitivity * 4.0;
-            SldOpacityWave.Value = 100 - AppSettings.WaveMode.VisualOpacity;
-            ChkGlowModeWave.IsChecked = AppSettings.WaveMode.IsGlowMode;
-            SldGlowIntensityWave.Value = AppSettings.WaveMode.GlowIntensity;
-            
-            SldGlowIntensityWave.IsEnabled = AppSettings.WaveMode.IsGlowMode;
-            SldGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeLabelWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeDescWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
+            // 1. 모드별 설정 (파도, 패드, 원형, 외곽선)
+            foreach (var mode in _modes) LoadMode(mode);
 
-            // 2. Pad Mode Load
-            SldIntensityPad.Value = AppSettings.PadMode.Intensity;
-            ChkIntensityAsOpacityPad.IsChecked = AppSettings.PadMode.IntensityAsOpacity;
-            SldOpacityFixedSizePad.Value = AppSettings.PadMode.OpacityFixedSize;
-            SldOpacityFixedMaxOpacityPad.Value = 100.0 - AppSettings.PadMode.OpacityFixedMaxOpacity;
-            
-            bool padOpacity = AppSettings.PadMode.IntensityAsOpacity;
-            SldOpacityFixedSizePad.IsEnabled = padOpacity;
-            SldOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-            SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
-            SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-            
-            SldIntensityPad.IsEnabled = !padOpacity;
-            SldIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtIntensityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtIntensityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            
-            SldOpacityPad.IsEnabled = !padOpacity;
-            SldOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtOpacityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            TxtOpacityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            SldSpeedPad.Value = AppSettings.PadMode.PositionSpeed;
-            SldSensitivityPad.Value = AppSettings.PadMode.Sensitivity * 4.0;
-            SldOpacityPad.Value = 100 - AppSettings.PadMode.VisualOpacity;
-            ChkGlowModePad.IsChecked = AppSettings.PadMode.IsGlowMode;
-            SldGlowIntensityPad.Value = AppSettings.PadMode.GlowIntensity;
-            
-            SldGlowIntensityPad.IsEnabled = AppSettings.PadMode.IsGlowMode;
-            SldGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeLabelPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeDescPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-
-            // 3. Circle Mode Load
-            SldIntensityCircle.Value = AppSettings.CircleMode.Intensity;
-            ChkIntensityAsOpacityCircle.IsChecked = AppSettings.CircleMode.IntensityAsOpacity;
-            SldOpacityFixedSizeCircle.Value = AppSettings.CircleMode.OpacityFixedSize;
-            SldOpacityFixedMaxOpacityCircle.Value = 100.0 - AppSettings.CircleMode.OpacityFixedMaxOpacity;
-            
-            bool circleOpacity = AppSettings.CircleMode.IntensityAsOpacity;
-            SldOpacityFixedSizeCircle.IsEnabled = circleOpacity;
-            SldOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
-            SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            
-            SldIntensityCircle.IsEnabled = !circleOpacity;
-            SldIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtIntensityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtIntensityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            
-            SldOpacityCircle.IsEnabled = !circleOpacity;
-            SldOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtOpacityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            TxtOpacityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            SldSpeedCircle.Value = AppSettings.CircleMode.PositionSpeed;
-            SldSensitivityCircle.Value = AppSettings.CircleMode.Sensitivity * 4.0;
-            SldOpacityCircle.Value = 100 - AppSettings.CircleMode.VisualOpacity;
-            ChkGlowModeCircle.IsChecked = AppSettings.CircleMode.IsGlowMode;
-            SldGlowIntensityCircle.Value = AppSettings.CircleMode.GlowIntensity;
-            SldCircleRadius.Value = AppSettings.CircleMode.CircleRadius;
-            
-            SldGlowIntensityCircle.IsEnabled = AppSettings.CircleMode.IsGlowMode;
-            SldGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeLabelCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeDescCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-
-            // 3.5. Outline Mode Load
-            SldIntensityOutline.Value = AppSettings.OutlineMode.Intensity;
-            ChkIntensityAsOpacityOutline.IsChecked = AppSettings.OutlineMode.IntensityAsOpacity;
-            SldOpacityFixedSizeOutline.Value = AppSettings.OutlineMode.OpacityFixedSize;
-            SldOpacityFixedMaxOpacityOutline.Value = 100.0 - AppSettings.OutlineMode.OpacityFixedMaxOpacity;
-            
-            bool outlineOpacity = AppSettings.OutlineMode.IntensityAsOpacity;
-            SldOpacityFixedSizeOutline.IsEnabled = outlineOpacity;
-            SldOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
-            SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            
-            SldIntensityOutline.IsEnabled = !outlineOpacity;
-            SldIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtIntensityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtIntensityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            
-            SldOpacityOutline.IsEnabled = !outlineOpacity;
-            SldOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            SldSpeedOutline.Value = AppSettings.OutlineMode.PositionSpeed;
-            SldSensitivityOutline.Value = AppSettings.OutlineMode.Sensitivity * 4.0;
-            SldOpacityOutline.Value = 100 - AppSettings.OutlineMode.VisualOpacity;
-            ChkGlowModeOutline.IsChecked = AppSettings.OutlineMode.IsGlowMode;
-            SldGlowIntensityOutline.Value = AppSettings.OutlineMode.GlowIntensity;
-            
-            SldGlowIntensityOutline.IsEnabled = AppSettings.OutlineMode.IsGlowMode;
-            SldGlowIntensityOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowIntensityOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeLabelOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-            TxtGlowModeDescOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-
-            // 4. Common settings
-            CmbVisualMode.SelectedIndex = AppSettings.VisualMode;
-            CmbSoundMode.SelectedIndex = AppSettings.SoundMode;
+            // 2. 공통 설정
+            ChipsVisualMode.SelectedIndex = AppSettings.VisualMode;
+            ChipsSoundMode.SelectedIndex = AppSettings.SoundMode;
             SldTargetFps.Maximum = AppSettings.GetMonitorRefreshRate();
             SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
@@ -383,9 +218,85 @@ namespace SoundVisualizer
                 SetColorButton(BtnColorDanger, AppSettings.ColorDanger);
             }
 
-            // 5. Expander states update
+            // 3. 고른 모드의 카드를 펼쳐 맨 위로
             UpdateExpanderStates();
         }
+
+        /// <summary>
+        /// 모드 하나의 칸에 저장된 값을 넣는다. 진하기·최대 진하기는 저장값(불투명도 %)을 그대로 보인다.
+        /// 예전에는 100 에서 뺀 투명도로 보였는데, 값이 클수록 옅어져 다른 슬라이더와 방향이 거꾸로였다.
+        /// </summary>
+        private static void LoadMode(ModeControls c)
+        {
+            var settings = c.Settings();
+            c.Size.Value = settings.Intensity;
+            c.SizeLock.IsChecked = settings.IntensityAsOpacity;
+            c.FixedSize.Value = settings.OpacityFixedSize;
+            c.MaxOpacity.Value = settings.OpacityFixedMaxOpacity;
+            c.Speed.Value = settings.PositionSpeed;
+            c.Sensitivity.Value = settings.Sensitivity * 4.0;
+            c.Opacity.Value = settings.VisualOpacity;
+            c.Glow.IsChecked = settings.IsGlowMode;
+            c.GlowStrength.Value = settings.GlowIntensity;
+            if (c.Radius != null) c.Radius.Value = settings.CircleRadius;
+            ShowDependentRows(c, settings);
+        }
+
+        /// <summary>
+        /// 스위치에 딸린 줄을 보이거나 접는다. 크기 고정을 켜면 고정 크기·최대 진하기를, 끄면 크기·진하기를 쓰고,
+        /// 광원을 켜야 광원 강도를 쓴다. 지금 먹지 않는 줄은 흐리게 남기지 않고 접는다(안드로이드 DependentSettings).
+        /// </summary>
+        private static void ShowDependentRows(ModeControls c, VisualModeSettings settings)
+        {
+            bool sizeLocked = settings.IntensityAsOpacity;
+            Show(c.FixedSize, sizeLocked);
+            Show(c.MaxOpacity, sizeLocked);
+            Show(c.Size, !sizeLocked);
+            Show(c.Opacity, !sizeLocked);
+            Show(c.GlowStrength, settings.IsGlowMode);
+        }
+
+        private static void Show(UIElement element, bool visible) => element.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+
+        /// <summary>모드 카드 칸 하나가 바뀌었다. 그 칸이 이 모드의 것이면 설정에 쓰고 true.</summary>
+        private static bool ApplyModeChange(ModeControls c, object sender)
+        {
+            var settings = c.Settings();
+            if (sender == c.Size) settings.Intensity = c.Size.Value;
+            else if (sender == c.SizeLock)
+            {
+                settings.IntensityAsOpacity = c.SizeLock.IsChecked ?? false;
+                ShowDependentRows(c, settings);
+            }
+            else if (sender == c.FixedSize) settings.OpacityFixedSize = c.FixedSize.Value;
+            else if (sender == c.MaxOpacity) settings.OpacityFixedMaxOpacity = c.MaxOpacity.Value;
+            else if (sender == c.Speed) settings.PositionSpeed = c.Speed.Value;
+            else if (sender == c.Sensitivity) settings.Sensitivity = c.Sensitivity.Value / 4.0;
+            else if (sender == c.Opacity) settings.VisualOpacity = c.Opacity.Value;
+            else if (sender == c.Glow)
+            {
+                settings.IsGlowMode = c.Glow.IsChecked ?? false;
+                ShowDependentRows(c, settings);
+            }
+            else if (sender == c.GlowStrength) settings.GlowIntensity = c.GlowStrength.Value;
+            else if (c.Radius != null && sender == c.Radius) settings.CircleRadius = c.Radius.Value;
+            else return false;
+            return true;
+        }
+
+        /// <summary>모드 카드 하나의 칸. 설정 객체는 초기화 버튼이 바꿔 끼우므로 쓸 때마다 Settings 로 꺼낸다.</summary>
+        private sealed record ModeControls(
+            Func<VisualModeSettings> Settings,
+            CheckBox SizeLock,
+            Slider FixedSize,
+            Slider MaxOpacity,
+            Slider Size,
+            Slider Opacity,
+            Slider Speed,
+            Slider Sensitivity,
+            CheckBox Glow,
+            Slider GlowStrength,
+            Slider? Radius);
 
         private void UpdateExpanderStates()
         {
@@ -546,211 +457,37 @@ namespace SoundVisualizer
         {
             if (_isInitializing) return;
 
-            // Wave
-            if (sender == SldIntensityWave) AppSettings.WaveMode.Intensity = SldIntensityWave.Value;
-            else if (sender == ChkIntensityAsOpacityWave)
+            if (!ApplyToModeCards(sender))
             {
-                AppSettings.WaveMode.IntensityAsOpacity = ChkIntensityAsOpacityWave.IsChecked ?? false;
-                bool waveOpacity = AppSettings.WaveMode.IntensityAsOpacity;
-                SldOpacityFixedSizeWave.IsEnabled = waveOpacity;
-                SldOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedSizeWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeLabelWave != null) TxtOpacityFixedSizeLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeDescWave != null) TxtOpacityFixedSizeDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                SldOpacityFixedMaxOpacityWave.IsEnabled = waveOpacity;
-                SldOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityLabelWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityDescWave.Opacity = waveOpacity ? 1.0 : 0.4;
-                
-                SldIntensityWave.IsEnabled = !waveOpacity;
-                SldIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtIntensityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtIntensityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtIntensityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                
-                SldOpacityWave.IsEnabled = !waveOpacity;
-                SldOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtOpacityWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtOpacityLabelWave.Opacity = !waveOpacity ? 1.0 : 0.4;
-                TxtOpacityDescWave.Opacity = !waveOpacity ? 1.0 : 0.4;
+                if (sender == ChipsVisualMode)
+                {
+                    AppSettings.VisualMode = ChipsVisualMode.SelectedIndex;
+                    UpdateExpanderStates();
+                }
+                else if (sender == ChipsSoundMode) AppSettings.SoundMode = ChipsSoundMode.SelectedIndex;
+                else if (sender == SldTargetFps) AppSettings.TargetFps = SldTargetFps.Value;
+                else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
+                else if (sender == ChkAutoMinimizeOnLaunch) AppSettings.AutoMinimizeOnLaunch = ChkAutoMinimizeOnLaunch.IsChecked ?? false;
+                else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
+                else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
+                else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;
             }
-            else if (sender == SldOpacityFixedSizeWave) AppSettings.WaveMode.OpacityFixedSize = SldOpacityFixedSizeWave.Value;
-            else if (sender == SldOpacityFixedMaxOpacityWave) AppSettings.WaveMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityWave.Value;
-            else if (sender == SldSpeedWave) AppSettings.WaveMode.PositionSpeed = SldSpeedWave.Value;
-            else if (sender == SldSensitivityWave) AppSettings.WaveMode.Sensitivity = SldSensitivityWave.Value / 4.0;
-            else if (sender == SldOpacityWave) AppSettings.WaveMode.VisualOpacity = 100 - SldOpacityWave.Value;
-            else if (sender == ChkGlowModeWave)
-            {
-                AppSettings.WaveMode.IsGlowMode = ChkGlowModeWave.IsChecked ?? false;
-                SldGlowIntensityWave.IsEnabled = AppSettings.WaveMode.IsGlowMode;
-                SldGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowIntensityWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeLabelWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeDescWave.Opacity = AppSettings.WaveMode.IsGlowMode ? 1.0 : 0.4;
-            }
-            else if (sender == SldGlowIntensityWave) AppSettings.WaveMode.GlowIntensity = SldGlowIntensityWave.Value;
-
-            // Pad
-            else if (sender == SldIntensityPad) AppSettings.PadMode.Intensity = SldIntensityPad.Value;
-            else if (sender == ChkIntensityAsOpacityPad)
-            {
-                AppSettings.PadMode.IntensityAsOpacity = ChkIntensityAsOpacityPad.IsChecked ?? false;
-                bool padOpacity = AppSettings.PadMode.IntensityAsOpacity;
-                SldOpacityFixedSizePad.IsEnabled = padOpacity;
-                SldOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedSizePad.Opacity = padOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeLabelPad != null) TxtOpacityFixedSizeLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeDescPad != null) TxtOpacityFixedSizeDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-                SldOpacityFixedMaxOpacityPad.IsEnabled = padOpacity;
-                SldOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityPad.Opacity = padOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityLabelPad.Opacity = padOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityDescPad.Opacity = padOpacity ? 1.0 : 0.4;
-                
-                SldIntensityPad.IsEnabled = !padOpacity;
-                SldIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtIntensityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtIntensityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtIntensityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                
-                SldOpacityPad.IsEnabled = !padOpacity;
-                SldOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtOpacityPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtOpacityLabelPad.Opacity = !padOpacity ? 1.0 : 0.4;
-                TxtOpacityDescPad.Opacity = !padOpacity ? 1.0 : 0.4;
-            }
-            else if (sender == SldOpacityFixedSizePad) AppSettings.PadMode.OpacityFixedSize = SldOpacityFixedSizePad.Value;
-            else if (sender == SldOpacityFixedMaxOpacityPad) AppSettings.PadMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityPad.Value;
-            else if (sender == SldSpeedPad) AppSettings.PadMode.PositionSpeed = SldSpeedPad.Value;
-            else if (sender == SldSensitivityPad) AppSettings.PadMode.Sensitivity = SldSensitivityPad.Value / 4.0;
-            else if (sender == SldOpacityPad) AppSettings.PadMode.VisualOpacity = 100 - SldOpacityPad.Value;
-            else if (sender == ChkGlowModePad)
-            {
-                AppSettings.PadMode.IsGlowMode = ChkGlowModePad.IsChecked ?? false;
-                SldGlowIntensityPad.IsEnabled = AppSettings.PadMode.IsGlowMode;
-                SldGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowIntensityPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeLabelPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeDescPad.Opacity = AppSettings.PadMode.IsGlowMode ? 1.0 : 0.4;
-            }
-            else if (sender == SldGlowIntensityPad) AppSettings.PadMode.GlowIntensity = SldGlowIntensityPad.Value;
-
-            // Circle
-            else if (sender == SldIntensityCircle) AppSettings.CircleMode.Intensity = SldIntensityCircle.Value;
-            else if (sender == ChkIntensityAsOpacityCircle)
-            {
-                AppSettings.CircleMode.IntensityAsOpacity = ChkIntensityAsOpacityCircle.IsChecked ?? false;
-                bool circleOpacity = AppSettings.CircleMode.IntensityAsOpacity;
-                SldOpacityFixedSizeCircle.IsEnabled = circleOpacity;
-                SldOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedSizeCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeLabelCircle != null) TxtOpacityFixedSizeLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeDescCircle != null) TxtOpacityFixedSizeDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                SldOpacityFixedMaxOpacityCircle.IsEnabled = circleOpacity;
-                SldOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityLabelCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityDescCircle.Opacity = circleOpacity ? 1.0 : 0.4;
-                
-                SldIntensityCircle.IsEnabled = !circleOpacity;
-                SldIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtIntensityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtIntensityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtIntensityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                
-                SldOpacityCircle.IsEnabled = !circleOpacity;
-                SldOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtOpacityCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtOpacityLabelCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-                TxtOpacityDescCircle.Opacity = !circleOpacity ? 1.0 : 0.4;
-            }
-            else if (sender == SldOpacityFixedSizeCircle) AppSettings.CircleMode.OpacityFixedSize = SldOpacityFixedSizeCircle.Value;
-            else if (sender == SldOpacityFixedMaxOpacityCircle) AppSettings.CircleMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityCircle.Value;
-            else if (sender == SldSpeedCircle) AppSettings.CircleMode.PositionSpeed = SldSpeedCircle.Value;
-            else if (sender == SldSensitivityCircle) AppSettings.CircleMode.Sensitivity = SldSensitivityCircle.Value / 4.0;
-            else if (sender == SldOpacityCircle) AppSettings.CircleMode.VisualOpacity = 100 - SldOpacityCircle.Value;
-            else if (sender == ChkGlowModeCircle)
-            {
-                AppSettings.CircleMode.IsGlowMode = ChkGlowModeCircle.IsChecked ?? false;
-                SldGlowIntensityCircle.IsEnabled = AppSettings.CircleMode.IsGlowMode;
-                SldGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowIntensityCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeLabelCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeDescCircle.Opacity = AppSettings.CircleMode.IsGlowMode ? 1.0 : 0.4;
-            }
-            else if (sender == SldGlowIntensityCircle) AppSettings.CircleMode.GlowIntensity = SldGlowIntensityCircle.Value;
-            else if (sender == SldCircleRadius) AppSettings.CircleMode.CircleRadius = SldCircleRadius.Value;
-
-            // Outline
-            else if (sender == SldIntensityOutline) AppSettings.OutlineMode.Intensity = SldIntensityOutline.Value;
-            else if (sender == ChkIntensityAsOpacityOutline)
-            {
-                AppSettings.OutlineMode.IntensityAsOpacity = ChkIntensityAsOpacityOutline.IsChecked ?? false;
-                bool outlineOpacity = AppSettings.OutlineMode.IntensityAsOpacity;
-                SldOpacityFixedSizeOutline.IsEnabled = outlineOpacity;
-                SldOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedSizeOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeLabelOutline != null) TxtOpacityFixedSizeLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                if (TxtOpacityFixedSizeDescOutline != null) TxtOpacityFixedSizeDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                SldOpacityFixedMaxOpacityOutline.IsEnabled = outlineOpacity;
-                SldOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-            TxtOpacityFixedMaxOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityFixedMaxOpacityOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityLabelOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                TxtIntensityAsOpacityDescOutline.Opacity = outlineOpacity ? 1.0 : 0.4;
-                
-                SldIntensityOutline.IsEnabled = !outlineOpacity;
-                SldIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtIntensityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtIntensityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtIntensityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                
-                SldOpacityOutline.IsEnabled = !outlineOpacity;
-                SldOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityLabelOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-                TxtOpacityDescOutline.Opacity = !outlineOpacity ? 1.0 : 0.4;
-            }
-            else if (sender == SldOpacityFixedSizeOutline) AppSettings.OutlineMode.OpacityFixedSize = SldOpacityFixedSizeOutline.Value;
-            else if (sender == SldOpacityFixedMaxOpacityOutline) AppSettings.OutlineMode.OpacityFixedMaxOpacity = 100.0 - SldOpacityFixedMaxOpacityOutline.Value;
-            else if (sender == SldSpeedOutline) AppSettings.OutlineMode.PositionSpeed = SldSpeedOutline.Value;
-            else if (sender == SldSensitivityOutline) AppSettings.OutlineMode.Sensitivity = SldSensitivityOutline.Value / 4.0;
-            else if (sender == SldOpacityOutline) AppSettings.OutlineMode.VisualOpacity = 100 - SldOpacityOutline.Value;
-            else if (sender == ChkGlowModeOutline)
-            {
-                AppSettings.OutlineMode.IsGlowMode = ChkGlowModeOutline.IsChecked ?? false;
-                SldGlowIntensityOutline.IsEnabled = AppSettings.OutlineMode.IsGlowMode;
-                SldGlowIntensityOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowIntensityOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeLabelOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-                TxtGlowModeDescOutline.Opacity = AppSettings.OutlineMode.IsGlowMode ? 1.0 : 0.4;
-            }
-            else if (sender == SldGlowIntensityOutline) AppSettings.OutlineMode.GlowIntensity = SldGlowIntensityOutline.Value;
-
-            // Common
-            else if (sender == CmbVisualMode)
-            {
-                AppSettings.VisualMode = CmbVisualMode.SelectedIndex;
-                UpdateExpanderStates();
-            }
-            else if (sender == CmbSoundMode) AppSettings.SoundMode = CmbSoundMode.SelectedIndex;
-            else if (sender == SldTargetFps) AppSettings.TargetFps = SldTargetFps.Value;
-            else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
-            else if (sender == ChkAutoMinimizeOnLaunch) AppSettings.AutoMinimizeOnLaunch = ChkAutoMinimizeOnLaunch.IsChecked ?? false;
-            // Removed old hotkey combo logic
-            else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
-            else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;
-            else if (sender == ChkShowDanger) AppSettings.ShowDanger = ChkShowDanger.IsChecked ?? true;
 
             AppSettings.Save();
+        }
+
+        // 선택지 칸(ChoiceChipList)은 이 앱에 있는 컨트롤이라 XAML 이 이벤트를 실행 중에 이름으로 잇는다. 그때는 인자 형식이
+        // 정확히 같아야 해서(RoutedEventArgs 로 받는 Setting_Changed 는 이어지지 않는다) 이 처리기를 거친다.
+        private void ChoiceChips_SelectionChanged(object sender, SelectionChangedEventArgs e) => Setting_Changed(sender, e);
+
+        /// <summary>바뀐 칸이 모드 카드의 것이면 그 모드 설정에 쓰고 true.</summary>
+        private bool ApplyToModeCards(object sender)
+        {
+            foreach (var mode in _modes)
+            {
+                if (ApplyModeChange(mode, sender)) return true;
+            }
+            return false;
         }
 
         private void BtnColor_Click(object sender, RoutedEventArgs e)
@@ -936,8 +673,8 @@ namespace SoundVisualizer
                             bool wasInitializing = _isInitializing;
                             _isInitializing = true;
 
-                            // 콤보박스 선택 변경 반영
-                            CmbSoundMode.SelectedIndex = newSoundMode;
+                            // 사운드 모드 칸의 선택을 맞춘다
+                            ChipsSoundMode.SelectedIndex = newSoundMode;
 
                             _isInitializing = wasInitializing;
                         }

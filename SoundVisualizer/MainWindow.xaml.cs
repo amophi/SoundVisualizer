@@ -17,6 +17,7 @@ using SoundVisualizer.CoreAudio;
 using SoundVisualizer.DSP;
 using SoundVisualizer.Ai;
 using SoundVisualizer.Localization;
+using SoundVisualizer.Ui;
 using SoundVisualizer.Visualizers;
 
 namespace SoundVisualizer
@@ -855,126 +856,69 @@ namespace SoundVisualizer
             // 콤보 항목의 Tag 가 설정값(system 또는 언어 코드)이다.
             LanguagePicker.Select(CmbLanguage, AppSettings.Language);
 
-            // 콤보박스 선택 상태 동기화
-            if (CmbEditPanelVisualMode != null)
-                CmbEditPanelVisualMode.SelectedIndex = AppSettings.VisualMode;
-            if (CmbEditPanelSoundMode != null)
-                CmbEditPanelSoundMode.SelectedIndex = AppSettings.SoundMode;
+            // 모드 칸 선택 상태 동기화
+            EditPanelVisualModeChips.SelectedIndex = AppSettings.VisualMode;
+            EditPanelSoundModeChips.SelectedIndex = AppSettings.SoundMode;
 
+            // 슬라이더 값 글자는 서식(SliderRow)이 값에서 바로 만든다.
             EditPanelSpeedSlider.Value = AppSettings.WavePositionSpeed;
-            EditPanelSpeedValueText.Text = Number(AppSettings.WavePositionSpeed);
-
             EditPanelSensitivitySlider.Value = AppSettings.WaveSensitivity * 4.0;
-            EditPanelSensitivityValueText.Text = Number(AppSettings.WaveSensitivity * 4.0);
+            // 진하기·최대 진하기는 저장값(불투명도 %)을 그대로 보인다. 예전에는 100 에서 뺀 투명도로 보였다.
+            EditPanelOpacitySlider.Value = AppSettings.VisualOpacity;
+            EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
 
-            EditPanelOpacitySlider.Value = 100.0 - AppSettings.VisualOpacity;
-            EditPanelOpacityValueText.Text = Percent(100.0 - AppSettings.VisualOpacity);
-
-            if (EditPanelIntensitySlider != null)
-            {
-                EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                EditPanelIntensityValueText.Text = Percent(AppSettings.WaveIntensity);
-                if (EditPanelIntensityAsOpacityCheckBox != null)
-                {
-                    EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
-                    bool isOpacity = AppSettings.IntensityAsOpacity;
-
-                    if (EditPanelIntensityPanel != null)
-                    {
-                        EditPanelIntensityPanel.IsEnabled = !isOpacity;
-                        EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
-                    }
-                    
-                    if (EditPanelOpacityPanel != null)
-                    {
-                        EditPanelOpacityPanel.IsEnabled = !isOpacity;
-                        EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
-                    }
-
-                    if (EditPanelOpacityFixedSizePanel != null)
-                    {
-                        EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
-                        EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
-                        
-                        if (EditPanelOpacityFixedSizeLabel != null)
-                        {
-                            EditPanelOpacityFixedSizeLabel.Text = Loc.Get(FixedSizeKeys[AppSettings.VisualMode]);
-                        }
-                        
-                        EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
-                        EditPanelOpacityFixedSizeValueText.Text = Percent(AppSettings.OpacityFixedSize);
-                    }
-
-                    if (EditPanelOpacityFixedMaxOpacityPanel != null)
-                    {
-                        EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
-                        EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
-                        
-                        EditPanelOpacityFixedMaxOpacitySlider.Value = 100.0 - AppSettings.OpacityFixedMaxOpacity;
-                        EditPanelOpacityFixedMaxOpacityValueText.Text = Percent(100.0 - AppSettings.OpacityFixedMaxOpacity);
-                    }
-                }
-            }
+            EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
+            ShowSizeRows(AppSettings.IntensityAsOpacity);
+            SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
+            EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
+            EditPanelOpacityFixedMaxOpacitySlider.Value = AppSettings.OpacityFixedMaxOpacity;
 
             EditPanelGlowCheckBox.IsChecked = AppSettings.IsGlowMode;
-            EditPanelGlowIntensityPanel.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
-
+            EditPanelGlowSlider.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
             EditPanelGlowSlider.Value = AppSettings.GlowIntensity;
-            EditPanelGlowValueText.Text = Percent(AppSettings.GlowIntensity);
 
             // 소리 분류 표시 설정 바인딩
-            if (EditPanelShowAmbientCheckBox != null)
-                EditPanelShowAmbientCheckBox.IsChecked = AppSettings.ShowAmbient;
-            if (EditPanelShowSpeechCheckBox != null)
-                EditPanelShowSpeechCheckBox.IsChecked = AppSettings.ShowSpeech;
-            if (EditPanelShowDangerCheckBox != null)
-                EditPanelShowDangerCheckBox.IsChecked = AppSettings.ShowDanger;
+            EditPanelShowAmbientCheckBox.IsChecked = AppSettings.ShowAmbient;
+            EditPanelShowSpeechCheckBox.IsChecked = AppSettings.ShowSpeech;
+            EditPanelShowDangerCheckBox.IsChecked = AppSettings.ShowDanger;
 
             // 색상 버튼 배경색 설정
-            if (EditPanelAmbientColorBtn != null)
-                EditPanelAmbientColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorAmbient));
-            if (EditPanelSpeechColorBtn != null)
-                EditPanelSpeechColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorSpeech));
-            if (EditPanelDangerColorBtn != null)
-                EditPanelDangerColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorDanger));
+            EditPanelAmbientColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorAmbient));
+            EditPanelSpeechColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorSpeech));
+            EditPanelDangerColorBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(AppSettings.ColorDanger));
 
             // 단축키 설정 바인딩
-            
-            if (BtnEditPanelVisualHotkey != null)
-                BtnEditPanelVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
-            if (BtnEditPanelSoundModeHotkey != null)
-                BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
-            if (BtnEditPanelEditHotkey != null)
-                BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
-            
-            if (EditPanelHotkeyText != null)
-                EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
+            BtnEditPanelVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
+            BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
+            BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
+            EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
 
             // 고급 설정 바인딩
-            if (EditPanelTargetFpsSlider != null)
-            {
-                EditPanelTargetFpsSlider.Maximum = AppSettings.GetMonitorRefreshRate();
-                EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
-                EditPanelTargetFpsValueText.Text = Number(AppSettings.TargetFps) + " FPS";
-            }
-
-            if (EditPanelAdminCheckBox != null)
-                EditPanelAdminCheckBox.IsChecked = AppSettings.IsAdminMode;
+            EditPanelTargetFpsSlider.Maximum = AppSettings.GetMonitorRefreshRate();
+            EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
+            EditPanelAdminCheckBox.IsChecked = AppSettings.IsAdminMode;
 
             _isUpdatingEditPanelSliders = false;
         }
 
-        private void CmbEditPanelVisualMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <summary>
+        /// 크기 고정을 켜면 고정 크기·최대 진하기를, 끄면 크기·진하기를 보인다. 지금 먹지 않는 쪽은 흐리게 남기지 않고 접는다
+        /// (런처의 모드 카드, 안드로이드 설정과 같다).
+        /// </summary>
+        private void ShowSizeRows(bool sizeLocked)
+        {
+            EditPanelSizeLockedRows.Visibility = sizeLocked ? Visibility.Visible : Visibility.Collapsed;
+            EditPanelSizeFreeRows.Visibility = sizeLocked ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void EditPanelVisualMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isUpdatingEditPanelSliders) return;
 
-            AppSettings.VisualMode = CmbEditPanelVisualMode.SelectedIndex;
+            AppSettings.VisualMode = EditPanelVisualModeChips.SelectedIndex;
             AppSettings.Save();
 
-            if (EditPanelOpacityFixedSizeLabel != null)
-            {
-                EditPanelOpacityFixedSizeLabel.Text = Loc.Get(FixedSizeKeys[AppSettings.VisualMode]);
-            }
+            SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
 
             // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
             UpdateGuidelinePositions();
@@ -982,11 +926,11 @@ namespace SoundVisualizer
             OnSettingsChangedFromHotkey?.Invoke();
         }
 
-        private void CmbEditPanelSoundMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void EditPanelSoundMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isUpdatingEditPanelSliders) return;
 
-            AppSettings.SoundMode = CmbEditPanelSoundMode.SelectedIndex;
+            AppSettings.SoundMode = EditPanelSoundModeChips.SelectedIndex;
             AppSettings.Save();
 
             OnSettingsChangedFromHotkey?.Invoke();
@@ -999,46 +943,38 @@ namespace SoundVisualizer
             if (sender == EditPanelSpeedSlider)
             {
                 AppSettings.WavePositionSpeed = EditPanelSpeedSlider.Value;
-                EditPanelSpeedValueText.Text = Number(EditPanelSpeedSlider.Value);
             }
             else if (sender == EditPanelSensitivitySlider)
             {
                 AppSettings.WaveSensitivity = EditPanelSensitivitySlider.Value / 4.0;
-                EditPanelSensitivityValueText.Text = Number(EditPanelSensitivitySlider.Value);
                 OnSettingsChangedFromHotkey?.Invoke();
             }
             else if (sender == EditPanelOpacitySlider)
             {
-                AppSettings.VisualOpacity = 100.0 - EditPanelOpacitySlider.Value;
-                EditPanelOpacityValueText.Text = Percent(EditPanelOpacitySlider.Value);
+                AppSettings.VisualOpacity = EditPanelOpacitySlider.Value;
                 UnifiedWave.Opacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
             }
             else if (sender == EditPanelIntensitySlider)
             {
                 AppSettings.WaveIntensity = EditPanelIntensitySlider.Value;
-                EditPanelIntensityValueText.Text = Percent(EditPanelIntensitySlider.Value);
                 UpdateGuidelinePositions();
             }
             else if (sender == EditPanelOpacityFixedSizeSlider)
             {
                 AppSettings.OpacityFixedSize = EditPanelOpacityFixedSizeSlider.Value;
-                EditPanelOpacityFixedSizeValueText.Text = Percent(EditPanelOpacityFixedSizeSlider.Value);
                 UpdateGuidelinePositions();
             }
             else if (sender == EditPanelOpacityFixedMaxOpacitySlider)
             {
-                AppSettings.OpacityFixedMaxOpacity = 100.0 - EditPanelOpacityFixedMaxOpacitySlider.Value;
-                EditPanelOpacityFixedMaxOpacityValueText.Text = Percent(EditPanelOpacityFixedMaxOpacitySlider.Value);
+                AppSettings.OpacityFixedMaxOpacity = EditPanelOpacityFixedMaxOpacitySlider.Value;
             }
             else if (sender == EditPanelGlowSlider)
             {
                 AppSettings.GlowIntensity = EditPanelGlowSlider.Value;
-                EditPanelGlowValueText.Text = Percent(EditPanelGlowSlider.Value);
             }
             else if (sender == EditPanelTargetFpsSlider)
             {
                 AppSettings.TargetFps = EditPanelTargetFpsSlider.Value;
-                EditPanelTargetFpsValueText.Text = Number(EditPanelTargetFpsSlider.Value) + " FPS";
             }
 
             AppSettings.Save();
@@ -1049,31 +985,7 @@ namespace SoundVisualizer
         {
             if (_isUpdatingEditPanelSliders) return;
             AppSettings.IntensityAsOpacity = EditPanelIntensityAsOpacityCheckBox.IsChecked ?? false;
-            bool isOpacity = AppSettings.IntensityAsOpacity;
-
-            if (EditPanelIntensityPanel != null)
-            {
-                EditPanelIntensityPanel.IsEnabled = !isOpacity;
-                EditPanelIntensityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
-            }
-
-            if (EditPanelOpacityPanel != null)
-            {
-                EditPanelOpacityPanel.IsEnabled = !isOpacity;
-                EditPanelOpacityPanel.Opacity = !isOpacity ? 1.0 : 0.4;
-            }
-
-            if (EditPanelOpacityFixedSizePanel != null)
-            {
-                EditPanelOpacityFixedSizePanel.IsEnabled = isOpacity;
-                EditPanelOpacityFixedSizePanel.Opacity = isOpacity ? 1.0 : 0.4;
-            }
-
-            if (EditPanelOpacityFixedMaxOpacityPanel != null)
-            {
-                EditPanelOpacityFixedMaxOpacityPanel.IsEnabled = isOpacity;
-                EditPanelOpacityFixedMaxOpacityPanel.Opacity = isOpacity ? 1.0 : 0.4;
-            }
+            ShowSizeRows(AppSettings.IntensityAsOpacity);
 
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
@@ -1084,7 +996,7 @@ namespace SoundVisualizer
             if (_isUpdatingEditPanelSliders) return;
 
             AppSettings.IsGlowMode = EditPanelGlowCheckBox.IsChecked == true;
-            EditPanelGlowIntensityPanel.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
+            EditPanelGlowSlider.Visibility = AppSettings.IsGlowMode ? Visibility.Visible : Visibility.Collapsed;
 
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
@@ -1348,16 +1260,14 @@ namespace SoundVisualizer
                 if (opSize < 10.0) opSize = 10.0;
                 if (opSize > 100.0) opSize = 100.0;
                 AppSettings.OpacityFixedSize = opSize;
-                if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
-                if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = Percent(AppSettings.OpacityFixedSize);
+                EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
             }
             else
             {
                 if (intensity < 10.0) intensity = 10.0;
                 if (intensity > 100.0) intensity = 100.0;
                 AppSettings.WaveIntensity = intensity;
-                if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = Percent(AppSettings.WaveIntensity);
+                EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
             }
 
             UpdateGuidelinePositions();
@@ -1460,16 +1370,14 @@ namespace SoundVisualizer
                         if (opSize < 0.0) opSize = 0.0;
                         if (opSize > 100.0) opSize = 100.0;
                         AppSettings.OpacityFixedSize = opSize;
-                        if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
-                        if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = Percent(AppSettings.OpacityFixedSize);
+                        EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
                     }
                     else
                     {
                         if (intensity < 0.0) intensity = 0.0;
                         if (intensity > 100.0) intensity = 100.0;
                         AppSettings.WaveIntensity = intensity;
-                        if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                        if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = Percent(AppSettings.WaveIntensity);
+                        EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
                     }
                 }
 
@@ -1510,16 +1418,14 @@ namespace SoundVisualizer
                     if (opSize < 10.0) opSize = 10.0;
                     if (opSize > 100.0) opSize = 100.0;
                     AppSettings.OpacityFixedSize = opSize;
-                    if (EditPanelOpacityFixedSizeSlider != null) EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
-                    if (EditPanelOpacityFixedSizeValueText != null) EditPanelOpacityFixedSizeValueText.Text = Percent(AppSettings.OpacityFixedSize);
+                    EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
                 }
                 else
                 {
                     if (intensity < 10.0) intensity = 10.0;
                     if (intensity > 100.0) intensity = 100.0;
                     AppSettings.WaveIntensity = intensity;
-                    if (EditPanelIntensitySlider != null) EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
-                    if (EditPanelIntensityValueText != null) EditPanelIntensityValueText.Text = Percent(AppSettings.WaveIntensity);
+                    EditPanelIntensitySlider.Value = AppSettings.WaveIntensity;
                 }
 
                 UpdateGuidelinePositions();
@@ -1567,7 +1473,7 @@ namespace SoundVisualizer
             LanguagePicker.Select(CmbLanguage, AppSettings.Language);
             _isUpdatingEditPanelSliders = wasUpdating;
 
-            EditPanelOpacityFixedSizeLabel.Text = Loc.Get(FixedSizeKeys[AppSettings.VisualMode]);
+            SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
             if (_bindingTarget != "Visual") BtnEditPanelVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
             if (_bindingTarget != "Sound") BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
             if (_bindingTarget != "Edit") BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
@@ -1577,10 +1483,9 @@ namespace SoundVisualizer
             UpdateGuidelinePositions();
         }
 
-        // 화면에 보이는 값(FPS, %, 슬라이더 값)은 Windows 지역 설정과 상관없이 같은 꼴로 적는다.
+        // 화면에 보이는 값(FPS, 가이드라인 라벨)은 Windows 지역 설정과 상관없이 같은 꼴로 적는다.
+        // 편집 패널 슬라이더의 값은 서식(SliderRow)이 같은 꼴로 적는다(ValueFormatConverter).
         private static string Number(double value) => value.ToString("F0", CultureInfo.InvariantCulture);
-
-        private static string Percent(double value) => Number(value) + "%";
     }
 }
 
