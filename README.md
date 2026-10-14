@@ -33,7 +33,6 @@ Going beyond simple waveform rendering, it integrates an AI sound classifier pow
 - [System & AI Architecture](#-system--ai-architecture)
 - [Installation & Quick Start](#-installation--quick-start)
 - [Build Guide (For Developers)](#-build-guide-for-developers)
-- [Team Members](#-team-members)
 - [License](#-license)
 
 ---
@@ -57,6 +56,7 @@ We provide 4 unique rendering modes that intuitively map sound intensity and dir
 - **Circle Mode**: Radiates circular ripples outward from the center of the screen.
 - **Pad Mode**: Displays glowing pads anchored to specific spatial grid directions.
 - **Outline Mode**: A minimalist variation of Wave mode, showing only the thin borders of the wave to minimize screen occlusion.
+- Animations move at the same speed at any frame rate, from 30 FPS up to your monitor's refresh rate.
 
 ### 2. On-Screen Real-Time Editor (F4)
 Modify settings instantly while in a full-screen application or game without minimizing the window.
@@ -65,15 +65,28 @@ Modify settings instantly while in a full-screen application or game without min
 
 ### 3. Hardware-Aware Multi-Channel Support
 - Automatically detects the system's audio configuration (Stereo, 5.1, 7.1 Surround) and accurately maps the sound's origin (Front/Back/Left/Right) to produce a 3D visual effect on a 2D screen.
+- The sound mode switches to match your output device whenever the visualizer starts or the device changes, and you can still change it yourself.
+- With stereo output, sound common to both channels is drawn at the top and only the difference between left and right goes to the sides, so a centred sound no longer looks like sound coming from both sides.
 
 ### 4. Real-Time AI Sound Classification (ONNX & YAMNet)
 - **3-Class Detection**: Analyzes all incoming audio into `Ambient`, `Speech`, and `Danger` categories. Each category triggers independent, customizable UI colors and dynamic opacity changes.
 - **Warning cues**: Sirens, alarms, explosions, fireworks and similar warning sounds count as `Danger` even when they are only among the model's top five candidates (at 5% or more), so music or game audio can't drown them out. Gunshot labels are not promoted this way, to avoid false alarms.
 - **Stable colors**: `Danger` appears on the first qualifying result; `Speech` and `Ambient` need two in a row, so the color doesn't flicker. The AI pauses while it's quiet and resumes as soon as sound returns.
 - **Every channel counts**: On 5.1/7.1 systems, the AI hears the rear and side channels too, not just the front.
+- **Late danger**: If a `Danger` result arrives a moment after the sound, the overlay still draws that sound at the size it had, even when its earlier type was hidden.
 
-### 5. Comprehensive Localization
-- Fully supports 8 languages: English, Korean, Japanese, Chinese, Spanish, French, German, and Russian.
+### 5. Choose How Each Sound Counts (Sounds Tab)
+- Browse the 521 sounds the AI knows, grouped like the Android version, and choose whether each group (or, in advanced mode, each sound) counts as `Ambient`, `Speech`, or `Danger`.
+- Search by name, filter by type or by the sounds you changed, and reset everything in one step. The overlay's AI follows your changes immediately.
+
+### 6. Help, Notices, and Tray Icon
+- **Help tab**: Getting started, visual modes, sound types, hotkeys, FAQ, a report button that opens a prefilled GitHub issue or email, and the open source licenses.
+- **Notices**: The Home tab tells you when there is no playback device to capture, when sound type detection is unavailable, or why the visualizer stopped.
+- **Tray icon**: Start or stop the visualizer, return to the launcher, or exit from the notification area.
+
+### 7. Comprehensive Localization
+- Supports 18 languages: Korean, English, Japanese, Chinese (Simplified and Traditional), Vietnamese, Thai, Indonesian, Spanish, Portuguese (Brazil), French, Italian, German, Russian, Polish, Turkish, Hindi, and Arabic (right-to-left). By default it follows the Windows display language.
+- The interface uses the Pretendard font, with Windows fonts for scripts Pretendard doesn't cover.
 
 ---
 
@@ -82,20 +95,23 @@ Modify settings instantly while in a full-screen application or game without min
 The project is rigorously engineered for high-performance, real-time background processing with minimal system overhead.
 
 * **Core Audio API (WASAPI)**: Loopback captures system-wide audio with zero latency.
-* **DSP & FFT Computation**: High-speed frequency transformation calculations run entirely on a background audio thread multiple times per second.
+* **Per-Channel Levels**: The capture thread measures each channel's peak level for every buffer, and the render loop takes the loudest value since the previous frame.
 * **Zero-Allocation Rendering**: The WPF/C# rendering loop is designed to minimize Garbage Collector (GC) allocation, entirely preventing frame drops.
+* **Frame-Rate Independent and Idle-Aware**: Smoothing is normalized to a 60 FPS reference. When nothing has been visible for a second, the overlay stops redrawing every frame and wakes as soon as sound arrives.
 * **ONNX Inference Pipeline**: Every 250 ms, the last 0.975 seconds of audio is downmixed to mono, resampled to 16 kHz through an anti-aliasing filter, turned into the log-mel spectrogram the model was exported with, and classified by YAMNet via `Microsoft.ML.OnnxRuntime`. The model files are checked against pinned SHA-256 hashes at load. Each step is unit-tested against reference outputs.
 
 ---
 
 ## 🚀 Installation & Quick Start
 
-Sound Visualizer is provided as a lightweight, **portable (no-install)** open-source package.
+Sound Visualizer is provided as a lightweight, **portable (no-install)** open-source package for Windows 10/11 (64-bit). You don't need to install .NET.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
-2. Download and extract the latest `SoundVisualizer.zip` file to any location on your PC.
+2. Download the latest `SoundVisualizer_vX.Y.zip` file and extract it to any location on your PC.
 3. Run **`SoundVisualizer.exe`**.
 4. Configure your initial settings and language in the launcher, then click **Start** to activate the overlay.
+
+Your settings are saved in `settings.json` next to `SoundVisualizer.exe`, so the folder can be moved or copied as is.
 
 ---
 
@@ -103,13 +119,19 @@ Sound Visualizer is provided as a lightweight, **portable (no-install)** open-so
 
 To build from source to modify the code or contribute to the project:
 
-1. **Prerequisites**: Windows 10/11, Visual Studio 2022 (with .NET Desktop Development workload), and .NET 10.0 SDK.
+1. **Prerequisites**: Windows 10/11 and the .NET 10 SDK. Visual Studio 2026 (with the .NET Desktop Development workload) is optional.
 2. **Clone the repository**:
    ```bash
    git clone https://github.com/amophi/SoundVisualizer.git
    ```
-3. Open the `SoundVisualizer.slnx` solution file in Visual Studio 2022.
-4. Select `Release` or `Debug` configuration, build (`Ctrl + Shift + B`), and press `F5` to run.
+3. Build and test from the repository folder:
+   ```bash
+   dotnet build SoundVisualizer.slnx -c Release
+   dotnet test SoundVisualizer.Tests/SoundVisualizer.Tests.csproj
+   ```
+   Or open `SoundVisualizer.slnx` in Visual Studio, build (`Ctrl + Shift + B`), and press `F5` to run.
+
+The solution has three projects: `SoundVisualizer` (the WPF app), `SoundVisualizer.Core` (audio, AI, rendering logic, settings, and the 18 language tables, with no UI dependency), and `SoundVisualizer.Tests` (xUnit tests, including reference outputs for each AI step).
 
 ---
 
