@@ -16,6 +16,10 @@ namespace SoundVisualizer.Rendering
     /// 표시를 꺼 둔 종류라 그리지 못한 피크는 약 1초 보관해(<see cref="LateDangerHold"/>), 위협음 판정이 늦게 와도 표시 중이었을 때의
     /// 크기로 그린다.
     ///
+    /// 아무것도 보이지 않은 지 1초가 지나고 조용하면(또는 지금 설정과 라벨로는 그릴 수 없으면) 쉰다(<see cref="IsIdle"/>).
+    /// 쉬는 동안 오버레이는 프레임마다 그리지 않고 <see cref="IdlePollMs"/> 마다 <see cref="PollWake"/> 로 확인하며,
+    /// 그릴 수 있는 소리가 나면 깨어난다.
+    ///
     /// 렌더 스레드(UI 스레드)에서만 쓴다. 프레임마다 힙 할당이 없다.
     /// 채널은 캡처 순서 FL, FR, FC, BL, BR, SL, SR, LFE 다(<see cref="PeakAccumulator"/> 와 같다).
     /// 둘레 자리는 0:FC(상단 중앙) 1:FR(우상단) 2:SR(우측 중앙) 3:BR(우하단) 4:BC(하단 중앙) 5:BL(좌하단) 6:SL(좌측 중앙) 7:FL(좌상단)이다.
@@ -52,8 +56,22 @@ namespace SoundVisualizer.Rendering
         public const double CircleDepthScale = 0.35;
         public const double CircleMaxHeightRatio = 0.4;
 
-        /// <summary>이보다 옅으면 보이지 않는 것으로 본다(진하기 0..1).</summary>
+        /// <summary>
+        /// 이보다 옅으면 보이지 않는 것으로 본다(진하기 0..1). 크기 고정 모드는 진하기가 전체 크기를 따라 0 으로 다가가기만 해서,
+        /// 이 문턱이 없으면 소리가 그친 뒤에도 몇 분 동안 보이지 않는 도형을 화면 전체 크기로 계속 그린다.
+        /// </summary>
         public const double MinVisibleAlpha = 0.002;
+
+        /// <summary>도형이 보이기 시작하는 문턱(DIP). 파도·외곽선은 깊이, 패드는 두께, 원형은 깊이로 본다(Visualizers 와 같다).</summary>
+        public const double WaveActiveDepth = 3;
+        public const double PadMinThickness = 0.5;
+        public const double CircleMinDepth = 1;
+
+        /// <summary>아무것도 보이지 않은 채 이만큼(밀리초) 지나면 쉰다.</summary>
+        public const double IdleAfterMs = 1000;
+
+        /// <summary>쉬는 동안 단축키와 소리를 확인하는 간격(밀리초).</summary>
+        public const int IdlePollMs = 33;
 
         /// <summary>그리는 채널 가운데 가장 큰 값이 이 이하면 조용한 것으로 본다. AI 무음 게이트(<see cref="AiSilenceGate.ActiveThreshold"/>)와 같다.</summary>
         public const float WakeThreshold = 0.01f;
@@ -85,6 +103,13 @@ namespace SoundVisualizer.Rendering
         private readonly double[] _circleDepths = new double[Positions];
         private double _baseDepth;
         private double _animationTime;
+        private double _alpha;
+        private bool _visible;
+
+        // 쉬기
+        private double _invisibleSinceMs = -1;  // 보이지 않기 시작한 프레임 시각. 보이는 동안은 -1.
+        private double _lastHoldMs = double.NaN; // 보관 시간을 마지막으로 흘린 시각
+        private bool _quietAtLastPoll;
 
         private double _width, _height;
 
@@ -101,11 +126,13 @@ namespace SoundVisualizer.Rendering
         /// <param name="nowMs">이번 프레임 시각(밀리초, 단조 증가).</param>
         /// <param name="peaks">지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 하나도 오지 않았으면 비운다.</param>
         /// <param name="input">이번 프레임의 설정과 AI 라벨.</param>
-        public void Tick(double nowMs, ReadOnlySpan<float> peaks, in OverlayInput input)
+        /// <param name="keepAwake">보이는 것이 없어도 쉬지 않는다(오버레이 편집 중).</param>
+        public void Tick(double nowMs, ReadOnlySpan<float> peaks, in OverlayInput input, bool keepAwake = false)
         {
             double step = _clock.Next(nowMs);
             var settings = input.Settings;
             int soundMode = input.SoundMode;
+            _lastHoldMs = nowMs;
 
             // 1. 목표값. 버퍼가 왔으면 그 피크, 안 왔으면 60fps 기준 프레임마다 0.87 씩 줄인 값.
             if (!peaks.IsEmpty)
@@ -120,8 +147,10 @@ namespace SoundVisualizer.Rendering
 
             // 1-1. 라벨. 숨긴 종류면 이번 피크를 보관하고, 위협음 판정이 새로 왔으면 보관한 크기로 시작한다.
             // 그릴 수 없는 설정이면 판정이 와도 보일 것이 없으니 보관하지 않는다.
+            // 깨어 있는 동안 받은 소리도 판정이 오기 전에 쉬기로 내려가면 사라지므로 여기서도 똑같이 모은다(PollWake 참고).
             _hold.Advance(step);
-            if (CanDraw(settings))
+            bool drawable = CanDraw(settings);
+            if (drawable)
             {
                 if (!input.Shown)
                 {
@@ -150,10 +179,131 @@ namespace SoundVisualizer.Rendering
             FillDepths(settings.IntensityAsOpacity, soundMode);
 
             // 4. 패드·원형은 깊이를 다시 한 번 부드럽게 따라간다. 그리는 모드만 움직인다.
-            if (input.VisualMode == ModePad) StepPad(step);
-            else if (input.VisualMode == ModeCircle) StepCircle(step);
+            bool anyShape = input.VisualMode switch
+            {
+                ModePad => StepPad(step),
+                ModeCircle => StepCircle(step),
+                _ => AnyDepthAbove(WaveActiveDepth),
+            };
 
             _animationTime += AnimationStep * step;
+
+            // 5. 진하기와 보이는지. 크기 고정 모드는 진하기가 소리 크기를 따른다.
+            _alpha = AlphaFor(settings, _smoothTotal);
+            _visible = input.Shown && _alpha > MinVisibleAlpha && anyShape;
+
+            // 6. 쉬기. 보이지 않은 지 1초가 지났고 조용하거나, 소리는 나도 지금 라벨과 설정으로는 그릴 수 없으면 쉰다.
+            // 소리 조건만 보면 표시를 끈 종류의 음악이 계속 나올 때 그릴 것도 없이 최대 프레임으로 돈다.
+            if (_visible || keepAwake)
+            {
+                _invisibleSinceMs = -1;
+            }
+            else if (_invisibleSinceMs < 0)
+            {
+                _invisibleSinceMs = nowMs;
+            }
+            else if (nowMs - _invisibleSinceMs > IdleAfterMs &&
+                (Loudness(_targets, soundMode) < WakeThreshold || !(input.Shown && drawable)))
+            {
+                EnterIdle();
+            }
+        }
+
+        /// <summary>
+        /// 쉬는 동안 <see cref="IdlePollMs"/> 마다(또는 캡처 스레드가 큰 소리로 앞당겨) 부른다. 소리가 나고 지금 설정과 라벨로 그릴 수
+        /// 있을 때만 깨어나 true 를 돌려준다. 그러면 부르는 쪽은 다시 프레임마다 <see cref="Tick"/> 을 부른다.
+        ///
+        /// 표시를 끈 종류의 소리가 계속 나는 동안에는 깨어나지 않는다. 다만 그 피크는 버리지 않고 약 1초 보관한다. 위협음만 보이게
+        /// 해 두면 총성 같은 짧은 소리는 먼저 숨긴 라벨로 들어오고, 위협음 판정은 다음 분류와 추론 시간만큼 늦게 온다.
+        /// 위협음 판정이 오면 소리가 이미 끝났어도 보관한 크기로 깨어난다.
+        /// </summary>
+        /// <param name="nowMs">확인 시각(밀리초, <see cref="Tick"/> 과 같은 시계).</param>
+        /// <param name="peaks">지난 확인 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 비운다.</param>
+        /// <param name="input">지금 설정과 AI 라벨.</param>
+        public bool PollWake(double nowMs, ReadOnlySpan<float> peaks, in OverlayInput input)
+        {
+            if (!IsIdle) return false;
+
+            // 보관 시간은 실제로 흐른 시간만큼 흘린다. 확인 간격은 타이머 해상도와 앞당긴 확인 때문에 고르지 않다.
+            double frames = double.IsNaN(_lastHoldMs) ? 0 : Math.Max(0, nowMs - _lastHoldMs) / FrameStep.ReferenceFrameMs;
+            _lastHoldMs = nowMs;
+            _hold.Advance(frames);
+
+            int soundMode = input.SoundMode;
+            float level = peaks.IsEmpty ? 0 : Loudness(peaks, soundMode);
+            bool loud = level > WakeThreshold;
+            // 조용하고 보관한 소리도 없으면 설정·라벨을 볼 필요가 없다. 쉬는 동안의 확인은 대부분 여기서 끝나고,
+            // 다음 확인은 소리가 날 때까지 미룰 수 있다(CanSleepUntilLoud).
+            _quietAtLastPoll = !loud && !_hold.HasData;
+            if (_quietAtLastPoll) return false;
+
+            var settings = input.Settings;
+            if (!CanDraw(settings)) return false;
+            if (!input.Shown)
+            {
+                if (!peaks.IsEmpty) _hold.Keep(peaks, level, WakeThreshold);
+                return false;
+            }
+
+            // 위협음 판정이 새로 왔으면 보관한 크기로 시작한다. 소리가 이미 끝났어도 깨어난다.
+            // 그 밖의 깨어남은 0 에서 민감도 속도로 자란다.
+            bool released = input.Label == SoundType.Danger && ReleaseHold(settings, soundMode);
+            if (!loud && !released) return false;
+
+            if (!peaks.IsEmpty) peaks[..Channels].CopyTo(_targets);
+            Wake();
+            return true;
+        }
+
+        /// <summary>
+        /// 소리와 상관없이 깨운다(오버레이 편집을 시작할 때). 이미 깨어 있으면 아무것도 하지 않는다.
+        /// </summary>
+        public void Resume()
+        {
+            if (IsIdle) Wake();
+        }
+
+        private void Wake()
+        {
+            IsIdle = false;
+            _invisibleSinceMs = -1;
+            // 쉰 시간만큼 한꺼번에 진행하지 않게, 깨어난 첫 프레임은 한 프레임으로 센다.
+            _clock.Reset();
+        }
+
+        private void EnterIdle()
+        {
+            IsIdle = true;
+            _visible = false;
+            // 깨어나는 길은 조용하지 않은 확인뿐이다. 쉬기로 내려오기 직전에 보관한 소리가 있을 수 있으니 한 번은 확인하고 잠든다.
+            _quietAtLastPoll = false;
+            Array.Clear(_targets);
+            Array.Clear(_sources);
+            _smoothTotal = 0;
+            Array.Clear(_padThickness);
+            Array.Clear(_circleDepths);
+            _clock.Reset();
+            // 보관한 피크는 비우지 않는다. 쉬기로 내려간 뒤에 위협음 판정이 와도 쓸 수 있어야 한다.
+        }
+
+        /// <summary>진하기(0..1). 크기 고정이면 최대 진하기 × 소리 크기(2.5 에서 가득), 아니면 진하기 설정 그대로다.</summary>
+        public static double AlphaFor(VisualModeSettings s, double smoothTotal)
+        {
+            if (s.IntensityAsOpacity)
+            {
+                double maxOpacity = Math.Max(0.0, s.OpacityFixedMaxOpacity) / 100.0;
+                return maxOpacity * Math.Max(0.0, Math.Min(1.0, smoothTotal / 2.5));
+            }
+            return Math.Max(0.0, s.VisualOpacity) / 100.0;
+        }
+
+        private bool AnyDepthAbove(double threshold)
+        {
+            for (int i = 0; i < Positions; i++)
+            {
+                if (_depths[i] > threshold) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -320,28 +470,51 @@ namespace SoundVisualizer.Rendering
         private static double Depth(double baseDepth, bool sizeLocked, double smoothTotal, double share) =>
             Math.Min(baseDepth, baseDepth * (sizeLocked ? share * 4.0 : smoothTotal * share));
 
-        private void StepPad(double step)
+        /// <summary>패드 두께를 따라붙이고, 보이는 막대가 있는지 돌려준다.</summary>
+        private bool StepPad(double step)
         {
             double lerp = FrameStep.Approach(PadLerp, step);
+            bool any = false;
             for (int c = 0; c < Positions; c++)
             {
                 double target = _depths[c] * PadDepthScale;
                 if (target > PadMaxThickness) target = PadMaxThickness;
                 _padThickness[c] += (target - _padThickness[c]) * lerp;
+                if (_padThickness[c] >= PadMinThickness) any = true;
             }
+            return any;
         }
 
-        private void StepCircle(double step)
+        /// <summary>원형 깊이를 따라붙이고, 보이게 부푼 자리가 있는지 돌려준다.</summary>
+        private bool StepCircle(double step)
         {
             double lerp = FrameStep.Approach(CircleLerp, step);
             double cap = _height * CircleMaxHeightRatio;
+            bool any = false;
             for (int i = 0; i < Positions; i++)
             {
                 double target = _depths[i] * CircleDepthScale;
                 if (target > cap) target = cap;
                 _circleDepths[i] += (target - _circleDepths[i]) * lerp;
+                if (_circleDepths[i] > CircleMinDepth) any = true;
             }
+            return any;
         }
+
+        /// <summary>이번 프레임에 그릴 것이 보이는지: 라벨을 보이게 해 두었고, 진하기가 문턱을 넘고, 보이는 도형이 있다.</summary>
+        public bool Visible => _visible;
+
+        /// <summary>이번 프레임의 진하기(0..1).</summary>
+        public double Alpha => _alpha;
+
+        /// <summary>쉬는 중인지. 쉬는 동안은 <see cref="Tick"/> 대신 <see cref="PollWake"/> 를 부른다.</summary>
+        public bool IsIdle { get; private set; }
+
+        /// <summary>
+        /// 쉬는 동안 다음 확인을 큰 소리가 날 때까지 미뤄도 되는지(<see cref="SoundWakeSignal"/>). 직전 확인이 조용했고 보관한 소리도
+        /// 없을 때만 true 다. 표시를 꺼 둔 종류의 소리가 나는 동안이나, 늦게 올 위협음 판정을 위해 소리를 보관하는 동안에는 false 다.
+        /// </summary>
+        public bool CanSleepUntilLoud => IsIdle && _quietAtLastPoll;
 
         /// <summary>스무딩한 전체 크기. 크기 고정 모드의 진하기도 이것으로 정한다.</summary>
         public double SmoothTotal => _smoothTotal;

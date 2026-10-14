@@ -112,10 +112,18 @@ namespace SoundVisualizer
         private double _currentFps;
         private readonly Stopwatch _fpsStopwatch = new();
 
+        // 쉬는 동안(엔진이 IsIdle) 프레임마다 그리지 않고 이 타이머로 단축키·HUD·소리를 확인한다.
+        // 조용히 쉬는 동안에는 캡처 스레드가 큰 소리가 든 버퍼에서 확인을 바로 앞당긴다(_wake).
+        private readonly System.Windows.Threading.DispatcherTimer _idleTimer = new() { Interval = TimeSpan.FromMilliseconds(VisualizerEngine.IdlePollMs) };
+        private readonly SoundWakeSignal _wake = new(VisualizerEngine.WakeThreshold);
+        private readonly Action _pollIdleNow;
+
         private const int WAVE_SAMPLE_COUNT = 400;
 
         public MainWindow()
         {
+            _pollIdleNow = PollIdle;
+            _idleTimer.Tick += (s, e) => PollIdle();
             InitializeComponent();
             LanguagePicker.Fill(CmbLanguage);
             Loc.Instance.LanguageChanged += OnLanguageChanged;
@@ -136,7 +144,9 @@ namespace SoundVisualizer
                 }
 
                 CompositionTarget.Rendering -= OnCompositionTargetRendering;
-                
+                _idleTimer.Stop();
+                _wake.Disarm();
+
                 if (_captureEngine != null)
                 {
                     _captureEngine.OnAudioDataAvailable -= HandleAudioDataAsync;
@@ -231,9 +241,57 @@ namespace SoundVisualizer
         private void RenderFrame()
         {
             long nowTicks = Environment.TickCount64;
+            _frameCount++;
+            UpdateHotkeysAndHud(nowTicks);
 
+            // AI 결과는 프레임마다 한 번만 읽고, 이 프레임의 판단은 모두 그 한 결과로 한다.
+            var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
+            _currentType = aiResult?.Coarse ?? SoundType.Ambient;
+
+            bool isVisible = IsTypeVisible(_currentType);
+            var activeColor = GetColorForType(_currentType);
+            UpdateAiLabel(aiResult, isVisible);
+
+            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
+            // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
+            // 숨긴 종류의 소리는 엔진이 약 1초 보관했다가, 위협음 판정이 늦게 오면 표시 중이었을 크기로 그린다.
+            bool tookPeaks = _peaks.TryTake(_peakFrame);
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            _engine.SetSurfaceSize(w, h);
+            _engine.Tick(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
+                new OverlayInput(AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode, _currentType, isVisible),
+                keepAwake: _isEditMode);
+
+            // 보이는 것(표시를 켠 종류, 문턱을 넘는 진하기, 보이는 도형)이 있을 때만 도형을 만든다.
+            // 크기 고정 모드에서 소리가 잦아들어 진하기가 0 에 다가가면 보이지 않는 도형을 화면 전체 크기로 그리지 않고 접는다.
+            if (_engine.Visible && w > 0 && h > 0)
+            {
+                DrawWave(w, h, activeColor);
+            }
+            else
+            {
+                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Collapsed);
+            }
+
+            if (_isEditMode)
+            {
+                UpdateGuidelinePositions();
+            }
+
+            // 아무것도 보이지 않은 지 1초가 지나 엔진이 쉬기로 했으면, 프레임마다 그리지 않고 33ms 확인으로 내려간다.
+            if (_engine.IsIdle) PauseRendering();
+        }
+
+        /// <summary>
+        /// 그리기 말고 프레임마다 하던 일: 단축키, 모드 HUD, 개발자 모드의 FPS 표시. 쉬는 동안에도 <see cref="PollIdle"/> 이 부른다.
+        /// </summary>
+        /// <param name="pollHotkeysNow">33ms 를 재지 않고 단축키를 지금 확인한다. 쉬는 동안의 확인은 타이머가 이미 그 간격이다
+        /// (TickCount 는 15.6ms 단위라, 재면 31ms 만에 온 확인을 건너뛴다).</param>
+        private void UpdateHotkeysAndHud(long nowTicks, bool pollHotkeysNow = false)
+        {
             // 1. 핫키 체크 스로틀링 (약 30Hz - CPU 사용량 감소 및 P/Invoke 부하 최소화)
-            if (nowTicks - _lastHotkeyCheckTick >= 33)
+            if (pollHotkeysNow || nowTicks - _lastHotkeyCheckTick >= 33)
             {
                 _lastHotkeyCheckTick = nowTicks;
 
@@ -318,7 +376,6 @@ namespace SoundVisualizer
                 }
             }
 
-            _frameCount++;
             double fpsElapsed = _fpsStopwatch.Elapsed.TotalSeconds;
             if (fpsElapsed >= 0.5)
             {
@@ -334,23 +391,24 @@ namespace SoundVisualizer
                 }
             }
 
-            // AI 결과는 프레임마다 한 번만 읽고, 이 프레임의 판단은 모두 그 한 결과로 한다.
-            var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
-            _currentType = aiResult?.Coarse ?? SoundType.Ambient;
+            Visibility targetModeUIStackVisibility = (DateTime.Now < _modeUIVisibleUntil && !_isEditMode) ? Visibility.Visible : Visibility.Collapsed;
+            SetVisibilityIfChanged(ModeUIStack, ref _cachedModeUIStackVisibility, targetModeUIStackVisibility);
 
-            bool isVisible = IsTypeVisible(_currentType);
-            var activeColor = GetColorForType(_currentType);
+            if (AppSettings.IsAdminMode)
+            {
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Visible);
+            }
+            else
+            {
+                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
+                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
+            }
+        }
 
-            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
-            // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
-            // 숨긴 종류의 소리는 엔진이 약 1초 보관했다가, 위협음 판정이 늦게 오면 표시 중이었을 크기로 그린다.
-            bool tookPeaks = _peaks.TryTake(_peakFrame);
-            double w = this.ActualWidth;
-            double h = this.ActualHeight;
-            _engine.SetSurfaceSize(w, h);
-            _engine.Tick(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
-                new OverlayInput(AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode, _currentType, isVisible));
-
+        /// <summary>개발자 모드의 AI 라벨. 지금 종류를 보이게 해 두었을 때만 화면 가운데에 띄운다.</summary>
+        private void UpdateAiLabel(AiClassificationResult? aiResult, bool isVisible)
+        {
             if (isVisible)
             {
                 if (AppSettings.IsAdminMode)
@@ -379,30 +437,15 @@ namespace SoundVisualizer
                 {
                     SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
                 }
-                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Visible);
             }
             else
             {
                 SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
-                SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Collapsed);
             }
+        }
 
-            Visibility targetModeUIStackVisibility = (DateTime.Now < _modeUIVisibleUntil && !_isEditMode) ? Visibility.Visible : Visibility.Collapsed;
-            SetVisibilityIfChanged(ModeUIStack, ref _cachedModeUIStackVisibility, targetModeUIStackVisibility);
-
-            if (AppSettings.IsAdminMode)
-            {
-                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
-                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Visible);
-            }
-            else
-            {
-                SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
-                SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
-            }
-
-            if (w == 0 || h == 0) return;
-
+        private void DrawWave(double w, double h, Color activeColor)
+        {
             // 깊이(Intensity 100%가 화면 중앙 최대 한계선에 도달하도록 매핑)는 엔진이 정했다.
             // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
             _engine.Depths.CopyTo(_channelDepths);
@@ -471,22 +514,69 @@ namespace SoundVisualizer
                 }
             }
             
-            if (AppSettings.IntensityAsOpacity)
-            {
-                double maxOpacity = Math.Max(0.0, AppSettings.OpacityFixedMaxOpacity) / 100.0;
-                double volumeFactor = Math.Max(0.0, Math.Min(1.0, _engine.SmoothTotal / 2.5));
-                UnifiedWave.Opacity = maxOpacity * volumeFactor;
-            }
-            else
-            {
-                double baseOpacity = Math.Max(0.0, AppSettings.VisualOpacity) / 100.0;
-                UnifiedWave.Opacity = baseOpacity;
-            }
+            UnifiedWave.Opacity = _engine.Alpha;
+            SetVisibilityIfChanged(UnifiedWave, ref _cachedUnifiedWaveVisibility, Visibility.Visible);
+        }
 
+        // ==========================================
+        // 쉬기: 아무것도 보이지 않으면 프레임마다 그리지 않는다
+        // ==========================================
+
+        /// <summary>
+        /// 엔진이 쉬기로 했다. CompositionTarget.Rendering 을 떼어 WPF 가 최대 프레임으로 렌더 틱을 돌리지 않게 하고,
+        /// 33ms 타이머로 단축키·HUD·소리만 확인한다.
+        /// </summary>
+        private void PauseRendering()
+        {
+            CompositionTarget.Rendering -= OnCompositionTargetRendering;
+            _idleTimer.Start();
+        }
+
+        /// <summary>그릴 것이 생겼다. 다음 화면 틱부터 다시 프레임마다 그린다.</summary>
+        private void ResumeRendering()
+        {
+            _wake.Disarm();
+            _idleTimer.Stop();
+            if (_isClosed) return;
+            CompositionTarget.Rendering -= OnCompositionTargetRendering; // 두 번 붙지 않게
+            CompositionTarget.Rendering += OnCompositionTargetRendering;
+        }
+
+        /// <summary>
+        /// 쉬는 동안 33ms 마다, 또는 캡처 스레드가 큰 소리로 앞당겨 부른다. 단축키·모드 HUD·개발자 표시는 깨어 있을 때처럼 하고,
+        /// 그릴 수 있는 소리가 나거나 편집을 시작하면 다시 프레임마다 그린다.
+        /// </summary>
+        private void PollIdle()
+        {
+            if (_isClosed || !_engine.IsIdle) return;
+            UpdateHotkeysAndHud(Environment.TickCount64, pollHotkeysNow: true);
+
+            // 편집 중에는 쉬지 않는다. 가이드라인을 끌 때 그래픽도 바로 다시 그린다.
             if (_isEditMode)
             {
-                UpdateGuidelinePositions();
+                _engine.Resume();
+                ResumeRendering();
+                return;
             }
+
+            var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
+            _currentType = aiResult?.Coarse ?? SoundType.Ambient;
+            bool isVisible = IsTypeVisible(_currentType);
+            UpdateAiLabel(aiResult, isVisible);
+
+            // 확인하기 직전부터 들어오는 큰 소리만 다음 확인을 앞당긴다. 확인과 다음 확인 사이에 온 소리도 놓치지 않는다.
+            _wake.Arm();
+            bool tookPeaks = _peaks.TryTake(_peakFrame);
+            if (_engine.PollWake(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
+                new OverlayInput(AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode, _currentType, isVisible)))
+            {
+                ResumeRendering();
+                return;
+            }
+
+            // 표시를 꺼 둔 소리가 나는 중이거나 늦게 올 위협음 판정을 위해 소리를 보관하는 중이면 33ms 확인만 한다.
+            // 그때도 큰 소리로 앞당기면 버퍼마다(약 10ms) 확인하게 된다.
+            if (!_engine.CanSleepUntilLoud) _wake.Disarm();
         }
 
         private void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
@@ -512,6 +602,17 @@ namespace SoundVisualizer
 
             // 렌더 루프가 다음 프레임에 가져간다. 그사이 버퍼가 여럿이면 채널마다 가장 큰 값이 남는다.
             _peaks.Offer(fl, fr, fc, bl, br, sl, sr, lfe);
+
+            // 조용히 쉬는 오버레이를 소리가 난 이 버퍼에서 바로 깨운다(33ms 확인을 기다리지 않는다).
+            // 오버레이가 그리는 동안에는 원자 변수 읽기 한 번으로 끝난다.
+            if (_wake.IsArmed)
+            {
+                Span<float> frame = stackalloc float[] { fl, fr, fc, bl, br, sl, sr, lfe };
+                if (_wake.OnBuffer(VisualizerEngine.Loudness(frame, AppSettings.SoundMode)))
+                {
+                    Dispatcher.InvokeAsync(_pollIdleNow);
+                }
+            }
 
             // AI 는 이 캡처 형식에 맞춰 만든 파이프라인에만 넣는다. 장치가 바뀌어 형식이 달라졌으면 새로 만들기를 요청한다.
             // float32 가 아닌 형식은 AI 가 읽지 못하므로 넣지 않는다(WASAPI 공유 모드의 믹스 형식은 보통 float32 다).

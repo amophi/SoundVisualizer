@@ -9,15 +9,12 @@ namespace SoundVisualizer.Tests.Rendering;
 
 /// <summary>
 /// 늦게 온 위협음 판정: 숨긴 라벨로 먼저 들어온 짧은 소리(Android VisualizerEngineTest 의 같은 묶음).
-/// 깨어 있는 엔진의 경우다.
+/// 깨어 있는 엔진의 경우다. 쉬는 엔진의 경우는 <see cref="OverlayIdleTests"/> 에 있다.
 /// </summary>
 public class LateDangerTests
 {
     // 캡처 채널 번호
     private const int FL = 0, FR = 1, BL = 3, BR = 4, SL = 5, SR = 6;
-
-    /// <summary>파도·외곽선이 보이기 시작하는 깊이(WaveVisualizer 의 문턱).</summary>
-    private const double WaveActiveDepth = 3;
 
     /// <summary>환경음을 숨기고 위협음만 보이게 한 엔진. 조용한 프레임 10개를 흘려 둔다.</summary>
     private static EngineHarness HiddenAmbient()
@@ -27,40 +24,14 @@ public class LateDangerTests
         return run;
     }
 
-    private static void Stereo(EngineHarness run, float left, float right)
-    {
-        run.Peaks[FL] = left;
-        run.Peaks[FR] = right;
-    }
-
-    private static double DeepestDepth(EngineHarness run) => run.Engine.Depths.ToArray().Max();
-
-    /// <summary>
-    /// 위협음을 표시 중인 엔진이 같은 소리를 제때 받았을 때 평소 경로가 도달하는 가장 큰 전체 크기.
-    /// <paramref name="loudFrames"/> 프레임 동안 <paramref name="loud"/>, 이어서 <paramref name="tailFrames"/> 프레임 동안 <paramref name="tail"/>.
-    /// </summary>
-    private static double OnTimePeakSmoothTotal(float loud, int loudFrames, float tail, int tailFrames)
-    {
-        var run = new EngineHarness { Label = SoundType.Danger, Shown = true };
-        double peak = 0;
-        for (int n = 0; n < loudFrames + tailFrames; n++)
-        {
-            float v = n < loudFrames ? loud : tail;
-            Stereo(run, v, v);
-            run.Tick();
-            peak = Math.Max(peak, run.Engine.SmoothTotal);
-        }
-        return peak;
-    }
-
     [Fact]
     public void 숨긴_라벨로_지나간_짧은_소리는_늦게_온_위협음_판정에_제때_표시했을_크기로_커진다()
     {
         // 총성 두 프레임 뒤로는 약한 잔향만 남는다. 아직 라벨은 숨긴 환경음이다.
         var run = HiddenAmbient();
-        Stereo(run, 0.9f, 0.9f);
+        run.Stereo(0.9f, 0.9f);
         run.Advance(2);
-        Stereo(run, 0.03f, 0.03f);
+        run.Stereo(0.03f, 0.03f);
         run.Advance(20);
         double before = run.Engine.SmoothTotal;
 
@@ -85,22 +56,22 @@ public class LateDangerTests
         for (int n = 0; n < 32; n++)
         {
             float v = n < 2 ? 0.1f : 0f;
-            Stereo(onTime, v, v);
+            onTime.Stereo(v, v);
             onTime.Tick();
-            onTimeDeepest = Math.Max(onTimeDeepest, DeepestDepth(onTime));
+            onTimeDeepest = Math.Max(onTimeDeepest, onTime.DeepestDepth);
         }
-        Assert.True(onTimeDeepest < WaveActiveDepth, $"전제가 틀렸다: 제때 표시해도 보이는 크기다 ({onTimeDeepest})");
+        Assert.True(onTimeDeepest < VisualizerEngine.WaveActiveDepth, $"전제가 틀렸다: 제때 표시해도 보이는 크기다 ({onTimeDeepest})");
 
         // 판정까지 난 위협음은 안 보이면 안 되므로, 늦게 온 판정에서는 보이는 깊이까지 올린다.
         var run = HiddenAmbient();
-        Stereo(run, 0.1f, 0.1f);
+        run.Stereo(0.1f, 0.1f);
         run.Advance(2);
-        Stereo(run, 0f, 0f);
+        run.Stereo(0f, 0f);
         run.Advance(10);
 
         run.BecomeDanger();
         run.Advance(4);
-        Assert.True(DeepestDepth(run) > WaveActiveDepth, $"판정까지 난 작은 위협음이 보이지 않는다 ({DeepestDepth(run)})");
+        Assert.True(run.DeepestDepth > VisualizerEngine.WaveActiveDepth, $"판정까지 난 작은 위협음이 보이지 않는다 ({run.DeepestDepth})");
     }
 
     [Fact]
@@ -110,9 +81,9 @@ public class LateDangerTests
         var settings = new VisualModeSettings { IntensityAsOpacity = true };
         var run = new EngineHarness { Settings = settings, Label = SoundType.Ambient, Shown = false };
         run.Advance(10);
-        Stereo(run, 0.1f, 0.1f);
+        run.Stereo(0.1f, 0.1f);
         run.Advance(2);
-        Stereo(run, 0f, 0f);
+        run.Stereo(0f, 0f);
         run.Advance(10);
         run.BecomeDanger();
         run.Tick();
@@ -135,7 +106,7 @@ public class LateDangerTests
         run.BecomeDanger();
         run.Advance(3);
         var d = run.Engine.Depths;
-        Assert.True(d[6] > WaveActiveDepth, $"좌측이 보이지 않는다 ({d[6]})");
+        Assert.True(d[6] > VisualizerEngine.WaveActiveDepth, $"좌측이 보이지 않는다 ({d[6]})");
         Assert.True(d[6] > d[2], $"좌측({d[6]}) 이 우측({d[2]}) 보다 깊어야 한다");
     }
 
@@ -144,11 +115,11 @@ public class LateDangerTests
     {
         var run = new EngineHarness { Label = SoundType.Danger, Shown = true };
         run.Advance(10);
-        Stereo(run, 0.9f, 0.9f);
+        run.Stereo(0.9f, 0.9f);
         run.Tick();
 
         var fresh = new EngineHarness { Label = SoundType.Danger, Shown = true };
-        Stereo(fresh, 0.9f, 0.9f);
+        fresh.Stereo(0.9f, 0.9f);
         fresh.Tick();
 
         Assert.Equal(fresh.Engine.SmoothTotal, run.Engine.SmoothTotal, 9);
@@ -161,9 +132,9 @@ public class LateDangerTests
         // 대화음을 숨긴 채 말소리가 지나가고, 끝난 뒤 라벨이 표시 중인 환경음으로 돌아온다.
         var run = new EngineHarness { Label = SoundType.Speech, Shown = false };
         run.Advance(10);
-        Stereo(run, 0.7f, 0.7f);
+        run.Stereo(0.7f, 0.7f);
         run.Advance(5);
-        Stereo(run, 0f, 0f);
+        run.Stereo(0f, 0f);
         run.Advance(5);
         double before = run.Engine.SmoothTotal;
 
@@ -177,9 +148,9 @@ public class LateDangerTests
     public void 한_번_쓴_소리로는_다시_커지지_않는다()
     {
         var run = HiddenAmbient();
-        Stereo(run, 0.9f, 0.9f);
+        run.Stereo(0.9f, 0.9f);
         run.Tick();
-        Stereo(run, 0f, 0f);
+        run.Stereo(0f, 0f);
         run.Advance(10);
 
         run.BecomeDanger();
@@ -203,13 +174,14 @@ public class LateDangerTests
     [InlineData(144.0)]
     public void 보관한_피크는_최대_프레임과_상관없이_약_1초_뒤_사라진다(double fps)
     {
+        // 깨어 있는 엔진은 보이는 것 없이 1초가 지나면 쉰다. 1초 넘게 깨어 있는 것은 오버레이 편집 중일 때다.
         bool SeedsAfter(double quietSeconds)
         {
-            var run = new EngineHarness { Label = SoundType.Ambient, Shown = false };
+            var run = new EngineHarness { Label = SoundType.Ambient, Shown = false, KeepAwake = true };
             run.Advance(10, 1000.0 / fps);
-            Stereo(run, 0.9f, 0.9f);
+            run.Stereo(0.9f, 0.9f);
             run.Tick(1000.0 / fps);
-            Stereo(run, 0f, 0f);
+            run.Stereo(0f, 0f);
             run.Advance((int)Math.Round(quietSeconds * fps), 1000.0 / fps);
             double before = run.Engine.SmoothTotal;
             run.BecomeDanger();
@@ -228,9 +200,9 @@ public class LateDangerTests
         var settings = new VisualModeSettings { VisualOpacity = 0 };
         var run = new EngineHarness { Settings = settings, Label = SoundType.Ambient, Shown = false };
         run.Advance(10);
-        Stereo(run, 0.9f, 0.9f);
+        run.Stereo(0.9f, 0.9f);
         run.Tick();
-        Stereo(run, 0f, 0f);
+        run.Stereo(0f, 0f);
         run.Advance(10);
         double before = run.Engine.SmoothTotal;
 

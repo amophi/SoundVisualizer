@@ -126,10 +126,12 @@ public class VisualizerEngineTests
     [Fact]
     public void 애니메이션_시각은_흐른_시간만큼_간다()
     {
-        // 첫 프레임 + 1초 = 61 프레임 분량
+        // 첫 프레임 + 1초 = 61 프레임 분량. 보이는 것 없이 1초가 지나면 쉬므로 소리를 넣어 둔다.
         var slow = new EngineHarness();
+        slow.All(0.5f);
         slow.Advance(31, 1000.0 / 30);
         var fast = new EngineHarness();
+        fast.All(0.5f);
         fast.Advance(121, 1000.0 / 120);
 
         Assert.Equal(VisualizerEngine.AnimationStep * 61, slow.Engine.AnimationTime, 9);
@@ -141,7 +143,7 @@ public class VisualizerEngineTests
     {
         // 시간 정규화 전 MainWindow 의 계산을 그대로 옮긴 것과 견준다. 60fps 화면에서 보이는 모양이 바뀌면 안 된다.
         var settings = new VisualModeSettings { Sensitivity = 3.75, PositionSpeed = 20 };
-        var run = new EngineHarness { Settings = settings };
+        var run = new EngineHarness { Settings = settings, KeepAwake = true }; // 소리가 그친 뒤의 계산도 견주게 쉬지 않는다
         var legacy = new LegacyFrameLoop();
         var rnd = new Random(60);
 
