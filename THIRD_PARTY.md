@@ -33,3 +33,14 @@ This project (`SoundVisualizer`) uses the following third-party open-source libr
 - **Copyright**: (c) 2021, Kil Hyung-jin
 - **Source**: [https://github.com/orioncactus/pretendard](https://github.com/orioncactus/pretendard) (release v1.3.9)
 - **Description**: The app's UI font. Five static weights are embedded in the executable without modification. The full license text ships next to the executable as `Fonts/Pretendard-LICENSE.txt` and is kept in this repository at [`SoundVisualizer/Fonts/Pretendard-LICENSE.txt`](SoundVisualizer/Fonts/Pretendard-LICENSE.txt). Characters that Pretendard does not cover (Chinese characters, Thai, Devanagari and Arabic) are drawn with the Windows system fonts.
+
+## Sounds
+
+### Tutorial sounds
+- **Files**: `SoundVisualizer/Tutorial/Sounds/tutorial_birds.wav`, `tutorial_chirp.wav`, `tutorial_talk.wav`, `tutorial_honk.wav`
+- **License**: CC0 1.0 Universal (public domain dedication), or works of the U.S. government in the public domain. No attribution is required, but the sources are listed below.
+- **Description**: Real recordings that the tutorial plays along with its pictures when its sound is turned on. They are the clips of the Android app's tutorial (`app/src/main/res/raw/tutorial_*.ogg`), which were cut short from the originals below, had their low end removed, their ends faded and their levels matched, and were saved as mono Ogg Vorbis. The PC copies are those Ogg files decoded once to PCM WAV (mono, 16-bit, the same 44.1 kHz rate) without other changes, so that the app needs no Ogg decoder.
+- **Sources**:
+  - `tutorial_birds.wav` (28.0–30.2 s) and `tutorial_chirp.wav` (3.48–3.93 s): "Forêt" by Joseph SARDIN (BigSoundBank #0100), https://commons.wikimedia.org/wiki/File:For%C3%AAt_(Joseph_SARDIN).wav, CC0 1.0 Universal (dual-licensed with the WTFPL), https://creativecommons.org/publicdomain/zero/1.0/
+  - `tutorial_talk.wav` (0.70–2.90 s): "Anna Pete, hi! Hi, we are here!", VOA Learning English "Let's Learn English" Lesson 4 (Voice of America), https://commons.wikimedia.org/wiki/File:Anna_Pete,_hi!_Hi,_we_are_here!.ogg, a work of the U.S. government (VOA) in the public domain
+  - `tutorial_honk.wav` (0.42–0.92 s, the first honk): "Car Horn" by 15HPanska_Ruttner_Jan (Freesound #461679), https://commons.wikimedia.org/wiki/File:Car_Horn.wav, CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/

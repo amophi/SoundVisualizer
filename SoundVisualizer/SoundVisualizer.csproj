@@ -25,6 +25,12 @@
     <None Include="Fonts\Pretendard-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- 튜토리얼 소리(CC0·퍼블릭 도메인, 출처는 THIRD_PARTY.md 의 Tutorial sounds). 안드로이드의 Ogg 조각을 한 번 풀어 둔 PCM WAV 다.
+       Ogg 를 앱에서 풀려면 디코더 라이브러리가 더 필요해, 풀어 둔 파일(모노 16비트, 넷 합쳐 약 470KB)을 실행 파일에 넣는다. -->
+  <ItemGroup>
+    <Resource Include="Tutorial\Sounds\*.wav" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
     <PackageReference Include="NAudio" Version="2.3.0" />
