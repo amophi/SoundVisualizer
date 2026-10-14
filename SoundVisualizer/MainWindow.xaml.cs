@@ -629,7 +629,7 @@ namespace SoundVisualizer
                 {
                     var classes = _classMap ??= YamnetClassMap.Load(System.IO.Path.Combine(ModelDirectory, "yamnet_class_map.csv"));
                     created = RealtimeAiPipeline.Create(rate, channels, ModelDirectory, classes,
-                        mappingOverrides: null,
+                        mappingOverrides: () => AppSettings.SoundTypes,
                         tickFailed: ex => AppLog.Warn("ai", "AI 추론 한 번이 실패했습니다.", ex));
                     lock (_aiGate)
                     {
