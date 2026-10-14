@@ -1,0 +1,388 @@
+<Window x:Class="SoundVisualizer.Tutorial.TutorialWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:SoundVisualizer.Localization"
+        xmlns:local="clr-namespace:SoundVisualizer.Tutorial"
+        Title="{l:Loc tutorial.window_title}" Width="720" Height="640" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        FontFamily="{DynamicResource AppFontFamily}"
+        PreviewKeyDown="Window_PreviewKeyDown" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <!-- 처음 여는 사람에게 앱이 무엇을 하는지 보여 주는 창(안드로이드 TutorialScreen). 홈의 "튜토리얼 보기"로 다시 연다.
+         쪽마다 그림 · 제목 · 짧은 설명이 있고, 아래 버튼이나 키보드(←/→, PageUp/PageDown)로 넘긴다. 진동 쪽은 PC 에 진동이 없어 없다.
+         서식과 색은 Themes/Theme.xaml 이다. 오른쪽에서 왼쪽으로 쓰는 언어면 창 내용 전체를 뒤집되, 소리 그림만은 뒤집지 않는다(아래). -->
+    <Window.Resources>
+        <!-- 쪽 제목. 쪽이 바뀌면 키보드 초점이 여기로 와 화면 읽어주기가 제목부터 읽는다.
+             초점 테두리가 글자만 두르도록 가운데에 글자 폭만큼 둔다(창 폭을 다 차지하면 테두리가 창 폭만큼 길어진다). -->
+        <Style x:Key="Tutorial.Title" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LineHeight" Value="30"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="AutomationProperties.HeadingLevel" Value="Level1"/>
+        </Style>
+        <Style x:Key="Tutorial.Body" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+        </Style>
+
+        <!-- 종류 쪽의 범례 한 줄. 지금 그림에 나오는 종류는 카드 바탕으로 밝힌다(색이 아닌 표시). 나머지도 흐리게 하지 않는다. -->
+        <Style x:Key="Tutorial.LegendItem" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style x:Key="Tutorial.LegendName" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LineHeight" Value="21"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="Tutorial.LegendExamples" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="LineHeight" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- 마지막 쪽의 단계 번호(도움말의 시작하기와 같은 모양). 동그라미 안에 숫자만 두어 오른쪽에서 왼쪽으로 쓰는 화면에서도 점이 앞으로 가지 않는다. -->
+        <Style x:Key="Tutorial.StepBadge" TargetType="Border">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{StaticResource ControlBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style x:Key="Tutorial.StepNumber" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Tutorial.StepText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="LineHeight" Value="22"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- 소리·멈춤 버튼. 아이콘만 있으므로 이름(AutomationProperties.Name)을 툴팁으로도 보인다. 소리를 켜 두면 코드가 강조색을 입힌다. -->
+        <Style x:Key="Tutorial.IconButton" TargetType="Button">
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingButton}"/>
+            <Setter Property="ToolTip" Value="{Binding (AutomationProperties.Name), RelativeSource={RelativeSource Self}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ControlPressedBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 아이콘(Material 의 volume_up · volume_off · pause · play_arrow, 24 칸 기준). 매체 조작 아이콘이라 오른쪽에서 왼쪽으로 쓰는 화면에서도 뒤집지 않는다.
+             경로는 속성(Figures)에 둔다. 요소 글로 두면 문자열 검사가 화면 글자로 읽는다. -->
+        <PathGeometry x:Key="Tutorial.Icon.SoundOn" Figures="M3,9v6h4l5,5V4L7,9H3zM16.5,12c0,-1.77 -1.02,-3.29 -2.5,-4.03v8.05c1.48,-0.73 2.5,-2.25 2.5,-4.02zM14,3.23v2.06c2.89,0.86 5,3.54 5,6.71s-2.11,5.85 -5,6.71v2.06c4.01,-0.91 7,-4.49 7,-8.77s-2.99,-7.86 -7,-8.77z"/>
+        <PathGeometry x:Key="Tutorial.Icon.SoundOff" Figures="M16.5,12c0,-1.77 -1.02,-3.29 -2.5,-4.03v2.21l2.45,2.45c0.03,-0.2 0.05,-0.41 0.05,-0.63zM19,12c0,0.94 -0.2,1.82 -0.54,2.64l1.51,1.51C20.63,14.91 21,13.5 21,12c0,-4.28 -2.99,-7.86 -7,-8.77v2.06c2.89,0.86 5,3.54 5,6.71zM4.27,3L3,4.27 7.73,9H3v6h4l5,5v-6.73l4.25,4.25c-0.67,0.52 -1.42,0.93 -2.25,1.18v2.06c1.38,-0.31 2.63,-0.95 3.69,-1.81L19.73,21 21,19.73l-9,-9L4.27,3zM12,4L9.91,6.09 12,8.18V4z"/>
+        <PathGeometry x:Key="Tutorial.Icon.Pause" Figures="M6,19h4V5H6v14zM14,5v14h4V5h-4z"/>
+        <PathGeometry x:Key="Tutorial.Icon.Play" Figures="M8,5v14l11,-7z"/>
+
+        <!-- 쪽 표시 점. 지금 쪽은 색만이 아니라 길쭉한 모양으로도 구분한다(코드가 넓힌다). -->
+        <Style x:Key="Tutorial.Dot" TargetType="Border">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Height" Value="8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Background" Value="{StaticResource SecondaryTextBrush}"/>
+        </Style>
+
+        <!-- 홈 그림의 글자 대신 그린 막대 -->
+        <Style x:Key="Tutorial.MockLine" TargetType="Border">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Background" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="Opacity" Value="0.45"/>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="24" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
+            FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
+        <Grid Margin="24,12,24,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 건너뛰기. 마지막 쪽에서는 아래 "확인"이 같은 일을 하므로 숨긴다(자리는 남겨 줄이 흔들리지 않게). -->
+            <Button x:Name="BtnSkip" Style="{StaticResource Button.Text}" HorizontalAlignment="Right" Content="{l:Loc tutorial.skip}" Click="BtnSkip_Click"/>
+
+            <Grid x:Name="IllustrationArea" Grid.Row="1" Height="252" Margin="0,4,0,0">
+                <!-- 소리 그림: 16:9 화면 안의 게임 장면 위에 실제 오버레이 엔진이 대본의 소리를 그린다(TutorialDemo, TutorialDemoRenderer).
+                     장면은 기준 화면(1920×1080) 좌표로 두고 Viewbox 가 그림 크기로 줄인다.
+                     왼쪽·오른쪽은 실제 방향이다. 왼쪽 스피커의 소리는 오버레이도 화면 왼쪽에 그리므로, 아랍어처럼 오른쪽에서 쓰는 언어에서도
+                     그림은 뒤집지 않는다(안드로이드와 같다). 그림은 옆의 글이 말하는 것을 보여 주기만 하므로 화면 읽어주기에서는 건너뛴다. -->
+                <local:TutorialDecoration x:Name="DemoFrame" Width="448" Height="252" FlowDirection="LeftToRight">
+                    <Grid>
+                        <Viewbox Stretch="Fill">
+                            <Viewbox.Clip>
+                                <RectangleGeometry Rect="0,0,448,252" RadiusX="16" RadiusY="16"/>
+                            </Viewbox.Clip>
+                            <Canvas Width="1920" Height="1080" ClipToBounds="True">
+                                <!-- 게임 장면. 어둡게 두어 흰 환경음 색도 잘 보이게 한다. -->
+                                <Rectangle Width="1920" Height="1080">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#2A3854" Offset="0"/>
+                                            <GradientStop Color="#151C2B" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Ellipse Canvas.Left="1236" Canvas.Top="183.6" Width="216" Height="216" Fill="#40FFFFFF"/>
+                                <Path Fill="#1B2335" Data="M0,756 Q384,540 806.4,712.8 Q1190.4,864 1536,648 Q1766.4,540 1920,669.6 L1920,1080 L0,1080 Z"/>
+                                <Path Fill="#0E131D" Data="M0,928.8 Q576,777.6 1056,907.2 Q1497.6,1015.2 1920,864 L1920,1080 L0,1080 Z"/>
+
+                                <!-- 방향 쪽: 장면 안에서 소리가 나는 자리(점과 박자마다 퍼지는 파문). 위치와 진하기는 코드가 정한다. -->
+                                <Ellipse x:Name="SourceRipple" Width="56" Height="56" Stroke="{StaticResource PrimaryTextBrush}" StrokeThickness="8" Visibility="Collapsed"/>
+                                <Ellipse x:Name="SourceDot" Width="40" Height="40" Fill="{StaticResource PrimaryTextBrush}" Visibility="Collapsed"/>
+
+                                <!-- 오버레이와 같은 도형 -->
+                                <Path x:Name="DemoShape" Visibility="Collapsed"/>
+                            </Canvas>
+                        </Viewbox>
+                        <Border CornerRadius="16" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"/>
+                    </Grid>
+                </local:TutorialDecoration>
+
+                <!-- 마지막 쪽 그림: 런처의 홈을 줄여 그린 것. 실행 버튼 둘레로 테두리가 퍼져 누를 곳을 가리킨다. 진짜 버튼처럼 보이면
+                     눌러 보게 되므로 작게 그리고, 화면 읽어주기에서는 건너뛴다. 런처처럼 오른쪽에서 왼쪽으로 쓰는 화면에서는 뒤집힌다. -->
+                <local:TutorialDecoration x:Name="HomeFrame" Width="280" Height="156" Visibility="Collapsed"
+                                          Background="{StaticResource CardBrush}" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
+                                          CornerRadius="16" Padding="24,0">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock FontSize="17" FontWeight="Black" Foreground="{StaticResource PrimaryTextBrush}" Text="Sound Visualizer"/>
+                        <Border Style="{StaticResource Tutorial.MockLine}" Width="200" Margin="0,8,0,0"/>
+                        <Border Style="{StaticResource Tutorial.MockLine}" Width="150" Margin="0,6,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center"/>
+                            <Border Style="{StaticResource Tutorial.MockLine}" Width="90" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Background="{StaticResource AccentFillBrush}" CornerRadius="8" MinHeight="34" Padding="4">
+                                <TextBlock FontSize="12" FontWeight="Bold" Foreground="{StaticResource OnFillBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" Text="{l:Loc launcher.home.start}"/>
+                            </Border>
+                            <!-- 실행 버튼 둘레로 퍼지는 테두리. 크기와 진하기는 코드가 그림의 시각으로 정한다. -->
+                            <Rectangle x:Name="StartPulse" RadiusX="8" RadiusY="8" Stroke="{StaticResource AccentFillBrush}" StrokeThickness="1.5"
+                                       RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                                <Rectangle.RenderTransform>
+                                    <ScaleTransform x:Name="StartPulseScale"/>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+                            <Border Grid.Column="2" Background="{StaticResource ControlBrush}" CornerRadius="8" MinHeight="34" Padding="4">
+                                <TextBlock FontSize="12" FontWeight="Bold" Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" Text="{l:Loc launcher.home.stop}"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </local:TutorialDecoration>
+            </Grid>
+
+            <!-- 글. 길면(큰 번역) 쪽 안에서 굴려 본다. 아래에 더 있으면 끝을 바탕색으로 흐리게 덮어 이어진다는 것을 보인다.
+                 안쪽 위아래 여백은 제목의 초점 테두리(글자 밖 4)가 굴리는 칸에 잘리지 않게 둔다. -->
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <ScrollViewer x:Name="TextScroll" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False"
+                              ScrollChanged="TextScroll_ScrollChanged">
+                    <Grid Margin="0,6">
+                        <StackPanel x:Name="PageSound">
+                            <TextBlock x:Name="TitleSound" Style="{StaticResource Tutorial.Title}" Text="{l:Loc tutorial.sound.title}"/>
+                            <TextBlock Style="{StaticResource Tutorial.Body}" Text="{l:Loc tutorial.sound.body}"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="PageDirection" Visibility="Collapsed">
+                            <TextBlock x:Name="TitleDirection" Style="{StaticResource Tutorial.Title}" Text="{l:Loc tutorial.direction.title}"/>
+                            <TextBlock Style="{StaticResource Tutorial.Body}" Text="{l:Loc tutorial.direction.body}"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="PageTypes" Visibility="Collapsed">
+                            <TextBlock x:Name="TitleTypes" Style="{StaticResource Tutorial.Title}" Text="{l:Loc tutorial.types.title}"/>
+                            <TextBlock Style="{StaticResource Tutorial.Body}" Text="{l:Loc tutorial.types.body}"/>
+                            <!-- 범례. 색만으로 전하지 않도록 종류 이름과 어떤 소리인지를 함께 적는다. 색은 사용자가 설정 탭에서 고른 색이다(코드가 넣는다).
+                                 어두운 색을 골랐어도 보이도록 색 동그라미에 테두리를 두른다. 줄마다 이름 칸 폭을 맞춰 예가 한 줄로 늘어선다. -->
+                            <StackPanel Margin="0,14,0,0" Grid.IsSharedSizeScope="True">
+                                <Border x:Name="LegendAmbient" Style="{StaticResource Tutorial.LegendItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="LegendName"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="12" Height="12" VerticalAlignment="Top" Margin="0,5,12,0">
+                                            <Ellipse x:Name="DotAmbient"/>
+                                            <Ellipse Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1" Opacity="0.5"/>
+                                        </Grid>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource Tutorial.LegendName}" Margin="0,0,16,0" Text="{l:Loc sounds.type.ambient}"/>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource Tutorial.LegendExamples}" Margin="0,1,0,0" Text="{l:Loc tutorial.type.ambient_examples}"/>
+                                    </Grid>
+                                </Border>
+                                <Border x:Name="LegendSpeech" Style="{StaticResource Tutorial.LegendItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="LegendName"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="12" Height="12" VerticalAlignment="Top" Margin="0,5,12,0">
+                                            <Ellipse x:Name="DotSpeech"/>
+                                            <Ellipse Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1" Opacity="0.5"/>
+                                        </Grid>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource Tutorial.LegendName}" Margin="0,0,16,0" Text="{l:Loc sounds.type.speech}"/>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource Tutorial.LegendExamples}" Margin="0,1,0,0" Text="{l:Loc tutorial.type.speech_examples}"/>
+                                    </Grid>
+                                </Border>
+                                <Border x:Name="LegendDanger" Style="{StaticResource Tutorial.LegendItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="LegendName"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="12" Height="12" VerticalAlignment="Top" Margin="0,5,12,0">
+                                            <Ellipse x:Name="DotDanger"/>
+                                            <Ellipse Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1" Opacity="0.5"/>
+                                        </Grid>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource Tutorial.LegendName}" Margin="0,0,16,0" Text="{l:Loc sounds.type.danger}"/>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource Tutorial.LegendExamples}" Margin="0,1,0,0" Text="{l:Loc tutorial.type.danger_examples}"/>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel x:Name="PageStart" Visibility="Collapsed">
+                            <TextBlock x:Name="TitleStart" Style="{StaticResource Tutorial.Title}" Text="{l:Loc tutorial.start.title}"/>
+                            <!-- 켜고 끄는 순서. 도움말 탭 "시작하기"의 단계를 그대로 쓰고(안드로이드 튜토리얼과 같다), PC 단축키 한 줄을 더한다.
+                                 첫 단계(언어 고르기)는 "이 창 위쪽"을 가리켜 이 창에서는 맞지 않아 넣지 않았다. {0} 자리는 코드가 채운다. -->
+                            <Border Background="{StaticResource CardBrush}" CornerRadius="20" Padding="20,14" Margin="0,12,0,0">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Tutorial.StepBadge}"><TextBlock Style="{StaticResource Tutorial.StepNumber}" Text="1"/></Border>
+                                        <TextBlock x:Name="TxtStep1" Grid.Column="1" Style="{StaticResource Tutorial.StepText}"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Tutorial.StepBadge}"><TextBlock Style="{StaticResource Tutorial.StepNumber}" Text="2"/></Border>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource Tutorial.StepText}" Text="{l:Loc help.start.3}"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Tutorial.StepBadge}"><TextBlock Style="{StaticResource Tutorial.StepNumber}" Text="3"/></Border>
+                                        <TextBlock x:Name="TxtStep3" Grid.Column="1" Style="{StaticResource Tutorial.StepText}"/>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Tutorial.StepBadge}"><TextBlock Style="{StaticResource Tutorial.StepNumber}" Text="4"/></Border>
+                                        <TextBlock x:Name="TxtStep4" Grid.Column="1" Style="{StaticResource Tutorial.StepText}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+                <Border x:Name="TextFade" Height="28" VerticalAlignment="Bottom" IsHitTestVisible="False" Visibility="Collapsed">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#002A2C31" Offset="0"/>
+                            <GradientStop Color="#FF2A2C31" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Grid>
+
+            <!-- 아래 줄: 소리·멈춤 | 쪽 표시 | 이전·다음. 다음(마지막 쪽에서는 확인)이 기본 버튼이라 Enter 로 넘어간다. -->
+            <Grid Grid.Row="3" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnSound" Style="{StaticResource Tutorial.IconButton}" Click="BtnSound_Click">
+                        <Viewbox Width="22" Height="22" FlowDirection="LeftToRight">
+                            <Canvas Width="24" Height="24">
+                                <Path x:Name="IconSound" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+                    <Button x:Name="BtnPause" Style="{StaticResource Tutorial.IconButton}" Margin="4,0,0,0" Click="BtnPause_Click">
+                        <Viewbox Width="22" Height="22" FlowDirection="LeftToRight">
+                            <Canvas Width="24" Height="24">
+                                <Path x:Name="IconPause" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+                </StackPanel>
+
+                <!-- 쪽 표시: 점과 "4쪽 중 1쪽". 넘길 때 따로 알리지는 않는다. 그때는 초점이 새 쪽의 제목으로 가서 제목을 읽는다. -->
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Border x:Name="Dot0" Style="{StaticResource Tutorial.Dot}"/>
+                        <Border x:Name="Dot1" Style="{StaticResource Tutorial.Dot}"/>
+                        <Border x:Name="Dot2" Style="{StaticResource Tutorial.Dot}"/>
+                        <Border x:Name="Dot3" Style="{StaticResource Tutorial.Dot}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtPageStatus" Style="{StaticResource Text.Caption}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,6,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnPrevious" Style="{StaticResource Button.Secondary}" MinWidth="112" Content="{l:Loc tutorial.previous}" Click="BtnPrevious_Click"/>
+                    <Button x:Name="BtnNext" Style="{StaticResource Button.Primary}" MinWidth="112" Margin="12,0,0,0" IsDefault="True" Click="BtnNext_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

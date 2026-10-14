@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "출력 장치를 찾을 수 없습니다.",
   "audio.error.capture_stopped": "캡처 비정상 종료: {0}",
-  "audio.error.capture_start_failed": "캡처 엔진 시작 실패: {0}"
+  "audio.error.capture_start_failed": "캡처 엔진 시작 실패: {0}",
+
+  "tutorial.window_title": "튜토리얼",
+  "tutorial.skip": "건너뛰기",
+  "tutorial.previous": "이전 쪽",
+  "tutorial.next": "다음",
+  "tutorial.done": "확인",
+  "tutorial.page_status": "{1}쪽 중 {0}쪽",
+  "tutorial.pause": "그림 멈추기",
+  "tutorial.play": "그림 움직이기",
+  "tutorial.sound_on": "소리 켜기",
+  "tutorial.sound_off": "소리 끄기",
+  "tutorial.sound.title": "소리를 눈으로 보여 드립니다",
+  "tutorial.sound.body": "게임이나 영상의 소리를 화면 테두리에 그립니다. 소리가 클수록 크게 그려집니다. 이 PC에서 재생되는 소리만 보여 드리고, 주변에서 나는 소리는 듣지 않습니다.",
+  "tutorial.direction.title": "소리가 나는 방향을 보여 드립니다",
+  "tutorial.direction.body": "2채널(스테레오)로 출력하면 왼쪽에서 나는 소리는 왼쪽이, 오른쪽에서 나는 소리는 오른쪽이 더 크게 그려집니다. 5.1채널이나 7.1채널로 출력하면 앞뒤도 구분해, 앞에서 나는 소리는 화면 위쪽에, 뒤에서 나는 소리는 아래쪽에 그려집니다.",
+  "tutorial.types.title": "소리 종류를 색으로 구분합니다",
+  "tutorial.types.body": "AI가 소리를 세 종류로 나눠 서로 다른 색으로 그립니다. 색은 설정 탭에서 바꿀 수 있습니다.",
+  "tutorial.type.ambient_examples": "음악·빗소리 등 그 밖의 소리",
+  "tutorial.type.speech_examples": "사람 목소리",
+  "tutorial.type.danger_examples": "총소리·폭발음·사이렌",
+  "tutorial.start.title": "켜고 끄는 방법",
+  "tutorial.start.hotkeys": "실행 중에는 {0} 키로 사운드 모드를, {1} 키로 표현 모드를 바꾸고, {2} 키로 오버레이 설정을 엽니다."
 }

@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "找不到輸出裝置。",
   "audio.error.capture_stopped": "音訊擷取意外停止：{0}",
-  "audio.error.capture_start_failed": "無法啟動音訊擷取引擎：{0}"
+  "audio.error.capture_start_failed": "無法啟動音訊擷取引擎：{0}",
+
+  "tutorial.window_title": "教學",
+  "tutorial.skip": "略過",
+  "tutorial.previous": "上一頁",
+  "tutorial.next": "下一步",
+  "tutorial.done": "我知道了",
+  "tutorial.page_status": "第 {0} 頁，共 {1} 頁",
+  "tutorial.pause": "暫停動畫",
+  "tutorial.play": "播放動畫",
+  "tutorial.sound_on": "開啟聲音",
+  "tutorial.sound_off": "關閉聲音",
+  "tutorial.sound.title": "在螢幕上看見聲音",
+  "tutorial.sound.body": "遊戲或影片的聲音會沿著螢幕邊緣描繪出來。聲音越大，圖形就越大。只會顯示這台電腦上播放的聲音。這個應用程式不會擷取你周遭的聲音。",
+  "tutorial.direction.title": "顯示聲音來自哪個方向",
+  "tutorial.direction.body": "以 2 聲道 (立體聲) 輸出時，來自左邊的聲音會在左側顯示得更大，來自右邊的聲音會在右側顯示得更大。以 5.1 或 7.1 聲道輸出時，還能分辨前後：來自前方的聲音顯示在螢幕上方，來自後方的聲音顯示在下方。",
+  "tutorial.types.title": "用顏色區分聲音類型",
+  "tutorial.types.body": "AI 會將聲音分為三種類型，並以不同顏色顯示。你可以在「設定」分頁中變更顏色。",
+  "tutorial.type.ambient_examples": "音樂、雨聲等其他聲音",
+  "tutorial.type.speech_examples": "說話聲",
+  "tutorial.type.danger_examples": "槍聲、爆炸聲、警報聲",
+  "tutorial.start.title": "如何開啟和關閉",
+  "tutorial.start.hotkeys": "執行時，按 {0} 切換聲音模式，按 {1} 切換視覺模式，按 {2} 開啟覆疊畫面設定。"
 }

@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "未找到输出设备。",
   "audio.error.capture_stopped": "音频捕获意外停止：{0}",
-  "audio.error.capture_start_failed": "无法启动音频捕获引擎：{0}"
+  "audio.error.capture_start_failed": "无法启动音频捕获引擎：{0}",
+
+  "tutorial.window_title": "教程",
+  "tutorial.skip": "跳过",
+  "tutorial.previous": "上一页",
+  "tutorial.next": "下一步",
+  "tutorial.done": "知道了",
+  "tutorial.page_status": "第 {0} 页，共 {1} 页",
+  "tutorial.pause": "暂停动画",
+  "tutorial.play": "播放动画",
+  "tutorial.sound_on": "打开声音",
+  "tutorial.sound_off": "关闭声音",
+  "tutorial.sound.title": "在屏幕上看见声音",
+  "tutorial.sound.body": "游戏或视频中的声音会以图形显示在屏幕边缘。声音越大，图形就越大。只显示这台电脑上播放的声音。本应用不会捕获您周围的声音。",
+  "tutorial.direction.title": "显示声音来自哪个方向",
+  "tutorial.direction.body": "以 2 声道（立体声）输出时，来自左边的声音会在左侧显示得更大，来自右边的声音会在右侧显示得更大。以 5.1 或 7.1 声道输出时，还能分辨前后：来自前方的声音显示在屏幕顶部，来自后方的声音显示在底部。",
+  "tutorial.types.title": "用颜色区分声音类型",
+  "tutorial.types.body": "AI 会将声音分为三种类型，并用不同的颜色显示。您可以在“设置”标签页中更改颜色。",
+  "tutorial.type.ambient_examples": "音乐、雨声等其他声音",
+  "tutorial.type.speech_examples": "说话声",
+  "tutorial.type.danger_examples": "枪声、爆炸声、警报声",
+  "tutorial.start.title": "如何开启和关闭",
+  "tutorial.start.hotkeys": "运行时，按 {0} 切换声音模式，按 {1} 切换显示模式，按 {2} 打开覆盖层设置。"
 }

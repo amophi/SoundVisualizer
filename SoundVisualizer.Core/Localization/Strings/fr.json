@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Aucun périphérique de sortie n'a été trouvé.",
   "audio.error.capture_stopped": "La capture s'est arrêtée de manière inattendue : {0}",
-  "audio.error.capture_start_failed": "Impossible de démarrer le moteur de capture : {0}"
+  "audio.error.capture_start_failed": "Impossible de démarrer le moteur de capture : {0}",
+
+  "tutorial.window_title": "Tutoriel",
+  "tutorial.skip": "Passer",
+  "tutorial.previous": "Page précédente",
+  "tutorial.next": "Suivant",
+  "tutorial.done": "J'ai compris",
+  "tutorial.page_status": "Page {0} sur {1}",
+  "tutorial.pause": "Mettre l'animation en pause",
+  "tutorial.play": "Lire l'animation",
+  "tutorial.sound_on": "Activer le son",
+  "tutorial.sound_off": "Couper le son",
+  "tutorial.sound.title": "Voir le son sur votre écran",
+  "tutorial.sound.body": "Le son de votre jeu ou de votre vidéo est dessiné le long des bords de l'écran. Plus le son est fort, plus le dessin est grand. Seul le son diffusé sur ce PC est affiché. Les sons autour de vous ne sont pas captés.",
+  "tutorial.direction.title": "Indique d'où vient le son",
+  "tutorial.direction.body": "Avec une sortie 2 canaux (stéréo), un son venant de la gauche est dessiné plus grand à gauche, et un son venant de la droite, à droite. Avec une sortie 5.1 ou 7.1 canaux, l'application distingue aussi l'avant de l'arrière : le son venant de l'avant est dessiné en haut de l'écran, et celui venant de l'arrière, en bas.",
+  "tutorial.types.title": "Chaque type de son a sa couleur",
+  "tutorial.types.body": "L'IA classe les sons en trois types et dessine chaque type d'une couleur différente. Vous pouvez changer les couleurs dans l'onglet Paramètres.",
+  "tutorial.type.ambient_examples": "Musique, pluie et tout le reste",
+  "tutorial.type.speech_examples": "Personnes qui parlent",
+  "tutorial.type.danger_examples": "Coups de feu, explosions, sirènes",
+  "tutorial.start.title": "Activer et désactiver la visualisation",
+  "tutorial.start.hotkeys": "Pendant la visualisation, appuyez sur {0} pour changer de mode audio, sur {1} pour changer de mode visuel et sur {2} pour ouvrir les paramètres de l'overlay."
 }

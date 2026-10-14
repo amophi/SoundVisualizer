@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Nenhum dispositivo de saída foi encontrado.",
   "audio.error.capture_stopped": "A captura parou inesperadamente: {0}",
-  "audio.error.capture_start_failed": "Não foi possível iniciar o mecanismo de captura: {0}"
+  "audio.error.capture_start_failed": "Não foi possível iniciar o mecanismo de captura: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Pular",
+  "tutorial.previous": "Página anterior",
+  "tutorial.next": "Próximo",
+  "tutorial.done": "Entendi",
+  "tutorial.page_status": "Página {0} de {1}",
+  "tutorial.pause": "Pausar animação",
+  "tutorial.play": "Reproduzir animação",
+  "tutorial.sound_on": "Ativar som",
+  "tutorial.sound_off": "Desativar som",
+  "tutorial.sound.title": "Veja o som na sua tela",
+  "tutorial.sound.body": "O som do seu jogo ou vídeo é desenhado nas bordas da tela. Quanto mais alto o som, maior o desenho. Só aparece o som que toca neste PC. Os sons ao seu redor não são captados.",
+  "tutorial.direction.title": "Mostra de onde vem o som",
+  "tutorial.direction.body": "Com saída de 2 canais (estéreo), um som da esquerda é desenhado maior do lado esquerdo, e um som da direita, do lado direito. Com saída de 5.1 ou 7.1 canais, o app também diferencia frente e trás: o som que vem da frente é desenhado na parte de cima da tela, e o que vem de trás, na parte de baixo.",
+  "tutorial.types.title": "Cada tipo de som tem sua própria cor",
+  "tutorial.types.body": "A IA separa os sons em três tipos e desenha cada um com uma cor diferente. Você pode mudar as cores na aba Ajustes.",
+  "tutorial.type.ambient_examples": "Música, chuva e todo o resto",
+  "tutorial.type.speech_examples": "Pessoas falando",
+  "tutorial.type.danger_examples": "Tiros, explosões, sirenes",
+  "tutorial.start.title": "Como ligar e desligar",
+  "tutorial.start.hotkeys": "Enquanto estiver em execução, pressione {0} para alternar o modo de som, {1} para alternar o modo visual e {2} para abrir os ajustes da sobreposição."
 }

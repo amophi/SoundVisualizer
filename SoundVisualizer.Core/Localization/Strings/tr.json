@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Çıkış cihazı bulunamadı.",
   "audio.error.capture_stopped": "Ses yakalama beklenmedik şekilde durdu: {0}",
-  "audio.error.capture_start_failed": "Ses yakalama motoru başlatılamadı: {0}"
+  "audio.error.capture_start_failed": "Ses yakalama motoru başlatılamadı: {0}",
+
+  "tutorial.window_title": "Tanıtım",
+  "tutorial.skip": "Atla",
+  "tutorial.previous": "Önceki sayfa",
+  "tutorial.next": "İleri",
+  "tutorial.done": "Anladım",
+  "tutorial.page_status": "Sayfa {0}, toplam {1}",
+  "tutorial.pause": "Animasyonu duraklat",
+  "tutorial.play": "Animasyonu oynat",
+  "tutorial.sound_on": "Sesi aç",
+  "tutorial.sound_off": "Sesi kapat",
+  "tutorial.sound.title": "Sesleri ekranınızda görün",
+  "tutorial.sound.body": "Oyununuzun veya videonuzun sesi ekranın kenarlarında çizilir. Ses ne kadar yüksekse o kadar büyük çizilir. Yalnızca bu bilgisayarda çalan ses gösterilir. Uygulama çevrenizdeki sesleri dinlemez.",
+  "tutorial.direction.title": "Sesin nereden geldiğini gösterir",
+  "tutorial.direction.body": "2 kanal (stereo) çıkışta soldan gelen ses solda, sağdan gelen ses sağda daha büyük çizilir. 5.1 veya 7.1 kanal çıkışta uygulama önü ve arkayı da ayırt eder: önden gelen ses ekranın üst kısmında, arkadan gelen ses alt kısmında çizilir.",
+  "tutorial.types.title": "Her ses türünün kendi rengi var",
+  "tutorial.types.body": "Yapay zeka, sesleri üç türe ayırır ve her türü farklı bir renkte çizer. Renkleri “Ayarlar” sekmesinden değiştirebilirsiniz.",
+  "tutorial.type.ambient_examples": "Müzik, yağmur ve diğer tüm sesler",
+  "tutorial.type.speech_examples": "İnsan sesleri",
+  "tutorial.type.danger_examples": "Silah sesi, patlama, siren",
+  "tutorial.start.title": "Nasıl açılıp kapatılır",
+  "tutorial.start.hotkeys": "Çalışırken ses modunu değiştirmek için {0} tuşuna, görsel modu değiştirmek için {1} tuşuna, yer paylaşımı ayarlarını açmak için {2} tuşuna basın."
 }

@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Không tìm thấy thiết bị đầu ra.",
   "audio.error.capture_stopped": "Việc thu âm thanh đã dừng đột ngột: {0}",
-  "audio.error.capture_start_failed": "Không thể khởi động bộ thu âm thanh: {0}"
+  "audio.error.capture_start_failed": "Không thể khởi động bộ thu âm thanh: {0}",
+
+  "tutorial.window_title": "Hướng dẫn",
+  "tutorial.skip": "Bỏ qua",
+  "tutorial.previous": "Trang trước",
+  "tutorial.next": "Tiếp theo",
+  "tutorial.done": "Đã hiểu",
+  "tutorial.page_status": "Trang {0} trên {1}",
+  "tutorial.pause": "Tạm dừng hoạt ảnh",
+  "tutorial.play": "Phát hoạt ảnh",
+  "tutorial.sound_on": "Bật âm thanh",
+  "tutorial.sound_off": "Tắt âm thanh",
+  "tutorial.sound.title": "Nhìn thấy âm thanh trên màn hình",
+  "tutorial.sound.body": "Âm thanh từ trò chơi hoặc video được vẽ dọc theo các cạnh màn hình. Âm thanh càng lớn thì đồ họa càng lớn. Chỉ âm thanh đang phát trên PC này mới được hiển thị. Ứng dụng không thu âm thanh xung quanh bạn.",
+  "tutorial.direction.title": "Cho biết âm thanh đến từ hướng nào",
+  "tutorial.direction.body": "Khi xuất âm thanh 2 kênh (âm thanh nổi), âm thanh từ bên trái được vẽ lớn hơn ở bên trái, âm thanh từ bên phải được vẽ lớn hơn ở bên phải. Khi xuất âm thanh 5.1 hoặc 7.1 kênh, ứng dụng còn phân biệt được phía trước và phía sau: âm thanh từ phía trước được vẽ ở cạnh trên màn hình, âm thanh từ phía sau được vẽ ở cạnh dưới.",
+  "tutorial.types.title": "Mỗi loại âm thanh có một màu riêng",
+  "tutorial.types.body": "AI phân loại âm thanh thành ba loại và vẽ mỗi loại bằng một màu riêng. Bạn có thể đổi màu trong thẻ Cài đặt.",
+  "tutorial.type.ambient_examples": "Nhạc, tiếng mưa và mọi âm thanh khác",
+  "tutorial.type.speech_examples": "Tiếng người nói",
+  "tutorial.type.danger_examples": "Tiếng súng, tiếng nổ, tiếng còi báo động",
+  "tutorial.start.title": "Cách bật và tắt",
+  "tutorial.start.hotkeys": "Khi đang chạy, nhấn {0} để chuyển chế độ âm thanh, {1} để chuyển chế độ hiển thị và {2} để mở cài đặt lớp phủ."
 }

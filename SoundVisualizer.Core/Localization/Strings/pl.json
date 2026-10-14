@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Nie znaleziono urządzenia wyjściowego.",
   "audio.error.capture_stopped": "Przechwytywanie dźwięku nieoczekiwanie się zatrzymało: {0}",
-  "audio.error.capture_start_failed": "Nie udało się uruchomić mechanizmu przechwytywania dźwięku: {0}"
+  "audio.error.capture_start_failed": "Nie udało się uruchomić mechanizmu przechwytywania dźwięku: {0}",
+
+  "tutorial.window_title": "Samouczek",
+  "tutorial.skip": "Pomiń",
+  "tutorial.previous": "Poprzednia strona",
+  "tutorial.next": "Dalej",
+  "tutorial.done": "Rozumiem",
+  "tutorial.page_status": "Strona {0} z {1}",
+  "tutorial.pause": "Wstrzymaj animację",
+  "tutorial.play": "Odtwórz animację",
+  "tutorial.sound_on": "Włącz dźwięk",
+  "tutorial.sound_off": "Wyłącz dźwięk",
+  "tutorial.sound.title": "Zobacz dźwięk na ekranie",
+  "tutorial.sound.body": "Dźwięk z gry lub filmu jest rysowany wzdłuż krawędzi ekranu. Im głośniejszy dźwięk, tym większa grafika. Pokazywany jest tylko dźwięk odtwarzany na tym komputerze. Dźwięki wokół Ciebie nie są wychwytywane.",
+  "tutorial.direction.title": "Pokazuje, skąd dochodzi dźwięk",
+  "tutorial.direction.body": "Przy wyjściu 2-kanałowym (stereo) dźwięk z lewej strony powiększa grafikę po lewej, a dźwięk z prawej – po prawej. Przy wyjściu 5.1 lub 7.1 aplikacja odróżnia też przód od tyłu: dźwięk z przodu jest rysowany u góry ekranu, a dźwięk z tyłu – u dołu.",
+  "tutorial.types.title": "Każdy rodzaj dźwięku ma swój kolor",
+  "tutorial.types.body": "AI dzieli dźwięki na trzy rodzaje i rysuje każdy w innym kolorze. Kolory możesz zmienić na karcie „Ustawienia”.",
+  "tutorial.type.ambient_examples": "Muzyka, deszcz i cała reszta",
+  "tutorial.type.speech_examples": "Głosy ludzi",
+  "tutorial.type.danger_examples": "Strzały, wybuchy, syreny",
+  "tutorial.start.title": "Jak włączyć i wyłączyć",
+  "tutorial.start.hotkeys": "Podczas działania naciśnij {0}, aby zmienić tryb dźwięku, {1}, aby zmienić tryb wizualizacji, i {2}, aby otworzyć ustawienia nakładki."
 }

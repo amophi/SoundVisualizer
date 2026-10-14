@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Es wurde kein Ausgabegerät gefunden.",
   "audio.error.capture_stopped": "Die Audioerfassung wurde unerwartet beendet: {0}",
-  "audio.error.capture_start_failed": "Die Erfassungs-Engine konnte nicht gestartet werden: {0}"
+  "audio.error.capture_start_failed": "Die Erfassungs-Engine konnte nicht gestartet werden: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Überspringen",
+  "tutorial.previous": "Vorherige Seite",
+  "tutorial.next": "Weiter",
+  "tutorial.done": "Verstanden",
+  "tutorial.page_status": "Seite {0} von {1}",
+  "tutorial.pause": "Animation anhalten",
+  "tutorial.play": "Animation abspielen",
+  "tutorial.sound_on": "Ton einschalten",
+  "tutorial.sound_off": "Ton ausschalten",
+  "tutorial.sound.title": "Geräusche auf dem Bildschirm sehen",
+  "tutorial.sound.body": "Der Ton Ihres Spiels oder Videos wird an den Bildschirmrändern dargestellt. Je lauter er ist, desto größer wird er gezeichnet. Angezeigt wird nur der Ton, der auf diesem PC wiedergegeben wird. Geräusche um Sie herum werden nicht erfasst.",
+  "tutorial.direction.title": "Zeigt, woher ein Geräusch kommt",
+  "tutorial.direction.body": "Bei 2-Kanal-Ausgabe (Stereo) wird ein Geräusch von links auf der linken Seite größer dargestellt, ein Geräusch von rechts auf der rechten Seite. Bei 5.1- oder 7.1-Kanal-Ausgabe unterscheidet die App auch vorne und hinten: Geräusche von vorne erscheinen am oberen Bildschirmrand, Geräusche von hinten am unteren.",
+  "tutorial.types.title": "Jede Geräuschart hat ihre eigene Farbe",
+  "tutorial.types.body": "Die KI teilt Geräusche in drei Arten ein und stellt jede Art in einer eigenen Farbe dar. Die Farben können Sie im Tab „Einstellungen“ ändern.",
+  "tutorial.type.ambient_examples": "Musik, Regen und alles andere",
+  "tutorial.type.speech_examples": "Menschen, die sprechen",
+  "tutorial.type.danger_examples": "Schüsse, Explosionen, Sirenen",
+  "tutorial.start.title": "Ein- und ausschalten",
+  "tutorial.start.hotkeys": "Während die Tonvisualisierung läuft, wechseln Sie mit {0} den Audiomodus, mit {1} den Darstellungsmodus und öffnen mit {2} die Overlay-Einstellungen."
 }

@@ -355,7 +355,8 @@ namespace SoundVisualizer
             catch { }
         }
 
-        private string GetKeysName(List<int> codes)
+        // 튜토리얼의 마지막 쪽도 지금 단축키를 이 이름으로 적는다(TutorialWindow). 설정 탭과 같은 이름이어야 찾아 누를 수 있다.
+        internal static string GetKeysName(List<int> codes)
         {
             if (codes == null || codes.Count == 0) return Loc.Get("hotkey.none");
             List<string> names = new List<string>();

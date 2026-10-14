@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "No se encontró ningún dispositivo de salida.",
   "audio.error.capture_stopped": "La captura se detuvo inesperadamente: {0}",
-  "audio.error.capture_start_failed": "No se pudo iniciar el motor de captura: {0}"
+  "audio.error.capture_start_failed": "No se pudo iniciar el motor de captura: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Omitir",
+  "tutorial.previous": "Página anterior",
+  "tutorial.next": "Siguiente",
+  "tutorial.done": "Entendido",
+  "tutorial.page_status": "Página {0} de {1}",
+  "tutorial.pause": "Pausar animación",
+  "tutorial.play": "Reproducir animación",
+  "tutorial.sound_on": "Activar sonido",
+  "tutorial.sound_off": "Desactivar sonido",
+  "tutorial.sound.title": "Mira el sonido en tu pantalla",
+  "tutorial.sound.body": "El sonido de tu juego o video se dibuja en los bordes de la pantalla. Cuanto más fuerte es, más grande se dibuja. Solo se muestra el sonido que se reproduce en este PC. Los sonidos de tu entorno no se captan.",
+  "tutorial.direction.title": "Muestra de dónde viene el sonido",
+  "tutorial.direction.body": "Con salida de 2 canales (estéreo), un sonido que viene de la izquierda se dibuja más grande a la izquierda, y uno que viene de la derecha, a la derecha. Con salida de 5.1 o 7.1 canales, también distingue entre delante y detrás: el sonido que viene de delante se dibuja en la parte superior de la pantalla, y el que viene de detrás, en la inferior.",
+  "tutorial.types.title": "Cada tipo de sonido tiene su color",
+  "tutorial.types.body": "La IA clasifica los sonidos en tres tipos y dibuja cada uno con su propio color. Puedes cambiar los colores en la pestaña Ajustes.",
+  "tutorial.type.ambient_examples": "Música, lluvia y todo lo demás",
+  "tutorial.type.speech_examples": "Personas que hablan",
+  "tutorial.type.danger_examples": "Disparos, explosiones, sirenas",
+  "tutorial.start.title": "Cómo encenderlo y apagarlo",
+  "tutorial.start.hotkeys": "Mientras se ejecuta, pulsa {0} para cambiar el modo de sonido, {1} para cambiar el modo visual y {2} para abrir los ajustes de superposición."
 }

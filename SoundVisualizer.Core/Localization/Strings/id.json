@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Perangkat output tidak ditemukan.",
   "audio.error.capture_stopped": "Penangkapan audio berhenti tiba-tiba: {0}",
-  "audio.error.capture_start_failed": "Tidak dapat memulai mesin penangkap audio: {0}"
+  "audio.error.capture_start_failed": "Tidak dapat memulai mesin penangkap audio: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Lewati",
+  "tutorial.previous": "Halaman sebelumnya",
+  "tutorial.next": "Berikutnya",
+  "tutorial.done": "Mengerti",
+  "tutorial.page_status": "Halaman {0} dari {1}",
+  "tutorial.pause": "Jeda animasi",
+  "tutorial.play": "Putar animasi",
+  "tutorial.sound_on": "Nyalakan suara",
+  "tutorial.sound_off": "Matikan suara",
+  "tutorial.sound.title": "Lihat suara di layar Anda",
+  "tutorial.sound.body": "Suara dari game atau video Anda digambar di sepanjang tepi layar. Makin keras suaranya, makin besar gambarnya. Hanya suara yang diputar di PC ini yang ditampilkan. Aplikasi ini tidak mendengarkan suara di sekitar Anda.",
+  "tutorial.direction.title": "Menunjukkan arah datangnya suara",
+  "tutorial.direction.body": "Dengan output 2 saluran (stereo), suara dari kiri digambar lebih besar di sisi kiri, dan suara dari kanan di sisi kanan. Dengan output 5.1 atau 7.1 saluran, aplikasi juga dapat membedakan depan dan belakang: suara dari depan digambar di bagian atas layar, dan suara dari belakang di bagian bawah.",
+  "tutorial.types.title": "Setiap jenis suara punya warnanya sendiri",
+  "tutorial.types.body": "AI mengelompokkan suara menjadi tiga jenis dan menggambar setiap jenis dengan warna yang berbeda. Anda dapat mengubah warnanya di tab Setelan.",
+  "tutorial.type.ambient_examples": "Musik, hujan, dan suara lainnya",
+  "tutorial.type.speech_examples": "Suara manusia",
+  "tutorial.type.danger_examples": "Tembakan, ledakan, sirene",
+  "tutorial.start.title": "Cara menyalakan dan mematikannya",
+  "tutorial.start.hotkeys": "Saat berjalan, tekan {0} untuk mengganti mode suara, {1} untuk mengganti mode visual, dan {2} untuk membuka setelan overlay."
 }

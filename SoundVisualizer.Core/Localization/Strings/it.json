@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "Nessun dispositivo di uscita trovato.",
   "audio.error.capture_stopped": "L'acquisizione si è interrotta in modo imprevisto: {0}",
-  "audio.error.capture_start_failed": "Impossibile avviare il motore di acquisizione: {0}"
+  "audio.error.capture_start_failed": "Impossibile avviare il motore di acquisizione: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Salta",
+  "tutorial.previous": "Pagina precedente",
+  "tutorial.next": "Avanti",
+  "tutorial.done": "Ho capito",
+  "tutorial.page_status": "Pagina {0} di {1}",
+  "tutorial.pause": "Metti in pausa l'animazione",
+  "tutorial.play": "Riproduci l'animazione",
+  "tutorial.sound_on": "Attiva l'audio",
+  "tutorial.sound_off": "Disattiva l'audio",
+  "tutorial.sound.title": "Vedi i suoni sullo schermo",
+  "tutorial.sound.body": "Il suono del gioco o del video viene disegnato lungo i bordi dello schermo. Più il suono è forte, più il disegno è grande. Viene mostrato solo l'audio riprodotto su questo PC. I suoni intorno a te non vengono captati.",
+  "tutorial.direction.title": "Mostra da dove arriva il suono",
+  "tutorial.direction.body": "Con un'uscita a 2 canali (stereo), un suono a sinistra viene disegnato più grande sul lato sinistro, e un suono a destra sul lato destro. Con un'uscita a 5.1 o 7.1 canali, l'app distingue anche il davanti dal dietro: i suoni che arrivano da davanti vengono disegnati in alto sullo schermo e quelli che arrivano da dietro in basso.",
+  "tutorial.types.title": "Ogni tipo di suono ha il suo colore",
+  "tutorial.types.body": "L'IA classifica i suoni in tre tipi e disegna ogni tipo con un colore diverso. Puoi cambiare i colori nella scheda Impostazioni.",
+  "tutorial.type.ambient_examples": "Musica, pioggia e tutto il resto",
+  "tutorial.type.speech_examples": "Persone che parlano",
+  "tutorial.type.danger_examples": "Spari, esplosioni, sirene",
+  "tutorial.start.title": "Come si attiva e si disattiva",
+  "tutorial.start.hotkeys": "Durante la visualizzazione, premi {0} per cambiare la modalità audio, {1} per cambiare la modalità visiva e {2} per aprire le impostazioni dell'overlay."
 }

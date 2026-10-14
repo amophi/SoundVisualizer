@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "No output device was found.",
   "audio.error.capture_stopped": "Capture stopped unexpectedly: {0}",
-  "audio.error.capture_start_failed": "Couldn't start the capture engine: {0}"
+  "audio.error.capture_start_failed": "Couldn't start the capture engine: {0}",
+
+  "tutorial.window_title": "Tutorial",
+  "tutorial.skip": "Skip",
+  "tutorial.previous": "Previous page",
+  "tutorial.next": "Next",
+  "tutorial.done": "Got it",
+  "tutorial.page_status": "Page {0} of {1}",
+  "tutorial.pause": "Pause animation",
+  "tutorial.play": "Play animation",
+  "tutorial.sound_on": "Turn on sound",
+  "tutorial.sound_off": "Turn off sound",
+  "tutorial.sound.title": "See sound on your screen",
+  "tutorial.sound.body": "Sound from your game or video is drawn along the edges of the screen. The louder it is, the bigger it is drawn. Only sound playing on this PC is shown. Sounds around you are not picked up.",
+  "tutorial.direction.title": "Shows where sound comes from",
+  "tutorial.direction.body": "With 2-channel (stereo) output, a sound on the left is drawn bigger on the left, and a sound on the right on the right. With 5.1 or 7.1 channel output, it also tells front from back: sound from the front is drawn at the top of the screen and sound from behind at the bottom.",
+  "tutorial.types.title": "Each type of sound gets its own color",
+  "tutorial.types.body": "AI sorts sounds into three types and draws each in its own color. You can change the colors in the Settings tab.",
+  "tutorial.type.ambient_examples": "Music, rain and everything else",
+  "tutorial.type.speech_examples": "Voices",
+  "tutorial.type.danger_examples": "Gunshots, explosions, sirens",
+  "tutorial.start.title": "How to turn it on and off",
+  "tutorial.start.hotkeys": "While it's running, press {0} to switch the sound mode, {1} to switch the visual mode and {2} to open the overlay settings."
 }

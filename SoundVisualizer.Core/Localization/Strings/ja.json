@@ -249,5 +249,27 @@
 
   "audio.error.no_device": "出力デバイスが見つかりません。",
   "audio.error.capture_stopped": "キャプチャが予期せず停止しました：{0}",
-  "audio.error.capture_start_failed": "キャプチャエンジンを開始できませんでした：{0}"
+  "audio.error.capture_start_failed": "キャプチャエンジンを開始できませんでした：{0}",
+
+  "tutorial.window_title": "チュートリアル",
+  "tutorial.skip": "スキップ",
+  "tutorial.previous": "前のページ",
+  "tutorial.next": "次へ",
+  "tutorial.done": "OK",
+  "tutorial.page_status": "{1}ページ中{0}ページ目",
+  "tutorial.pause": "アニメーションを一時停止",
+  "tutorial.play": "アニメーションを再生",
+  "tutorial.sound_on": "音を出す",
+  "tutorial.sound_off": "音を消す",
+  "tutorial.sound.title": "音を画面で見られます",
+  "tutorial.sound.body": "ゲームや動画の音が、画面の端に沿って描かれます。音が大きいほど、大きく描かれます。表示するのは、この PC で再生中の音だけです。周囲の音は拾いません。",
+  "tutorial.direction.title": "音の方向がわかります",
+  "tutorial.direction.body": "2 チャンネル（ステレオ）で出力すると、左からの音は画面の左側が、右からの音は右側が大きく描かれます。5.1 または 7.1 チャンネルで出力すると前後も区別し、前方からの音は画面の上側に、後方からの音は下側に描かれます。",
+  "tutorial.types.title": "音の種類を色で区別します",
+  "tutorial.types.body": "AI が音を3種類に分類し、それぞれ違う色で描きます。色は「設定」タブで変更できます。",
+  "tutorial.type.ambient_examples": "音楽・雨音など、その他の音",
+  "tutorial.type.speech_examples": "人の声",
+  "tutorial.type.danger_examples": "銃声・爆発音・サイレン",
+  "tutorial.start.title": "オン/オフの方法",
+  "tutorial.start.hotkeys": "実行中は、{0} でサウンドモード、{1} で表示モードを切り替え、{2} でオーバーレイ設定を開きます。"
 }
