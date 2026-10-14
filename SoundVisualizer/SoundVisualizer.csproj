@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UI\" />
     <Using Remove="System.Drawing" />
     <Using Remove="System.Windows.Forms" />
   </ItemGroup>
@@ -19,6 +18,7 @@
   <ItemGroup>
     <Content Include="SoundVisualizer.ico" />
   </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
@@ -41,6 +41,10 @@
     <None Update="AIModel\yamnet_class_map.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundVisualizer.Core\SoundVisualizer.Core.csproj" />
   </ItemGroup>
 
 </Project>

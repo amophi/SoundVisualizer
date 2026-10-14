@@ -24,11 +24,17 @@ namespace SoundVisualizer
 
     public static class AppSettings
     {
-        // 모드별 개별 설정 인스턴스
-        public static VisualModeSettings WaveMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-        public static VisualModeSettings PadMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-        public static VisualModeSettings CircleMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-        public static VisualModeSettings OutlineMode { get; set; } = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
+        // 모드별 개별 설정 인스턴스. 기본값은 VisualModeSettings 의 초기값 한 곳에만 둔다.
+        public static VisualModeSettings WaveMode { get; set; } = new VisualModeSettings();
+        public static VisualModeSettings PadMode { get; set; } = new VisualModeSettings();
+        public static VisualModeSettings CircleMode { get; set; } = new VisualModeSettings();
+        public static VisualModeSettings OutlineMode { get; set; } = new VisualModeSettings();
+
+        // 단축키 기본값(가상 키 코드). F2 사운드 모드, F3 표현 모드, F4 오버레이 설정.
+        public const int DefaultSoundModeKey = 0x71;
+        public const int DefaultVisualModeKey = 0x72;
+        public const int DefaultEditModeKey = 0x73;
+        public const double DefaultTargetFps = 144.0;
 
         // 1. 파도의 크기 (현재 모드값 반환/설정)
         public static double WaveIntensity
@@ -104,14 +110,14 @@ namespace SoundVisualizer
         }
 
         // 7. 단축키 설정
-        public static List<int> StereoUpmixKeyBind { get; set; } = new List<int> { 0x71 }; // F2
-        public static List<int> VisualModeKeyBind { get; set; } = new List<int> { 0x72 };  // F3
-        public static List<int> EditModeKeyBind { get; set; } = new List<int> { 0x73 };    // F4
+        public static List<int> StereoUpmixKeyBind { get; set; } = new List<int> { DefaultSoundModeKey }; // F2
+        public static List<int> VisualModeKeyBind { get; set; } = new List<int> { DefaultVisualModeKey };  // F3
+        public static List<int> EditModeKeyBind { get; set; } = new List<int> { DefaultEditModeKey };    // F4
 
         // 구버전 호환용
-        public static int StereoUpmixHotkey { get; set; } = 0x71; 
-        public static int VisualModeHotkey { get; set; } = 0x72;  
-        public static int EditModeHotkey { get; set; } = 0x73;    
+        public static int StereoUpmixHotkey { get; set; } = DefaultSoundModeKey;
+        public static int VisualModeHotkey { get; set; } = DefaultVisualModeKey;
+        public static int EditModeHotkey { get; set; } = DefaultEditModeKey;
 
         // 7. 현재 언어 설정
         public static string Language { get; set; } = "ENG";
@@ -121,7 +127,7 @@ namespace SoundVisualizer
         public static bool AutoMinimizeOnLaunch { get; set; } = false;
 
         // 8.6. 렌더링 최대 프레임
-        public static double TargetFps { get; set; } = 144.0;
+        public static double TargetFps { get; set; } = DefaultTargetFps;
 
         // 9. 화면 표시 여부 (환경음, 말소리, 강조음)
         public static bool ShowAmbient { get; set; } = true;
@@ -129,11 +135,25 @@ namespace SoundVisualizer
         public static bool ShowDanger { get; set; } = true;
 
         // 10. 화면 표시 색상 (환경음, 말소리, 강조음)
-        public static string ColorAmbient { get; set; } = "#FFFFFFFF";
-        public static string ColorSpeech { get; set; } = "#FFFFFF00";
-        public static string ColorDanger { get; set; } = "#FFFF0000";
+        public const string DefaultColorAmbient = "#FFFFFFFF";
+        public const string DefaultColorSpeech = "#FFFFFF00";
+        public const string DefaultColorDanger = "#FFFF0000";
+        public static string ColorAmbient { get; set; } = DefaultColorAmbient;
+        public static string ColorSpeech { get; set; } = DefaultColorSpeech;
+        public static string ColorDanger { get; set; } = DefaultColorDanger;
 
-        private static string SettingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+        /// <summary>설정 파일 위치. 포터블 배포라 실행 파일 옆에 둔다. 테스트는 임시 파일로 바꾼다.</summary>
+        public static string SettingsFilePath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+
+        /// <summary>
+        /// 저장을 이만큼 미뤄 모은다. 슬라이더를 끌면 값이 바뀔 때마다 저장을 부르는데, 그때마다 파일을 쓰면
+        /// UI 스레드가 디스크를 기다린다. 마지막 변경 뒤 이만큼 조용하면 한 번 쓴다.
+        /// </summary>
+        public const int SaveDelayMs = 400;
+
+        private static readonly object SaveGate = new();
+        private static System.Threading.Timer? _saveTimer;
+        private static bool _savePending;
 
         private static VisualModeSettings GetCurrentModeSettings()
         {
@@ -156,13 +176,13 @@ namespace SoundVisualizer
                         VisualMode = data.VisualMode;
                         SoundMode = data.SoundMode;
                         if (data.StereoUpmixKeyBind != null && data.StereoUpmixKeyBind.Count > 0) StereoUpmixKeyBind = data.StereoUpmixKeyBind;
-                        else StereoUpmixKeyBind = new List<int> { data.StereoUpmixHotkey != 0 ? data.StereoUpmixHotkey : 0x71 };
+                        else StereoUpmixKeyBind = new List<int> { data.StereoUpmixHotkey != 0 ? data.StereoUpmixHotkey : DefaultSoundModeKey };
 
                         if (data.VisualModeKeyBind != null && data.VisualModeKeyBind.Count > 0) VisualModeKeyBind = data.VisualModeKeyBind;
-                        else VisualModeKeyBind = new List<int> { data.VisualModeHotkey != 0 ? data.VisualModeHotkey : 0x72 };
+                        else VisualModeKeyBind = new List<int> { data.VisualModeHotkey != 0 ? data.VisualModeHotkey : DefaultVisualModeKey };
 
                         if (data.EditModeKeyBind != null && data.EditModeKeyBind.Count > 0) EditModeKeyBind = data.EditModeKeyBind;
-                        else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : 0x73 };
+                        else EditModeKeyBind = new List<int> { data.EditModeHotkey != 0 ? data.EditModeHotkey : DefaultEditModeKey };
 
                         Language = data.Language ?? "ENG";
                         
@@ -172,9 +192,9 @@ namespace SoundVisualizer
                         ShowAmbient = data.ShowAmbient;
                         ShowSpeech = data.ShowSpeech;
                         ShowDanger = data.ShowDanger;
-                        ColorAmbient = data.ColorAmbient ?? "#FFFFFFFF";
-                        ColorSpeech = data.ColorSpeech ?? "#FFFFFF00";
-                        ColorDanger = data.ColorDanger ?? "#FFFF0000";
+                        ColorAmbient = data.ColorAmbient ?? DefaultColorAmbient;
+                        ColorSpeech = data.ColorSpeech ?? DefaultColorSpeech;
+                        ColorDanger = data.ColorDanger ?? DefaultColorDanger;
 
                         // 하이브리드 모드 로드 (모드별 설정이 없는 구버전 호환)
                         if (data.WaveMode != null) WaveMode = data.WaveMode;
@@ -194,10 +214,100 @@ namespace SoundVisualizer
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                AppLog.Warn("settings", "설정 파일을 읽지 못해 기본값으로 시작합니다.", ex);
+            }
         }
 
+        /// <summary>
+        /// 저장을 예약한다. <see cref="SaveDelayMs"/> 안에 다시 부르면 마지막 것 한 번만 쓴다.
+        /// 부른 스레드(보통 UI 스레드)에서 쓰므로 설정을 고치는 쪽과 엇갈리지 않는다. 앱을 닫을 때는 <see cref="Flush"/> 를 부른다.
+        /// </summary>
         public static void Save()
+        {
+            lock (SaveGate)
+            {
+                _savePending = true;
+                _saveContext = SynchronizationContext.Current;
+                _saveTimer ??= new System.Threading.Timer(OnSaveTimer, null, Timeout.Infinite, Timeout.Infinite);
+                _saveTimer.Change(SaveDelayMs, Timeout.Infinite);
+            }
+        }
+
+        /// <summary>예약된 저장이 있으면 지금 쓴다. 앱을 닫을 때와 오버레이 편집을 마칠 때 부른다.</summary>
+        public static void Flush()
+        {
+            lock (SaveGate)
+            {
+                if (!_savePending) return;
+                _savePending = false;
+                _saveTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+                WriteFile();
+            }
+        }
+
+        /// <summary>미루지 않고 바로 쓴다. 예약된 저장도 이것으로 끝난다.</summary>
+        public static void SaveNow()
+        {
+            lock (SaveGate)
+            {
+                _savePending = false;
+                _saveTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+                WriteFile();
+            }
+        }
+
+        /// <summary>예약된 저장이 남아 있는지. 테스트가 쓴다.</summary>
+        public static bool HasPendingSave
+        {
+            get { lock (SaveGate) return _savePending; }
+        }
+
+        private static SynchronizationContext? _saveContext;
+
+        private static void OnSaveTimer(object? state)
+        {
+            SynchronizationContext? context;
+            lock (SaveGate) context = _saveContext;
+            if (context != null) context.Post(_ => Flush(), null);
+            else Flush();
+        }
+
+        /// <summary>
+        /// 언어를 뺀 모든 설정을 기본값으로 되돌린다(전체 초기화 버튼). 단축키는 실제로 쓰는 키 목록까지 되돌린다.
+        /// 저장은 부르는 쪽이 한다.
+        /// </summary>
+        public static void ResetToDefaults()
+        {
+            WaveMode = new VisualModeSettings();
+            PadMode = new VisualModeSettings();
+            CircleMode = new VisualModeSettings();
+            OutlineMode = new VisualModeSettings();
+
+            VisualMode = 0;
+            SoundMode = 2; // 실행 중이면 장치의 채널 수에 맞춰 다시 정해진다
+
+            StereoUpmixKeyBind = new List<int> { DefaultSoundModeKey };
+            VisualModeKeyBind = new List<int> { DefaultVisualModeKey };
+            EditModeKeyBind = new List<int> { DefaultEditModeKey };
+            StereoUpmixHotkey = DefaultSoundModeKey;
+            VisualModeHotkey = DefaultVisualModeKey;
+            EditModeHotkey = DefaultEditModeKey;
+
+            IsAdminMode = false;
+            AutoMinimizeOnLaunch = false;
+            TargetFps = Math.Min(DefaultTargetFps, GetMonitorRefreshRate());
+
+            ShowAmbient = true;
+            ShowSpeech = true;
+            ShowDanger = true;
+            ColorAmbient = DefaultColorAmbient;
+            ColorSpeech = DefaultColorSpeech;
+            ColorDanger = DefaultColorDanger;
+        }
+
+        private static void WriteFile()
         {
             try
             {
@@ -238,7 +348,11 @@ namespace SoundVisualizer
                 var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(SettingsFilePath, json);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // 쓰기 금지 폴더(Program Files 등)에 풀어 둔 경우 여기로 온다. 설정은 이번 실행 동안만 남는다.
+                AppLog.Warn("settings", $"설정을 저장하지 못했습니다: {SettingsFilePath}", ex);
+            }
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]

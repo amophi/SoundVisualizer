@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="SoundVisualizer.Core/SoundVisualizer.Core.csproj" />
+  <Project Path="SoundVisualizer.Tests/SoundVisualizer.Tests.csproj" />
   <Project Path="SoundVisualizer/SoundVisualizer.csproj" />
 </Solution>

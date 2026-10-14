@@ -15,6 +15,13 @@ namespace SoundVisualizer
             base.OnStartup(e);
             AppSettings.Load();
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // 슬라이더를 움직인 직후에 닫아도 마지막 값이 남게, 미뤄 둔 저장을 지금 쓴다.
+            AppSettings.Flush();
+            base.OnExit(e);
+        }
     }
 }
 
