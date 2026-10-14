@@ -18,6 +18,9 @@ internal static class AiTestData
 
     public static string ClassMapPath => Path.Combine(AppContext.BaseDirectory, "Models", "yamnet_class_map.csv");
 
+    /// <summary>앱이 쓰는 yamnet.onnx·yamnet.data 가 있는 폴더(모바일 assets/ai 와 같은 파일).</summary>
+    public static string ModelDirectory => Path.Combine(AppContext.BaseDirectory, "Models");
+
     /// <summary>실제 521개 클래스 목록. 불변이라 테스트끼리 나눠 쓴다.</summary>
     public static YamnetClassMap ClassMap => RealClassMap.Value;
 
