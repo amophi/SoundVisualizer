@@ -200,6 +200,9 @@
   "notice.stopped.capture_error": "오류로 소리 받기가 멈춰 그래픽이 꺼졌습니다.",
   "notice.dismiss": "안내 닫기",
 
+  "tray.open": "런처 열기",
+  "tray.exit": "프로그램 종료",
+
   "more_info.title": "GitHub 저장소 및 프로젝트 기여",
   "more_info.body": "Sound Visualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다.",
   "more_info.github_button": "GitHub 저장소 방문하기",

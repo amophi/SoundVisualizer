@@ -200,6 +200,9 @@
   "notice.stopped.capture_error": "Sound capture stopped because of an error, so the graphics are off.",
   "notice.dismiss": "Dismiss notice",
 
+  "tray.open": "Open launcher",
+  "tray.exit": "Exit",
+
   "more_info.title": "Dépôt GitHub et contributions",
   "more_info.body": "Sound Visualizer est un projet open source dont le code source est public sur GitHub. Vous pouvez y participer en signalant des bugs, en suggérant des fonctionnalités ou en contribuant au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel ! Vous pouvez aussi vérifier et télécharger la dernière version dans l'onglet Releases de GitHub.",
   "more_info.github_button": "Visiter le dépôt GitHub",

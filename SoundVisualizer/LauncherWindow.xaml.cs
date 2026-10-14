@@ -154,7 +154,7 @@ namespace SoundVisualizer
             ApplyCodeTexts();
         }
 
-        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태와 홈 안내, 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
+        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태와 홈 안내(트레이 포함), 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
         private void ApplyCodeTexts()
         {
             SetStatusUI(_overlayWindow != null);
@@ -176,8 +176,9 @@ namespace SoundVisualizer
             TxtStatus.Text = isRunning ? Loc.Get("launcher.status.running") : Loc.Get("launcher.status.idle");
             // 실행 중이면 상태 점만 강조색이 된다(안드로이드 홈과 같다). 글자는 늘 보조 글자색이다.
             StatusDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, isRunning ? "AccentBrush" : "SecondaryTextBrush");
-            // 상태 줄 아래 안내도 같은 상태를 보인다(LauncherWindow.Status.cs).
+            // 상태 줄 아래 안내와 트레이도 같은 상태를 보인다(LauncherWindow.Status.cs).
             UpdateNotices();
+            _tray?.SetState(isRunning, TxtStatus.Text);
         }
 
         private void LoadSettingsToUI()
@@ -510,7 +511,7 @@ namespace SoundVisualizer
             }
         }
 
-        // 켜고 끄는 일은 LauncherWindow.Status.cs 에 있다.
+        // 켜고 끄는 일은 트레이 메뉴와 같은 길을 탄다(LauncherWindow.Status.cs).
         private void BtnLaunch_Click(object sender, RoutedEventArgs e) => StartOverlay();
 
         private void BtnStop_Click(object sender, RoutedEventArgs e) => StopOverlay();

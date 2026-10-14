@@ -200,6 +200,9 @@
   "notice.stopped.capture_error": "Sound capture stopped because of an error, so the graphics are off.",
   "notice.dismiss": "Dismiss notice",
 
+  "tray.open": "Open launcher",
+  "tray.exit": "Exit",
+
   "more_info.title": "GitHub 存放庫與專案貢獻",
   "more_info.body": "Sound Visualizer 是開放原始碼專案，原始碼公開在 GitHub 上。你可以透過回報錯誤、建議功能或參與開發來加入這個專案。按一下下方按鈕，前往官方 GitHub 存放庫吧！你也可以在 GitHub 的 Releases 頁面查看並下載最新版本。",
   "more_info.github_button": "前往 GitHub 存放庫",
