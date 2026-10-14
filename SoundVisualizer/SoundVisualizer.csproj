@@ -8,6 +8,8 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>SoundVisualizer.ico</ApplicationIcon>
+    <!-- 도움말의 앱 정보와 제보의 환경 정보가 이 값을 읽는다. 배포할 때마다 올린다. -->
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
