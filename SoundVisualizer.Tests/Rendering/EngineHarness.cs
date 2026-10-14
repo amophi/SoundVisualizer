@@ -1,6 +1,7 @@
 // Copyright (C) 2026 amophi (SoundVisualizer Contributors)
 // This file is part of SoundVisualizer.
 // SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+using SoundVisualizer.Ai;
 using SoundVisualizer.Rendering;
 
 namespace SoundVisualizer.Tests.Rendering;
@@ -25,6 +26,12 @@ internal sealed class EngineHarness
     public int VisualMode = VisualizerEngine.ModeWave;
     public int SoundMode = 2;
 
+    /// <summary>AI 가 확정한 종류와, 그 종류를 보이게 해 두었는지.</summary>
+    public SoundType Label = SoundType.Ambient;
+    public bool Shown = true;
+
+    public OverlayInput Input => new(Settings, VisualMode, SoundMode, Label, Shown);
+
     /// <summary>다음 프레임에 들어올 채널별 피크.</summary>
     public readonly float[] Peaks = new float[VisualizerEngine.Channels];
 
@@ -48,7 +55,14 @@ internal sealed class EngineHarness
     public void Tick(double stepMs = Frame60)
     {
         Now += stepMs;
-        Engine.Tick(Now, Buffers ? Peaks : ReadOnlySpan<float>.Empty, Settings, VisualMode, SoundMode);
+        Engine.Tick(Now, Buffers ? Peaks : ReadOnlySpan<float>.Empty, Input);
+    }
+
+    /// <summary>분류기가 위협음으로 판정했고, 위협음은 표시가 켜져 있다.</summary>
+    public void BecomeDanger()
+    {
+        Label = SoundType.Danger;
+        Shown = true;
     }
 
     public void Advance(int frames, double stepMs = Frame60)

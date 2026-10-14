@@ -334,21 +334,22 @@ namespace SoundVisualizer
                 }
             }
 
-            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
-            // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
-            bool tookPeaks = _peaks.TryTake(_peakFrame);
-            double w = this.ActualWidth;
-            double h = this.ActualHeight;
-            _engine.SetSurfaceSize(w, h);
-            _engine.Tick(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
-                AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode);
-
             // AI 결과는 프레임마다 한 번만 읽고, 이 프레임의 판단은 모두 그 한 결과로 한다.
             var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
             _currentType = aiResult?.Coarse ?? SoundType.Ambient;
 
             bool isVisible = IsTypeVisible(_currentType);
             var activeColor = GetColorForType(_currentType);
+
+            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
+            // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
+            // 숨긴 종류의 소리는 엔진이 약 1초 보관했다가, 위협음 판정이 늦게 오면 표시 중이었을 크기로 그린다.
+            bool tookPeaks = _peaks.TryTake(_peakFrame);
+            double w = this.ActualWidth;
+            double h = this.ActualHeight;
+            _engine.SetSurfaceSize(w, h);
+            _engine.Tick(_renderStopwatch.Elapsed.TotalMilliseconds, tookPeaks ? _peakFrame : ReadOnlySpan<float>.Empty,
+                new OverlayInput(AppSettings.CurrentModeSettings, AppSettings.VisualMode, AppSettings.SoundMode, _currentType, isVisible));
 
             if (isVisible)
             {
