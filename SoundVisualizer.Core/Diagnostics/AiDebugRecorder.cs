@@ -15,27 +15,27 @@ namespace SoundVisualizer.Diagnostics
     /// 켜면 <c>&lt;실행 파일 폴더&gt;/ai-log/ai-yyyyMMdd-HHmmss.csv</c> 를 새로 열고, 끄면 닫는다. 앱이 설정 파일도 실행 파일 옆에 두는
     /// 포터블 배포라 기록도 옆에 둔다. 그 폴더에 쓸 수 없으면(Program Files 에 풀어 둔 경우 등) <c>%LOCALAPPDATA%/SoundVisualizer/ai-log/</c> 에 둔다.
     ///
-    /// 디스크는 쓰는 스레드에서만 만진다. 부르는 곳은 오버레이의 렌더 루프(UI 스레드)라, 거기서 폴더를 확인하거나 파일을 열거나 쓰면
-    /// 그리는 프레임이 밀린다. 그래서 <see cref="Offer"/> 는 큐에 넣고 바로 돌아오고, 폴더를 고르는 일까지 쓰는 스레드가 한다(#199, #208).
+    /// 디스크는 쓰는 스레드에서만 만진다. 부르는 곳은 오버레이의 개발자 모드 HUD(UI 스레드, <see cref="AiDebugHud"/>)라, 거기서 폴더를
+    /// 확인하거나 파일을 열거나 쓰면 그리는 프레임이 밀린다. 그래서 <see cref="Offer"/> 는 큐에 넣고 바로 돌아오고, 폴더를 고르는 일까지 쓰는 스레드가 한다(#199, #208).
     ///
     /// 켠 회차마다 큐와 쓰는 스레드를 따로 둔다. <see cref="Stop"/> 은 쓰는 스레드를 기다리지 않으므로 껐다 곧바로 켜면 옛 스레드가 아직
     /// 살아 있다. 큐가 하나면 두 스레드가 나눠 먹어 줄이 두 파일로 갈렸다(#208). 회차마다 따로면 옛 스레드는 자기 줄만 비우고 나가고,
     /// 새 줄은 새 스레드만 본다.
     ///
     /// 스레드: <see cref="Start"/>·<see cref="Stop"/>·<see cref="Offer"/> 는 UI 스레드에서 부른다(어느 스레드여도 되고, 디스크를 기다리지 않는다).
-    /// <see cref="Dispose"/> 는 앱을 닫을 때 부르며, 남은 줄을 쓰고 파일을 닫기를 1초까지 기다린다.
+    /// <see cref="Dispose"/> 는 오버레이를 닫을 때 부르며, 남은 줄을 쓰고 파일을 닫기를 1초까지 기다린다.
     ///
     /// 모바일과 다른 점:
     /// - 폴더를 고르려면 실제로 만들어 봐야 해서 폴더와 파일을 첫 줄이 올 때 함께 정한다. 그래서 <see cref="CurrentFile"/> 은 파일이
     ///   생긴 뒤에 채워진다(모바일은 쓰는 스레드가 시작할 때 경로만 정한다).
     /// - 같은 초에 다시 켜면 모바일은 같은 이름의 파일을 덮어쓴다. 여기서는 앞 회차를 지우지 않게 <c>ai-…-2.csv</c> 처럼 번호를 붙인다.
     ///   Windows 에서는 옛 스레드가 아직 연 파일을 다시 열 수도 없다.
-    /// - <see cref="Offer"/> 가 같은 결과를 큐에 거듭 넣지 않는다. 모바일 HUD 는 100ms 마다 읽지만 PC 렌더 루프는 프레임마다 부른다.
-    ///   남는 줄은 모바일과 같다(그 결과를 처음 본 때의 값이 남는다).
+    /// - <see cref="Offer"/> 가 같은 결과를 큐에 거듭 넣지 않는다. HUD 는 추론(250ms)보다 자주(100ms) 읽어 같은 결과를 두세 번 넘기는데,
+    ///   모바일은 그것을 모두 큐에 넣고 쓰는 쪽에서 거른다. 남는 줄은 모바일과 같다(그 결과를 처음 본 때의 값이 남는다).
     /// - 끈 뒤에 들어온 줄은 받지 않고, 끄기 전에 받은 줄은 모두 쓴다. 모바일은 끄는 순간과 겹친 줄이 아무도 비우지 않는 큐에 남을 수 있다.
     /// - 쓰다 실패해도 회차를 닫는다. 모바일은 상한과 열기 실패에서만 닫아, 쓰기 실패 뒤에도 오버레이가 아무도 비우지 않는 큐에 줄을 넣는다.
     /// </summary>
-    public sealed class AiDebugRecorder : IDisposable
+    public sealed class AiDebugRecorder : IAiDebugRecorder
     {
         /// <summary>기록을 두는 폴더 이름. 모바일과 같다.</summary>
         public const string DirectoryName = "ai-log";
@@ -154,7 +154,8 @@ namespace SoundVisualizer.Diagnostics
         }
 
         /// <summary>
-        /// 결과 하나를 지금 회차의 큐에 넣고 바로 돌아온다. 꺼져 있으면 아무것도 하지 않는다. 렌더 루프에서 프레임마다 불러도 된다.
+        /// 결과 하나를 지금 회차의 큐에 넣고 바로 돌아온다. 꺼져 있으면 아무것도 하지 않는다. HUD 가 읽을 때마다(100ms) 부르며,
+        /// 렌더 루프에서 프레임마다 불러도 될 만큼 가볍다.
         /// 같은 결과(<see cref="AiClassificationResult.TimestampMs"/> 가 같은 것)를 거듭 넘기면 처음 넘긴 것만 남는다.
         /// </summary>
         /// <param name="result">마지막 결과.</param>
@@ -369,7 +370,7 @@ namespace SoundVisualizer.Diagnostics
                 {
                     // 끈 뒤에 들어온 줄은 받지 않는다. 받은 줄은 쓰는 스레드가 모두 쓴다.
                     if (!_active) return;
-                    // 렌더 루프는 프레임마다 같은 결과를 넘긴다. 큐가 같은 결과로 차서 새 결과를 밀어내지 않게 여기서 거른다.
+                    // HUD 는 추론보다 자주 읽어 같은 결과를 거듭 넘긴다. 큐가 같은 결과로 차서 새 결과를 밀어내지 않게 여기서 거른다.
                     long timestampMs = row.Result.TimestampMs;
                     if (_hasOffered && _lastOfferedMs == timestampMs) return;
                     _hasOffered = true;
