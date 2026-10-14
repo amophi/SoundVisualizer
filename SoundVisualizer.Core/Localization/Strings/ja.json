@@ -12,6 +12,7 @@
   "launcher.home.desc": "目に見えない音を画面に描き出します。\nゲームも映画も、新しい体験をどうぞ。",
   "launcher.home.start": "開始",
   "launcher.home.stop": "停止",
+  "launcher.home.tutorial": "チュートリアルを見る",
   "launcher.status.running": "状態：実行中",
   "launcher.status.idle": "状態：待機中",
 

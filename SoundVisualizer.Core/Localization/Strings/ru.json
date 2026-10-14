@@ -12,6 +12,7 @@
   "launcher.home.desc": "Показывает на экране звуки, которые нельзя увидеть.\nОт игр до фильмов — откройте для себя новые впечатления.",
   "launcher.home.start": "Запустить",
   "launcher.home.stop": "Остановить",
+  "launcher.home.tutorial": "Показать обучение",
   "launcher.status.running": "Статус: работает",
   "launcher.status.idle": "Статус: ожидает запуска",
 

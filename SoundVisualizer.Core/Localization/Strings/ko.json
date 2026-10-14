@@ -12,6 +12,7 @@
   "launcher.home.desc": "보이지 않던 소리를 화면에 그려냅니다.\n게이밍부터 영화 감상까지 새로운 경험을 시작하세요.",
   "launcher.home.start": "실행",
   "launcher.home.stop": "실행 종료",
+  "launcher.home.tutorial": "튜토리얼 보기",
   "launcher.status.running": "상태: 실행 중",
   "launcher.status.idle": "상태: 실행 대기 중",
 

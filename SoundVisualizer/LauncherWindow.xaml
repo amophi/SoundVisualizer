@@ -77,6 +77,11 @@
                             <Button x:Name="BtnLaunch" Style="{StaticResource Button.Primary.Large}" Content="{l:Loc launcher.home.start}" Click="BtnLaunch_Click"/>
                             <Button x:Name="BtnStop" Grid.Column="2" Style="{StaticResource Button.Stop.Large}" Content="{l:Loc launcher.home.stop}" Click="BtnStop_Click" IsEnabled="False"/>
                         </Grid>
+
+                        <!-- 처음 열 때 한 번 저절로 뜬 튜토리얼을 다시 보는 곳(안드로이드 홈의 "튜토리얼 보기", LauncherWindow.Tutorial.cs).
+                             글자만 있는 버튼이라 안쪽 여백(12)만큼 바깥으로 빼서 글자를 위 실행 버튼의 가장자리에 맞춘다. -->
+                        <Button x:Name="BtnTutorial" Style="{StaticResource Button.Text}" HorizontalAlignment="Left" Margin="-12,16,0,0"
+                                Content="{l:Loc launcher.home.tutorial}" Click="BtnTutorial_Click"/>
                     </StackPanel>
                 </TabItem>
 

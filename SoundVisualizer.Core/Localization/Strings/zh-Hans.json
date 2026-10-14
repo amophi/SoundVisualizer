@@ -12,6 +12,7 @@
   "launcher.home.desc": "将看不见的声音呈现在屏幕上。\n从游戏到观影，开启全新体验。",
   "launcher.home.start": "启动",
   "launcher.home.stop": "停止",
+  "launcher.home.tutorial": "查看教程",
   "launcher.status.running": "状态：运行中",
   "launcher.status.idle": "状态：待启动",
 

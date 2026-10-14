@@ -12,6 +12,7 @@
   "launcher.home.desc": "Göremediğiniz sesleri doğrudan ekranınıza çizer.\nOyunlardan filmlere, yepyeni bir deneyim yaşayın.",
   "launcher.home.start": "Başlat",
   "launcher.home.stop": "Durdur",
+  "launcher.home.tutorial": "Tanıtımı göster",
   "launcher.status.running": "Durum: Çalışıyor",
   "launcher.status.idle": "Durum: Hazır",
 

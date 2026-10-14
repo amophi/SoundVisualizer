@@ -12,6 +12,7 @@
   "launcher.home.desc": "เปลี่ยนเสียงที่มองไม่เห็นให้เป็นภาพบนหน้าจอ\nตั้งแต่เล่นเกมไปจนถึงดูภาพยนตร์ มาสัมผัสประสบการณ์ใหม่กันเลย",
   "launcher.home.start": "เริ่ม",
   "launcher.home.stop": "หยุด",
+  "launcher.home.tutorial": "ดูบทแนะนำ",
   "launcher.status.running": "สถานะ: กำลังทำงาน",
   "launcher.status.idle": "สถานะ: พร้อมใช้งาน",
 
