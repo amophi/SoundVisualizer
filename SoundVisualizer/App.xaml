@@ -4,7 +4,14 @@
              xmlns:local="clr-namespace:SoundVisualizer"
              StartupUri="LauncherWindow.xaml">
     <Application.Resources>
-        <!-- 앱 전체 글꼴. 언어에 맞는 대체 글꼴 순서는 시작할 때와 언어를 바꿀 때 AppFonts.Apply 가 다시 정한다. -->
-        <FontFamily x:Key="AppFontFamily">./Fonts/#Pretendard, Segoe UI, Malgun Gothic</FontFamily>
+        <ResourceDictionary>
+            <!-- 색(Palette.xaml)과 카드·버튼·스위치·슬라이더 같은 공통 서식. 런처, 오버레이 편집 패널, 색 선택 창이 함께 쓴다. -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundVisualizer;component/Themes/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- 앱 전체 글꼴. 언어에 맞는 대체 글꼴 순서는 시작할 때와 언어를 바꿀 때 AppFonts.Apply 가 다시 정한다. -->
+            <FontFamily x:Key="AppFontFamily">./Fonts/#Pretendard, Segoe UI, Malgun Gothic</FontFamily>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
