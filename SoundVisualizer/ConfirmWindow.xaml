@@ -1,0 +1,34 @@
+<Window x:Class="SoundVisualizer.ConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:SoundVisualizer.Localization"
+        Width="440" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FontFamily="{DynamicResource AppFontFamily}">
+
+    <!-- 확인·취소를 묻는 창. 안드로이드 ConfirmDialog(카드 바탕, 굵은 제목, 보조 글자색 본문, 확인·취소)를 런처 서식으로 옮겼다.
+         메시지 상자(MessageBox)를 쓰지 않는 것은 그 예/아니요 글자가 앱 언어가 아니라 Windows 언어를 따르기 때문이다.
+         본문은 길어도 끝까지 읽게 스크롤된다. 오른쪽에서 왼쪽으로 쓰는 언어면 창 내용 전체를 뒤집는다. -->
+    <Border Background="{StaticResource CardBrush}" CornerRadius="20" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
+            FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
+        <StackPanel Margin="24">
+            <TextBlock x:Name="TxtTitle" Style="{StaticResource Text.CardTitle}" FontSize="20" Margin="0,0,0,12"/>
+            <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                <TextBlock x:Name="TxtMessage" Style="{StaticResource Text.Body}"/>
+            </ScrollViewer>
+
+            <Grid Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BtnCancel" Style="{StaticResource Button.Secondary}" IsCancel="True" Click="BtnCancel_Click"/>
+                <Button x:Name="BtnConfirm" Grid.Column="2" Style="{StaticResource Button.Primary}" IsDefault="True" Click="BtnConfirm_Click"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>
