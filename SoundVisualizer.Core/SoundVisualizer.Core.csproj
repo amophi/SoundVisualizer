@@ -24,4 +24,13 @@
     <EmbeddedResource Include="Localization\Strings\*.json" LogicalName="SoundVisualizer.Localization.Strings.%(Filename)%(Extension)" WithCulture="false" />
   </ItemGroup>
 
+  <!-- 도움말의 오픈소스 라이선스 창이 보이는 고지(Help/LicenseNotices). 저장소의 원본을 제자리에서 넣는다.
+       복사본을 두면 원본만 고치고 잊었을 때 배포되는 앱에 옛 고지가 남는다. 이름은 LicenseNotices.Documents 와 맞춘다. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\THIRD_PARTY.md" Link="Licenses\THIRD_PARTY.md" LogicalName="SoundVisualizer.Licenses.THIRD_PARTY.md" WithCulture="false" />
+    <EmbeddedResource Include="..\SoundVisualizer\Fonts\Pretendard-LICENSE.txt" Link="Licenses\Pretendard-LICENSE.txt" LogicalName="SoundVisualizer.Licenses.Pretendard-LICENSE.txt" WithCulture="false" />
+    <EmbeddedResource Include="Sounds\Data\NOTICE.txt" LogicalName="SoundVisualizer.Licenses.NOTICE.txt" WithCulture="false" />
+    <EmbeddedResource Include="..\LICENSE" Link="Licenses\LICENSE" LogicalName="SoundVisualizer.Licenses.LICENSE" WithCulture="false" />
+  </ItemGroup>
+
 </Project>
