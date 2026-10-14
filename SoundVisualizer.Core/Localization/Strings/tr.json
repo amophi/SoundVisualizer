@@ -162,7 +162,7 @@
   "help.developer.body": "Geliştirici modunu açtığınızda yer paylaşımına algılanan ayrıntılı yapay zeka etiketi, ses motorunun anlık kanal durumu ve FPS gibi teknik bilgiler eklenir. Sistemin düzgün çalışıp çalışmadığını kontrol etmek istediğinizde işe yarar.",
   "help.notes.title": "Bilmeniz gerekenler",
   "help.note.direction_surround": "5.1 veya 7.1 kanal çıkışta ekranın üst kısmı önden, alt kısmı arkadan gelen sesi gösterir. Sol ve sağ kenarlar soldan ve sağdan gelen sesi gösterir; ekranın her yanından aynı anda gelen grafikler ise ortam sesleri veya yönü olmayan seslerdir.",
-  "help.note.direction_stereo": "2 kanal (stereo) çıkışta uygulama sağı ve solu ayırt edebilir, ancak önü ve arkayı ayırt edemez; bu yüzden grafikler yalnızca ekranın sol ve sağ kenarlarında görünür.",
+  "help.note.direction_stereo": "2 kanal (stereo) çıkışta uygulama sağı ve solu ayırt edebilir, ancak önü ve arkayı ayırt edemez. Bu durumda ekranın üst ve alt kısmındaki grafikler, her iki tarafta eşit duyulan sesleri ve uzamsal etkiyi gösterir.",
   "help.note.sources": "Windows'un varsayılan oynatma cihazından çalan tüm uygulamaların sesi gösterilir. Bir uygulamanın başka bir cihaza, örneğin yalnızca sesli sohbet için kullanılan bir kulaklığa gönderdiği ses gösterilmez.",
   "help.note.volume": "Bir uygulamanın ses düzeyi, uygulamanın kendisinde veya Windows ses karıştırıcısında çok kısıksa ya da kapalıysa sesi neredeyse hiç veya hiç görünmeyebilir. Grafikler iyi tepki vermiyorsa o sesi biraz açın veya “Ayarlar” sekmesinde “Hassasiyet” değerini artırın.",
   "help.note.ai": "Yapay zeka sınıflandırması hatalı olabilir. Güvenliğin söz konusu olduğu durumlarda yalnızca bu uygulamaya güvenmeyin.",
