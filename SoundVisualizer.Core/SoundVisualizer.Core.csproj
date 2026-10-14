@@ -11,11 +11,17 @@
   </ItemGroup>
 
   <!-- 분류 탭(Sounds)의 데이터: 18개 언어의 소리 이름과 새로 지은 묶음 이름, 묶음 표. 고지는 Sounds/Data/NOTICE.txt.
-       코드(SoundData)가 이 이름으로 읽으므로 폴더 이름과 상관없게 리소스 이름을 정해 둔다. -->
+       코드(SoundData)가 이 이름으로 읽으므로 폴더 이름과 상관없게 리소스 이름을 정해 둔다.
+       "ko.json" 같은 이름을 문화권 위성 어셈블리로 떼어 내지 않게 WithCulture 를 끈다. -->
   <ItemGroup>
-    <EmbeddedResource Include="Sounds\Data\SoundNames\*.json" LogicalName="SoundVisualizer.Sounds.Data.SoundNames.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="Sounds\Data\GroupTitles\*.json" LogicalName="SoundVisualizer.Sounds.Data.GroupTitles.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="Sounds\Data\sound_groups.tsv" LogicalName="SoundVisualizer.Sounds.Data.sound_groups.tsv" />
+    <EmbeddedResource Include="Sounds\Data\SoundNames\*.json" LogicalName="SoundVisualizer.Sounds.Data.SoundNames.%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="Sounds\Data\GroupTitles\*.json" LogicalName="SoundVisualizer.Sounds.Data.GroupTitles.%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="Sounds\Data\sound_groups.tsv" LogicalName="SoundVisualizer.Sounds.Data.sound_groups.tsv" WithCulture="false" />
+  </ItemGroup>
+
+  <!-- 화면 문자열 표. StringTables 가 이 이름으로 찾는다. "ko.json" 같은 이름을 문화권 위성 어셈블리로 떼어 내지 않게 WithCulture 를 끈다. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Strings\*.json" LogicalName="SoundVisualizer.Localization.Strings.%(Filename)%(Extension)" WithCulture="false" />
   </ItemGroup>
 
 </Project>
