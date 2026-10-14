@@ -18,6 +18,14 @@ This project (`SoundVisualizer`) uses the following third-party open-source libr
 - **Description**: A pre-trained network that predicts 521 audio event classes. The app runs it unmodified with ONNX Runtime and maps its output to three sound types (ambient, speech, danger). The app checks the SHA-256 of both model files at load.
 - **Class names**: The class names come from the AudioSet ontology, distributed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0); the AudioSet dataset is distributed under CC BY 4.0. https://research.google.com/audioset/
 
+## Data
+
+### AudioSet ontology (sound names and sound groups in the Sounds tab)
+- **Files**: `SoundVisualizer.Core/Sounds/Data/SoundNames/*.json` (the 521 sound names in 18 languages) and `SoundVisualizer.Core/Sounds/Data/sound_groups.tsv` (which group each sound belongs to)
+- **License**: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
+- **Source**: "AudioSet Ontology" by Google Inc., [https://github.com/audioset/ontology](https://github.com/audioset/ontology) (commit d417d32)
+- **Description**: The sound names shown in the Sounds tab are the AudioSet class names (the names YAMNet uses) and their translations into the app's languages, which are adaptations of the ontology. The sound groups were made by SoundVisualizer contributors by reading the ontology's hierarchy, and group names that reuse a sound name (Siren, Doorbell, etc.) are part of the same adaptation. Changes: the 521 YAMNet sound names were regrouped into everyday groups and translated. These files are distributed under the same CC BY-SA 4.0 license, as stated in [`SoundVisualizer.Core/Sounds/Data/NOTICE.txt`](SoundVisualizer.Core/Sounds/Data/NOTICE.txt) and in the header of `sound_groups.tsv`. The newly written group names (`GroupTitles/*.json`) and the app code are under this repository's license (GNU AGPL v3).
+
 ## Fonts
 
 ### Pretendard
