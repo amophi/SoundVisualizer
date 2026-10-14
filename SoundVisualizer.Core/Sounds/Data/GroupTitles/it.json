@@ -1,0 +1,17 @@
+{
+  "horns": "Clacson e allarmi dell'auto",
+  "vehicle_warnings": "Segnali di avviso dei veicoli",
+  "breaking": "Vetri rotti e schianti",
+  "talking": "Parlato e sussurri",
+  "distress": "Grida, strilli e pianto",
+  "signals": "Sveglie, bip e fischietti",
+  "voices": "Applausi, canticchiare e fischiettare",
+  "water": "Rubinetti e acqua corrente",
+  "kitchen": "Cucina e cottura",
+  "appliances": "Elettrodomestici e orologi",
+  "tools": "Attrezzi e macchinari",
+  "nature": "Natura e meteo",
+  "body": "Tosse, respiro e suoni del corpo",
+  "objects": "Oggetti e suoni brevi",
+  "background": "TV, radio e suoni di sottofondo"
+}

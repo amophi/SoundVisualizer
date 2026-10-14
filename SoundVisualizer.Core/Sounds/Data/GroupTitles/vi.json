@@ -1,0 +1,17 @@
+{
+  "horns": "Còi xe và báo động ô tô",
+  "vehicle_warnings": "Tín hiệu cảnh báo của xe cộ",
+  "breaking": "Kính vỡ và tiếng đổ vỡ",
+  "talking": "Nói chuyện và thì thầm",
+  "distress": "Tiếng kêu, tiếng thét và tiếng khóc",
+  "signals": "Đồng hồ báo thức, tiếng bíp và tiếng còi",
+  "voices": "Vỗ tay, ngân nga và huýt sáo",
+  "water": "Vòi nước và nước chảy",
+  "kitchen": "Nhà bếp và nấu ăn",
+  "appliances": "Đồ gia dụng và đồng hồ",
+  "tools": "Dụng cụ và máy móc",
+  "nature": "Thiên nhiên và thời tiết",
+  "body": "Ho, hơi thở và âm thanh cơ thể",
+  "objects": "Đồ vật và âm thanh ngắn",
+  "background": "Tivi, radio và âm thanh nền"
+}

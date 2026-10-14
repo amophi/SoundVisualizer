@@ -1,0 +1,534 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+#
+# SoundVisualizer sound groups: the group of each of the 521 YAMNet sound names in the Sounds tab.
+# Adapted from the AudioSet Ontology by Google Inc.
+# (https://github.com/audioset/ontology, commit d417d32), licensed under
+# CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+# Changes: the 521 YAMNet sound names were regrouped into everyday groups by SoundVisualizer contributors (revised 2026-10: laughs, yells, cries and cheering moved to the speech groups).
+# This file is licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+# Provided as is, without warranties of any kind (Section 5 of the licence: Disclaimer of Warranties
+# and Limitation of Liability).
+#
+# Format: group_id<TAB>display_name, one sound per line. Groups and sounds are in display order.
+# group_id is a SoundGroup entry (lower case); display_name is from assets/ai/yamnet_class_map.csv.
+alarms	Alarm
+alarms	Smoke detector, smoke alarm
+alarms	Fire alarm
+sirens	Siren
+sirens	Ambulance (siren)
+sirens	Fire engine, fire truck (siren)
+sirens	Police car (siren)
+sirens	Civil defense siren
+horns	Vehicle horn, car horn, honking
+horns	Air horn, truck horn
+horns	Car alarm
+vehicle_warnings	Reversing beeps
+vehicle_warnings	Bicycle bell
+vehicle_warnings	Tire squeal
+vehicle_warnings	Skidding
+vehicle_warnings	Emergency vehicle
+vehicle_warnings	Train horn
+vehicle_warnings	Train whistle
+vehicle_warnings	Foghorn
+breaking	Shatter
+breaking	Breaking
+breaking	Smash, crash
+breaking	Bang
+slam	Slam
+gunshots	Gunshot, gunfire
+gunshots	Machine gun
+gunshots	Fusillade
+gunshots	Artillery fire
+gunshots	Cap gun
+explosions	Explosion
+explosions	Boom
+explosions	Burst, pop
+fireworks	Fireworks
+fireworks	Firecracker
+thunder	Thunder
+thunder	Thunderstorm
+chainsaw	Chainsaw
+talking	Speech
+talking	Conversation
+talking	Child speech, kid speaking
+talking	Narration, monologue
+talking	Whispering
+talking	Babbling
+talking	Speech synthesizer
+distress	Shout
+distress	Screaming
+distress	Crying, sobbing
+distress	Children shouting
+distress	Yell
+distress	Bellow
+distress	Whoop
+distress	Wail, moan
+baby	Baby cry, infant cry
+baby	Whimper
+crowd	Crowd
+crowd	Chatter
+crowd	Hubbub, speech noise, speech babble
+crowd	Children playing
+crowd	Cheering
+laughter	Laughter
+laughter	Baby laughter
+laughter	Giggle
+laughter	Belly laugh
+laughter	Chuckle, chortle
+laughter	Snicker
+singing	Singing
+singing	Choir
+singing	Child singing
+singing	Rapping
+singing	Synthetic singing
+doorbell	Doorbell
+doorbell	Ding-dong
+doorbell	Knock
+doorbell	Tap
+phone	Telephone
+phone	Telephone bell ringing
+phone	Ringtone
+phone	Telephone dialing, DTMF
+phone	Dial tone
+phone	Busy signal
+signals	Alarm clock
+signals	Beep, bleep
+signals	Buzzer
+signals	Ding
+signals	Ping
+signals	Whistle
+signals	Steam whistle
+fire	Fire
+fire	Crackle
+dog	Dog
+dog	Bark
+dog	Bow-wow
+dog	Yip
+dog	Growling
+dog	Howl
+dog	Whimper (dog)
+voices	Applause
+voices	Clapping
+voices	Humming
+voices	Whistling
+voices	Yodeling
+voices	Chant
+voices	Mantra
+voices	Finger snapping
+voices	Hands
+footsteps	Walk, footsteps
+footsteps	Run
+footsteps	Shuffle
+door	Door
+door	Sliding door
+door	Squeak
+door	Creak
+door	Cupboard open or close
+door	Drawer open or close
+water	Water tap, faucet
+water	Toilet flush
+water	Drip
+water	Sink (filling or washing)
+water	Bathtub (filling or washing)
+water	Fill (with liquid)
+water	Gush
+water	Pour
+water	Trickle, dribble
+water	Spray
+water	Splash, splatter
+water	Slosh
+water	Squish
+water	Pump (liquid)
+water	Liquid
+kitchen	Microwave oven
+kitchen	Frying (food)
+kitchen	Dishes, pots, and pans
+kitchen	Blender
+kitchen	Boiling
+kitchen	Sizzle
+kitchen	Chopping (food)
+kitchen	Cutlery, silverware
+kitchen	Stir
+kitchen	Glass
+kitchen	Chink, clink
+appliances	Vacuum cleaner
+appliances	Hair dryer
+appliances	Clock
+appliances	Mechanical fan
+appliances	Air conditioning
+appliances	Sewing machine
+appliances	Electric shaver, electric razor
+appliances	Electric toothbrush
+appliances	Toothbrush
+appliances	Printer
+appliances	Camera
+appliances	Single-lens reflex camera
+appliances	Tick-tock
+appliances	Tick
+tools	Drill
+tools	Hammer
+tools	Lawn mower
+tools	Power tool
+tools	Jackhammer
+tools	Sawing
+tools	Sanding
+tools	Filing (rasp)
+tools	Tools
+tools	Dental drill, dentist's drill
+tools	Mechanisms
+tools	Gears
+tools	Pulleys
+tools	Ratchet, pawl
+tools	Whir
+tools	Cash register
+vehicle	Vehicle
+vehicle	Car
+vehicle	Train
+vehicle	Fixed-wing aircraft, airplane
+vehicle	Car passing by
+vehicle	Traffic noise, roadway noise
+vehicle	Bus
+vehicle	Truck
+vehicle	Motorcycle
+vehicle	Motor vehicle (road)
+vehicle	Air brake
+vehicle	Power windows, electric windows
+vehicle	Race car, auto racing
+vehicle	Ice cream truck, ice cream van
+vehicle	Bicycle
+vehicle	Skateboard
+vehicle	Engine
+vehicle	Engine starting
+vehicle	Idling
+vehicle	Accelerating, revving, vroom
+vehicle	Engine knocking
+vehicle	Light engine (high frequency)
+vehicle	Medium engine (mid frequency)
+vehicle	Heavy engine (low frequency)
+vehicle	Subway, metro, underground
+vehicle	Rail transport
+vehicle	Railroad car, train wagon
+vehicle	Train wheels squealing
+vehicle	Helicopter
+vehicle	Aircraft
+vehicle	Aircraft engine
+vehicle	Jet engine
+vehicle	Propeller, airscrew
+vehicle	Boat, Water vehicle
+vehicle	Ship
+vehicle	Motorboat, speedboat
+vehicle	Sailboat, sailing ship
+vehicle	Rowboat, canoe, kayak
+vehicle	Toot
+bell	Bell
+bell	Church bell
+bell	Chime
+bell	Wind chime
+bell	Jingle bell
+bell	Cowbell
+bell	Change ringing (campanology)
+bell	Tuning fork
+animal	Animal
+animal	Cat
+animal	Bird
+animal	Chicken, rooster
+animal	Meow
+animal	Purr
+animal	Caterwaul
+animal	Domestic animals, pets
+animal	Bird vocalization, bird call, bird song
+animal	Chirp, tweet
+animal	Squawk
+animal	Pigeon, dove
+animal	Coo
+animal	Crow
+animal	Caw
+animal	Owl
+animal	Hoot
+animal	Bird flight, flapping wings
+animal	Livestock, farm animals, working animals
+animal	Crowing, cock-a-doodle-doo
+animal	Cluck
+animal	Fowl
+animal	Duck
+animal	Quack
+animal	Goose
+animal	Honk
+animal	Turkey
+animal	Gobble
+animal	Horse
+animal	Neigh, whinny
+animal	Clip-clop
+animal	Cattle, bovinae
+animal	Moo
+animal	Pig
+animal	Oink
+animal	Sheep
+animal	Goat
+animal	Bleat
+animal	Wild animals
+animal	Roaring cats (lions, tigers)
+animal	Roar
+animal	Canidae, dogs, wolves
+animal	Rodents, rats, mice
+animal	Mouse
+animal	Patter
+animal	Insect
+animal	Mosquito
+animal	Fly, housefly
+animal	Buzz
+animal	Bee, wasp, etc.
+animal	Cricket
+animal	Frog
+animal	Croak
+animal	Snake
+animal	Whale vocalization
+nature	Rain
+nature	Wind
+nature	Waves, surf
+nature	Rain on surface
+nature	Raindrop
+nature	Rustling leaves
+nature	Water
+nature	Stream
+nature	Waterfall
+nature	Ocean
+nature	Steam
+nature	Gurgling
+nature	Eruption
+body	Cough
+body	Snoring
+body	Breathing
+body	Sneeze
+body	Gasp
+body	Wheeze
+body	Pant
+body	Throat clearing
+body	Sniff
+body	Snort
+body	Sigh
+body	Groan
+body	Grunt
+body	Chewing, mastication
+body	Biting
+body	Gargling
+body	Hiccup
+body	Burping, eructation
+body	Stomach rumble
+body	Fart
+body	Heart sounds, heartbeat
+body	Heart murmur
+objects	Thump, thud
+objects	Typing
+objects	Keys jangling
+objects	Thunk
+objects	Clatter
+objects	Clang
+objects	Slap, smack
+objects	Whack, thwack
+objects	Crunch
+objects	Crushing
+objects	Crumpling, crinkling
+objects	Tearing
+objects	Rattle
+objects	Hiss
+objects	Jingle, tinkle
+objects	Coin (dropping)
+objects	Zipper (clothing)
+objects	Scissors
+objects	Shuffling cards
+objects	Computer keyboard
+objects	Typewriter
+objects	Writing
+objects	Clicking
+objects	Clickety-clack
+objects	Squeal
+objects	Rustle
+objects	Scratch
+objects	Scrape
+objects	Rub
+objects	Roll
+objects	Bouncing
+objects	Basketball bounce
+objects	Plop
+objects	Whoosh, swoosh, swish
+objects	Whip
+objects	Flap
+objects	Boing
+objects	Zing
+objects	Arrow
+objects	Wood
+objects	Chop
+objects	Splinter
+objects	Crack
+music	Music
+music	Musical instrument
+music	Pop music
+music	Piano
+music	Classical music
+music	Guitar
+music	Background music
+music	Drum
+music	Song
+music	Theme music
+music	Soundtrack music
+music	Video game music
+music	Jingle (music)
+music	Lullaby
+music	Music for children
+music	Christmas music
+music	Wedding music
+music	Dance music
+music	Happy music
+music	Sad music
+music	Tender music
+music	Exciting music
+music	Angry music
+music	Scary music
+music	Rock music
+music	Heavy metal
+music	Punk rock
+music	Grunge
+music	Progressive rock
+music	Rock and roll
+music	Psychedelic rock
+music	Hip hop music
+music	Beatboxing
+music	Rhythm and blues
+music	Soul music
+music	Funk
+music	Disco
+music	Reggae
+music	Ska
+music	Jazz
+music	Blues
+music	Swing music
+music	Country
+music	Bluegrass
+music	Folk music
+music	Opera
+music	Electronic music
+music	House music
+music	Techno
+music	Dubstep
+music	Drum and bass
+music	Electronica
+music	Electronic dance music
+music	Ambient music
+music	Trance music
+music	New-age music
+music	Vocal music
+music	A capella
+music	Gospel music
+music	Christian music
+music	Independent music
+music	Traditional music
+music	Middle Eastern music
+music	Music of Africa
+music	Afrobeat
+music	Music of Asia
+music	Carnatic music
+music	Music of Bollywood
+music	Music of Latin America
+music	Salsa music
+music	Flamenco
+music	Electric piano
+music	Keyboard (musical)
+music	Organ
+music	Electronic organ
+music	Hammond organ
+music	Synthesizer
+music	Sampler
+music	Harpsichord
+music	Acoustic guitar
+music	Electric guitar
+music	Bass guitar
+music	Steel guitar, slide guitar
+music	Tapping (guitar technique)
+music	Strum
+music	Plucked string instrument
+music	Banjo
+music	Sitar
+music	Mandolin
+music	Zither
+music	Ukulele
+music	Harp
+music	Bowed string instrument
+music	Violin, fiddle
+music	Pizzicato
+music	Cello
+music	Double bass
+music	String section
+music	Orchestra
+music	Brass instrument
+music	Trumpet
+music	Trombone
+music	French horn
+music	Wind instrument, woodwind instrument
+music	Flute
+music	Saxophone
+music	Clarinet
+music	Harmonica
+music	Accordion
+music	Bagpipes
+music	Didgeridoo
+music	Shofar
+music	Theremin
+music	Percussion
+music	Drum kit
+music	Drum machine
+music	Snare drum
+music	Rimshot
+music	Drum roll
+music	Bass drum
+music	Timpani
+music	Tabla
+music	Cymbal
+music	Hi-hat
+music	Wood block
+music	Tambourine
+music	Rattle (instrument)
+music	Maraca
+music	Gong
+music	Tubular bells
+music	Mallet percussion
+music	Marimba, xylophone
+music	Glockenspiel
+music	Vibraphone
+music	Steelpan
+music	Scratching (performance technique)
+music	Electronic tuner
+music	Effects unit
+music	Chorus effect
+music	Singing bowl
+background	Television
+background	Radio
+background	Noise
+background	Field recording
+background	Environmental noise
+background	Hum
+background	Mains hum
+background	Rumble
+background	Static
+background	White noise
+background	Pink noise
+background	Throbbing
+background	Vibration
+background	Distortion
+background	Cacophony
+background	Sidetone
+background	Wind noise (microphone)
+background	Echo
+background	Reverberation
+background	Inside, small room
+background	Inside, large room or hall
+background	Inside, public space
+background	Outside, urban or manmade
+background	Outside, rural or natural
+background	Silence
+background	Sound effect
+background	Sine wave
+background	Harmonic
+background	Chirp tone
+background	Pulse
+background	Sonar

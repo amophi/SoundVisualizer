@@ -1,0 +1,17 @@
+{
+  "horns": "Hupen und Autoalarme",
+  "vehicle_warnings": "Warnsignale von Fahrzeugen",
+  "breaking": "Glasbruch und Krachen",
+  "talking": "Sprechen und Flüstern",
+  "distress": "Rufen, Schreien und Weinen",
+  "signals": "Wecker, Pieptöne und Trillerpfeifen",
+  "voices": "Klatschen, Summen und Pfeifen",
+  "water": "Wasserhähne und fließendes Wasser",
+  "kitchen": "Küche und Kochen",
+  "appliances": "Haushaltsgeräte und Uhren",
+  "tools": "Werkzeuge und Maschinen",
+  "nature": "Natur und Wetter",
+  "body": "Husten, Atmen und Körpergeräusche",
+  "objects": "Gegenstände und kurze Geräusche",
+  "background": "Fernseher, Radio und Hintergrundgeräusche"
+}

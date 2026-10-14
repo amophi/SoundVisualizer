@@ -1,0 +1,17 @@
+{
+  "horns": "Klakson dan alarm mobil",
+  "vehicle_warnings": "Peringatan kendaraan",
+  "breaking": "Kaca pecah dan benturan",
+  "talking": "Obrolan dan bisikan",
+  "distress": "Teriakan, jeritan, dan tangisan",
+  "signals": "Jam weker, bip, dan peluit",
+  "voices": "Tepuk tangan, senandung, dan siulan",
+  "water": "Keran dan air mengalir",
+  "kitchen": "Dapur dan memasak",
+  "appliances": "Peralatan rumah tangga dan jam",
+  "tools": "Perkakas dan mesin",
+  "nature": "Alam dan cuaca",
+  "body": "Batuk, napas, dan suara tubuh",
+  "objects": "Benda dan suara singkat",
+  "background": "TV, radio, dan bising sekitar"
+}

@@ -10,4 +10,12 @@
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
   </ItemGroup>
 
+  <!-- 분류 탭(Sounds)의 데이터: 18개 언어의 소리 이름과 새로 지은 묶음 이름, 묶음 표. 고지는 Sounds/Data/NOTICE.txt.
+       코드(SoundData)가 이 이름으로 읽으므로 폴더 이름과 상관없게 리소스 이름을 정해 둔다. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Sounds\Data\SoundNames\*.json" LogicalName="SoundVisualizer.Sounds.Data.SoundNames.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Sounds\Data\GroupTitles\*.json" LogicalName="SoundVisualizer.Sounds.Data.GroupTitles.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Sounds\Data\sound_groups.tsv" LogicalName="SoundVisualizer.Sounds.Data.sound_groups.tsv" />
+  </ItemGroup>
+
 </Project>

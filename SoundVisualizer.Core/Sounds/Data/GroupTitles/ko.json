@@ -1,0 +1,17 @@
+{
+  "horns": "경적·자동차 경보음",
+  "vehicle_warnings": "차량 경고음",
+  "breaking": "유리 깨짐·충돌",
+  "talking": "말소리·속삭임",
+  "distress": "외침·비명·울음",
+  "signals": "알람·삐 소리·호루라기",
+  "voices": "박수·콧노래·휘파람",
+  "water": "수돗물·물 흐르는 소리",
+  "kitchen": "부엌·요리",
+  "appliances": "가전제품·시계",
+  "tools": "공구·기계",
+  "nature": "자연·날씨",
+  "body": "기침·숨소리·몸 소리",
+  "objects": "물건 소리·짧은 소리",
+  "background": "TV·라디오·배경 소리"
+}
