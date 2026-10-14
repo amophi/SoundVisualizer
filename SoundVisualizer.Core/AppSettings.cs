@@ -166,6 +166,11 @@ namespace SoundVisualizer
         // 12. 소리 탭을 고급 모드(소리를 하나씩 바꾸는 화면)로 볼지(모바일 classify_advanced). 바꾼 종류와 따로 두는 화면 설정이다.
         public static bool ClassifyAdvanced { get; set; } = false;
 
+        // 13. 튜토리얼을 본 적이 있는지(모바일 tutorial_seen). 아직이면 런처를 열 때 튜토리얼부터 띄운다. 튜토리얼을 닫으면(끝까지 넘기거나
+        // 건너뛰면) true 가 되고, 그 뒤로는 홈의 "튜토리얼 보기"로만 연다. 저장한 적이 없으면 읽을 때 정한다(Load).
+        // 보는 사람에 대한 값이라 전체 초기화(ResetToDefaults)가 건드리지 않는다. 모양 설정을 되돌렸다고 튜토리얼이 다시 뜨면 안 된다.
+        public static bool TutorialSeen { get; set; } = false;
+
         /// <summary>설정 파일 위치. 포터블 배포라 실행 파일 옆에 둔다. 테스트는 임시 파일로 바꾼다.</summary>
         public static string SettingsFilePath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
@@ -192,6 +197,11 @@ namespace SoundVisualizer
 
         public static void Load()
         {
+            // 튜토리얼(모바일 loadTutorialSeen): 설정 파일이 없으면 새로 설치한 것이라 아직 보지 않았다. 파일이 있으면 이미 앱을 써 본
+            // 사람이라, 아래에서 저장한 값을 읽지 못하면(이 기능 전의 파일, 깨진 파일) 본 것으로 둔다.
+            // 모바일은 정한 값을 곧바로 저장한다(기기 표시가 먼저 저장되면 새 설치를 쓰던 사람으로 잘못 친다). PC 는 저장할 때마다 모든
+            // 항목을 쓰므로, 무엇을 먼저 저장하든 정한 값이 함께 남는다. 파일이 없는 동안은 늘 새 설치로 읽힌다.
+            TutorialSeen = File.Exists(SettingsFilePath);
             try
             {
                 if (File.Exists(SettingsFilePath))
@@ -228,6 +238,9 @@ namespace SoundVisualizer
                         // 소리 탭이 생기기 전의 설정 파일에는 둘 다 없다. 그때는 바꾼 소리가 없고 기본 모드로 연다.
                         SoundTypes = ReadSoundTypes(data.SoundTypes);
                         ClassifyAdvanced = data.ClassifyAdvanced ?? DefaultClassifyAdvanced(SoundTypes);
+
+                        // 튜토리얼 항목이 없는 파일은 이 기능 전부터 쓰던 사람의 것이다. 이미 앱을 알므로 튜토리얼을 띄우지 않는다.
+                        TutorialSeen = data.TutorialSeen ?? true;
 
                         // 하이브리드 모드 로드 (모드별 설정이 없는 구버전 호환)
                         if (data.WaveMode != null) WaveMode = data.WaveMode;
@@ -370,6 +383,7 @@ namespace SoundVisualizer
                     ColorDanger = ColorDanger,
                     SoundTypes = WriteSoundTypes(SoundTypes),
                     ClassifyAdvanced = ClassifyAdvanced,
+                    TutorialSeen = TutorialSeen,
 
                     WaveMode = WaveMode,
                     PadMode = PadMode,
@@ -502,6 +516,9 @@ namespace SoundVisualizer
             // 소리 탭. 예전 설정 파일에는 없어 null 로 읽힌다. 소리 종류는 JSON 그대로 받아 ReadSoundTypes 가 거른다.
             public JsonElement? SoundTypes { get; set; }
             public bool? ClassifyAdvanced { get; set; }
+
+            // 튜토리얼을 본 적이 있는지. 예전 설정 파일에는 없어 null 로 읽힌다(그때는 본 것으로 친다).
+            public bool? TutorialSeen { get; set; }
 
             public VisualModeSettings WaveMode { get; set; } = new VisualModeSettings();
             public VisualModeSettings PadMode { get; set; } = new VisualModeSettings();

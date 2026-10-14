@@ -36,11 +36,12 @@ public sealed class AppSettingsTests : IDisposable
         if (File.Exists(_path)) File.Delete(_path);
     }
 
-    // 전체 초기화는 소리 탭의 두 값을 건드리지 않으므로 테스트마다 따로 비운다.
+    // 전체 초기화는 소리 탭의 두 값과 튜토리얼을 본 기록을 건드리지 않으므로 테스트마다 따로 비운다.
     private static void ClearSoundTab()
     {
         AppSettings.SoundTypes = new Dictionary<string, string>();
         AppSettings.ClassifyAdvanced = false;
+        AppSettings.TutorialSeen = false;
     }
 
     [Fact]
@@ -387,5 +388,91 @@ public sealed class AppSettingsTests : IDisposable
         AppSettings.SoundTypes = Types(("Siren", SoundTypeLabels.Ambient));
         Assert.Equal(new[] { "Doorbell" }, before.Keys);
         Assert.Equal(new[] { "Siren" }, AppSettings.SoundTypes.Keys);
+    }
+
+    // ===== 튜토리얼을 본 적이 있는지(모바일 TutorialSettingTest) =====
+    // 처음 여는 사람에게만 튜토리얼을 저절로 띄운다. 이 기능 전부터 쓰던 사람은 이미 앱을 알므로 띄우지 않는다.
+
+    [Fact]
+    public void 새로_설치하면_튜토리얼을_아직_보지_않은_것이다()
+    {
+        AppSettings.TutorialSeen = true; // 앞에서 들고 있던 값이 남지 않는지도 본다
+
+        AppSettings.Load();
+
+        Assert.False(File.Exists(_path));
+        Assert.False(AppSettings.TutorialSeen);
+    }
+
+    [Fact]
+    public void 이_기능_전부터_쓰던_사람은_튜토리얼을_본_것으로_친다()
+    {
+        File.WriteAllText(_path, """{ "VisualMode": 1, "Language": "ko" }""");
+
+        AppSettings.Load();
+
+        Assert.True(AppSettings.TutorialSeen);
+    }
+
+    [Fact]
+    public void 깨진_설정_파일이_있어도_쓰던_사람이라_튜토리얼을_본_것으로_친다()
+    {
+        File.WriteAllText(_path, "{ not json");
+
+        AppSettings.Load();
+
+        Assert.True(AppSettings.TutorialSeen);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void 저장한_튜토리얼_값이_있으면_다른_설정과_상관없이_그_값을_쓴다(bool seen)
+    {
+        File.WriteAllText(_path, "{ \"VisualMode\": 1, \"TutorialSeen\": " + (seen ? "true" : "false") + " }");
+
+        AppSettings.Load();
+
+        Assert.Equal(seen, AppSettings.TutorialSeen);
+    }
+
+    [Fact]
+    public void 처음_정한_값은_다른_설정을_먼저_저장해도_바뀌지_않는다()
+    {
+        // 새로 설치하고 튜토리얼을 닫지 않은 채 언어만 바꾸고 나갔다가 다시 여는 경우. 저장된 파일이 생겼다고 쓰던 사람으로 치면 안 된다.
+        AppSettings.Load();
+        Assert.False(AppSettings.TutorialSeen);
+
+        AppSettings.Language = "ja";
+        AppSettings.SaveNow();
+        AppSettings.Load();
+
+        Assert.False(AppSettings.TutorialSeen);
+        using var doc = JsonDocument.Parse(File.ReadAllText(_path));
+        Assert.False(doc.RootElement.GetProperty("TutorialSeen").GetBoolean());
+    }
+
+    [Fact]
+    public void 닫아서_본_것으로_저장하면_다시_열어도_띄우지_않는다()
+    {
+        AppSettings.Load();
+        AppSettings.TutorialSeen = true;
+        AppSettings.SaveNow();
+
+        AppSettings.TutorialSeen = false;
+        AppSettings.Load();
+
+        Assert.True(AppSettings.TutorialSeen);
+    }
+
+    [Fact]
+    public void 전체_초기화는_튜토리얼을_본_기록을_건드리지_않는다()
+    {
+        // 모양 설정을 되돌렸다고 튜토리얼이 다시 뜨면 안 된다. 본 기록은 사람에 대한 값이다.
+        AppSettings.TutorialSeen = true;
+
+        AppSettings.ResetToDefaults();
+
+        Assert.True(AppSettings.TutorialSeen);
     }
 }
