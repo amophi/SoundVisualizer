@@ -86,6 +86,8 @@
   "settings.section.advanced": "進階設定",
   "settings.developer_mode.title": "開發人員模式",
   "settings.developer_mode.desc": "在覆疊畫面左上角顯示 AI 聽到的內容（它回報的聲音名稱、把握程度和耗時），並在右上角顯示 FPS。顯示內容為英文，不適合日常使用。",
+  "settings.developer_record.title": "將結果記錄到檔案",
+  "settings.developer_record.desc": "將 AI 的每個結果（它評分最高的聲音名稱、把握程度和耗時）寫入 SoundVisualizer.exe 旁邊 ai-log 資料夾中的新 CSV 檔案，方便日後回顧它聽到了什麼。如果無法寫入該資料夾，檔案會改存到 %LOCALAPPDATA%\\SoundVisualizer\\ai-log。檔案可能會變得很大，用完後請關閉。",
   "settings.auto_minimize.title": "開始時將啟動器最小化",
   "settings.auto_minimize.desc": "覆疊畫面開始執行時，自動將這個啟動器視窗最小化。",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "覆疊畫面即時編輯模式",
   "help.editor.body": "按下指定的快速鍵 (預設為 F4) 即可開啟覆疊畫面編輯模式。你可以直接在螢幕上用滑鼠拖曳來調整圖形的大小上限，並在跳出的設定面板中微調細節。",
   "help.developer.title": "開發人員模式",
-  "help.developer.body": "開啟開發人員模式後，覆疊畫面上會額外顯示技術資訊，例如目前偵測到的詳細 AI 標籤、音訊引擎的即時聲道狀態和 FPS。想確認系統是否正常運作時，這個模式就很實用。",
+  "help.developer.body": "開啟開發人員模式後，覆疊畫面左上角會顯示 AI 聽到的內容（聲音名稱、把握程度和耗時），右上角會顯示 FPS。如果同時開啟「{0}」，每個結果都會儲存到 CSV 檔案中。想確認系統是否正常運作時，這個模式就很實用。",
   "help.notes.title": "注意事項",
   "help.note.direction_surround": "以 5.1 或 7.1 聲道輸出時，螢幕上方代表來自前方的聲音，下方代表來自後方的聲音。左右兩側分別代表來自左邊和右邊的聲音，而從螢幕四周同時出現的圖形，則是環境音或沒有方向性的聲音。",
   "help.note.direction_stereo": "以 2 聲道 (立體聲) 輸出時，可以分辨左右，但無法分辨前後。這時螢幕上方和下方的圖形代表兩側聽起來差不多的聲音，以及空間感效果。",

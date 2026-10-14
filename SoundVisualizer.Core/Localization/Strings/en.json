@@ -86,6 +86,8 @@
   "settings.section.advanced": "Advanced settings",
   "settings.developer_mode.title": "Developer mode",
   "settings.developer_mode.desc": "Shows what the AI heard (the sound name it reported, how sure it was, and how long it took) in the top-left corner of the overlay, and the FPS in the top-right. The readout is in English and is not meant for everyday use.",
+  "settings.developer_record.title": "Record results to a file",
+  "settings.developer_record.desc": "Writes every AI result (the sound names it ranked highest, how sure it was, and the timings) to a new CSV file in the ai-log folder next to SoundVisualizer.exe, so you can look back at what it heard. If that folder can't be written to, the file goes to %LOCALAPPDATA%\\SoundVisualizer\\ai-log instead. Files can grow large; turn it off when you are done.",
   "settings.auto_minimize.title": "Minimize launcher on start",
   "settings.auto_minimize.desc": "Automatically minimizes this launcher window when the overlay starts.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Real-time overlay edit mode",
   "help.editor.body": "Press the assigned hotkey (F4 by default) to turn on the overlay edit mode. You can drag on the screen with your mouse to adjust the size limit of the graphics, and fine-tune the details in the settings panel that pops up.",
   "help.developer.title": "Developer mode",
-  "help.developer.body": "Turning on Developer mode adds technical information to the overlay, such as the detailed AI label being detected, the live channel status of the audio engine, and the FPS. It's useful when you want to check that the system is working properly.",
+  "help.developer.body": "Turning on Developer mode shows what the AI heard (the sound name, how sure it was, and how long it took) in the top-left corner of the overlay, and the FPS in the top-right. If you also turn on “{0}”, every result is saved to a CSV file. It's useful when you want to check that the system is working properly.",
   "help.notes.title": "Good to know",
   "help.note.direction_surround": "With 5.1 or 7.1 channel output, the top of the screen shows sound from the front and the bottom shows sound from behind. The left and right sides show sound from the left and right, and graphics coming from every side at once are ambient or non-directional sounds.",
   "help.note.direction_stereo": "With 2-channel (stereo) output, it can tell left from right, but not front from back. Graphics at the top and bottom of the screen then show sounds heard equally on both sides and a sense of space.",

@@ -86,6 +86,8 @@
   "settings.section.advanced": "Setelan lanjutan",
   "settings.developer_mode.title": "Mode pengembang",
   "settings.developer_mode.desc": "Menampilkan apa yang didengar AI (nama suara yang dilaporkan, seberapa yakin, dan berapa lama prosesnya) di sudut kiri atas overlay, serta FPS di sudut kanan atas. Tampilan ini berbahasa Inggris dan tidak ditujukan untuk penggunaan sehari-hari.",
+  "settings.developer_record.title": "Catat hasil ke file",
+  "settings.developer_record.desc": "Menulis setiap hasil AI (nama suara dengan peringkat tertinggi, seberapa yakin, dan waktu prosesnya) ke file CSV baru di folder ai-log di samping SoundVisualizer.exe, sehingga Anda bisa melihat kembali apa yang didengarnya. Jika folder itu tidak bisa ditulisi, file disimpan di %LOCALAPPDATA%\\SoundVisualizer\\ai-log. File bisa menjadi besar, jadi matikan setelah selesai.",
   "settings.auto_minimize.title": "Minimalkan peluncur saat mulai",
   "settings.auto_minimize.desc": "Otomatis meminimalkan jendela peluncur ini saat overlay dimulai.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Mode edit overlay real-time",
   "help.editor.body": "Tekan tombol pintasan yang ditetapkan (default F4) untuk menyalakan mode edit overlay. Anda dapat menyeret mouse di layar untuk mengatur batas ukuran grafik, dan menyempurnakan detailnya di panel setelan yang muncul.",
   "help.developer.title": "Mode pengembang",
-  "help.developer.body": "Menyalakan Mode pengembang akan menambahkan informasi teknis ke overlay, seperti label AI terperinci yang sedang terdeteksi, status saluran real-time dari mesin audio, dan FPS. Ini berguna jika Anda ingin memeriksa apakah sistem berfungsi dengan baik.",
+  "help.developer.body": "Menyalakan Mode pengembang akan menampilkan apa yang didengar AI (nama suara, seberapa yakin, dan berapa lama prosesnya) di sudut kiri atas overlay, serta FPS di sudut kanan atas. Jika Anda juga menyalakan “{0}”, setiap hasil disimpan ke file CSV. Ini berguna jika Anda ingin memeriksa apakah sistem berfungsi dengan baik.",
   "help.notes.title": "Perlu diketahui",
   "help.note.direction_surround": "Dengan output 5.1 atau 7.1 saluran, bagian atas layar menunjukkan suara dari depan, dan bagian bawah menunjukkan suara dari belakang. Sisi kiri dan kanan menunjukkan suara dari kiri dan kanan, sedangkan grafik yang muncul dari semua sisi layar sekaligus adalah suara latar atau suara yang tidak berarah.",
   "help.note.direction_stereo": "Dengan output 2 saluran (stereo), aplikasi dapat membedakan kiri dan kanan, tetapi tidak dapat membedakan depan dan belakang. Dalam hal ini, grafik di bagian atas dan bawah layar menunjukkan suara yang terdengar sama kuat di kedua sisi, serta memberi kesan ruang.",

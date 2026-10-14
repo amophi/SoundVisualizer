@@ -86,6 +86,8 @@
   "settings.section.advanced": "Impostazioni avanzate",
   "settings.developer_mode.title": "Modalità sviluppatore",
   "settings.developer_mode.desc": "Mostra in alto a sinistra dell'overlay cosa ha sentito l'IA (il nome del suono indicato, quanto era sicura e quanto tempo ha impiegato) e in alto a destra gli FPS. Le informazioni sono in inglese e non sono pensate per l'uso quotidiano.",
+  "settings.developer_record.title": "Salva i risultati in un file",
+  "settings.developer_record.desc": "Salva ogni risultato dell'IA (i nomi dei suoni con il punteggio più alto, quanto era sicura e i tempi) in un nuovo file CSV nella cartella ai-log accanto a SoundVisualizer.exe, così puoi rivedere in seguito cosa ha sentito. Se non è possibile scrivere in quella cartella, il file va in %LOCALAPPDATA%\\SoundVisualizer\\ai-log. I file possono diventare grandi, quindi disattivalo quando hai finito.",
   "settings.auto_minimize.title": "Riduci a icona il launcher all'avvio",
   "settings.auto_minimize.desc": "Riduce automaticamente a icona questa finestra del launcher all'avvio dell'overlay.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Modalità di modifica dell'overlay in tempo reale",
   "help.editor.body": "Premi la scorciatoia assegnata (F4 per impostazione predefinita) per attivare la modalità di modifica dell'overlay. Puoi trascinare con il mouse sullo schermo per regolare il limite di dimensione della grafica e rifinire i dettagli nel pannello delle impostazioni che compare.",
   "help.developer.title": "Modalità sviluppatore",
-  "help.developer.body": "Attivando la modalità sviluppatore, l'overlay mostra anche informazioni tecniche, come l'etichetta IA dettagliata rilevata, lo stato in tempo reale dei canali del motore audio e gli FPS. È utile per verificare che il sistema funzioni correttamente.",
+  "help.developer.body": "Attivando la modalità sviluppatore, l'overlay mostra in alto a sinistra cosa ha sentito l'IA (il nome del suono, quanto era sicura e quanto tempo ha impiegato) e in alto a destra gli FPS. Se attivi anche “{0}”, ogni risultato viene salvato in un file CSV. È utile per verificare che il sistema funzioni correttamente.",
   "help.notes.title": "Buono a sapersi",
   "help.note.direction_surround": "Con un'uscita a 5.1 o 7.1 canali, la parte alta dello schermo mostra i suoni che arrivano da davanti e quella bassa i suoni che arrivano da dietro. I lati sinistro e destro mostrano i suoni da sinistra e da destra, mentre la grafica che compare contemporaneamente da tutti i lati dello schermo indica suoni ambientali o senza una direzione.",
   "help.note.direction_stereo": "Con un'uscita a 2 canali (stereo), l'app distingue la sinistra dalla destra, ma non il davanti dal dietro. In questo caso la grafica in alto e in basso sullo schermo rappresenta i suoni che arrivano in modo simile da entrambi i lati e il senso di spazio.",

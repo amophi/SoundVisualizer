@@ -86,6 +86,8 @@
   "settings.section.advanced": "Erweiterte Einstellungen",
   "settings.developer_mode.title": "Entwicklermodus",
   "settings.developer_mode.desc": "Zeigt oben links im Overlay, was die KI gehört hat (den gemeldeten Geräuschnamen, wie sicher sie war und wie lange es gedauert hat), und oben rechts die FPS. Die Anzeige ist auf Englisch und nicht für den Alltag gedacht.",
+  "settings.developer_record.title": "Ergebnisse in eine Datei schreiben",
+  "settings.developer_record.desc": "Schreibt jedes KI-Ergebnis (die am höchsten bewerteten Geräuschnamen, wie sicher sich die KI war, und die Zeiten) in eine neue CSV-Datei im Ordner ai-log neben SoundVisualizer.exe, damit Sie später nachsehen können, was sie gehört hat. Ist dieser Ordner nicht beschreibbar, landet die Datei in %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Die Dateien können groß werden. Schalten Sie die Option aus, wenn Sie fertig sind.",
   "settings.auto_minimize.title": "Launcher beim Start minimieren",
   "settings.auto_minimize.desc": "Minimiert dieses Launcher-Fenster automatisch, wenn das Overlay startet.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Overlay-Bearbeitungsmodus in Echtzeit",
   "help.editor.body": "Drücken Sie das zugewiesene Tastenkürzel (standardmäßig F4), um den Overlay-Bearbeitungsmodus einzuschalten. Sie können auf dem Bildschirm mit der Maus ziehen, um die Größengrenze der Grafiken anzupassen, und im eingeblendeten Einstellungsbereich Details feinjustieren.",
   "help.developer.title": "Entwicklermodus",
-  "help.developer.body": "Wenn Sie den Entwicklermodus einschalten, zeigt das Overlay zusätzlich technische Informationen an, etwa das erkannte KI-Label im Detail, den Live-Kanalstatus der Audio-Engine und die FPS. Das ist nützlich, um zu prüfen, ob das System richtig funktioniert.",
+  "help.developer.body": "Wenn Sie den Entwicklermodus einschalten, zeigt das Overlay oben links, was die KI gehört hat (den Geräuschnamen, wie sicher sie war und wie lange es gedauert hat), und oben rechts die FPS. Schalten Sie zusätzlich „{0}“ ein, wird jedes Ergebnis in einer CSV-Datei gespeichert. Das ist nützlich, um zu prüfen, ob das System richtig funktioniert.",
   "help.notes.title": "Gut zu wissen",
   "help.note.direction_surround": "Bei 5.1- oder 7.1-Kanal-Ausgabe zeigt der obere Bildschirmrand Geräusche von vorne, der untere Geräusche von hinten. Die linke und rechte Seite zeigen Geräusche von links und rechts. Grafiken, die gleichzeitig von allen Seiten des Bildschirms kommen, stehen für Umgebungsgeräusche oder Geräusche ohne Richtung.",
   "help.note.direction_stereo": "Bei 2-Kanal-Ausgabe (Stereo) werden links und rechts unterschieden, vorne und hinten jedoch nicht. Grafiken am oberen und unteren Bildschirmrand zeigen dann Geräusche, die auf beiden Seiten gleich stark zu hören sind, sowie den Raumeindruck.",

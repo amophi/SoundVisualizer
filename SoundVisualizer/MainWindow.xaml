@@ -293,6 +293,9 @@
                                     <TextBlock x:Name="EditPanelAdminSettingsLabel" Style="{StaticResource Text.CardTitle}" Margin="0,0,0,16" Text="{l:Loc settings.section.advanced}"/>
                                     <CheckBox x:Name="EditPanelAdminCheckBox" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.developer_mode.title}"
                                               ui:SettingRow.Description="{l:Loc editor.developer_mode_desc}" Checked="EditPanelAdmin_Changed" Unchecked="EditPanelAdmin_Changed"/>
+                                    <!-- 개발자 모드에 딸린 스위치(런처와 같다). 파일이 어디에 생기는지 알려야 해서 설명은 런처의 것을 그대로 쓴다. -->
+                                    <CheckBox x:Name="EditPanelRecordCheckBox" Style="{StaticResource SwitchRow}" Margin="16,0,0,24" Content="{l:Loc settings.developer_record.title}"
+                                              ui:SettingRow.Description="{l:Loc settings.developer_record.desc}" Checked="EditPanelRecord_Changed" Unchecked="EditPanelRecord_Changed"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

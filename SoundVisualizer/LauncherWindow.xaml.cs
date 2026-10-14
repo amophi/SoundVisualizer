@@ -192,6 +192,8 @@ namespace SoundVisualizer
             SldTargetFps.Maximum = AppSettings.GetMonitorRefreshRate();
             SldTargetFps.Value = AppSettings.TargetFps;
             ChkAdminMode.IsChecked = AppSettings.IsAdminMode;
+            ChkDeveloperRecord.IsChecked = AppSettings.DeveloperRecord;
+            Show(ChkDeveloperRecord, AppSettings.IsAdminMode);
             if (ChkAutoMinimizeOnLaunch != null) ChkAutoMinimizeOnLaunch.IsChecked = AppSettings.AutoMinimizeOnLaunch;
 
             if (BtnVisualHotkey != null) BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
@@ -460,7 +462,13 @@ namespace SoundVisualizer
                 }
                 else if (sender == ChipsSoundMode) AppSettings.SoundMode = ChipsSoundMode.SelectedIndex;
                 else if (sender == SldTargetFps) AppSettings.TargetFps = SldTargetFps.Value;
-                else if (sender == ChkAdminMode) AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
+                else if (sender == ChkAdminMode)
+                {
+                    AppSettings.IsAdminMode = ChkAdminMode.IsChecked ?? false;
+                    // 결과 기록은 개발자 모드에서만 쓰므로 그때만 보인다. 값은 건드리지 않는다.
+                    Show(ChkDeveloperRecord, AppSettings.IsAdminMode);
+                }
+                else if (sender == ChkDeveloperRecord) AppSettings.DeveloperRecord = ChkDeveloperRecord.IsChecked ?? false;
                 else if (sender == ChkAutoMinimizeOnLaunch) AppSettings.AutoMinimizeOnLaunch = ChkAutoMinimizeOnLaunch.IsChecked ?? false;
                 else if (sender == ChkShowAmbient) AppSettings.ShowAmbient = ChkShowAmbient.IsChecked ?? true;
                 else if (sender == ChkShowSpeech) AppSettings.ShowSpeech = ChkShowSpeech.IsChecked ?? true;

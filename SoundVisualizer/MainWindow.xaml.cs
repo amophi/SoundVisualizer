@@ -887,6 +887,8 @@ namespace SoundVisualizer
             EditPanelTargetFpsSlider.Maximum = AppSettings.GetMonitorRefreshRate();
             EditPanelTargetFpsSlider.Value = AppSettings.TargetFps;
             EditPanelAdminCheckBox.IsChecked = AppSettings.IsAdminMode;
+            EditPanelRecordCheckBox.IsChecked = AppSettings.DeveloperRecord;
+            EditPanelRecordCheckBox.Visibility = AppSettings.IsAdminMode ? Visibility.Visible : Visibility.Collapsed;
 
             _isUpdatingEditPanelSliders = false;
         }
@@ -1136,6 +1138,17 @@ namespace SoundVisualizer
         {
             if (_isUpdatingEditPanelSliders) return;
             AppSettings.IsAdminMode = EditPanelAdminCheckBox.IsChecked ?? false;
+            // 결과 기록은 개발자 모드에서만 쓰므로 그때만 보인다(런처와 같다). 값은 건드리지 않는다.
+            EditPanelRecordCheckBox.Visibility = AppSettings.IsAdminMode ? Visibility.Visible : Visibility.Collapsed;
+            AppSettings.Save();
+            OnSettingsChangedFromHotkey?.Invoke();
+        }
+
+        private void EditPanelRecord_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingEditPanelSliders) return;
+            // 기록기는 다음 프레임에 SyncDebugHud 가 켜고 끈다.
+            AppSettings.DeveloperRecord = EditPanelRecordCheckBox.IsChecked ?? false;
             AppSettings.Save();
             OnSettingsChangedFromHotkey?.Invoke();
         }

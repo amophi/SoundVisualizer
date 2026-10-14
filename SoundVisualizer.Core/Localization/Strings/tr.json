@@ -86,6 +86,8 @@
   "settings.section.advanced": "Gelişmiş ayarlar",
   "settings.developer_mode.title": "Geliştirici modu",
   "settings.developer_mode.desc": "Yapay zekanın ne duyduğunu (bildirdiği ses adı, ne kadar emin olduğu ve ne kadar sürdüğü) yer paylaşımının sol üst köşesinde, FPS'yi de sağ üst köşesinde gösterir. Bilgiler İngilizce gösterilir ve günlük kullanım için tasarlanmamıştır.",
+  "settings.developer_record.title": "Sonuçları dosyaya kaydet",
+  "settings.developer_record.desc": "Yapay zekanın her sonucunu (en yüksek puan verdiği ses adları, ne kadar emin olduğu ve süreler) SoundVisualizer.exe ile aynı yerdeki ai-log klasöründe yeni bir CSV dosyasına yazar, böylece ne duyduğuna sonradan bakabilirsiniz. Bu klasöre yazılamıyorsa dosya %LOCALAPPDATA%\\SoundVisualizer\\ai-log klasörüne kaydedilir. Dosyalar büyüyebilir, işiniz bitince kapatın.",
   "settings.auto_minimize.title": "Başlatınca başlatıcıyı küçült",
   "settings.auto_minimize.desc": "Yer paylaşımı başladığında bu başlatıcı penceresini otomatik olarak simge durumuna küçültür.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Anlık yer paylaşımı düzenleme modu",
   "help.editor.body": "Yer paylaşımı düzenleme modunu açmak için atanmış kısayol tuşuna (varsayılan: F4) basın. Ekranda fareyle sürükleyerek grafiklerin boyut sınırını ayarlayabilir, açılan ayarlar panelinde ayrıntılara ince ayar yapabilirsiniz.",
   "help.developer.title": "Geliştirici modu",
-  "help.developer.body": "Geliştirici modunu açtığınızda yer paylaşımına algılanan ayrıntılı yapay zeka etiketi, ses motorunun anlık kanal durumu ve FPS gibi teknik bilgiler eklenir. Sistemin düzgün çalışıp çalışmadığını kontrol etmek istediğinizde işe yarar.",
+  "help.developer.body": "Geliştirici modunu açtığınızda yer paylaşımının sol üst köşesinde yapay zekanın ne duyduğu (ses adı, ne kadar emin olduğu ve ne kadar sürdüğü), sağ üst köşesinde de FPS gösterilir. “{0}” seçeneğini de açarsanız her sonuç bir CSV dosyasına kaydedilir. Sistemin düzgün çalışıp çalışmadığını kontrol etmek istediğinizde işe yarar.",
   "help.notes.title": "Bilmeniz gerekenler",
   "help.note.direction_surround": "5.1 veya 7.1 kanal çıkışta ekranın üst kısmı önden, alt kısmı arkadan gelen sesi gösterir. Sol ve sağ kenarlar soldan ve sağdan gelen sesi gösterir; ekranın her yanından aynı anda gelen grafikler ise ortam sesleri veya yönü olmayan seslerdir.",
   "help.note.direction_stereo": "2 kanal (stereo) çıkışta uygulama sağı ve solu ayırt edebilir, ancak önü ve arkayı ayırt edemez. Bu durumda ekranın üst ve alt kısmındaki grafikler, her iki tarafta eşit duyulan sesleri ve uzamsal etkiyi gösterir.",

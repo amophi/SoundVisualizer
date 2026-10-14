@@ -86,6 +86,8 @@
   "settings.section.advanced": "Paramètres avancés",
   "settings.developer_mode.title": "Mode développeur",
   "settings.developer_mode.desc": "Affiche en haut à gauche de l'overlay ce que l'IA a entendu (le nom du son indiqué, son degré de certitude et le temps de traitement), et les FPS en haut à droite. Ces informations sont en anglais et ne sont pas destinées à un usage quotidien.",
+  "settings.developer_record.title": "Enregistrer les résultats dans un fichier",
+  "settings.developer_record.desc": "Enregistre chaque résultat de l'IA (les noms de sons les mieux classés, son degré de certitude et les temps de traitement) dans un nouveau fichier CSV du dossier ai-log, à côté de SoundVisualizer.exe, pour revoir ensuite ce qu'elle a entendu. Si ce dossier n'est pas accessible en écriture, le fichier va dans %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Les fichiers peuvent devenir volumineux. Désactivez l'option une fois terminé.",
   "settings.auto_minimize.title": "Réduire le lanceur au démarrage",
   "settings.auto_minimize.desc": "Réduit automatiquement la fenêtre du lanceur au démarrage de l'overlay.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Mode d'édition de l'overlay en temps réel",
   "help.editor.body": "Appuyez sur le raccourci attribué (F4 par défaut) pour activer le mode d'édition de l'overlay. Vous pouvez faire glisser la souris à l'écran pour ajuster la limite de taille des graphismes, puis affiner les détails dans le panneau de paramètres qui s'affiche.",
   "help.developer.title": "Mode développeur",
-  "help.developer.body": "Une fois activé, le mode développeur ajoute des informations techniques à l'overlay, comme l'étiquette détaillée détectée par l'IA, l'état des canaux du moteur audio en temps réel et les FPS. C'est utile pour vérifier que le système fonctionne correctement.",
+  "help.developer.body": "Une fois activé, le mode développeur affiche en haut à gauche de l'overlay ce que l'IA a entendu (le nom du son, son degré de certitude et le temps de traitement) et les FPS en haut à droite. Si vous activez aussi « {0} », chaque résultat est enregistré dans un fichier CSV. C'est utile pour vérifier que le système fonctionne correctement.",
   "help.notes.title": "Bon à savoir",
   "help.note.direction_surround": "Avec une sortie 5.1 ou 7.1 canaux, le haut de l'écran montre les sons venant de l'avant, et le bas, ceux venant de l'arrière. Les côtés gauche et droit montrent les sons venant de la gauche et de la droite, et les graphismes qui apparaissent en même temps de tous les côtés de l'écran correspondent à des sons d'ambiance ou sans direction.",
   "help.note.direction_stereo": "Avec une sortie 2 canaux (stéréo), l'application distingue la gauche de la droite, mais pas l'avant de l'arrière. Les graphismes en haut et en bas de l'écran représentent alors les sons entendus de façon similaire des deux côtés, ainsi que la sensation d'espace.",

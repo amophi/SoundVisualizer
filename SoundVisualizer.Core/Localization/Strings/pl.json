@@ -86,6 +86,8 @@
   "settings.section.advanced": "Ustawienia zaawansowane",
   "settings.developer_mode.title": "Tryb programisty",
   "settings.developer_mode.desc": "Pokazuje w lewym górnym rogu nakładki, co usłyszała AI (zgłoszoną nazwę dźwięku, pewność i czas przetwarzania), a w prawym górnym rogu FPS. Informacje są po angielsku i nie są przeznaczone do codziennego użytku.",
+  "settings.developer_record.title": "Zapisuj wyniki do pliku",
+  "settings.developer_record.desc": "Zapisuje każdy wynik AI (najwyżej ocenione nazwy dźwięków, pewność i czasy przetwarzania) do nowego pliku CSV w folderze ai-log obok SoundVisualizer.exe, aby można było później sprawdzić, co usłyszała. Jeśli do tego folderu nie da się zapisywać, plik trafia do %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Pliki mogą być duże, więc wyłącz zapis, gdy skończysz.",
   "settings.auto_minimize.title": "Minimalizuj launcher po uruchomieniu",
   "settings.auto_minimize.desc": "Automatycznie minimalizuje okno launchera, gdy uruchamia się nakładka.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Edycja nakładki na żywo",
   "help.editor.body": "Naciśnij przypisany skrót (domyślnie F4), aby włączyć tryb edycji nakładki. Przeciągając myszą po ekranie, możesz ustawić limit rozmiaru grafiki, a szczegóły dopracować w wyświetlonym panelu ustawień.",
   "help.developer.title": "Tryb programisty",
-  "help.developer.body": "Po włączeniu trybu programisty na nakładce pojawiają się informacje techniczne, takie jak szczegółowa etykieta AI wykrywanego dźwięku, bieżący stan kanałów silnika audio i FPS. Przydaje się to, gdy chcesz sprawdzić, czy system działa prawidłowo.",
+  "help.developer.body": "Po włączeniu trybu programisty w lewym górnym rogu nakładki pojawia się to, co usłyszała AI (nazwa dźwięku, pewność i czas przetwarzania), a w prawym górnym rogu FPS. Jeśli włączysz też „{0}”, każdy wynik zostanie zapisany w pliku CSV. Przydaje się to, gdy chcesz sprawdzić, czy system działa prawidłowo.",
   "help.notes.title": "Warto wiedzieć",
   "help.note.direction_surround": "Przy wyjściu 5.1 lub 7.1 góra ekranu pokazuje dźwięk z przodu, a dół – dźwięk z tyłu. Lewa i prawa krawędź pokazują dźwięk z lewej i prawej strony, a grafika wychodząca jednocześnie ze wszystkich stron ekranu to dźwięki otoczenia lub dźwięki bez określonego kierunku.",
   "help.note.direction_stereo": "Przy wyjściu 2-kanałowym (stereo) aplikacja odróżnia lewą stronę od prawej, ale nie przód od tyłu. Grafika u góry i u dołu ekranu pokazuje wtedy dźwięki słyszalne jednakowo z obu stron oraz wrażenie przestrzeni.",

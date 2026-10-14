@@ -169,7 +169,8 @@
                     </StackPanel>
                     <StackPanel>
                         <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.developer.title}"/>
-                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.developer.body}"/>
+                        <!-- 결과 기록 스위치의 이름이 들어가 코드가 채운다(ApplyTexts). -->
+                        <TextBlock x:Name="TxtDeveloper" Style="{StaticResource Help.ItemText}"/>
                     </StackPanel>
                 </StackPanel>
             </Expander>

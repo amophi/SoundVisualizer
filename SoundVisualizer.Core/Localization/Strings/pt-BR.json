@@ -86,6 +86,8 @@
   "settings.section.advanced": "Ajustes avançados",
   "settings.developer_mode.title": "Modo de desenvolvedor",
   "settings.developer_mode.desc": "Mostra no canto superior esquerdo da sobreposição o que a IA ouviu (o nome do som informado, o grau de certeza e quanto tempo levou) e, no canto superior direito, o FPS. As informações aparecem em inglês e não são para o uso diário.",
+  "settings.developer_record.title": "Salvar os resultados em um arquivo",
+  "settings.developer_record.desc": "Salva cada resultado da IA (os nomes de som com maior pontuação, o grau de certeza e os tempos) em um novo arquivo CSV na pasta ai-log, ao lado do SoundVisualizer.exe, para você rever depois o que ela ouviu. Se não for possível gravar nessa pasta, o arquivo vai para %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Os arquivos podem ficar grandes, então desative quando terminar.",
   "settings.auto_minimize.title": "Minimizar o inicializador ao iniciar",
   "settings.auto_minimize.desc": "Minimiza automaticamente esta janela do inicializador quando a sobreposição é iniciada.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Modo de edição da sobreposição em tempo real",
   "help.editor.body": "Pressione o atalho definido (F4 por padrão) para ativar o modo de edição da sobreposição. Você pode arrastar o mouse na tela para ajustar o limite de tamanho dos gráficos e refinar os detalhes no painel de ajustes que aparece.",
   "help.developer.title": "Modo de desenvolvedor",
-  "help.developer.body": "Ao ativar o modo de desenvolvedor, a sobreposição passa a mostrar informações técnicas, como o rótulo detalhado que a IA está detectando, o status dos canais do mecanismo de áudio em tempo real e o FPS. É útil para verificar se o sistema está funcionando corretamente.",
+  "help.developer.body": "Ao ativar o modo de desenvolvedor, a sobreposição mostra no canto superior esquerdo o que a IA ouviu (o nome do som, o grau de certeza e quanto tempo levou) e, no canto superior direito, o FPS. Se você também ativar “{0}”, cada resultado é salvo em um arquivo CSV. É útil para verificar se o sistema está funcionando corretamente.",
   "help.notes.title": "Bom saber",
   "help.note.direction_surround": "Com saída de 5.1 ou 7.1 canais, a parte de cima da tela mostra o som que vem da frente, e a de baixo, o som que vem de trás. As laterais esquerda e direita mostram o som que vem da esquerda e da direita, e os gráficos que surgem de todos os lados da tela ao mesmo tempo representam sons ambientes ou sem direção.",
   "help.note.direction_stereo": "Com saída de 2 canais (estéreo), o app diferencia esquerda e direita, mas não frente e trás. Nesse caso, os gráficos nas partes de cima e de baixo da tela representam sons que chegam igualmente dos dois lados e a sensação de espaço.",

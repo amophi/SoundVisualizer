@@ -271,6 +271,8 @@
                             <Border Style="{StaticResource SettingsCard}">
                                 <StackPanel>
                                     <CheckBox x:Name="ChkAdminMode" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.developer_mode.title}" ui:SettingRow.Description="{l:Loc settings.developer_mode.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                    <!-- 개발자 모드에 딸린 스위치. 개발자 모드를 끄면 접는다(값은 남는다. 안드로이드 DependentSettings). -->
+                                    <CheckBox x:Name="ChkDeveloperRecord" Style="{StaticResource SwitchRow}" Margin="16,0,0,24" Content="{l:Loc settings.developer_record.title}" ui:SettingRow.Description="{l:Loc settings.developer_record.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                     <CheckBox x:Name="ChkAutoMinimizeOnLaunch" Style="{StaticResource SwitchRow}" Content="{l:Loc settings.auto_minimize.title}" ui:SettingRow.Description="{l:Loc settings.auto_minimize.desc}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                 </StackPanel>
                             </Border>

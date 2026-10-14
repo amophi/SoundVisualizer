@@ -86,6 +86,8 @@
   "settings.section.advanced": "高级设置",
   "settings.developer_mode.title": "开发者模式",
   "settings.developer_mode.desc": "在覆盖层左上角显示 AI 听到的内容（它报告的声音名称、把握程度和耗时），并在右上角显示 FPS。显示内容为英文，不适合日常使用。",
+  "settings.developer_record.title": "将结果记录到文件",
+  "settings.developer_record.desc": "将 AI 的每个结果（它评分最高的声音名称、把握程度和耗时）写入 SoundVisualizer.exe 旁边 ai-log 文件夹中的新 CSV 文件，方便日后回看它听到了什么。如果无法写入该文件夹，文件会改存到 %LOCALAPPDATA%\\SoundVisualizer\\ai-log。文件可能会变得很大，用完后请关闭。",
   "settings.auto_minimize.title": "启动时最小化启动器",
   "settings.auto_minimize.desc": "启动覆盖层时，自动最小化此启动器窗口。",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "覆盖层实时编辑模式",
   "help.editor.body": "按下指定的快捷键（默认为 F4）即可开启覆盖层编辑模式。您可以直接在屏幕上用鼠标拖动来调整图形的大小上限，并在弹出的设置面板中微调细节。",
   "help.developer.title": "开发者模式",
-  "help.developer.body": "开启开发者模式后，覆盖层上会额外显示技术信息，例如当前检测到的详细 AI 标签、音频引擎的实时声道状态以及 FPS。需要确认系统是否正常运行时，这个模式会很有用。",
+  "help.developer.body": "开启开发者模式后，覆盖层左上角会显示 AI 听到的内容（声音名称、把握程度和耗时），右上角会显示 FPS。如果同时开启“{0}”，每个结果都会保存到 CSV 文件中。需要确认系统是否正常运行时，这个模式会很有用。",
   "help.notes.title": "注意事项",
   "help.note.direction_surround": "以 5.1 或 7.1 声道输出时，屏幕顶部表示来自前方的声音，底部表示来自后方的声音。左右两侧分别表示来自左边和右边的声音，而从屏幕四周同时出现的图形表示环境音或没有方向的声音。",
   "help.note.direction_stereo": "以 2 声道（立体声）输出时，可以分辨左右，但无法分辨前后。此时屏幕顶部和底部的图形表示左右两侧听起来相近的声音以及空间感。",

@@ -86,6 +86,8 @@
   "settings.section.advanced": "Cài đặt nâng cao",
   "settings.developer_mode.title": "Chế độ nhà phát triển",
   "settings.developer_mode.desc": "Hiển thị nội dung AI nghe được (tên âm thanh AI báo, mức độ chắc chắn và thời gian xử lý) ở góc trên bên trái lớp phủ, cùng FPS ở góc trên bên phải. Nội dung hiển thị bằng tiếng Anh và không dành cho việc sử dụng hằng ngày.",
+  "settings.developer_record.title": "Ghi kết quả vào tệp",
+  "settings.developer_record.desc": "Ghi mọi kết quả của AI (các tên âm thanh được đánh giá cao nhất, mức độ chắc chắn và thời gian xử lý) vào một tệp CSV mới trong thư mục ai-log cạnh SoundVisualizer.exe, để bạn có thể xem lại AI đã nghe thấy gì. Nếu không ghi được vào thư mục đó, tệp sẽ được lưu vào %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Tệp có thể rất lớn, hãy tắt khi bạn xem xong.",
   "settings.auto_minimize.title": "Thu nhỏ trình khởi chạy khi bắt đầu",
   "settings.auto_minimize.desc": "Tự động thu nhỏ cửa sổ trình khởi chạy này khi lớp phủ bắt đầu chạy.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Chế độ chỉnh sửa lớp phủ theo thời gian thực",
   "help.editor.body": "Nhấn phím tắt đã gán (mặc định là F4) để bật chế độ chỉnh sửa lớp phủ. Bạn có thể kéo chuột trên màn hình để điều chỉnh giới hạn kích thước của đồ họa, rồi tinh chỉnh chi tiết trong bảng cài đặt hiện ra.",
   "help.developer.title": "Chế độ nhà phát triển",
-  "help.developer.body": "Khi bật Chế độ nhà phát triển, lớp phủ sẽ hiện thêm thông tin kỹ thuật như nhãn AI chi tiết đang được phát hiện, trạng thái kênh theo thời gian thực của bộ xử lý âm thanh và FPS. Chế độ này hữu ích khi bạn muốn kiểm tra xem hệ thống có hoạt động bình thường không.",
+  "help.developer.body": "Khi bật Chế độ nhà phát triển, góc trên bên trái lớp phủ sẽ hiện nội dung AI nghe được (tên âm thanh, mức độ chắc chắn và thời gian xử lý), còn góc trên bên phải hiện FPS. Nếu bật thêm “{0}”, mọi kết quả sẽ được lưu vào tệp CSV. Chế độ này hữu ích khi bạn muốn kiểm tra xem hệ thống có hoạt động bình thường không.",
   "help.notes.title": "Lưu ý",
   "help.note.direction_surround": "Khi xuất âm thanh 5.1 hoặc 7.1 kênh, cạnh trên màn hình thể hiện âm thanh từ phía trước và cạnh dưới thể hiện âm thanh từ phía sau. Hai bên trái và phải thể hiện âm thanh từ bên trái và bên phải, còn đồ họa xuất hiện cùng lúc từ mọi phía của màn hình là âm thanh môi trường hoặc âm thanh không có hướng.",
   "help.note.direction_stereo": "Khi xuất âm thanh 2 kênh (âm thanh nổi), ứng dụng phân biệt được trái và phải, nhưng không phân biệt được phía trước và phía sau. Khi đó, đồ họa ở cạnh trên và cạnh dưới màn hình biểu thị âm thanh nghe như nhau ở cả hai bên, cũng như cảm giác không gian.",

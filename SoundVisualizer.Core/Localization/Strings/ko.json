@@ -86,6 +86,8 @@
   "settings.section.advanced": "고급 설정",
   "settings.developer_mode.title": "개발자 모드",
   "settings.developer_mode.desc": "AI가 무슨 소리로 들었는지, 얼마나 확신했는지, 얼마나 걸렸는지를 오버레이 왼쪽 위에, FPS를 오른쪽 위에 띄웁니다. 내용은 영어로 나오고, 평소에 쓰라고 만든 것이 아닙니다.",
+  "settings.developer_record.title": "결과를 파일로 기록",
+  "settings.developer_record.desc": "AI가 내놓은 결과를 매번 SoundVisualizer.exe 옆의 ai-log 폴더에 새 CSV 파일로 남깁니다. 가장 높게 본 소리 이름들과 확신도, 걸린 시간이 함께 적혀서 무슨 소리로 들었는지 나중에 되짚어 볼 수 있습니다. 그 폴더에 쓸 수 없으면 %LOCALAPPDATA%\\SoundVisualizer\\ai-log 폴더에 남깁니다. 파일이 커질 수 있으니 다 보고 나면 꺼 주세요.",
   "settings.auto_minimize.title": "실행 시 런처 최소화",
   "settings.auto_minimize.desc": "오버레이 실행 시 이 런처 창을 자동으로 최소화합니다.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "오버레이 실시간 편집 모드",
   "help.editor.body": "지정된 단축키(기본 F4)를 누르면 오버레이 편집 모드가 활성화됩니다. 화면에서 직접 마우스를 드래그하여 그래픽의 크기 한계선을 조절할 수 있으며, 팝업된 설정 패널에서 세부 조작이 가능합니다.",
   "help.developer.title": "개발자 모드",
-  "help.developer.body": "개발자 모드를 활성화하면 현재 감지되는 상세 AI 라벨, 오디오 엔진의 실시간 채널 상태, FPS 등 기술적인 정보를 오버레이 화면에 추가로 표시합니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.",
+  "help.developer.body": "개발자 모드를 켜면 AI가 무슨 소리로 들었는지, 얼마나 확신했는지, 얼마나 걸렸는지를 오버레이 왼쪽 위에, FPS를 오른쪽 위에 표시합니다. ‘{0}’ 스위치도 켜면 모든 결과가 CSV 파일로 남습니다. 시스템의 정상 작동 여부를 확인하고 싶을 때 유용합니다.",
   "help.notes.title": "알아두세요",
   "help.note.direction_surround": "5.1채널이나 7.1채널로 출력하면 화면 위쪽은 앞에서, 아래쪽은 뒤에서 나는 소리를 나타냅니다. 왼쪽과 오른쪽은 각각 왼쪽, 오른쪽 소리이고, 화면 모든 방향에서 한꺼번에 나오는 그래픽은 환경음이나 방향성이 없는 소리입니다.",
   "help.note.direction_stereo": "2채널(스테레오)로 출력하면 좌우는 구분하지만 앞뒤는 구분하지 못합니다. 이때 화면 위·아래쪽 그래픽은 양쪽에서 비슷하게 들리는 소리와 공간감 효과를 나타냅니다.",

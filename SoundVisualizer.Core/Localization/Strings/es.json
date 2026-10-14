@@ -86,6 +86,8 @@
   "settings.section.advanced": "Ajustes avanzados",
   "settings.developer_mode.title": "Modo de desarrollador",
   "settings.developer_mode.desc": "Muestra en la esquina superior izquierda de la superposición lo que oyó la IA (el nombre del sonido que indicó, su grado de seguridad y cuánto tardó) y, en la esquina superior derecha, los FPS. La información aparece en inglés y no está pensada para el uso diario.",
+  "settings.developer_record.title": "Guardar los resultados en un archivo",
+  "settings.developer_record.desc": "Guarda cada resultado de la IA (los nombres de sonido que puntuó más alto, su grado de seguridad y los tiempos) en un archivo CSV nuevo dentro de la carpeta ai-log, junto a SoundVisualizer.exe, para que puedas revisar después lo que oyó. Si no se puede escribir en esa carpeta, el archivo se guarda en %LOCALAPPDATA%\\SoundVisualizer\\ai-log. Los archivos pueden ocupar mucho, así que desactívalo cuando termines.",
   "settings.auto_minimize.title": "Minimizar el lanzador al iniciar",
   "settings.auto_minimize.desc": "Minimiza automáticamente esta ventana del lanzador cuando se inicia la superposición.",
 
@@ -159,7 +161,7 @@
   "help.editor.title": "Modo de edición de la superposición en tiempo real",
   "help.editor.body": "Presiona el atajo asignado (F4 de forma predeterminada) para activar el modo de edición de la superposición. Puedes arrastrar sobre la pantalla para ajustar el límite de tamaño de los gráficos y afinar los detalles en el panel de ajustes que aparece.",
   "help.developer.title": "Modo de desarrollador",
-  "help.developer.body": "Al activar el modo de desarrollador, la superposición muestra información técnica adicional, como la etiqueta detallada que detecta la IA, el estado de los canales del motor de audio en tiempo real y los FPS. Es útil para comprobar que el sistema funciona correctamente.",
+  "help.developer.body": "Al activar el modo de desarrollador, la superposición muestra arriba a la izquierda lo que oyó la IA (el nombre del sonido, su grado de seguridad y cuánto tardó) y arriba a la derecha los FPS. Si además activas “{0}”, cada resultado se guarda en un archivo CSV. Es útil para comprobar que el sistema funciona correctamente.",
   "help.notes.title": "Ten en cuenta",
   "help.note.direction_surround": "Con salida de 5.1 o 7.1 canales, la parte superior de la pantalla muestra el sonido que viene de delante, y la inferior, el que viene de detrás. Los lados izquierdo y derecho muestran el sonido que viene de la izquierda y de la derecha, y los gráficos que aparecen a la vez desde todos los lados de la pantalla corresponden a sonido ambiente o a sonidos sin dirección.",
   "help.note.direction_stereo": "Con salida de 2 canales (estéreo), la app distingue la izquierda de la derecha, pero no lo que está delante de lo que está detrás. En ese caso, los gráficos de las partes superior e inferior de la pantalla representan los sonidos que se oyen por igual en ambos lados y la sensación de espacio.",
