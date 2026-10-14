@@ -23,6 +23,8 @@
 > **Sound Visualizer** is a desktop application that captures real-time system audio and translates its direction, intensity, and meaning into a graphical overlay. 
 Going beyond simple waveform rendering, it integrates an AI sound classifier powered by **YAMNet** and **ONNX Runtime** to instantly identify the type of sound playing (ambient, speech, danger) and provide adaptive visual feedback.
 
+> 📱 There is also an Android version: [SoundVisualizer for Android](https://github.com/bibibic76/SoundVisualizer).
+
 ---
 
 ## 📖 Table of Contents
@@ -59,14 +61,16 @@ We provide 4 unique rendering modes that intuitively map sound intensity and dir
 ### 2. On-Screen Real-Time Editor (F4)
 Modify settings instantly while in a full-screen application or game without minimizing the window.
 - **F2 / F3 Hotkeys**: Switch between sound modes and visualization modes on the fly. Hotkeys can be customized.
-- **Editor Mode (Default F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, AI detection sensitivities, and all other settings directly from the pop-up control panel.
+- **Editor Mode (Default F4)**: Drag the guideline boundaries on your screen to physically resize the rendering limits in real-time. Adjust colors, opacity, and all other settings directly from the pop-up control panel.
 
 ### 3. Hardware-Aware Multi-Channel Support
 - Automatically detects the system's audio configuration (Stereo, 5.1, 7.1 Surround) and accurately maps the sound's origin (Front/Back/Left/Right) to produce a 3D visual effect on a 2D screen.
 
 ### 4. Real-Time AI Sound Classification (ONNX & YAMNet)
 - **3-Class Detection**: Analyzes all incoming audio into `Ambient`, `Speech`, and `Danger` categories. Each category triggers independent, customizable UI colors and dynamic opacity changes.
-- **Gunshot Booster**: An auxiliary, highly-sensitive model designed specifically to ensure critical warning sounds (like gunshots in games/movies) are never missed.
+- **Warning cues**: Sirens, alarms, explosions, fireworks and similar warning sounds count as `Danger` even when they are only among the model's top five candidates (at 5% or more), so music or game audio can't drown them out. Gunshot labels are not promoted this way, to avoid false alarms.
+- **Stable colors**: `Danger` appears on the first qualifying result; `Speech` and `Ambient` need two in a row, so the color doesn't flicker. The AI pauses while it's quiet and resumes as soon as sound returns.
+- **Every channel counts**: On 5.1/7.1 systems, the AI hears the rear and side channels too, not just the front.
 
 ### 5. Comprehensive Localization
 - Fully supports 8 languages: English, Korean, Japanese, Chinese, Spanish, French, German, and Russian.
@@ -80,7 +84,7 @@ The project is rigorously engineered for high-performance, real-time background 
 * **Core Audio API (WASAPI)**: Loopback captures system-wide audio with zero latency.
 * **DSP & FFT Computation**: High-speed frequency transformation calculations run entirely on a background audio thread multiple times per second.
 * **Zero-Allocation Rendering**: The WPF/C# rendering loop is designed to minimize Garbage Collector (GC) allocation, entirely preventing frame drops.
-* **ONNX Inference Pipeline**: Audio is converted to 16kHz mono, processed into Log-mel spectrograms, and fed into a custom-trained YAMNet model via the `Microsoft.ML.OnnxRuntime` engine for instantaneous classification.
+* **ONNX Inference Pipeline**: Every 250 ms, the last 0.975 seconds of audio is downmixed to mono, resampled to 16 kHz through an anti-aliasing filter, turned into the log-mel spectrogram the model was exported with, and classified by YAMNet via `Microsoft.ML.OnnxRuntime`. The model files are checked against pinned SHA-256 hashes at load. Each step is unit-tested against reference outputs.
 
 ---
 
