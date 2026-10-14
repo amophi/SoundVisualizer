@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Set hotkey",
   "settings.section.advanced": "Advanced settings",
   "settings.developer_mode.title": "Developer mode",
-  "settings.developer_mode.desc": "Shows debug information and the audio engine status on screen.",
+  "settings.developer_mode.desc": "Shows what the AI heard (the sound name it reported, how sure it was, and how long it took) in the top-left corner of the overlay, and the FPS in the top-right. The readout is in English and is not meant for everyday use.",
   "settings.auto_minimize.title": "Minimize launcher on start",
   "settings.auto_minimize.desc": "Automatically minimizes this launcher window when the overlay starts.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Glow strength",
   "editor.color": "Color",
   "editor.hotkeys": "Hotkey settings",
-  "editor.developer_mode_desc": "Shows debug info and audio status",
+  "editor.developer_mode_desc": "Shows what the AI heard (top left) and the FPS (top right)",
   "editor.save_close_hint": "key to save and close",
   "editor.close_overlay": "Exit overlay",
   "editor.guide.limit": "{0} limit",

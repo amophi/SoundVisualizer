@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Atur pintasan",
   "settings.section.advanced": "Setelan lanjutan",
   "settings.developer_mode.title": "Mode pengembang",
-  "settings.developer_mode.desc": "Menampilkan informasi debug dan status mesin audio di layar.",
+  "settings.developer_mode.desc": "Menampilkan apa yang didengar AI (nama suara yang dilaporkan, seberapa yakin, dan berapa lama prosesnya) di sudut kiri atas overlay, serta FPS di sudut kanan atas. Tampilan ini berbahasa Inggris dan tidak ditujukan untuk penggunaan sehari-hari.",
   "settings.auto_minimize.title": "Minimalkan peluncur saat mulai",
   "settings.auto_minimize.desc": "Otomatis meminimalkan jendela peluncur ini saat overlay dimulai.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Kuat cahaya",
   "editor.color": "Warna",
   "editor.hotkeys": "Setelan tombol pintasan",
-  "editor.developer_mode_desc": "Menampilkan info debug dan status audio",
+  "editor.developer_mode_desc": "Menampilkan apa yang didengar AI (kiri atas) dan FPS (kanan atas)",
   "editor.save_close_hint": "untuk menyimpan setelan dan menutup",
   "editor.close_overlay": "Keluar dari overlay",
   "editor.guide.limit": "Batas {0}",

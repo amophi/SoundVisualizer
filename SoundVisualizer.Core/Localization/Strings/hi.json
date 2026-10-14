@@ -85,7 +85,7 @@
   "settings.hotkey.set": "कुंजी सेट करें",
   "settings.section.advanced": "एडवांस सेटिंग",
   "settings.developer_mode.title": "डेवलपर मोड",
-  "settings.developer_mode.desc": "स्क्रीन पर डीबग जानकारी और ऑडियो इंजन की स्थिति दिखाता है।",
+  "settings.developer_mode.desc": "AI ने क्या सुना (उसका बताया ध्वनि नाम, वह कितना पक्का था और कितना समय लगा), यह ओवरले के ऊपरी बाएं कोने में और FPS ऊपरी दाएं कोने में दिखाता है। यह जानकारी अंग्रेज़ी में दिखती है और रोज़मर्रा के इस्तेमाल के लिए नहीं है।",
   "settings.auto_minimize.title": "शुरू करने पर लॉन्चर छोटा करें",
   "settings.auto_minimize.desc": "ओवरले शुरू होने पर इस लॉन्चर विंडो को अपने आप छोटा कर देता है।",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "चमक का स्तर",
   "editor.color": "रंग",
   "editor.hotkeys": "शॉर्टकट कुंजियों की सेटिंग",
-  "editor.developer_mode_desc": "डीबग जानकारी और ऑडियो की स्थिति दिखाता है",
+  "editor.developer_mode_desc": "AI ने क्या सुना (ऊपर बाएं) और FPS (ऊपर दाएं) दिखाता है",
   "editor.save_close_hint": "दबाकर सेव करें और बंद करें",
   "editor.close_overlay": "ओवरले बंद करें",
   "editor.guide.limit": "{0} की सीमा",

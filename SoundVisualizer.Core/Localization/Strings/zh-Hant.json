@@ -85,7 +85,7 @@
   "settings.hotkey.set": "設定快速鍵",
   "settings.section.advanced": "進階設定",
   "settings.developer_mode.title": "開發人員模式",
-  "settings.developer_mode.desc": "在螢幕上顯示偵錯資訊和音訊引擎狀態。",
+  "settings.developer_mode.desc": "在覆疊畫面左上角顯示 AI 聽到的內容（它回報的聲音名稱、把握程度和耗時），並在右上角顯示 FPS。顯示內容為英文，不適合日常使用。",
   "settings.auto_minimize.title": "開始時將啟動器最小化",
   "settings.auto_minimize.desc": "覆疊畫面開始執行時，自動將這個啟動器視窗最小化。",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "光暈強度",
   "editor.color": "顏色",
   "editor.hotkeys": "快速鍵設定",
-  "editor.developer_mode_desc": "顯示偵錯資訊和音訊狀態",
+  "editor.developer_mode_desc": "顯示 AI 聽到的內容（左上角）和 FPS（右上角）",
   "editor.save_close_hint": "鍵儲存設定並關閉",
   "editor.close_overlay": "結束覆疊畫面",
   "editor.guide.limit": "{0}上限線",

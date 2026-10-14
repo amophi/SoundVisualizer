@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Définir le raccourci",
   "settings.section.advanced": "Paramètres avancés",
   "settings.developer_mode.title": "Mode développeur",
-  "settings.developer_mode.desc": "Affiche à l'écran des informations de débogage et l'état du moteur audio.",
+  "settings.developer_mode.desc": "Affiche en haut à gauche de l'overlay ce que l'IA a entendu (le nom du son indiqué, son degré de certitude et le temps de traitement), et les FPS en haut à droite. Ces informations sont en anglais et ne sont pas destinées à un usage quotidien.",
   "settings.auto_minimize.title": "Réduire le lanceur au démarrage",
   "settings.auto_minimize.desc": "Réduit automatiquement la fenêtre du lanceur au démarrage de l'overlay.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Intensité",
   "editor.color": "Couleur",
   "editor.hotkeys": "Paramètres des raccourcis",
-  "editor.developer_mode_desc": "Infos de débogage et état de l'audio",
+  "editor.developer_mode_desc": "Ce que l'IA a entendu (en haut à gauche) et les FPS (en haut à droite)",
   "editor.save_close_hint": "pour enregistrer et fermer",
   "editor.close_overlay": "Quitter l'overlay",
   "editor.guide.limit": "Limite en mode {0}",

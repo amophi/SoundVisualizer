@@ -16,6 +16,12 @@
         <SolidColorBrush x:Key="GuideBlueBrush" Color="#3182F6"/>
         <SolidColorBrush x:Key="GuideRedBrush" Color="#E53935"/>
         <SolidColorBrush x:Key="GuideBorderBrush" Color="#222429"/>
+
+        <!-- 개발자 모드 HUD 의 판과 글자. 안드로이드 AiDebugOverlay 와 같은 색이다. 밝은 게임 화면 위에서도 읽히게 판은 불투명하게,
+             본문은 밝게 두고, top-5 는 위의 판정 줄과 구분되게 조금 흐리게 둔다(판 위 대비 15:1, 9:1). -->
+        <SolidColorBrush x:Key="DebugHudPlateBrush" Color="#101216"/>
+        <SolidColorBrush x:Key="DebugHudTextBrush" Color="#E8EAED"/>
+        <SolidColorBrush x:Key="DebugHudTop5Brush" Color="#B0B4BA"/>
     </Window.Resources>
     
     <Grid x:Name="MainGrid">
@@ -32,11 +38,28 @@
             </Path.Effect>
         </Path>
 
-        <!-- AI 라벨 (화면 정중앙) -->
-        <Border x:Name="AILabelBorder" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                Background="#90000000" CornerRadius="15" Padding="20" IsHitTestVisible="False" Visibility="Collapsed">
-            <TextBlock x:Name="AILabelText" Foreground="{StaticResource PrimaryTextBrush}" FontSize="26" 
-                       FontWeight="Bold" Text=""/>
+        <!-- 개발자 모드 HUD (좌상단, 안드로이드 AiDebugOverlay). 팀이 영상·게임을 틀어 놓고 분류가 맞는지 채점하는 도구라, AI 가 말한 것을
+             번역하지 않고 그대로 보인다. 글자는 Core 의 AiDebugText 가 만들고 MainWindow.DebugHud.cs 가 100ms 마다 넣는다.
+             예전의 화면 가운데 AI 라벨을 대신한다. 같은 결과를 두 곳에서 다른 꼴로 보이지 않게 한 곳에만 둔다.
+             값이 바뀌어도 자리가 흔들리지 않게 고정폭 글꼴을 쓴다. 크기는 모바일 11sp 를 PC 화면 거리에서 비슷하게 보이도록 13 이다.
+             오른쪽 위 FPS 와 같은 높이에 두고, 누름은 받지 않는다(창이 클릭 관통이고 이 판도 IsHitTestVisible 이 꺼져 있다). -->
+        <Border x:Name="DebugHudBorder" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,50,0,0"
+                Background="{StaticResource DebugHudPlateBrush}" CornerRadius="6" Padding="8,6" IsHitTestVisible="False" Visibility="Collapsed"
+                TextElement.FontFamily="{StaticResource MonoFontFamily}" TextElement.FontSize="13" TextElement.Foreground="{StaticResource DebugHudTextBrush}">
+            <StackPanel>
+                <!-- 종류 ● 모델이 말한 이름 확신도. 점은 그 종류에 사용자가 고른 실제 색이고, 결과가 없으면 숨긴다. -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="DebugHudCoarse" FontWeight="Bold"/>
+                    <Ellipse x:Name="DebugHudDot" Width="8" Height="8" Margin="6,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <TextBlock x:Name="DebugHudLabel" Margin="6,0,0,0"/>
+                    <TextBlock x:Name="DebugHudConfidence" Margin="8,0,0,0" FontWeight="Bold"/>
+                </StackPanel>
+                <TextBlock x:Name="DebugHudDetail"/>
+                <TextBlock x:Name="DebugHudVerdict"/>
+                <TextBlock x:Name="DebugHudTiming"/>
+                <!-- 모델이 가장 높게 본 이름들(한 줄에 하나). 위의 줄과 섞이지 않게 조금 띄운다. -->
+                <TextBlock x:Name="DebugHudTop5" Margin="0,4,0,0" Foreground="{StaticResource DebugHudTop5Brush}" Visibility="Collapsed"/>
+            </StackPanel>
         </Border>
 
         <!-- FPS 카운터 (디버그용, 우상단) -->

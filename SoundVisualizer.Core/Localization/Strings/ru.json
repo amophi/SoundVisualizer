@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Назначить клавишу",
   "settings.section.advanced": "Дополнительные настройки",
   "settings.developer_mode.title": "Режим разработчика",
-  "settings.developer_mode.desc": "Показывает на экране отладочную информацию и состояние аудиодвижка.",
+  "settings.developer_mode.desc": "Показывает в левом верхнем углу оверлея, что услышал ИИ (название звука, уверенность и время обработки), а в правом верхнем — FPS. Эти сведения выводятся на английском и не предназначены для повседневного использования.",
   "settings.auto_minimize.title": "Сворачивать лаунчер при запуске",
   "settings.auto_minimize.desc": "Автоматически сворачивает окно лаунчера, когда запускается оверлей.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Сила сияния",
   "editor.color": "Цвет",
   "editor.hotkeys": "Настройка горячих клавиш",
-  "editor.developer_mode_desc": "Показывает отладочную информацию и состояние звука",
+  "editor.developer_mode_desc": "Показывает, что услышал ИИ (слева вверху), и FPS (справа вверху)",
   "editor.save_close_hint": "— сохранить и закрыть",
   "editor.close_overlay": "Закрыть оверлей",
   "editor.guide.limit": "{0}: граница",

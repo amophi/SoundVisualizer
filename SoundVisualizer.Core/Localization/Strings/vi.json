@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Đặt phím tắt",
   "settings.section.advanced": "Cài đặt nâng cao",
   "settings.developer_mode.title": "Chế độ nhà phát triển",
-  "settings.developer_mode.desc": "Hiển thị thông tin gỡ lỗi và trạng thái bộ xử lý âm thanh trên màn hình.",
+  "settings.developer_mode.desc": "Hiển thị nội dung AI nghe được (tên âm thanh AI báo, mức độ chắc chắn và thời gian xử lý) ở góc trên bên trái lớp phủ, cùng FPS ở góc trên bên phải. Nội dung hiển thị bằng tiếng Anh và không dành cho việc sử dụng hằng ngày.",
   "settings.auto_minimize.title": "Thu nhỏ trình khởi chạy khi bắt đầu",
   "settings.auto_minimize.desc": "Tự động thu nhỏ cửa sổ trình khởi chạy này khi lớp phủ bắt đầu chạy.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Độ phát sáng",
   "editor.color": "Màu",
   "editor.hotkeys": "Cài đặt phím tắt",
-  "editor.developer_mode_desc": "Hiện thông tin gỡ lỗi và trạng thái âm thanh",
+  "editor.developer_mode_desc": "Hiện nội dung AI nghe được (trên trái) và FPS (trên phải)",
   "editor.save_close_hint": "để lưu cài đặt và đóng",
   "editor.close_overlay": "Thoát lớp phủ",
   "editor.guide.limit": "Giới hạn {0}",

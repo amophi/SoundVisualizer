@@ -55,7 +55,6 @@ namespace SoundVisualizer
         private readonly float[] _peakFrame = new float[PeakAccumulator.ChannelCount];
         private readonly VisualizerEngine _engine = new();
         private SoundType _currentType = SoundType.Ambient;
-        private AiClassificationResult? _labelTextSource; // 개발자 모드 라벨을 마지막으로 만든 결과(같으면 문자열을 다시 만들지 않는다)
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
 
         // WPF UI 속성 갱신 및 가비지 최소화용 캐시 필드
@@ -77,9 +76,6 @@ namespace SoundVisualizer
         private Brush? _cachedStereoModeForeground = null;
         private string _cachedFpsText = "";
 
-        private Visibility _cachedAILabelBorderVisibility = Visibility.Collapsed;
-        private string _cachedAILabelText = "";
-        private Brush? _cachedAILabelForeground = null;
         private Visibility _cachedUnifiedWaveVisibility = Visibility.Collapsed;
 
         private Visibility _cachedStatusBorderVisibility = Visibility.Collapsed;
@@ -132,6 +128,7 @@ namespace SoundVisualizer
             ApplyClickThroughMagic();
             BootSequence();
             StartHighFpsRenderLoop();
+            InitDebugHud(); // 개발자 모드 HUD 와 결과 기록(MainWindow.DebugHud.cs)
 
             this.Closed += (s, e) =>
             {
@@ -252,7 +249,6 @@ namespace SoundVisualizer
 
             bool isVisible = IsTypeVisible(_currentType);
             var activeColor = GetColorForType(_currentType);
-            UpdateAiLabel(aiResult, isVisible);
 
             // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 엔진이 이전 값을 흐른 시간만큼 줄인다.
             // 스무딩·깊이·패드와 원형의 움직임은 모두 60fps 기준으로 시간 정규화되어 최대 프레임과 상관없이 같은 빠르기다.
@@ -286,7 +282,7 @@ namespace SoundVisualizer
         }
 
         /// <summary>
-        /// 그리기 말고 프레임마다 하던 일: 단축키, 모드 HUD, 개발자 모드의 FPS 표시. 쉬는 동안에도 <see cref="PollIdle"/> 이 부른다.
+        /// 그리기 말고 프레임마다 하던 일: 단축키, 모드 HUD, 개발자 모드의 FPS 표시와 AI HUD 켜고 끄기. 쉬는 동안에도 <see cref="PollIdle"/> 이 부른다.
         /// </summary>
         /// <param name="pollHotkeysNow">33ms 를 재지 않고 단축키를 지금 확인한다. 쉬는 동안의 확인은 타이머가 이미 그 간격이다
         /// (TickCount 는 15.6ms 단위라, 재면 31ms 만에 온 확인을 건너뛴다).</param>
@@ -406,44 +402,9 @@ namespace SoundVisualizer
                 SetVisibilityIfChanged(StatusBorder, ref _cachedStatusBorderVisibility, Visibility.Collapsed);
                 SetVisibilityIfChanged(FpsBorder, ref _cachedFpsBorderVisibility, Visibility.Collapsed);
             }
-        }
 
-        /// <summary>개발자 모드의 AI 라벨. 지금 종류를 보이게 해 두었을 때만 화면 가운데에 띄운다.</summary>
-        private void UpdateAiLabel(AiClassificationResult? aiResult, bool isVisible)
-        {
-            if (isVisible)
-            {
-                if (AppSettings.IsAdminMode)
-                {
-                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Visible);
-                    
-                    if (_labelTextSource != aiResult || _cachedAILabelText.Length == 0)
-                    {
-                        _labelTextSource = aiResult;
-                        string labelText = FormatAiLabel(aiResult);
-                        if (_cachedAILabelText != labelText)
-                        {
-                            _cachedAILabelText = labelText;
-                            AILabelText.Text = labelText;
-                        }
-                    }
-
-                    SolidColorBrush activeBrush = GetBrushForType(_currentType);
-                    if (_cachedAILabelForeground != activeBrush)
-                    {
-                        _cachedAILabelForeground = activeBrush;
-                        AILabelText.Foreground = activeBrush;
-                    }
-                }
-                else
-                {
-                    SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
-                }
-            }
-            else
-            {
-                SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Collapsed);
-            }
+            // 개발자 모드·결과 기록 설정을 따른다. 런처나 편집 패널에서 바꾸면 다음 프레임(쉬는 동안에는 다음 확인)에 켜고 끈다.
+            SyncDebugHud();
         }
 
         private void DrawWave(double w, double h, Color activeColor)
@@ -572,7 +533,6 @@ namespace SoundVisualizer
             var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
             _currentType = aiResult?.Coarse ?? SoundType.Ambient;
             bool isVisible = IsTypeVisible(_currentType);
-            UpdateAiLabel(aiResult, isVisible);
 
             // 확인하기 직전부터 들어오는 큰 소리만 다음 확인을 앞당긴다. 확인과 다음 확인 사이에 온 소리도 놓치지 않는다.
             _wake.Arm();
@@ -606,11 +566,16 @@ namespace SoundVisualizer
             // 렌더 루프가 다음 프레임에 가져간다. 그사이 버퍼가 여럿이면 채널마다 가장 큰 값이 남는다.
             _peaks.Offer(fl, fr, fc, bl, br, sl, sr, lfe);
 
+            // 이 버퍼의 채널별 최고값. 스택에 두어 버퍼마다 할당하지 않는다.
+            Span<float> frame = stackalloc float[] { fl, fr, fc, bl, br, sl, sr, lfe };
+
+            // 개발자 모드 HUD 의 소리 크기(모바일 AudioEngine.currentLevel). 읽어도 비우지 않는 가장 최근 버퍼의 값이다.
+            _level.Offer(frame, Environment.TickCount64);
+
             // 조용히 쉬는 오버레이를 소리가 난 이 버퍼에서 바로 깨운다(33ms 확인을 기다리지 않는다).
             // 오버레이가 그리는 동안에는 원자 변수 읽기 한 번으로 끝난다.
             if (_wake.IsArmed)
             {
-                Span<float> frame = stackalloc float[] { fl, fr, fc, bl, br, sl, sr, lfe };
                 if (_wake.OnBuffer(VisualizerEngine.Loudness(frame, AppSettings.SoundMode)))
                 {
                     Dispatcher.InvokeAsync(_pollIdleNow);
@@ -764,12 +729,6 @@ namespace SoundVisualizer
             SoundType.Speech => AppSettings.ShowSpeech,
             _ => AppSettings.ShowAmbient,
         };
-
-        /// <summary>개발자 모드 라벨. AI 가 아직 결과를 내지 않았거나 동작하지 않으면 그렇다고 적는다.</summary>
-        private static string FormatAiLabel(AiClassificationResult? result) => result == null
-            ? "AI: -"
-            : string.Create(System.Globalization.CultureInfo.InvariantCulture,
-                $"{result.Display} | {result.Coarse.ToLabel()} | {result.Confidence * 100:0.0}%");
 
         // ==========================================
         // 윈도우 클릭 관통 및 전체화면 최상단(Overlay) 강제 방어 구현 

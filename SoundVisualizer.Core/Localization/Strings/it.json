@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Imposta scorciatoia",
   "settings.section.advanced": "Impostazioni avanzate",
   "settings.developer_mode.title": "Modalità sviluppatore",
-  "settings.developer_mode.desc": "Mostra sullo schermo informazioni di debug e lo stato del motore audio.",
+  "settings.developer_mode.desc": "Mostra in alto a sinistra dell'overlay cosa ha sentito l'IA (il nome del suono indicato, quanto era sicura e quanto tempo ha impiegato) e in alto a destra gli FPS. Le informazioni sono in inglese e non sono pensate per l'uso quotidiano.",
   "settings.auto_minimize.title": "Riduci a icona il launcher all'avvio",
   "settings.auto_minimize.desc": "Riduce automaticamente a icona questa finestra del launcher all'avvio dell'overlay.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Intensità",
   "editor.color": "Colore",
   "editor.hotkeys": "Impostazioni scorciatoie",
-  "editor.developer_mode_desc": "Info di debug e stato dell'audio",
+  "editor.developer_mode_desc": "Cosa ha sentito l'IA (in alto a sinistra) e gli FPS (in alto a destra)",
   "editor.save_close_hint": "per salvare e chiudere",
   "editor.close_overlay": "Chiudi l'overlay",
   "editor.guide.limit": "Limite in modalità {0}",

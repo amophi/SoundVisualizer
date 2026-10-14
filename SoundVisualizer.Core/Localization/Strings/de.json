@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Tastenkürzel festlegen",
   "settings.section.advanced": "Erweiterte Einstellungen",
   "settings.developer_mode.title": "Entwicklermodus",
-  "settings.developer_mode.desc": "Zeigt Debug-Informationen und den Status der Audio-Engine auf dem Bildschirm an.",
+  "settings.developer_mode.desc": "Zeigt oben links im Overlay, was die KI gehört hat (den gemeldeten Geräuschnamen, wie sicher sie war und wie lange es gedauert hat), und oben rechts die FPS. Die Anzeige ist auf Englisch und nicht für den Alltag gedacht.",
   "settings.auto_minimize.title": "Launcher beim Start minimieren",
   "settings.auto_minimize.desc": "Minimiert dieses Launcher-Fenster automatisch, wenn das Overlay startet.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Leuchtstärke",
   "editor.color": "Farbe",
   "editor.hotkeys": "Einstellungen für Tastenkürzel",
-  "editor.developer_mode_desc": "Zeigt Debug-Infos und Audiostatus an",
+  "editor.developer_mode_desc": "Zeigt, was die KI gehört hat (oben links), und die FPS (oben rechts)",
   "editor.save_close_hint": "zum Speichern und Schließen",
   "editor.close_overlay": "Overlay beenden",
   "editor.guide.limit": "Grenze im Modus „{0}“",

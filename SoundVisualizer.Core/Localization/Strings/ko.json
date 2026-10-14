@@ -85,7 +85,7 @@
   "settings.hotkey.set": "핫키 설정",
   "settings.section.advanced": "고급 설정",
   "settings.developer_mode.title": "개발자 모드",
-  "settings.developer_mode.desc": "디버그용 정보 및 오디오 엔진 상태를 화면에 표시합니다.",
+  "settings.developer_mode.desc": "AI가 무슨 소리로 들었는지, 얼마나 확신했는지, 얼마나 걸렸는지를 오버레이 왼쪽 위에, FPS를 오른쪽 위에 띄웁니다. 내용은 영어로 나오고, 평소에 쓰라고 만든 것이 아닙니다.",
   "settings.auto_minimize.title": "실행 시 런처 최소화",
   "settings.auto_minimize.desc": "오버레이 실행 시 이 런처 창을 자동으로 최소화합니다.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "광원 강도",
   "editor.color": "색상",
   "editor.hotkeys": "단축키 설정",
-  "editor.developer_mode_desc": "디버그 정보 및 오디오 상태 표시",
+  "editor.developer_mode_desc": "AI가 들은 소리(왼쪽 위)와 FPS(오른쪽 위) 표시",
   "editor.save_close_hint": "키를 누르면 설정 저장 후 닫힘",
   "editor.close_overlay": "오버레이 실행 종료",
   "editor.guide.limit": "{0} 한계선",

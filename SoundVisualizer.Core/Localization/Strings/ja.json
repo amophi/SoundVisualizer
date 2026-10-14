@@ -85,7 +85,7 @@
   "settings.hotkey.set": "キーを設定",
   "settings.section.advanced": "詳細設定",
   "settings.developer_mode.title": "開発者モード",
-  "settings.developer_mode.desc": "デバッグ情報とオーディオエンジンの状態を画面に表示します。",
+  "settings.developer_mode.desc": "AI が聞き取った内容（報告した音の名前、確信度、かかった時間）をオーバーレイの左上に、FPS を右上に表示します。表示は英語で、普段使うためのものではありません。",
   "settings.auto_minimize.title": "開始時にランチャーを最小化",
   "settings.auto_minimize.desc": "オーバーレイの開始時に、このランチャーウィンドウを自動で最小化します。",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "発光の強さ",
   "editor.color": "色",
   "editor.hotkeys": "ショートカットキー設定",
-  "editor.developer_mode_desc": "デバッグ情報とオーディオの状態を表示",
+  "editor.developer_mode_desc": "AI が聞き取った内容（左上）と FPS（右上）を表示",
   "editor.save_close_hint": "キーで設定を保存して閉じる",
   "editor.close_overlay": "オーバーレイを終了",
   "editor.guide.limit": "{0}の上限ライン",

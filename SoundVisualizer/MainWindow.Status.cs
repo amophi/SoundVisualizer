@@ -26,6 +26,12 @@ namespace SoundVisualizer
         /// </summary>
         public event EventHandler<bool>? AiAvailabilityChanged;
 
+        /// <summary>
+        /// 마지막으로 <see cref="AiAvailabilityChanged"/> 로 알린 값. 개발자 모드 HUD 가 "AI OFF" 와 "WAIT" 를 가르는 데 쓴다. 런처와 같은 알림을
+        /// 보므로 홈 안내와 HUD 가 어긋나지 않는다. 만드는 중에는 쓸 수 있다고 본다(런처의 RunStatus 와 같다). UI 스레드에서만 쓴다.
+        /// </summary>
+        private bool _aiAvailable = true;
+
         private DispatcherTimer? _captureCheckTimer;
 
         /// <summary>캡처 엔진의 오류를 받기 시작한다. 캡처를 시작하기 전에 부른다.</summary>
@@ -84,7 +90,9 @@ namespace SoundVisualizer
         {
             Dispatcher.InvokeAsync(() =>
             {
-                if (!_isClosed) AiAvailabilityChanged?.Invoke(this, available);
+                if (_isClosed) return;
+                _aiAvailable = available;
+                AiAvailabilityChanged?.Invoke(this, available);
             });
         }
     }

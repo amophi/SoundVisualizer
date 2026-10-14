@@ -85,7 +85,7 @@
   "settings.hotkey.set": "设置快捷键",
   "settings.section.advanced": "高级设置",
   "settings.developer_mode.title": "开发者模式",
-  "settings.developer_mode.desc": "在屏幕上显示调试信息和音频引擎状态。",
+  "settings.developer_mode.desc": "在覆盖层左上角显示 AI 听到的内容（它报告的声音名称、把握程度和耗时），并在右上角显示 FPS。显示内容为英文，不适合日常使用。",
   "settings.auto_minimize.title": "启动时最小化启动器",
   "settings.auto_minimize.desc": "启动覆盖层时，自动最小化此启动器窗口。",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "发光强度",
   "editor.color": "颜色",
   "editor.hotkeys": "快捷键设置",
-  "editor.developer_mode_desc": "显示调试信息和音频状态",
+  "editor.developer_mode_desc": "显示 AI 听到的内容（左上角）和 FPS（右上角）",
   "editor.save_close_hint": "键保存设置并关闭",
   "editor.close_overlay": "退出覆盖层",
   "editor.guide.limit": "{0}上限线",

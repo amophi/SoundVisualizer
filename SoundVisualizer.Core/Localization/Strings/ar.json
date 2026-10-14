@@ -85,7 +85,7 @@
   "settings.hotkey.set": "تعيين مفتاح",
   "settings.section.advanced": "الإعدادات المتقدّمة",
   "settings.developer_mode.title": "وضع المطوّر",
-  "settings.developer_mode.desc": "يعرض على الشاشة معلومات تصحيح الأخطاء وحالة محرك الصوت.",
+  "settings.developer_mode.desc": "يعرض في الزاوية العلوية اليسرى من التراكب ما سمعه الذكاء الاصطناعي (اسم الصوت الذي أبلغ عنه ومدى ثقته والوقت المستغرق)، ومعدل الإطارات (FPS) في الزاوية العلوية اليمنى. تظهر هذه المعلومات بالإنجليزية وليست مخصّصة للاستخدام اليومي.",
   "settings.auto_minimize.title": "تصغير نافذة التشغيل عند البدء",
   "settings.auto_minimize.desc": "يصغّر نافذة التشغيل هذه تلقائيًا عند بدء التراكب.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "قوة التوهج",
   "editor.color": "اللون",
   "editor.hotkeys": "إعدادات مفاتيح الاختصار",
-  "editor.developer_mode_desc": "يعرض معلومات تصحيح الأخطاء وحالة الصوت",
+  "editor.developer_mode_desc": "يعرض ما سمعه الذكاء الاصطناعي (أعلى اليسار) ومعدل الإطارات (أعلى اليمين)",
   "editor.save_close_hint": "للحفظ والإغلاق",
   "editor.close_overlay": "إغلاق التراكب",
   "editor.guide.limit": "حد {0}",

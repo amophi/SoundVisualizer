@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Definir atalho",
   "settings.section.advanced": "Ajustes avançados",
   "settings.developer_mode.title": "Modo de desenvolvedor",
-  "settings.developer_mode.desc": "Mostra na tela informações de depuração e o status do mecanismo de áudio.",
+  "settings.developer_mode.desc": "Mostra no canto superior esquerdo da sobreposição o que a IA ouviu (o nome do som informado, o grau de certeza e quanto tempo levou) e, no canto superior direito, o FPS. As informações aparecem em inglês e não são para o uso diário.",
   "settings.auto_minimize.title": "Minimizar o inicializador ao iniciar",
   "settings.auto_minimize.desc": "Minimiza automaticamente esta janela do inicializador quando a sobreposição é iniciada.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Intensidade",
   "editor.color": "Cor",
   "editor.hotkeys": "Ajustes de atalhos",
-  "editor.developer_mode_desc": "Dados de depuração e status do áudio",
+  "editor.developer_mode_desc": "O que a IA ouviu (no alto à esquerda) e o FPS (no alto à direita)",
   "editor.save_close_hint": "para salvar e fechar",
   "editor.close_overlay": "Fechar a sobreposição",
   "editor.guide.limit": "Limite no modo {0}",

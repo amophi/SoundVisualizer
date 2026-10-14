@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Ustaw skrót",
   "settings.section.advanced": "Ustawienia zaawansowane",
   "settings.developer_mode.title": "Tryb programisty",
-  "settings.developer_mode.desc": "Pokazuje na ekranie informacje diagnostyczne i stan silnika audio.",
+  "settings.developer_mode.desc": "Pokazuje w lewym górnym rogu nakładki, co usłyszała AI (zgłoszoną nazwę dźwięku, pewność i czas przetwarzania), a w prawym górnym rogu FPS. Informacje są po angielsku i nie są przeznaczone do codziennego użytku.",
   "settings.auto_minimize.title": "Minimalizuj launcher po uruchomieniu",
   "settings.auto_minimize.desc": "Automatycznie minimalizuje okno launchera, gdy uruchamia się nakładka.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Moc poświaty",
   "editor.color": "Kolor",
   "editor.hotkeys": "Ustawienia skrótów",
-  "editor.developer_mode_desc": "Pokazuje informacje diagnostyczne i stan dźwięku",
+  "editor.developer_mode_desc": "Pokazuje, co usłyszała AI (u góry po lewej), i FPS (u góry po prawej)",
   "editor.save_close_hint": "– zapisz i zamknij",
   "editor.close_overlay": "Zamknij nakładkę",
   "editor.guide.limit": "{0}: granica",

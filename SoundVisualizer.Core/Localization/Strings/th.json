@@ -85,7 +85,7 @@
   "settings.hotkey.set": "ตั้งคีย์ลัด",
   "settings.section.advanced": "การตั้งค่าขั้นสูง",
   "settings.developer_mode.title": "โหมดนักพัฒนา",
-  "settings.developer_mode.desc": "แสดงข้อมูลการดีบักและสถานะของเอนจินเสียงบนหน้าจอ",
+  "settings.developer_mode.desc": "แสดงสิ่งที่ AI ได้ยิน (ชื่อเสียงที่ AI รายงาน ความมั่นใจ และเวลาที่ใช้) ที่มุมซ้ายบนของโอเวอร์เลย์ และแสดง FPS ที่มุมขวาบน ข้อมูลที่แสดงเป็นภาษาอังกฤษและไม่ได้มีไว้สำหรับการใช้งานทั่วไป",
   "settings.auto_minimize.title": "ย่อตัวเปิดใช้เมื่อเริ่ม",
   "settings.auto_minimize.desc": "ย่อหน้าต่างตัวเปิดใช้นี้โดยอัตโนมัติเมื่อโอเวอร์เลย์เริ่มทำงาน",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "ระดับแสงเรือง",
   "editor.color": "สี",
   "editor.hotkeys": "การตั้งค่าคีย์ลัด",
-  "editor.developer_mode_desc": "แสดงข้อมูลการดีบักและสถานะเสียง",
+  "editor.developer_mode_desc": "แสดงสิ่งที่ AI ได้ยิน (ซ้ายบน) และ FPS (ขวาบน)",
   "editor.save_close_hint": "เพื่อบันทึกการตั้งค่าและปิด",
   "editor.close_overlay": "ปิดโอเวอร์เลย์",
   "editor.guide.limit": "ขีดจำกัด{0}",

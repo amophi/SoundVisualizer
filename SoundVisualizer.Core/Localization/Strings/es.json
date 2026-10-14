@@ -85,7 +85,7 @@
   "settings.hotkey.set": "Asignar atajo",
   "settings.section.advanced": "Ajustes avanzados",
   "settings.developer_mode.title": "Modo de desarrollador",
-  "settings.developer_mode.desc": "Muestra en pantalla información de depuración y el estado del motor de audio.",
+  "settings.developer_mode.desc": "Muestra en la esquina superior izquierda de la superposición lo que oyó la IA (el nombre del sonido que indicó, su grado de seguridad y cuánto tardó) y, en la esquina superior derecha, los FPS. La información aparece en inglés y no está pensada para el uso diario.",
   "settings.auto_minimize.title": "Minimizar el lanzador al iniciar",
   "settings.auto_minimize.desc": "Minimiza automáticamente esta ventana del lanzador cuando se inicia la superposición.",
 
@@ -225,7 +225,7 @@
   "editor.glow_strength": "Intensidad",
   "editor.color": "Color",
   "editor.hotkeys": "Ajustes de atajos",
-  "editor.developer_mode_desc": "Datos de depuración y estado del audio",
+  "editor.developer_mode_desc": "Lo que oyó la IA (arriba a la izquierda) y los FPS (arriba a la derecha)",
   "editor.save_close_hint": "para guardar y cerrar",
   "editor.close_overlay": "Cerrar la superposición",
   "editor.guide.limit": "Límite en modo {0}",
