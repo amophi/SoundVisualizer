@@ -11,8 +11,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
-using SoundVisualizer.CoreAudio; 
-using SoundVisualizer.DSP;       
+using SoundVisualizer.Audio;
+using SoundVisualizer.CoreAudio;
+using SoundVisualizer.DSP;
 using SoundVisualizer.AIModel;   
 using SoundVisualizer.Visualizers;
 
@@ -41,11 +42,13 @@ namespace SoundVisualizer
         private double _smoothTotal;
         private double _distFL = 0.125, _distFR = 0.125, _distFC = 0.125, _distBL = 0.125, _distBR = 0.125, _distSL = 0.125, _distSR = 0.125, _distLFE = 0.125;
         private double _smoothFL, _smoothFR, _smoothFC, _smoothBL, _smoothBR, _smoothSL, _smoothSR, _smoothLFE;
+        // 렌더 스레드만 쓴다. 캡처 스레드는 _peaks 에 넣고, 렌더 루프가 프레임마다 가져와 여기에 옮긴다.
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
+        private readonly PeakAccumulator _peaks = new();
+        private readonly float[] _peakFrame = new float[PeakAccumulator.ChannelCount];
         private string _currentLabel = "";
         private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
-        private volatile int _lastSourceChannels = 0;  // 현재 소스 채널 수 (실시간)
 
         // WPF UI 속성 갱신 및 가비지 최소화용 캐시 필드
         private string? _cachedColorDangerHex;
@@ -99,14 +102,12 @@ namespace SoundVisualizer
         // 렌더링 최적화를 위한 재사용 객체
         private VisualizerContext _renderContext = new VisualizerContext();
         private double[] _channelDepths = new double[8];
-        private readonly double[] _rmsBuffer = new double[8];
         private double[] _channelDists = new double[8];
         
         public Action? OnSettingsChangedFromHotkey;
 
         private readonly Stopwatch _renderStopwatch = new();
         private double _lastRenderTimeMs = 0;
-        private long _lastChannelCountTick = 0;
         private long _lastHotkeyCheckTick = 0;
         private long _lastHudUpdateTick = 0;
         private bool _forceUpdateHUDTexts = true;
@@ -161,7 +162,9 @@ namespace SoundVisualizer
 
             _captureEngine.OnChannelsChanged += (s, currentChannels) =>
             {
-                Dispatcher.Invoke(() =>
+                // 장치를 다시 여는 스레드에서 불린다. 기다리지 않고 넘긴다. 기다리면 그사이 UI 스레드가 캡처를 멈추려 할 때
+                // 서로 상대를 기다리며 멈출 수 있다.
+                Dispatcher.InvokeAsync(() =>
                 {
                     int autoSoundMode = currentChannels >= 8 ? 2 : (currentChannels >= 6 ? 1 : 0);
                     if (AppSettings.SoundMode != autoSoundMode)
@@ -325,6 +328,13 @@ namespace SoundVisualizer
             }
 
             _animationTime += 0.035;
+
+            // 지난 프레임 뒤로 들어온 버퍼들의 채널별 최고값. 버퍼가 없었으면 이전 값을 그대로 두고 아래에서 줄인다.
+            if (_peaks.TryTake(_peakFrame))
+            {
+                _targetFL = _peakFrame[0]; _targetFR = _peakFrame[1]; _targetFC = _peakFrame[2]; _targetBL = _peakFrame[3];
+                _targetBR = _peakFrame[4]; _targetSL = _peakFrame[5]; _targetSR = _peakFrame[6]; _targetLFE = _peakFrame[7];
+            }
 
             float totalTarget = _targetFL + _targetFR + _targetFC + _targetBL + _targetBR + _targetSL + _targetSR + _targetLFE;
 
@@ -543,16 +553,9 @@ namespace SoundVisualizer
             int bytesRecorded = e.BytesRecorded;
             int channels = e.Channels;
 
-            // 1. 오디오 라우팅, 실시간 활성 채널 파악, 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
-            _audioRouter.OnDataReceived(this, rawData);
-            
-            long currentTick = Environment.TickCount64;
-            if (currentTick - _lastChannelCountTick >= 500)
-            {
-                _lastChannelCountTick = currentTick;
-                _lastSourceChannels = CountActiveChannels(rawData, channels);
-            }
-            
+            // 1. 오디오 라우팅과 멀티채널 볼륨 연산을 캡처 스레드에서 직접 동기 실행 (극히 가벼움)
+            _audioRouter.OnDataReceived(rawData, bytesRecorded);
+
             var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, channels);
             
             // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
@@ -563,10 +566,8 @@ namespace SoundVisualizer
                 sr = fr; br = fr;
             }
 
-            // 렌더 스레드가 참조할 볼륨 변수를 즉시 갱신 (지연 시간 0)
-            _targetFL = fl; _targetFR = fr; _targetFC = fc;
-            _targetBL = bl; _targetBR = br;
-            _targetSL = sl; _targetSR = sr; _targetLFE = lfe;
+            // 렌더 루프가 다음 프레임에 가져간다. 그사이 버퍼가 여럿이면 채널마다 가장 큰 값이 남는다.
+            _peaks.Offer(fl, fr, fc, bl, br, sl, sr, lfe);
 
             // YAMNet 실시간 링 버퍼에 데이터를 끊김 없이 모노 다운믹스하여 적재 (데이터의 연속성 및 정확도 보존)
             int sampleRate = _captureEngine?.CaptureFormat?.SampleRate ?? SoundClassifier.DefaultCaptureSampleRate;
@@ -614,55 +615,6 @@ namespace SoundVisualizer
                 }
             }
         }
-
-        /// <summary>
-        /// float32 멀티채널 버퍼에서 실제로 신호가 있는 채널 수를 반환합니다.
-        /// WASAPI는 소스가 2ch여도 장치 포맷(8ch)으로 패딩하므로,
-        /// 무음(절댓값 합산이 임계값 미만)인 채널은 제외합니다.
-        /// </summary>
-        private int CountActiveChannels(byte[] buffer, int totalChannels)
-        {
-            const float threshold = 1e-6f;
-            const int bytesPerSample = 4; // float32
-            int frames = buffer.Length / (totalChannels * bytesPerSample);
-            if (frames == 0) return totalChannels;
-
-            // 채널별 RMS 계산 (전체 프레임의 일부만 샘플링)
-            int step = Math.Max(1, frames / 200);
-            
-            double[] rms = _rmsBuffer;
-            if (totalChannels > rms.Length)
-            {
-                rms = new double[totalChannels];
-            }
-            else
-            {
-                Array.Clear(rms, 0, totalChannels);
-            }
-
-            ReadOnlySpan<float> samples = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(buffer.AsSpan(0, buffer.Length));
-            int count = 0;
-            for (int i = 0; i < frames; i += step)
-            {
-                int baseOffset = i * totalChannels;
-                for (int ch = 0; ch < totalChannels; ch++)
-                {
-                    float s = samples[baseOffset + ch];
-                    rms[ch] += s * s;
-                }
-                count++;
-            }
-
-            int active = 0;
-            for (int ch = 0; ch < totalChannels; ch++)
-            {
-                if (Math.Sqrt(rms[ch] / count) > threshold)
-                    active++;
-            }
-            return active > 0 ? active : totalChannels;
-        }
-
-
 
         private void SetVisibilityIfChanged(UIElement element, ref Visibility cachedValue, Visibility newValue)
         {
@@ -855,18 +807,8 @@ namespace SoundVisualizer
 
             if (CmbLanguage != null)
             {
-                // AppSettings.Language stores native names ("日本語", "中文", etc.)
-                // but CmbLanguage items have English Tags ("Japanese", "Chinese", etc.)
-                string langToMatch = AppSettings.Language switch
-                {
-                    "日本語" => "Japanese",
-                    "中文" => "Chinese",
-                    "Español" => "Spanish",
-                    "Français" => "French",
-                    "Deutsch" => "German",
-                    "Русский" => "Russian",
-                    _ => AppSettings.Language // "KOR" and "English" match directly
-                };
+                // 설정에는 언어 이름("日本語")이, 콤보 항목의 Tag 에는 영어 키("Japanese")가 들어 있다.
+                string langToMatch = LegacyLanguageKeys.ToOverlayKey(AppSettings.Language);
                 foreach (System.Windows.Controls.ComboBoxItem item in CmbLanguage.Items)
                 {
                     if (item.Tag?.ToString() == langToMatch)
@@ -1898,20 +1840,8 @@ namespace SoundVisualizer
             {
                 string newLang = item.Tag.ToString() ?? "KOR";
                 
-                // MainWindow uses English keys (e.g. "Japanese"), but LauncherWindow.SetLanguage
-                // and AppSettings.Language expect native names (e.g. "日本語"). Convert.
-                string nativeLangKey = newLang switch
-                {
-                    "KOR" => "KOR",
-                    "English" => "English",
-                    "Japanese" => "日本語",
-                    "Chinese" => "中文",
-                    "Spanish" => "Español",
-                    "French" => "Français",
-                    "German" => "Deutsch",
-                    "Russian" => "Русский",
-                    _ => newLang
-                };
+                // 오버레이는 영어 키("Japanese")를, 런처와 설정은 언어 이름("日本語")을 쓴다.
+                string nativeLangKey = LegacyLanguageKeys.ToStoredKey(newLang);
 
                 if (AppSettings.Language != nativeLangKey)
                 {

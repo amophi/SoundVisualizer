@@ -1094,20 +1094,8 @@ namespace SoundVisualizer
             SetExtraLanguageTexts(lang);
             SetMainComboItems(lang);
 
-            // LauncherWindow uses native language names (e.g. "日本語", "中文"), 
-            // but MainWindow.ApplyLanguage expects English keys (e.g. "Japanese", "Chinese").
-            string overlayLangKey = lang switch
-            {
-                "KOR" => "KOR",
-                "English" => "English",
-                "日本語" => "Japanese",
-                "中文" => "Chinese",
-                "Español" => "Spanish",
-                "Français" => "French",
-                "Deutsch" => "German",
-                "Русский" => "Russian",
-                _ => lang
-            };
+            // 런처는 언어를 그 언어의 이름("日本語")으로, 오버레이는 영어 키("Japanese")로 다룬다.
+            string overlayLangKey = LegacyLanguageKeys.ToOverlayKey(lang);
 
             var mw = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
             if (mw != null)
@@ -2137,7 +2125,7 @@ namespace SoundVisualizer
             }
 
             _overlayWindow = new MainWindow();
-            _overlayWindow.ApplyLanguage(AppSettings.Language);
+            _overlayWindow.ApplyLanguage(LegacyLanguageKeys.ToOverlayKey(AppSettings.Language));
             _overlayWindow.OnSettingsChangedFromHotkey = () =>
             {
                 // UI 스레드에서 LoadSettingsToUI 호출 (MainWindow는 이미 UI 스레드에서 이벤트를 발생시킴)
@@ -2248,28 +2236,11 @@ namespace SoundVisualizer
 
             _isInitializing = true;
 
-            // 모드별 개별 설정을 모두 기본값으로 안전하게 초기화
-            AppSettings.WaveMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-            AppSettings.PadMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-            AppSettings.CircleMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-            AppSettings.OutlineMode = new VisualModeSettings { Intensity = 50.0, PositionSpeed = 20.0, Sensitivity = 3.75, VisualOpacity = 50.0, IsGlowMode = false, GlowIntensity = 0.0, CircleRadius = 40.0 };
-
-            AppSettings.VisualMode = 0;
-            AppSettings.SoundMode = 2;
-            
-            AppSettings.IsAdminMode = false;
-            AppSettings.VisualModeHotkey = 0x72; // F3
-            AppSettings.StereoUpmixHotkey = 0x71; // F2
-
-            AppSettings.ShowAmbient = true;
-            AppSettings.ShowSpeech = true;
-            AppSettings.ShowDanger = true;
-            AppSettings.ColorAmbient = "#FFFFFFFF";
-            AppSettings.ColorSpeech = "#FFFFFF00";
-            AppSettings.ColorDanger = "#FFFF0000";
+            // 언어를 뺀 모든 설정을 기본값으로 되돌린다. 단축키도 실제로 쓰는 키 목록까지 되돌린다.
+            AppSettings.ResetToDefaults();
 
             LoadSettingsToUI();
-            AppSettings.Save();
+            AppSettings.SaveNow();
 
             _isInitializing = false;
         }

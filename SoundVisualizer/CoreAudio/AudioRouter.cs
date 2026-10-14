@@ -3,9 +3,9 @@
 // SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
+using SoundVisualizer.Audio;
 
 namespace SoundVisualizer.CoreAudio
 {
@@ -80,116 +80,24 @@ namespace SoundVisualizer.CoreAudio
 
         }
 
-        public void OnDataReceived(object sender, byte[] rawAudioData)
+        /// <summary>
+        /// 캡처한 버퍼를 실제 스피커로 보낸다. <paramref name="bytesRecorded"/> 까지만 쓴다.
+        /// NAudio 는 캡처 버퍼를 재사용하므로 배열 전체를 보내면 지난 버퍼의 남은 소리가 섞인다.
+        /// </summary>
+        public void OnDataReceived(byte[] rawAudioData, int bytesRecorded)
         {
             if (_bufferedWaveProvider == null) return;
+            int length = Math.Clamp(bytesRecorded, 0, rawAudioData.Length);
 
             // 캡처-출력 채널 수가 다르면 변환
             if (_captureChannels != _outputChannels)
             {
-                int neededSize = ConvertChannels(rawAudioData, _captureChannels, _captureBytesPerSample, _outputChannels, ref _conversionBuffer);
+                int neededSize = ChannelDownmix.Convert(rawAudioData.AsSpan(0, length), _captureChannels, _captureBytesPerSample, _outputChannels, ref _conversionBuffer);
                 _bufferedWaveProvider.AddSamples(_conversionBuffer, 0, neededSize);
             }
             else
             {
-                _bufferedWaveProvider.AddSamples(rawAudioData, 0, rawAudioData.Length);
-            }
-        }
-
-        /// <summary>
-        /// 채널 수 변환. 8ch→2ch 및 6ch→2ch는 다운믹스, 그 외는 앞쪽 채널 추출/복제 (가비지 할당 0%).
-        /// </summary>
-        private static int ConvertChannels(byte[] input, int inCh, int bytesPerSample, int outCh, ref byte[] outputBuffer)
-        {
-            int frames = input.Length / (inCh * bytesPerSample);
-            int neededSize = frames * outCh * bytesPerSample;
-            if (outputBuffer.Length < neededSize)
-            {
-                outputBuffer = new byte[neededSize * 2]; // 넉넉하게 2배 스케일링하여 재할당 최소화
-            }
-
-            if (inCh == 8 && outCh == 2 && bytesPerSample == 4)
-            {
-                Downmix8chTo2ch(input, outputBuffer);
-                return neededSize;
-            }
-            if (inCh == 6 && outCh == 2 && bytesPerSample == 4)
-            {
-                Downmix6chTo2ch(input, outputBuffer);
-                return neededSize;
-            }
-
-            // 일반 추출/복제 (Span을 이용한 0-allocation 고속 복사)
-            var srcSpan = MemoryMarshal.Cast<byte, float>(input.AsSpan());
-            var dstSpan = MemoryMarshal.Cast<byte, float>(outputBuffer.AsSpan(0, neededSize));
-
-            for (int i = 0; i < frames; i++)
-            {
-                for (int ch = 0; ch < outCh; ch++)
-                {
-                    int srcCh = ch < inCh ? ch : 0;
-                    dstSpan[i * outCh + ch] = srcSpan[i * inCh + srcCh];
-                }
-            }
-            return neededSize;
-        }
-
-        /// <summary>
-        /// 7.1ch float32 → 2ch float32 다운믹스 (ITU-R BS.775 기반 - GC Free)
-        /// L = FL + 0.707*FC + 0.707*SL + 0.5*BL
-        /// R = FR + 0.707*FC + 0.707*SR + 0.5*BR
-        /// </summary>
-        private static void Downmix8chTo2ch(byte[] input, byte[] output)
-        {
-            const float kCenter = 0.707f; // -3dB
-            const float kSide   = 0.707f; // -3dB
-            const float kBack   = 0.500f; // -6dB
-
-            var src = MemoryMarshal.Cast<byte, float>(input.AsSpan());
-            var dst = MemoryMarshal.Cast<byte, float>(output.AsSpan());
-            int frames = src.Length / 8;
-
-            for (int i = 0; i < frames; i++)
-            {
-                int srcOffset = i * 8;
-                float fl = src[srcOffset + 0];
-                float fr = src[srcOffset + 1];
-                float fc = src[srcOffset + 2];
-                // srcOffset + 3 (LFE) -> 제외
-                float sl = src[srcOffset + 4];
-                float sr = src[srcOffset + 5];
-                float bl = src[srcOffset + 6];
-                float br = src[srcOffset + 7];
-
-                dst[i * 2 + 0] = Math.Clamp(fl + kCenter * fc + kSide * sl + kBack * bl, -1f, 1f);
-                dst[i * 2 + 1] = Math.Clamp(fr + kCenter * fc + kSide * sr + kBack * br, -1f, 1f);
-            }
-        }
-
-        /// <summary>
-        /// 5.1ch float32 → 2ch float32 다운믹스 (GC Free)
-        /// </summary>
-        private static void Downmix6chTo2ch(byte[] input, byte[] output)
-        {
-            const float kCenter = 0.707f; // -3dB
-            const float kSurround = 0.707f; // -3dB
-
-            var src = MemoryMarshal.Cast<byte, float>(input.AsSpan());
-            var dst = MemoryMarshal.Cast<byte, float>(output.AsSpan());
-            int frames = src.Length / 6;
-
-            for (int i = 0; i < frames; i++)
-            {
-                int srcOffset = i * 6;
-                float fl = src[srcOffset + 0];
-                float fr = src[srcOffset + 1];
-                float fc = src[srcOffset + 2];
-                // LFE는 제외
-                float sl = src[srcOffset + 4];
-                float sr = src[srcOffset + 5];
-
-                dst[i * 2 + 0] = Math.Clamp(fl + kCenter * fc + kSurround * sl, -1f, 1f);
-                dst[i * 2 + 1] = Math.Clamp(fr + kCenter * fc + kSurround * sr, -1f, 1f);
+                _bufferedWaveProvider.AddSamples(rawAudioData, 0, length);
             }
         }
 
