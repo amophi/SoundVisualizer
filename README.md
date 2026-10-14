@@ -83,6 +83,8 @@ Modify settings instantly while in a full-screen application or game without min
 - **Help tab**: Getting started, visual modes, sound types, hotkeys, FAQ, a report button that opens a prefilled GitHub issue or email, and the open source licenses.
 - **Notices**: The Home tab tells you when there is no playback device to capture, when sound type detection is unavailable, or why the visualizer stopped.
 - **Tray icon**: Start or stop the visualizer, return to the launcher, or exit from the notification area.
+- **Tutorial**: The first time you open the app, a short tutorial shows how sound, direction, and sound types are drawn, using the real renderer. You can open it again from the Home tab.
+- **Developer mode**: Shows what the AI heard (its top five sounds, how sure it was, and how long it took) at the top left of the overlay, and can record every result to a CSV file in the `ai-log` folder next to the app.
 
 ### 7. Comprehensive Localization
 - Supports 18 languages: Korean, English, Japanese, Chinese (Simplified and Traditional), Vietnamese, Thai, Indonesian, Spanish, Portuguese (Brazil), French, Italian, German, Russian, Polish, Turkish, Hindi, and Arabic (right-to-left). By default it follows the Windows display language.
