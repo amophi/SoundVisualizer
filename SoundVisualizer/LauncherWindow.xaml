@@ -263,6 +263,11 @@
                     </ScrollViewer>
                 </TabItem>
 
+                <!-- 소리 탭(안드로이드 분류 탭). 소리마다 어느 종류로 볼지 고른다. 내용은 Ui/SoundsTab 이 그린다. -->
+                <TabItem x:Name="TabSounds" Header="{l:Loc launcher.tab.sounds}">
+                    <ui:SoundsTab x:Name="SoundsTabView"/>
+                </TabItem>
+
                 <!-- 도움말 탭 -->
                 <TabItem x:Name="TabHelp" Header="{l:Loc launcher.tab.help}">
                     <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">

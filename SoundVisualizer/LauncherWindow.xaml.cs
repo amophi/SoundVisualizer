@@ -220,6 +220,9 @@ namespace SoundVisualizer
 
             // 3. 고른 모드의 카드를 펼쳐 맨 위로
             UpdateExpanderStates();
+
+            // 4. 소리 탭: 종류 색(점·거르기 칸)과 바꾼 종류
+            SoundsTabView?.ReloadSettings();
         }
 
         /// <summary>
