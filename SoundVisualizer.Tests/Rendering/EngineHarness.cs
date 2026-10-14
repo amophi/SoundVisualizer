@@ -73,9 +73,9 @@ internal sealed class EngineHarness
     /// <paramref name="loudFrames"/> 프레임 동안 <paramref name="loud"/>, 이어서 <paramref name="tailFrames"/> 프레임 동안 <paramref name="tail"/> 을
     /// 앞 좌우에 같게 넣는다.
     /// </summary>
-    public static double OnTimePeakSmoothTotal(float loud, int loudFrames, float tail, int tailFrames)
+    public static double OnTimePeakSmoothTotal(float loud, int loudFrames, float tail, int tailFrames, int soundMode = 2)
     {
-        var run = new EngineHarness { Label = SoundType.Danger, Shown = true };
+        var run = new EngineHarness { Label = SoundType.Danger, Shown = true, SoundMode = soundMode };
         double peak = 0;
         for (int n = 0; n < loudFrames + tailFrames; n++)
         {

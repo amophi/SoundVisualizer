@@ -450,16 +450,24 @@ namespace SoundVisualizer
             // 0:상단중앙, 1:우상단, 2:우측중앙, 3:우하단, 4:하단중앙, 5:좌하단, 6:좌측중앙, 7:좌상단
             _engine.Depths.CopyTo(_channelDepths);
 
-            // 분포(캡처 순서 FL, FR, FC, BL, BR, SL, SR, LFE)를 둘레 자리 순서로 옮긴다. 하단 가운데 자리에는 LFE 를 둔다.
+            // 분포를 둘레 자리 순서로 옮긴다. 2.0 은 이미 그 순서이고, 5.1·7.1 은 캡처 순서(FL, FR, FC, BL, BR, SL, SR, LFE)라
+            // 옮겨 놓는다. 하단 가운데 자리에는 LFE 를 둔다.
             var dist = _engine.Distribution;
-            _channelDists[0] = dist[2];
-            _channelDists[1] = dist[1];
-            _channelDists[2] = dist[6];
-            _channelDists[3] = dist[4];
-            _channelDists[4] = dist[7];
-            _channelDists[5] = dist[3];
-            _channelDists[6] = dist[5];
-            _channelDists[7] = dist[0];
+            if (AppSettings.SoundMode == 0)
+            {
+                dist.CopyTo(_channelDists);
+            }
+            else
+            {
+                _channelDists[0] = dist[2];
+                _channelDists[1] = dist[1];
+                _channelDists[2] = dist[6];
+                _channelDists[3] = dist[4];
+                _channelDists[4] = dist[7];
+                _channelDists[5] = dist[3];
+                _channelDists[6] = dist[5];
+                _channelDists[7] = dist[0];
+            }
 
             _renderContext.Width = w;
             _renderContext.Height = h;
@@ -591,15 +599,8 @@ namespace SoundVisualizer
             _audioRouter.OnDataReceived(rawData, bytesRecorded);
 
             var (fl, fr, fc, bl, br, sl, sr, lfe) = _vectorCalc.CalculateVolumes(rawData, bytesRecorded, channels);
-            
-            // 사용자가 2채널 확장(Upmix) 모드를 켰을 경우, 
-            // 좌/우에서 들리는 소리(FL, FR)를 전체 화면으로 강제 복사하여 사방에서 파도가 치도록 만듭니다.
-            if (AppSettings.SoundMode == 0)
-            {
-                sl = fl; bl = fl;
-                sr = fr; br = fr;
-            }
 
+            // 2.0 모드에서 앞 좌우를 화면 둘레로 펼치는 것(Mid/Side)은 렌더 쪽 엔진이 한다(StereoUpmix).
             // 렌더 루프가 다음 프레임에 가져간다. 그사이 버퍼가 여럿이면 채널마다 가장 큰 값이 남는다.
             _peaks.Offer(fl, fr, fc, bl, br, sl, sr, lfe);
 

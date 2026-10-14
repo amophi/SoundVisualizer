@@ -20,9 +20,12 @@ namespace SoundVisualizer.Rendering
     /// 쉬는 동안 오버레이는 프레임마다 그리지 않고 <see cref="IdlePollMs"/> 마다 <see cref="PollWake"/> 로 확인하며,
     /// 그릴 수 있는 소리가 나면 깨어난다.
     ///
+    /// 사운드 모드 2.0 은 앞 좌우를 Mid/Side 로 둘레 여덟 자리에 펼쳐 그린다(<see cref="StereoUpmix"/>). 5.1·7.1 은 채널마다 제자리에 그린다.
+    ///
     /// 렌더 스레드(UI 스레드)에서만 쓴다. 프레임마다 힙 할당이 없다.
     /// 채널은 캡처 순서 FL, FR, FC, BL, BR, SL, SR, LFE 다(<see cref="PeakAccumulator"/> 와 같다).
     /// 둘레 자리는 0:FC(상단 중앙) 1:FR(우상단) 2:SR(우측 중앙) 3:BR(우하단) 4:BC(하단 중앙) 5:BL(좌하단) 6:SL(좌측 중앙) 7:FL(좌상단)이다.
+    /// 스무딩에 넣는 값(<see cref="Distribution"/>)은 5.1·7.1 이면 채널 순서, 2.0 이면 둘레 자리 순서다.
     /// </summary>
     public sealed class VisualizerEngine
     {
@@ -85,10 +88,12 @@ namespace SoundVisualizer.Rendering
 
         private readonly FrameClock _clock = new();
         private readonly LateDangerHold _hold = new();
+        private readonly StereoUpmix _upmix = new();
+        private bool _stereoLayout; // 지난 프레임이 2.0 배치(둘레 자리 순서)였는지
 
         // 채널별 목표(최근 피크). 버퍼가 오면 그 피크로 바꾸고, 안 오면 줄인다.
         private readonly float[] _targets = new float[Channels];
-        // 이번 프레임에 스무딩에 넣은 채널 값
+        // 이번 프레임에 스무딩에 넣은 값. 5.1·7.1 은 채널 순서, 2.0 은 둘레 자리 순서다.
         private readonly float[] _sources = new float[Channels];
         private float _totalTarget;
         // 늦은 위협음 판정 때 보관한 소리를 채널 값으로 펼쳐 보는 자리
@@ -163,7 +168,16 @@ namespace SoundVisualizer.Rendering
             }
 
             // 2. 스무딩. 전체 크기(민감도·떨림)와 소리가 어디서 나는지의 분포(위치 변화 속도)를 따로 따라간다.
-            float total = MapSources(_targets, soundMode, _sources);
+            // 2.0 과 5.1·7.1 은 분포의 배치가 달라, 사운드 모드를 바꾸면 분포를 고르게 놓고 새로 따라간다.
+            // 그대로 두면 바꾼 직후 잠깐 엉뚱한 방향이 그려진다.
+            bool stereo = soundMode == 0;
+            if (stereo != _stereoLayout)
+            {
+                _stereoLayout = stereo;
+                Array.Fill(_dist, 1.0 / Channels);
+                _upmix.Clear();
+            }
+            float total = MapSources(nowMs, soundMode);
             _totalTarget = total;
 
             _smoothTotal += (total - _smoothTotal) * FrameStep.Approach(TremorCoefficient(settings), step);
@@ -282,6 +296,7 @@ namespace SoundVisualizer.Rendering
             _smoothTotal = 0;
             Array.Clear(_padThickness);
             Array.Clear(_circleDepths);
+            _upmix.Clear();
             _clock.Reset();
             // 보관한 피크는 비우지 않는다. 쉬기로 내려간 뒤에 위협음 판정이 와도 쓸 수 있어야 한다.
         }
@@ -334,23 +349,44 @@ namespace SoundVisualizer.Rendering
         }
 
         /// <summary>
-        /// 채널 목표값을 스무딩에 넣을 채널 값으로 펼치고 그 합을 돌려준다. 2.0 의 좌우 복사는 캡처 스레드가 해 두었다.
+        /// 이번 프레임의 채널 목표값을 스무딩에 넣을 값(<see cref="_sources"/>)으로 펼치고 그 합을 돌려준다.
+        /// 2.0 은 앞 좌우를 둘레 여덟 자리로 펼치고 뒤쪽 자리는 조금 늦은 좌우로 그린다. 5.1·7.1 은 채널 그대로다.
         /// </summary>
-        private static float MapSources(ReadOnlySpan<float> targets, int soundMode, Span<float> sources)
+        private float MapSources(double nowMs, int soundMode)
         {
-            targets[..Channels].CopyTo(sources);
+            if (soundMode == 0)
+            {
+                _upmix.Push(nowMs, _targets[FL], _targets[FR], out float rearL, out float rearR);
+                return StereoUpmix.Spread(_targets[FL], _targets[FR], rearL, rearR, _sources);
+            }
+            return CopyChannels(_targets, _sources);
+        }
+
+        /// <summary>
+        /// 보관한 프레임 하나를 스무딩에 넣을 값으로 펼치고 그 합을 돌려준다. 판정이 올 즈음엔 뒤쪽 지연도 따라잡았다고 보고
+        /// 앞뒤에 같은 좌우를 넣는다(Android upmixTotal).
+        /// </summary>
+        private static float MapHeld(ReadOnlySpan<float> frame, int soundMode, Span<float> sources)
+        {
+            if (soundMode == 0) return StereoUpmix.Spread(frame[FL], frame[FR], frame[FL], frame[FR], sources);
+            return CopyChannels(frame, sources);
+        }
+
+        private static float CopyChannels(ReadOnlySpan<float> frame, Span<float> sources)
+        {
+            frame[..Channels].CopyTo(sources);
             float total = 0;
             for (int i = 0; i < Channels; i++) total += sources[i];
             return total;
         }
 
         /// <summary>
-        /// 펼친 채널 값에서 가장 깊이 그려질 자리의 몫. 2.0 은 좌우 가운데 두 자리(FL, FR)만, 5.1·7.1 은 LFE 를 뺀 채널이 그려진다
+        /// 펼친 값에서 가장 깊이 그려질 자리의 몫. 2.0 은 여덟 자리가 모두 그려지고, 5.1·7.1 은 LFE 를 뺀 채널이 그려진다
         /// (하단 가운데는 뒤 좌우의 평균이라 그 둘보다 깊지 않다).
         /// </summary>
         private static double MaxDrawnShare(ReadOnlySpan<float> sources, double total, int soundMode)
         {
-            int count = soundMode == 0 ? 2 : LFE;
+            int count = soundMode == 0 ? Positions : LFE;
             double max = 0;
             for (int i = 0; i < count; i++)
             {
@@ -381,7 +417,7 @@ namespace SoundVisualizer.Rendering
             float loudestLevel = 0;
             for (int n = 0; n <= LateDangerHold.Slots; n++)
             {
-                ramp += (MapSources(_hold.Slot(n), soundMode, _heldSources) - ramp) * sf;
+                ramp += (MapHeld(_hold.Slot(n), soundMode, _heldSources) - ramp) * sf;
                 if (ramp > rampPeak) rampPeak = ramp;
                 float level = _hold.SlotLevel(n);
                 if (level > loudestLevel)
@@ -392,7 +428,7 @@ namespace SoundVisualizer.Rendering
             }
 
             // 이 소리가 계속 날 때 다다르는 크기. _heldSources 에 방향이 남는다.
-            double full = loudest < 0 ? 0 : MapSources(_hold.Slot(loudest), soundMode, _heldSources);
+            double full = loudest < 0 ? 0 : MapHeld(_hold.Slot(loudest), soundMode, _heldSources);
             _hold.Clear();
             if (full <= 0) return true;
 
@@ -446,10 +482,8 @@ namespace SoundVisualizer.Rendering
             double total = _smoothTotal;
             if (soundMode == 0)
             {
-                // 2.0: 캡처 스레드가 좌우를 옆·뒤로 복사해 두었다. 좌우 가운데 두 자리만 그린다.
-                Array.Clear(_depths);
-                _depths[2] = Math.Min(bd, bd * (sizeLocked ? 1.0 : total * _dist[FR]));
-                _depths[6] = Math.Min(bd, bd * (sizeLocked ? 1.0 : total * _dist[FL]));
+                // 2.0: 분포가 이미 둘레 자리 순서다.
+                for (int p = 0; p < Positions; p++) _depths[p] = Depth(bd, sizeLocked, total, _dist[p]);
                 return;
             }
 
