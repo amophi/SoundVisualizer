@@ -148,7 +148,7 @@
   "help.sound.danger": "Wird ein Gefahrengeräusch (z. B. ein Schuss) erkannt, wechselt die Farbe sofort statt allmählich.",
   "help.pc.title": "PC-Einstellungen und Tastenkürzel",
   "help.sound_mode.title": "Audiomodus",
-  "help.sound_mode.body": "Damit die Richtungsanzeige (Radar) richtig funktioniert, muss Ihr Ausgabegerät in den Windows-Soundeinstellungen auf „5.1-Surround“ (6 Kanäle) oder „7.1-Surround“ (8 Kanäle) eingestellt sein. Bei normalem Stereo (2 Kanäle) erscheinen die Grafiken möglicherweise nur links und rechts. Wählen Sie zum Ausgleich im Tab „Einstellungen“ den passenden „Audiomodus“.",
+  "help.sound_mode.body": "Damit neben links und rechts auch vorne und hinten unterschieden werden, stellen Sie Ihr Ausgabegerät in den Windows-Soundeinstellungen auf „5.1-Surround“ (6 Kanäle) oder „7.1-Surround“ (8 Kanäle) ein. Bei normalem Stereo (2 Kanäle) werden links und rechts unterschieden, vorne und hinten jedoch nicht. Der „Audiomodus“ im Tab „Einstellungen“ passt sich beim Start und bei einem Gerätewechsel an das Ausgabegerät an; Sie können ihn auch selbst ändern.",
   "help.sound_mode.tip": "💡 Wenn Sie kein 7.1-Ausgabegerät haben, können Sie den {0} installieren und das Ausgabegerät auf 7.1 Kanäle einstellen, um das Overlay mit 7.1-Surround-Sound anzuzeigen.",
   "help.sound_mode.tip_link": "virtuellen Treiber VB-CABLE",
   "help.hotkeys.title": "Eigene Tastenkürzel in Echtzeit",

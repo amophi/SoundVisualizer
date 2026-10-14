@@ -148,7 +148,7 @@
   "help.sound.danger": "Bir tehlike sesi (ör. silah sesi) algılandığında renk yavaşça geçiş yapmak yerine anında değişir.",
   "help.pc.title": "PC ayarları ve kısayol tuşları",
   "help.sound_mode.title": "Ses modu",
-  "help.sound_mode.body": "Yönün (radar) düzgün çalışması için Windows ses ayarlarında çıkış cihazınızın “5.1 Surround” (6 kanal) veya “7.1 Surround” (8 kanal) olarak ayarlanması gerekir. Normal stereoda (2 kanal) grafikler yalnızca solda ve sağda görünebilir. Bunu telafi etmek için “Ayarlar” sekmesinde “Ses modu”nu uygun şekilde ayarlayın.",
+  "help.sound_mode.body": "Sağ ve solun yanı sıra önü ve arkayı da ayırt etmek için Windows ses ayarlarında çıkış cihazınızı “5.1 Surround” (6 kanal) veya “7.1 Surround” (8 kanal) olarak ayarlayın. Normal stereoda (2 kanal) uygulama sağı ve solu ayırt edebilir, ancak önü ve arkayı ayırt edemez. “Ayarlar” sekmesindeki “Ses modu”, başlatıldığında ve çıkış cihazı değiştiğinde o cihaza göre ayarlanır; dilerseniz kendiniz de değiştirebilirsiniz.",
   "help.sound_mode.tip": "💡 7.1 çıkış cihazınız yoksa {0} yükleyip çıkış cihazını 7.1 kanala ayarlayarak yer paylaşımını 7.1 surround sesle gösterebilirsiniz.",
   "help.sound_mode.tip_link": "VB-CABLE sanal sürücüsünü",
   "help.hotkeys.title": "Anlık özel kısayol tuşları",

@@ -148,7 +148,7 @@
   "help.sound.danger": "Saat suara bahaya (seperti suara tembakan) terdeteksi, warna langsung berubah tanpa memudar perlahan.",
   "help.pc.title": "Setelan PC dan tombol pintas",
   "help.sound_mode.title": "Mode suara",
-  "help.sound_mode.body": "Agar arah (radar) berfungsi dengan benar, perangkat output harus disetel ke surround 5.1 (6 saluran) atau surround 7.1 (8 saluran) di setelan suara Windows. Dengan stereo biasa (2 saluran), grafik mungkin hanya muncul di kiri dan kanan. Untuk mengatasinya, setel “Mode suara” agar sesuai di tab Setelan.",
+  "help.sound_mode.body": "Agar suara dari depan dan belakang juga dapat dibedakan, bukan hanya kiri dan kanan, setel perangkat output ke surround 5.1 (6 saluran) atau surround 7.1 (8 saluran) di setelan suara Windows. Dengan stereo biasa (2 saluran), aplikasi dapat membedakan kiri dan kanan, tetapi tidak dapat membedakan depan dan belakang. “Mode suara” di tab Setelan akan menyesuaikan dengan perangkat output saat mulai dijalankan atau saat perangkat berubah, dan Anda tetap dapat mengubahnya sendiri.",
   "help.sound_mode.tip": "💡 Jika tidak punya perangkat output 7.1, Anda dapat menginstal {0} lalu menyetel perangkat output ke 7.1 saluran untuk menampilkan overlay dengan suara surround 7.1.",
   "help.sound_mode.tip_link": "driver virtual VB-CABLE",
   "help.hotkeys.title": "Tombol pintasan kustom real-time",

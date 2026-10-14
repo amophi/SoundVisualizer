@@ -148,7 +148,7 @@
   "help.sound.danger": "Lorsqu'un son de danger (comme un coup de feu) est détecté, la couleur change instantanément, sans transition progressive.",
   "help.pc.title": "Paramètres PC et raccourcis clavier",
   "help.sound_mode.title": "Mode audio",
-  "help.sound_mode.body": "Pour que la direction (radar) fonctionne correctement, votre périphérique de sortie doit être configuré en « Surround 5.1 » (6 canaux) ou « Surround 7.1 » (8 canaux) dans les paramètres de son de Windows. En stéréo classique (2 canaux), les graphismes risquent de n'apparaître qu'à gauche et à droite. Pour compenser, réglez le « Mode audio » en conséquence dans l'onglet Paramètres.",
+  "help.sound_mode.body": "Pour distinguer aussi l'avant de l'arrière, en plus de la gauche et de la droite, configurez votre périphérique de sortie en « Surround 5.1 » (6 canaux) ou « Surround 7.1 » (8 canaux) dans les paramètres de son de Windows. En stéréo classique (2 canaux), l'application distingue la gauche de la droite, mais pas l'avant de l'arrière. Le « Mode audio » de l'onglet Paramètres s'adapte au périphérique de sortie au démarrage et lorsque le périphérique change, et vous pouvez aussi le modifier vous-même.",
   "help.sound_mode.tip": "💡 Si vous n'avez pas de périphérique de sortie 7.1, vous pouvez installer le {0} et configurer le périphérique de sortie en 7.1 canaux pour afficher l'overlay en son surround 7.1.",
   "help.sound_mode.tip_link": "pilote virtuel VB-CABLE",
   "help.hotkeys.title": "Raccourcis personnalisés en temps réel",

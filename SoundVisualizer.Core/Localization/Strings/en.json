@@ -148,7 +148,7 @@
   "help.sound.danger": "When a danger sound (like a gunshot) is detected, the color changes instantly instead of fading.",
   "help.pc.title": "PC settings and hotkeys",
   "help.sound_mode.title": "Sound mode",
-  "help.sound_mode.body": "For direction (radar) to work properly, your output device must be set to '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels) in the Windows sound settings. With ordinary stereo (2 channels), the graphics may only appear on the left and right. To make up for this, set 'Sound mode' to match in the Settings tab.",
+  "help.sound_mode.body": "To see sounds from the front and back as well as from the left and right, set your output device to '5.1 Surround' (6 channels) or '7.1 Surround' (8 channels) in the Windows sound settings. With ordinary stereo (2 channels), the graphics can show left and right, but not front and back. 'Sound mode' in the Settings tab switches to match your output device when the visualizer starts or the device changes, and you can still change it yourself.",
   "help.sound_mode.tip": "💡 If you don't have a 7.1 output device, you can install the {0} and set the output device to 7.1 channels to show the overlay with 7.1 surround sound.",
   "help.sound_mode.tip_link": "VB-CABLE virtual driver",
   "help.hotkeys.title": "Real-time custom hotkeys",

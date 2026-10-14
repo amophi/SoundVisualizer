@@ -148,7 +148,7 @@
   "help.sound.danger": "Quando viene rilevato un suono di pericolo (come uno sparo), il colore cambia all'istante invece di sfumare gradualmente.",
   "help.pc.title": "Impostazioni PC e scorciatoie da tastiera",
   "help.sound_mode.title": "Modalità audio",
-  "help.sound_mode.body": "Perché la direzione (radar) funzioni correttamente, il dispositivo di uscita deve essere configurato come “Surround 5.1” (6 canali) o “Surround 7.1” (8 canali) nelle impostazioni audio di Windows. Con un normale stereo (2 canali), la grafica potrebbe comparire solo a sinistra e a destra. Per compensare, imposta di conseguenza la “Modalità audio” nella scheda Impostazioni.",
+  "help.sound_mode.body": "Per distinguere anche il davanti dal dietro, oltre alla sinistra e alla destra, configura il dispositivo di uscita come “Surround 5.1” (6 canali) o “Surround 7.1” (8 canali) nelle impostazioni audio di Windows. Con un normale stereo (2 canali), l'app distingue la sinistra dalla destra, ma non il davanti dal dietro. La “Modalità audio” nella scheda Impostazioni si adatta al dispositivo di uscita all'avvio e quando il dispositivo cambia, e puoi comunque modificarla tu.",
   "help.sound_mode.tip": "💡 Se non hai un dispositivo di uscita 7.1, puoi installare il {0} e impostare il dispositivo di uscita su 7.1 canali per mostrare l'overlay con l'audio surround 7.1.",
   "help.sound_mode.tip_link": "driver virtuale VB-CABLE",
   "help.hotkeys.title": "Scorciatoie personalizzate in tempo reale",

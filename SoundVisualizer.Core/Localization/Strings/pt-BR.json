@@ -148,7 +148,7 @@
   "help.sound.danger": "Quando um som de perigo (como um tiro) é detectado, a cor muda na hora, sem transição gradual.",
   "help.pc.title": "Ajustes do PC e teclas de atalho",
   "help.sound_mode.title": "Modo de som",
-  "help.sound_mode.body": "Para que a direção (radar) funcione corretamente, o dispositivo de saída precisa estar configurado como “Surround 5.1” (6 canais) ou “Surround 7.1” (8 canais) nas configurações de som do Windows. Com um estéreo comum (2 canais), os gráficos podem aparecer só à esquerda e à direita. Para compensar, ajuste o “Modo de som” de acordo na aba Ajustes.",
+  "help.sound_mode.body": "Para diferenciar também os sons da frente e de trás, além dos da esquerda e da direita, configure o dispositivo de saída como “Surround 5.1” (6 canais) ou “Surround 7.1” (8 canais) nas configurações de som do Windows. Com um estéreo comum (2 canais), o app diferencia esquerda e direita, mas não frente e trás. O “Modo de som” na aba Ajustes se ajusta ao dispositivo de saída ao iniciar e quando o dispositivo muda, e você também pode alterá-lo.",
   "help.sound_mode.tip": "💡 Se você não tiver um dispositivo de saída 7.1, pode instalar o {0} e configurar o dispositivo de saída em 7.1 canais para mostrar a sobreposição com som surround 7.1.",
   "help.sound_mode.tip_link": "driver virtual VB-CABLE",
   "help.hotkeys.title": "Atalhos personalizados em tempo real",

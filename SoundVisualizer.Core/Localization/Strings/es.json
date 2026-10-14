@@ -148,7 +148,7 @@
   "help.sound.danger": "Cuando se detecta un sonido de peligro (como un disparo), el color cambia al instante en lugar de hacerlo poco a poco.",
   "help.pc.title": "Ajustes de PC y atajos de teclado",
   "help.sound_mode.title": "Modo de sonido",
-  "help.sound_mode.body": "Para que la dirección (radar) funcione correctamente, el dispositivo de salida debe estar configurado como “Envolvente 5.1” (6 canales) o “Envolvente 7.1” (8 canales) en la configuración de sonido de Windows. Con un estéreo normal (2 canales), es posible que los gráficos solo aparezcan a la izquierda y a la derecha. Para compensarlo, ajusta el “Modo de sonido” en la pestaña Ajustes para que coincida.",
+  "help.sound_mode.body": "Para distinguir también los sonidos de delante y de detrás, además de los de la izquierda y la derecha, configura el dispositivo de salida como “Envolvente 5.1” (6 canales) o “Envolvente 7.1” (8 canales) en la configuración de sonido de Windows. Con un estéreo normal (2 canales), la app distingue la izquierda de la derecha, pero no lo que está delante de lo que está detrás. El “Modo de sonido” de la pestaña Ajustes se adapta al dispositivo de salida al iniciar y cuando cambia el dispositivo, y también puedes cambiarlo tú.",
   "help.sound_mode.tip": "💡 Si no tienes un dispositivo de salida 7.1, puedes instalar el {0} y configurar el dispositivo de salida en 7.1 canales para mostrar la superposición con sonido envolvente 7.1.",
   "help.sound_mode.tip_link": "controlador virtual VB-CABLE",
   "help.hotkeys.title": "Atajos personalizados en tiempo real",

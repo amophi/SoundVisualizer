@@ -148,7 +148,7 @@
   "help.sound.danger": "Khi phát hiện âm thanh nguy hiểm (như tiếng súng), màu sẽ đổi ngay lập tức thay vì chuyển dần.",
   "help.pc.title": "Cài đặt PC và phím tắt",
   "help.sound_mode.title": "Chế độ âm thanh",
-  "help.sound_mode.body": "Để tính năng chỉ hướng (radar) hoạt động đúng, thiết bị đầu ra phải được thiết lập là âm thanh vòm 5.1 (6 kênh) hoặc 7.1 (8 kênh) trong cài đặt âm thanh của Windows. Với âm thanh nổi thông thường (2 kênh), đồ họa có thể chỉ hiện ở bên trái và bên phải. Để khắc phục, hãy đặt “Chế độ âm thanh” cho phù hợp trong thẻ Cài đặt.",
+  "help.sound_mode.body": "Để phân biệt cả âm thanh phía trước và phía sau, ngoài trái và phải, hãy đặt thiết bị đầu ra thành âm thanh vòm 5.1 (6 kênh) hoặc 7.1 (8 kênh) trong cài đặt âm thanh của Windows. Với âm thanh nổi thông thường (2 kênh), ứng dụng phân biệt được trái và phải nhưng không phân biệt được trước và sau. “Chế độ âm thanh” trong thẻ Cài đặt sẽ tự khớp với thiết bị đầu ra khi bắt đầu chạy hoặc khi thiết bị thay đổi, và bạn vẫn có thể tự thay đổi.",
   "help.sound_mode.tip": "💡 Nếu không có thiết bị đầu ra 7.1, bạn có thể cài {0} rồi đặt thiết bị đầu ra thành 7.1 kênh để hiển thị lớp phủ bằng âm thanh vòm 7.1.",
   "help.sound_mode.tip_link": "trình điều khiển ảo VB-CABLE",
   "help.hotkeys.title": "Phím tắt tùy chỉnh theo thời gian thực",

@@ -148,7 +148,7 @@
   "help.sound.danger": "Gdy zostanie wykryty dźwięk zagrożenia (np. strzał), kolor zmienia się natychmiast, a nie stopniowo.",
   "help.pc.title": "Ustawienia PC i skróty klawiszowe",
   "help.sound_mode.title": "Tryb dźwięku",
-  "help.sound_mode.body": "Aby kierunek (radar) działał prawidłowo, w ustawieniach dźwięku systemu Windows urządzenie wyjściowe musi być skonfigurowane jako dźwięk przestrzenny 5.1 (6 kanałów) lub 7.1 (8 kanałów). Przy zwykłym stereo (2 kanały) grafika może pojawiać się tylko po lewej i prawej stronie. Aby to zrekompensować, ustaw odpowiedni „Tryb dźwięku” na karcie „Ustawienia”.",
+  "help.sound_mode.body": "Aby rozróżniać także dźwięki z przodu i z tyłu, a nie tylko z lewej i prawej, w ustawieniach dźwięku systemu Windows skonfiguruj urządzenie wyjściowe jako dźwięk przestrzenny 5.1 (6 kanałów) lub 7.1 (8 kanałów). Przy zwykłym stereo (2 kanały) aplikacja odróżnia lewą stronę od prawej, ale nie przód od tyłu. „Tryb dźwięku” na karcie „Ustawienia” dopasowuje się do urządzenia wyjściowego przy uruchomieniu i po zmianie urządzenia, ale możesz go też zmienić samodzielnie.",
   "help.sound_mode.tip": "💡 Jeśli nie masz urządzenia wyjściowego 7.1, zainstaluj {0} i skonfiguruj urządzenie wyjściowe jako 7.1 – wtedy nakładka będzie pokazywać dźwięk przestrzenny 7.1.",
   "help.sound_mode.tip_link": "wirtualny sterownik VB-CABLE",
   "help.hotkeys.title": "Własne skróty klawiszowe",
