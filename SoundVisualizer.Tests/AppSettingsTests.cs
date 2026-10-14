@@ -53,6 +53,7 @@ public sealed class AppSettingsTests : IDisposable
         AppSettings.CircleRadius = 90;
         AppSettings.ColorDanger = "#FF00FF00";
         AppSettings.IsAdminMode = true;
+        AppSettings.DeveloperRecord = true;
         AppSettings.Language = "ja";
 
         AppSettings.ResetToDefaults();
@@ -64,7 +65,38 @@ public sealed class AppSettingsTests : IDisposable
         Assert.Equal(40.0, AppSettings.CircleMode.CircleRadius);
         Assert.Equal(AppSettings.DefaultColorDanger, AppSettings.ColorDanger);
         Assert.False(AppSettings.IsAdminMode);
+        Assert.False(AppSettings.DeveloperRecord);
         Assert.Equal("ja", AppSettings.Language);
+    }
+
+    [Fact]
+    public void 결과_기록은_꺼진_채로_시작하고_개발자_모드와_따로_저장한다()
+    {
+        // 켜 두고 잊으면 디스크를 먹으므로 기본은 꺼짐이다.
+        Assert.False(AppSettings.DeveloperRecord);
+
+        // 모바일처럼 개발자 모드를 꺼도 기록 스위치의 값은 남는다. 두 값은 서로 다른 항목에 저장한다.
+        AppSettings.IsAdminMode = false;
+        AppSettings.DeveloperRecord = true;
+        AppSettings.SaveNow();
+        AppSettings.ResetToDefaults();
+        AppSettings.Load();
+
+        Assert.False(AppSettings.IsAdminMode);
+        Assert.True(AppSettings.DeveloperRecord);
+    }
+
+    [Fact]
+    public void 결과_기록이_없는_예전_설정은_꺼진_채로_읽는다()
+    {
+        // 앞에서 들고 있던 값이 남지 않는지도 본다.
+        AppSettings.DeveloperRecord = true;
+        File.WriteAllText(_path, """{ "IsAdminMode": true, "Language": "ko" }""");
+
+        AppSettings.Load();
+
+        Assert.True(AppSettings.IsAdminMode);
+        Assert.False(AppSettings.DeveloperRecord);
     }
 
     [Fact]

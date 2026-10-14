@@ -128,6 +128,11 @@ namespace SoundVisualizer
 
         // 8.5. 관리자 모드
         public static bool IsAdminMode { get; set; } = false;
+
+        // 8.5.1. 개발자 모드의 결과 기록(모바일 developer_record, #193). 개발자 모드를 꺼도 값은 남고, 오버레이가 떠 있고 개발자 모드가
+        // 켜져 있을 때만 기록한다(Diagnostics.AiDebugHud). 켜 두고 잊으면 디스크를 먹으므로 기본은 꺼짐이다.
+        public static bool DeveloperRecord { get; set; } = false;
+
         public static bool AutoMinimizeOnLaunch { get; set; } = false;
 
         // 8.6. 렌더링 최대 프레임
@@ -210,6 +215,7 @@ namespace SoundVisualizer
                         Language = UiLanguages.NormalizeSetting(data.Language);
 
                         IsAdminMode = data.IsAdminMode;
+                        DeveloperRecord = data.DeveloperRecord;
                         AutoMinimizeOnLaunch = data.AutoMinimizeOnLaunch;
                         if (data.TargetFps >= 30.0) TargetFps = data.TargetFps;
                         ShowAmbient = data.ShowAmbient;
@@ -327,6 +333,7 @@ namespace SoundVisualizer
             EditModeHotkey = DefaultEditModeKey;
 
             IsAdminMode = false;
+            DeveloperRecord = false;
             AutoMinimizeOnLaunch = false;
             TargetFps = Math.Min(DefaultTargetFps, GetMonitorRefreshRate());
 
@@ -352,6 +359,7 @@ namespace SoundVisualizer
                     Language = Language,
                     
                     IsAdminMode = IsAdminMode,
+                    DeveloperRecord = DeveloperRecord,
                     AutoMinimizeOnLaunch = AutoMinimizeOnLaunch,
                     TargetFps = TargetFps,
                     ShowAmbient = ShowAmbient,
@@ -480,6 +488,8 @@ namespace SoundVisualizer
             public string? Language { get; set; } = "KOR";
             
             public bool IsAdminMode { get; set; } = false;
+            // 결과 기록이 생기기 전의 설정 파일에는 없어 꺼진 채로 읽힌다.
+            public bool DeveloperRecord { get; set; } = false;
             public bool AutoMinimizeOnLaunch { get; set; } = false;
             public double TargetFps { get; set; } = 144.0;
             public bool ShowAmbient { get; set; } = true;
