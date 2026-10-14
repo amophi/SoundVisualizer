@@ -1,0 +1,106 @@
+<Window x:Class="SoundVisualizer.LicenseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:SoundVisualizer.Localization"
+        Title="{l:Loc help.licenses.title}" Width="720" Height="560" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        FontFamily="{DynamicResource AppFontFamily}" ContentRendered="Window_ContentRendered">
+
+    <!-- 오픈소스 라이선스 창(안드로이드 LicenseDialog). 고지 네 개(Core 의 LicenseNotices)를 고정폭 글꼴로 이어 보인다.
+         Esc 나 닫기 버튼으로 닫는다. 아랍어 화면이면 제목줄과 버튼은 뒤집고, 고지 글은 영어·한국어라 왼쪽에서 오른쪽으로 둔다. -->
+    <Window.Resources>
+        <!-- 어두운 바탕에 맞춘 가는 세로 스크롤 막대. 이 창에만 쓴다(런처의 탭은 스크롤 막대를 숨긴다). -->
+        <Style x:Key="ScrollThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="Bar" CornerRadius="4" Background="{StaticResource ControlHoverBrush}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bar" Property="Background" Value="{StaticResource SecondaryTextBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Bar" Property="Background" Value="{StaticResource SecondaryTextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ScrollPage" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="MinWidth" Value="8"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ScrollPage}" Command="ScrollBar.PageUpCommand"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ScrollPage}" Command="ScrollBar.PageDownCommand"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource ScrollThumb}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{StaticResource CardBrush}" CornerRadius="20" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
+            FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 제목과 닫기. 제목줄을 끌면 창이 움직인다. -->
+            <Grid Margin="0,0,0,16" Background="Transparent" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource Text.Section}" Margin="0" VerticalAlignment="Center" Text="{l:Loc help.licenses.title}"/>
+                <Button Grid.Column="1" Style="{StaticResource Button.Chrome}" Width="36" Height="36" Tag="18" Margin="12,0,0,0" Content="&#xE8BB;"
+                        AutomationProperties.Name="{l:Loc help.licenses.close}" Click="BtnClose_Click"/>
+            </Grid>
+
+            <!-- 고지 전문. 읽기 전용이라 고치지는 못하고, 골라서 복사할 수 있다. 구분선은 창 폭에 맞춘다(ApplyText). -->
+            <TextBox x:Name="TxtLicenses" Grid.Row="1" IsReadOnly="True" IsReadOnlyCaretVisible="False" FlowDirection="LeftToRight"
+                     FontFamily="{StaticResource MonoFontFamily}" FontSize="13" Foreground="{StaticResource SecondaryTextBrush}"
+                     SelectionBrush="{StaticResource AccentFillBrush}" CaretBrush="{StaticResource PrimaryTextBrush}"
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"
+                     AutomationProperties.Name="{l:Loc help.licenses.title}" SizeChanged="TxtLicenses_SizeChanged">
+                <TextBox.Template>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{StaticResource BackgroundBrush}" CornerRadius="12" Padding="16,12,8,12">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="False"/>
+                        </Border>
+                    </ControlTemplate>
+                </TextBox.Template>
+            </TextBox>
+
+            <!-- IsCancel 이라 Esc 로도 눌린다. 창은 ShowDialog 로 열리므로 WPF 가 대화 상자를 닫는다(Click 에서 또 닫지 않는다). -->
+            <Button Grid.Row="2" Style="{StaticResource Button.Secondary}" Margin="0,16,0,0" MinWidth="160" HorizontalAlignment="Right"
+                    IsCancel="True" Content="{l:Loc help.licenses.close}"/>
+        </Grid>
+    </Border>
+</Window>

@@ -3,6 +3,7 @@
 // SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 using System.Text.RegularExpressions;
 using SoundVisualizer.Help;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer.Tests.Help;
 
@@ -13,6 +14,13 @@ namespace SoundVisualizer.Tests.Help;
 public class LicenseNoticesTests
 {
     private static readonly string Ruler80 = new('=', 80);
+
+    public static TheoryData<string> Codes()
+    {
+        var data = new TheoryData<string>();
+        foreach (var code in StringTables.AvailableCodes) data.Add(code);
+        return data;
+    }
 
     [Fact]
     public void 넣어_둔_고지는_저장소_원본과_같다()
@@ -83,6 +91,19 @@ public class LicenseNoticesTests
                 && s.Contains("(CC BY 4.0)", StringComparison.Ordinal))
             .ToArray();
         Assert.True(sentences.Length == 0, "온톨로지를 CC BY 4.0 으로 적은 문장:\n" + string.Join("\n", sentences));
+    }
+
+    [Theory]
+    [MemberData(nameof(Codes))]
+    public void 앱_정보의_라이선스_안내는_AGPL_과_소리_이름의_CC_BY_SA_4_0_을_적는다(string code)
+    {
+        // PC 판은 AGPL-3.0 이다(안드로이드 판의 Apache License 2.0 문장을 옮기지 않는다). 소리 이름과 묶음 표는 AudioSet
+        // 온톨로지의 각색물이라 CC BY-SA 4.0 이고, 자세한 고지는 바로 아래 버튼을 그 언어의 버튼 이름 그대로 가리킨다.
+        var table = StringTables.Get(code)!;
+        Assert.True(table.TryGet("help.about.license", out var text), code + ": help.about.license 가 없습니다");
+        Assert.True(table.TryGet("help.licenses.button", out var button), code + ": help.licenses.button 이 없습니다");
+        Assert.All(new[] { "AGPL-3.0", "AudioSet", "CC BY-SA 4.0", button }, phrase => Assert.Contains(phrase, text, StringComparison.Ordinal));
+        Assert.DoesNotContain("Apache", text, StringComparison.Ordinal);
     }
 
     // ===== 구분선 맞추기(안드로이드 LicenseRulersTest, #167) =====

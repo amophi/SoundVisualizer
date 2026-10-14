@@ -154,25 +154,13 @@ namespace SoundVisualizer
             ApplyCodeTexts();
         }
 
-        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태, 링크가 든 안내 문장, 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
+        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태, 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
         private void ApplyCodeTexts()
         {
             SetStatusUI(_overlayWindow != null);
-            UpdateHelpTip();
             if (_bindingTarget != "Visual") BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
             if (_bindingTarget != "Sound") BtnSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
             if (_bindingTarget != "Edit") BtnEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
-        }
-
-        /// <summary>
-        /// 링크가 문장 가운데에 오므로 번역문의 {0} 자리에서 나눠 앞뒤 글을 넣는다. 언어마다 어순이 달라 링크 위치를 번역문이 정한다.
-        /// </summary>
-        private void UpdateHelpTip()
-        {
-            string tip = Loc.Get("help.sound_mode.tip");
-            int at = tip.IndexOf("{0}", StringComparison.Ordinal);
-            TxtHelp1TipPrefix.Text = at < 0 ? tip + " " : tip[..at];
-            TxtHelp1TipSuffix.Text = at < 0 ? "" : tip[(at + 3)..];
         }
 
         private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -704,23 +692,6 @@ namespace SoundVisualizer
         public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
         {
             CheckAndApplyDeviceChannels();
-        }
-
-        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            try
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = e.Uri.AbsoluteUri,
-                    UseShellExecute = true
-                });
-                e.Handled = true;
-            }
-            catch (Exception ex)
-            {
-                Dialogs.Show(Loc.Format("dialog.link_error", ex.Message));
-            }
         }
 
         private void BtnMoreInfoGithub_Click(object sender, RoutedEventArgs e)

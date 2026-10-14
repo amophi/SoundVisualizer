@@ -270,60 +270,8 @@
 
                 <!-- 도움말 탭 -->
                 <TabItem x:Name="TabHelp" Header="{l:Loc launcher.tab.help}">
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">
-                        <StackPanel>
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.direction.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.direction.body}"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.sound_mode.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Margin="0,0,0,12" Text="{l:Loc help.sound_mode.body}"/>
-                                    <!-- help.sound_mode.tip 의 {0} 자리에 링크가 온다. 앞뒤 글은 UpdateHelpTip 이 넣는다. 요소 사이 공백이 글자가 되지 않게 붙여 쓴다. -->
-                                    <TextBlock x:Name="TxtHelp1Tip" Style="{StaticResource Text.Warning}"><Run x:Name="TxtHelp1TipPrefix"/><Hyperlink Style="{StaticResource Link}" NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate"><Run x:Name="TxtHelp1TipLink" Text="{l:Loc help.sound_mode.tip_link}"/></Hyperlink><Run x:Name="TxtHelp1TipSuffix"/></TextBlock>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.hotkeys.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.hotkeys.body}"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.size_lock.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.size_lock.body}"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.editor.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.editor.body}"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.ai.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.ai.body}"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc help.developer.title}"/>
-                                    <TextBlock Style="{StaticResource Text.Body}" Text="{l:Loc help.developer.body}"/>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </ScrollViewer>
+                    <!-- 내용은 HelpTab.xaml(안드로이드 도움말 탭의 펼치기 카드 구성) -->
+                    <local:HelpTab xmlns:local="clr-namespace:SoundVisualizer"/>
                 </TabItem>
 
                 <!-- 더 알아보기 탭 -->
