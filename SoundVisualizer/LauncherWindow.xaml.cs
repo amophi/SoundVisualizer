@@ -154,7 +154,7 @@ namespace SoundVisualizer
             ApplyCodeTexts();
         }
 
-        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태, 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
+        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태와 홈 안내, 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
         private void ApplyCodeTexts()
         {
             SetStatusUI(_overlayWindow != null);
@@ -176,6 +176,8 @@ namespace SoundVisualizer
             TxtStatus.Text = isRunning ? Loc.Get("launcher.status.running") : Loc.Get("launcher.status.idle");
             // 실행 중이면 상태 점만 강조색이 된다(안드로이드 홈과 같다). 글자는 늘 보조 글자색이다.
             StatusDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, isRunning ? "AccentBrush" : "SecondaryTextBrush");
+            // 상태 줄 아래 안내도 같은 상태를 보인다(LauncherWindow.Status.cs).
+            UpdateNotices();
         }
 
         private void LoadSettingsToUI()
@@ -508,49 +510,10 @@ namespace SoundVisualizer
             }
         }
 
-        private void BtnLaunch_Click(object sender, RoutedEventArgs e)
-        {
-            if (_overlayWindow != null)
-            {
-                Dialogs.Show(Loc.Get("dialog.already_running"), Loc.Get("dialog.notice_title"), MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+        // 켜고 끄는 일은 LauncherWindow.Status.cs 에 있다.
+        private void BtnLaunch_Click(object sender, RoutedEventArgs e) => StartOverlay();
 
-            _overlayWindow = new MainWindow();
-            _overlayWindow.OnSettingsChangedFromHotkey = () =>
-            {
-                // UI 스레드에서 LoadSettingsToUI 호출 (MainWindow는 이미 UI 스레드에서 이벤트를 발생시킴)
-                LoadSettingsToUI();
-            };
-            _overlayWindow.Closed += (s, args) => 
-            {
-                _overlayWindow = null;
-                BtnLaunch.IsEnabled = true;
-                BtnStop.IsEnabled = false;
-                SetStatusUI(false);
-                
-                // 오버레이 동작 중 핫키로 변경된 사항(모드 등)을 다시 UI에 반영
-                LoadSettingsToUI();
-            };
-            _overlayWindow.Show();
-            
-            BtnLaunch.IsEnabled = false;
-            BtnStop.IsEnabled = true;
-            SetStatusUI(true);
-
-            if (AppSettings.AutoMinimizeOnLaunch)
-            {
-                this.WindowState = WindowState.Minimized;
-            }
-        }
-
-        private void BtnStop_Click(object sender, RoutedEventArgs e)
-        {
-            if (_overlayWindow != null)
-            {
-                _overlayWindow.Close();
-            }
-        }
+        private void BtnStop_Click(object sender, RoutedEventArgs e) => StopOverlay();
         private void BtnResetWave_Click(object sender, RoutedEventArgs e)
         {
             if (!Dialogs.Confirm(Loc.Get("dialog.reset_wave"), Loc.Get("dialog.reset_title"))) return;

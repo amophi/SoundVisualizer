@@ -193,6 +193,13 @@
   "help.licenses.title": "오픈소스 라이선스",
   "help.licenses.close": "닫기",
 
+  "notice.ai_unavailable": "소리 종류를 구분하지 못하고 있어 모든 소리가 환경음 색으로 표시됩니다. 실행 종료 후 다시 실행해 보세요.",
+  "notice.ai_unavailable_hidden": "소리 종류를 구분하지 못해 모든 소리를 환경음으로 보는데, 환경음 표시가 꺼져 있어 아무것도 보이지 않습니다. 설정 탭에서 ‘{0}’ 스위치를 켜거나, 실행 종료 후 다시 실행해 보세요.",
+  "notice.stopped.title": "소리 시각화가 꺼졌습니다",
+  "notice.stopped.no_device": "열 수 있는 출력 장치가 없어 소리를 받을 수 없습니다. 스피커나 헤드폰을 연결하거나 Windows 소리 설정에서 기본 출력 장치를 정한 뒤 다시 실행해 주세요.",
+  "notice.stopped.capture_error": "오류로 소리 받기가 멈춰 그래픽이 꺼졌습니다.",
+  "notice.dismiss": "안내 닫기",
+
   "more_info.title": "GitHub 저장소 및 프로젝트 기여",
   "more_info.body": "Sound Visualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다.",
   "more_info.github_button": "GitHub 저장소 방문하기",

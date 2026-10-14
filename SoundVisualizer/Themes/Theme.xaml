@@ -332,6 +332,45 @@
         <Setter Property="Padding" Value="12,8"/>
     </Style>
 
+    <!-- 글자만 있는 버튼(홈 안내의 "안내 닫기"). 안드로이드 TextButton 처럼 바탕 없이 보조 글자색 굵게 두고, 마우스를 올리면 바탕이 생긴다.
+         보조 글자는 카드·바탕 위 4.6:1 이상이다. -->
+    <Style x:Key="Button.Text" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="40"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingButton}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="False">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource ControlBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource ControlPressedBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- 소리 종류 색 버튼: 이름("색상 설정") + 32px 동그라미. 동그라미 색은 코드가 Background 로 넣는다. 누르는 자리는 이름까지 48px 높이다.
          이름(Content)을 비우면 동그라미만 둔다. 그때는 AutomationProperties.Name 으로 이름을 준다. -->
     <Style x:Key="Button.Swatch" TargetType="Button">

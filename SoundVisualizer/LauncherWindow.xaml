@@ -41,15 +41,32 @@
                         <TextBlock Style="{StaticResource Text.Title}" Margin="0,0,0,12" Text="Sound Visualizer"/>
                         <TextBlock Style="{StaticResource Text.Lead}" Margin="0,0,0,24" Text="{l:Loc launcher.home.desc}"/>
 
-                        <!-- 상태: 실행 중이면 점만 강조색이 된다(안드로이드 홈과 같다). 색과 글은 SetStatusUI 가 넣는다. -->
-                        <Grid Margin="0,0,0,24">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Ellipse x:Name="StatusDot" Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center" Fill="{StaticResource SecondaryTextBrush}"/>
-                            <TextBlock x:Name="TxtStatus" Grid.Column="1" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        </Grid>
+                        <StackPanel Margin="0,0,0,24">
+                            <!-- 상태: 실행 중이면 점만 강조색이 된다(안드로이드 홈과 같다). 색과 글은 SetStatusUI 가 넣는다.
+                                 실행·실행 종료를 누른 결과를 화면 읽어주기가 알려 준다(켜고 끌 때만 알린다). -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse x:Name="StatusDot" Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center" Fill="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock x:Name="TxtStatus" Grid.Column="1" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" TextWrapping="Wrap" VerticalAlignment="Center"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                            </Grid>
+
+                            <!-- 상태 줄 아래 안내(안드로이드 홈). 실행 중에는 AI 를 쓸 수 없을 때, 멈춘 뒤에는 사용자가 끄지 않았는데 꺼졌을 때 보인다.
+                                 무엇을 보일지는 Core 의 RunStatus 가 정하고 UpdateNotices 가 넣는다. 글은 상태 점 너비(12 + 8)만큼 들여 상태 글과 줄을 맞춘다. -->
+                            <TextBlock x:Name="TxtAiNotice" Style="{StaticResource Text.Warning}" Margin="20,8,0,0" Visibility="Collapsed"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <StackPanel x:Name="PanelStopped" Margin="20,8,0,0" Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource Text.Warning}" FontWeight="SemiBold" Text="{l:Loc notice.stopped.title}"/>
+                                <!-- 제목과 내용을 한 번에 읽도록 이 글의 이름에 제목을 함께 넣는다(UpdateNotices). -->
+                                <TextBlock x:Name="TxtStoppedText" Style="{StaticResource Text.Warning}" AutomationProperties.LiveSetting="Polite"/>
+                                <!-- 다시 켜는 버튼은 따로 두지 않는다. 바로 아래 실행 버튼이 같은 일을 한다. -->
+                                <Button x:Name="BtnDismissNotice" Style="{StaticResource Button.Text}" HorizontalAlignment="Right" Margin="0,4,0,0"
+                                        Content="{l:Loc notice.dismiss}" Click="BtnDismissNotice_Click"/>
+                            </StackPanel>
+                        </StackPanel>
 
                         <Grid>
                             <Grid.ColumnDefinitions>

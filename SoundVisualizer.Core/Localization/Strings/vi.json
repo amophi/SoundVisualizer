@@ -193,6 +193,13 @@
   "help.licenses.title": "Open source licenses",
   "help.licenses.close": "Close",
 
+  "notice.ai_unavailable": "Sound type detection isn't working, so every sound is shown in the ambient color. Try turning the visualizer off and on again.",
+  "notice.ai_unavailable_hidden": "Sound type detection isn't working, so every sound counts as ambient, and ambient sounds are turned off, so nothing is shown. Turn on “{0}” in the Settings tab, or try turning the visualizer off and on again.",
+  "notice.stopped.title": "Sound visualizer turned off",
+  "notice.stopped.no_device": "No playback device could be opened, so sound can't be captured. Connect speakers or headphones, or set a default playback device in the Windows sound settings, then start again.",
+  "notice.stopped.capture_error": "Sound capture stopped because of an error, so the graphics are off.",
+  "notice.dismiss": "Dismiss notice",
+
   "more_info.title": "Kho lưu trữ GitHub và đóng góp",
   "more_info.body": "Sound Visualizer là dự án nguồn mở, mã nguồn được công khai trên GitHub. Bạn có thể tham gia bằng cách báo lỗi, đề xuất tính năng hoặc đóng góp vào việc phát triển. Hãy nhấp vào nút bên dưới để truy cập kho lưu trữ GitHub chính thức! Bạn cũng có thể xem và tải phiên bản mới nhất trong thẻ Releases trên GitHub.",
   "more_info.github_button": "Truy cập kho lưu trữ GitHub",

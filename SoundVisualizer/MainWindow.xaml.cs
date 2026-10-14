@@ -189,7 +189,9 @@ namespace SoundVisualizer
             };
 
             _captureEngine.OnAudioDataAvailable += HandleAudioDataAsync;
+            WatchCaptureErrors();
             _captureEngine.StartCapture();
+            CheckCaptureStarted(); // 시작하지 못했으면 런처가 이 창을 띄우지 않고 이유를 알린다(MainWindow.Status.cs)
 
             var captureFormat = _captureEngine.CaptureFormat;
             AppLog.Info("capture", captureFormat == null
@@ -670,11 +672,13 @@ namespace SoundVisualizer
                         Volatile.Write(ref _aiPipeline, created);
                     }
                     AppLog.Info("ai", $"AI 를 시작했습니다({rate}Hz, {channels}ch).");
+                    NotifyAiAvailability(true);
                 }
                 catch (Exception ex)
                 {
                     created?.Dispose();
                     AppLog.Warn("ai", $"AI 를 시작하지 못해 그래픽만 표시합니다({rate}Hz, {channels}ch).", ex);
+                    NotifyAiAvailability(false); // 홈이 "모든 소리가 환경음 색" 이라고 알린다
                 }
             });
         }

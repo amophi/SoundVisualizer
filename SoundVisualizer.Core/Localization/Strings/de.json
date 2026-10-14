@@ -193,6 +193,13 @@
   "help.licenses.title": "Open source licenses",
   "help.licenses.close": "Close",
 
+  "notice.ai_unavailable": "Sound type detection isn't working, so every sound is shown in the ambient color. Try turning the visualizer off and on again.",
+  "notice.ai_unavailable_hidden": "Sound type detection isn't working, so every sound counts as ambient, and ambient sounds are turned off, so nothing is shown. Turn on “{0}” in the Settings tab, or try turning the visualizer off and on again.",
+  "notice.stopped.title": "Sound visualizer turned off",
+  "notice.stopped.no_device": "No playback device could be opened, so sound can't be captured. Connect speakers or headphones, or set a default playback device in the Windows sound settings, then start again.",
+  "notice.stopped.capture_error": "Sound capture stopped because of an error, so the graphics are off.",
+  "notice.dismiss": "Dismiss notice",
+
   "more_info.title": "GitHub-Repository und Mitwirkung",
   "more_info.body": "Sound Visualizer ist ein Open-Source-Projekt, dessen Quellcode öffentlich auf GitHub verfügbar ist. Sie können mitmachen, indem Sie Fehler melden, Funktionen vorschlagen oder zur Entwicklung beitragen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen! Im Tab „Releases“ auf GitHub können Sie außerdem nach der neuesten Version suchen und sie herunterladen.",
   "more_info.github_button": "GitHub-Repository besuchen",
