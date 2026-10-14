@@ -13,6 +13,16 @@ namespace SoundVisualizer
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // 개발용: 환경 변수 SOUNDVISUALIZER_TRACE 에 파일 경로를 주면 AppLog 기록을 그 파일에도 남긴다.
+            var tracePath = Environment.GetEnvironmentVariable("SOUNDVISUALIZER_TRACE");
+            if (!string.IsNullOrWhiteSpace(tracePath))
+            {
+                System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(tracePath));
+                System.Diagnostics.Trace.AutoFlush = true;
+                AppLog.Info("app", $"시작합니다({DateTime.Now:yyyy-MM-dd HH:mm:ss}).");
+            }
+
             AppSettings.Load();
             AppFonts.Apply(AppSettings.Language);
         }

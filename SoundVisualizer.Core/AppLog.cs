@@ -11,6 +11,9 @@ namespace SoundVisualizer
     /// </summary>
     public static class AppLog
     {
+        /// <summary>정상 동작의 이정표(예: AI 를 어떤 형식으로 시작했는지). 문제를 되짚을 때 쓴다.</summary>
+        public static void Info(string tag, string message) => Trace.WriteLine($"[SoundVisualizer:{tag}] {message}");
+
         public static void Warn(string tag, string message, Exception? error = null)
         {
             Trace.WriteLine(error == null

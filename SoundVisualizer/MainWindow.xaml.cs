@@ -14,7 +14,7 @@ using System.Windows.Media;
 using SoundVisualizer.Audio;
 using SoundVisualizer.CoreAudio;
 using SoundVisualizer.DSP;
-using SoundVisualizer.AIModel;   
+using SoundVisualizer.Ai;
 using SoundVisualizer.Visualizers;
 
 namespace SoundVisualizer
@@ -36,7 +36,14 @@ namespace SoundVisualizer
         private AudioCaptureEngine? _captureEngine;
         private AudioRouter? _audioRouter;
         private VectorCalculator? _vectorCalc;
-        private SoundClassifier? _soundAI;
+        // AI 는 캡처 형식(샘플레이트·채널 수)이 정해진 뒤 백그라운드에서 만든다. 만드는 동안과 만들지 못했을 때는 null 이고,
+        // 그동안 그래픽은 환경음 색으로 그린다. 캡처 스레드가 넣고(Ingest) 렌더 루프가 읽는다(LastClassification).
+        private RealtimeAiPipeline? _aiPipeline;
+        private readonly object _aiGate = new();
+        private int _aiRequestedRate, _aiRequestedChannels; // 만들기를 요청한 형식. 같은 형식을 거듭 만들지 않게 한다.
+        private volatile bool _isClosed;
+        private static YamnetClassMap? _classMap;
+        private static readonly string ModelDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "AIModel");
 
         // 전체 볼륨 및 위치 분포 관련 변수
         private double _smoothTotal;
@@ -46,7 +53,8 @@ namespace SoundVisualizer
         private float _targetFL, _targetFR, _targetFC, _targetBL, _targetBR, _targetSL, _targetSR, _targetLFE;
         private readonly PeakAccumulator _peaks = new();
         private readonly float[] _peakFrame = new float[PeakAccumulator.ChannelCount];
-        private string _currentLabel = "";
+        private SoundType _currentType = SoundType.Ambient;
+        private AiClassificationResult? _labelTextSource; // 개발자 모드 라벨을 마지막으로 만든 결과(같으면 문자열을 다시 만들지 않는다)
         private double _animationTime = 0;
         private DateTime _modeUIVisibleUntil = DateTime.Now.AddSeconds(5);
 
@@ -89,12 +97,6 @@ namespace SoundVisualizer
         private string[] _visualModeNames = { "파도", "패드", "원형", "외곽선" };
         private string[] _soundModeNames = { "2 채널", "5.1 채널", "7.1 채널" };
         private string[] _opacityFixedSizeLabels = { "파도 크기", "패드 크기", "원형 크기", "외곽선 두께" };
-
-        // YAMNet 추론 스로틀링 제어 필드
-        private readonly object _aiLock = new();
-        private volatile bool _isPredicting = false;
-        private long _lastPredictTimeTicks = 0;
-        private const long AI_PREDICT_INTERVAL_MS = 250; // YAMNet 추론 주기 (250ms)
 
         // 시각화 모듈 (Strategy Pattern)
         private IVisualizerMode[] _visualizers = new IVisualizerMode[4];
@@ -144,7 +146,10 @@ namespace SoundVisualizer
                 }
                 
                 _audioRouter?.StopRouting();
-                _soundAI?.Dispose();
+
+                // 캡처를 먼저 멈춘 뒤 AI 를 닫는다. 도는 추론이 있으면 끝날 때까지 최대 1초 기다린다.
+                lock (_aiGate) _isClosed = true;
+                Interlocked.Exchange(ref _aiPipeline, null)?.Dispose();
             };
         }
 
@@ -156,7 +161,6 @@ namespace SoundVisualizer
             _visualizers[3] = new OutlineVisualizer();
 
             _vectorCalc = new VectorCalculator();
-            _soundAI = new SoundClassifier();
             _captureEngine = new AudioCaptureEngine();
             _audioRouter = new AudioRouter();
 
@@ -179,6 +183,10 @@ namespace SoundVisualizer
             _captureEngine.OnAudioDataAvailable += HandleAudioDataAsync;
             _captureEngine.StartCapture();
 
+            var captureFormat = _captureEngine.CaptureFormat;
+            AppLog.Info("capture", captureFormat == null
+                ? "캡처 장치를 열지 못해 AI 를 시작하지 않습니다."
+                : $"캡처 형식: {captureFormat.SampleRate}Hz, {captureFormat.Channels}ch, {captureFormat.BitsPerSample}bit {captureFormat.Encoding}.");
             if (_captureEngine.CaptureFormat != null)
             {
                 int channels = _captureEngine.CaptureFormat.Channels;
@@ -193,6 +201,7 @@ namespace SoundVisualizer
                     StatusText.Foreground = Brushes.LimeGreen;
                 }
                 _audioRouter.StartRouting(_captureEngine.CaptureFormat);
+                RequestAiPipeline(_captureEngine.CaptureFormat.SampleRate, _captureEngine.CaptureFormat.Channels);
             }
         }
 
@@ -369,8 +378,12 @@ namespace SoundVisualizer
             _smoothSR = _smoothTotal * _distSR;
             _smoothLFE = _smoothTotal * _distLFE;
 
-            bool isVisible = IsLabelVisible(_currentLabel);
-            var activeColor = GetColorForLabel(_currentLabel);
+            // AI 결과는 프레임마다 한 번만 읽고, 이 프레임의 판단은 모두 그 한 결과로 한다.
+            var aiResult = Volatile.Read(ref _aiPipeline)?.LastClassification();
+            _currentType = aiResult?.Coarse ?? SoundType.Ambient;
+
+            bool isVisible = IsTypeVisible(_currentType);
+            var activeColor = GetColorForType(_currentType);
 
             if (isVisible)
             {
@@ -378,13 +391,18 @@ namespace SoundVisualizer
                 {
                     SetVisibilityIfChanged(AILabelBorder, ref _cachedAILabelBorderVisibility, Visibility.Visible);
                     
-                    if (_cachedAILabelText != _currentLabel)
+                    if (_labelTextSource != aiResult || _cachedAILabelText.Length == 0)
                     {
-                        _cachedAILabelText = _currentLabel;
-                        AILabelText.Text = _currentLabel;
+                        _labelTextSource = aiResult;
+                        string labelText = FormatAiLabel(aiResult);
+                        if (_cachedAILabelText != labelText)
+                        {
+                            _cachedAILabelText = labelText;
+                            AILabelText.Text = labelText;
+                        }
                     }
 
-                    SolidColorBrush activeBrush = GetBrushForLabel(_currentLabel);
+                    SolidColorBrush activeBrush = GetBrushForType(_currentType);
                     if (_cachedAILabelForeground != activeBrush)
                     {
                         _cachedAILabelForeground = activeBrush;
@@ -547,7 +565,7 @@ namespace SoundVisualizer
 
         private void HandleAudioDataAsync(object? sender, AudioDataAvailableEventArgs e)
         {
-            if (_audioRouter == null || _vectorCalc == null || _soundAI == null) return;
+            if (_audioRouter == null || _vectorCalc == null) return;
 
             byte[] rawData = e.Buffer;
             int bytesRecorded = e.BytesRecorded;
@@ -569,51 +587,68 @@ namespace SoundVisualizer
             // 렌더 루프가 다음 프레임에 가져간다. 그사이 버퍼가 여럿이면 채널마다 가장 큰 값이 남는다.
             _peaks.Offer(fl, fr, fc, bl, br, sl, sr, lfe);
 
-            // YAMNet 실시간 링 버퍼에 데이터를 끊김 없이 모노 다운믹스하여 적재 (데이터의 연속성 및 정확도 보존)
-            int sampleRate = _captureEngine?.CaptureFormat?.SampleRate ?? SoundClassifier.DefaultCaptureSampleRate;
-            _soundAI.IngestAudio(rawData, bytesRecorded, channels, sampleRate);
-
-            // 2. AI 추론 스로틀링 (250ms 간격으로 백그라운드 스레드풀에서 무거운 ONNX 추론 실행)
-            long nowTicks = Environment.TickCount64;
-            long elapsedMs = nowTicks - _lastPredictTimeTicks;
-
-            if (elapsedMs >= AI_PREDICT_INTERVAL_MS && !_isPredicting)
+            // AI 는 이 캡처 형식에 맞춰 만든 파이프라인에만 넣는다. 장치가 바뀌어 형식이 달라졌으면 새로 만들기를 요청한다.
+            // float32 가 아닌 형식은 AI 가 읽지 못하므로 넣지 않는다(WASAPI 공유 모드의 믹스 형식은 보통 float32 다).
+            var format = _captureEngine?.CaptureFormat;
+            if (format != null && format.BitsPerSample == 32)
             {
-                lock (_aiLock)
+                var ai = Volatile.Read(ref _aiPipeline);
+                if (ai != null && ai.SampleRate == format.SampleRate && ai.ChannelCount == channels)
                 {
-                    if (!_isPredicting)
-                    {
-                        _isPredicting = true;
-                        _lastPredictTimeTicks = nowTicks;
-
-                        Task.Run(() =>
-                        {
-                            try
-                            {
-                                // 링 버퍼에 안전하게 축적된 데이터에서 추론 진행
-                                string prediction = _soundAI.PredictSoundType(sampleRate);
-
-                                // 이전 값과 다를 때만 UI 스레드에 디스패칭하여 가비지 및 컨텍스트 스위칭 최소화
-                                if (_currentLabel != prediction)
-                                {
-                                    // UI 프레임 렌더링에 부정적인 영향을 미치지 않도록 Background 우선순위로 라벨 업데이트
-                                    Dispatcher.InvokeAsync(() =>
-                                    {
-                                        _currentLabel = prediction;
-                                    }, System.Windows.Threading.DispatcherPriority.Background);
-                                }
-                            }
-                            catch (Exception)
-                            {
-                            }
-                            finally
-                            {
-                                _isPredicting = false;
-                            }
-                        });
-                    }
+                    ai.Ingest(MemoryMarshal.Cast<byte, float>(rawData.AsSpan(0, bytesRecorded)));
+                }
+                else
+                {
+                    RequestAiPipeline(format.SampleRate, channels);
                 }
             }
+        }
+
+        /// <summary>
+        /// 캡처 형식에 맞는 AI 파이프라인을 백그라운드에서 만든다. 모델을 읽는 데 0.1초 남짓 걸려 UI·캡처 스레드에서 하지 않는다.
+        /// 형식이 바뀌면(장치 변경) 옛 파이프라인을 버리고 새로 만든다. 지원하지 않는 샘플레이트이거나 모델 파일이 맞지 않으면
+        /// AI 없이 그래픽만 돈다(이유는 AppLog 에 남는다). 같은 형식은 다시 요청해도 한 번만 만든다.
+        /// </summary>
+        private void RequestAiPipeline(int rate, int channels)
+        {
+            lock (_aiGate)
+            {
+                if (_isClosed) return;
+                if (_aiRequestedRate == rate && _aiRequestedChannels == channels) return;
+                _aiRequestedRate = rate;
+                _aiRequestedChannels = channels;
+            }
+
+            var previous = Interlocked.Exchange(ref _aiPipeline, null);
+            Task.Run(() =>
+            {
+                previous?.Dispose();
+                RealtimeAiPipeline? created = null;
+                try
+                {
+                    var classes = _classMap ??= YamnetClassMap.Load(System.IO.Path.Combine(ModelDirectory, "yamnet_class_map.csv"));
+                    created = RealtimeAiPipeline.Create(rate, channels, ModelDirectory, classes,
+                        mappingOverrides: null,
+                        tickFailed: ex => AppLog.Warn("ai", "AI 추론 한 번이 실패했습니다.", ex));
+                    lock (_aiGate)
+                    {
+                        // 만드는 사이 형식이 또 바뀌었거나 창이 닫혔으면 버린다.
+                        if (_isClosed || _aiRequestedRate != rate || _aiRequestedChannels != channels)
+                        {
+                            created.Dispose();
+                            return;
+                        }
+                        created.Start();
+                        Volatile.Write(ref _aiPipeline, created);
+                    }
+                    AppLog.Info("ai", $"AI 를 시작했습니다({rate}Hz, {channels}ch).");
+                }
+                catch (Exception ex)
+                {
+                    created?.Dispose();
+                    AppLog.Warn("ai", $"AI 를 시작하지 못해 그래픽만 표시합니다({rate}Hz, {channels}ch).", ex);
+                }
+            });
         }
 
         private void SetVisibilityIfChanged(UIElement element, ref Visibility cachedValue, Visibility newValue)
@@ -657,12 +692,15 @@ namespace SoundVisualizer
             }
         }
 
-        private SolidColorBrush GetBrushForLabel(string label)
+        private SolidColorBrush GetBrushForType(SoundType type)
         {
             UpdateCachedBrushesIfNeeded();
-            if (label.Contains("danger")) return _dangerBrush!;
-            if (label.Contains("speech")) return _speechBrush!;
-            return _ambientBrush!;
+            return type switch
+            {
+                SoundType.Danger => _dangerBrush!,
+                SoundType.Speech => _speechBrush!,
+                _ => _ambientBrush!,
+            };
         }
 
         private Color ParseColor(string hex)
@@ -677,20 +715,29 @@ namespace SoundVisualizer
             }
         }
 
-        private Color GetColorForLabel(string label)
+        private Color GetColorForType(SoundType type)
         {
             UpdateCachedBrushesIfNeeded();
-            if (label.Contains("danger")) return _dangerColor;
-            if (label.Contains("speech")) return _speechColor;
-            return _ambientColor;
+            return type switch
+            {
+                SoundType.Danger => _dangerColor,
+                SoundType.Speech => _speechColor,
+                _ => _ambientColor,
+            };
         }
 
-        private bool IsLabelVisible(string label)
+        private static bool IsTypeVisible(SoundType type) => type switch
         {
-            if (label.Contains("danger")) return AppSettings.ShowDanger;
-            if (label.Contains("speech")) return AppSettings.ShowSpeech;
-            return AppSettings.ShowAmbient;
-        }
+            SoundType.Danger => AppSettings.ShowDanger,
+            SoundType.Speech => AppSettings.ShowSpeech,
+            _ => AppSettings.ShowAmbient,
+        };
+
+        /// <summary>개발자 모드 라벨. AI 가 아직 결과를 내지 않았거나 동작하지 않으면 그렇다고 적는다.</summary>
+        private static string FormatAiLabel(AiClassificationResult? result) => result == null
+            ? "AI: -"
+            : string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"{result.Display} | {result.Coarse.ToLabel()} | {result.Confidence * 100:0.0}%");
 
         // ==========================================
         // 윈도우 클릭 관통 및 전체화면 최상단(Overlay) 강제 방어 구현 
