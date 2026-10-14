@@ -2,6 +2,7 @@
 // This file is part of SoundVisualizer.
 // SoundVisualizer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 using System.Text.Json;
+using SoundVisualizer.Ai;
 
 namespace SoundVisualizer.Tests;
 
@@ -23,14 +24,23 @@ public sealed class AppSettingsTests : IDisposable
         AppSettings.SettingsFilePath = _path;
         AppSettings.ResetToDefaults();
         AppSettings.Language = "ko";
+        ClearSoundTab();
     }
 
     public void Dispose()
     {
         AppSettings.Flush();
         AppSettings.ResetToDefaults();
+        ClearSoundTab();
         AppSettings.SettingsFilePath = _originalPath;
         if (File.Exists(_path)) File.Delete(_path);
+    }
+
+    // 전체 초기화는 소리 탭의 두 값을 건드리지 않으므로 테스트마다 따로 비운다.
+    private static void ClearSoundTab()
+    {
+        AppSettings.SoundTypes = new Dictionary<string, string>();
+        AppSettings.ClassifyAdvanced = false;
     }
 
     [Fact]
@@ -204,5 +214,146 @@ public sealed class AppSettingsTests : IDisposable
         AppSettings.Load();
 
         Assert.Equal("system", AppSettings.Language);
+    }
+
+    // 소리 탭의 두 값. 초인종(Doorbell)은 기본이 환경음, 사이렌(Siren)은 기본이 위협음인 소리로 쓴다.
+    private static Dictionary<string, string> Types(params (string Name, string Label)[] values) =>
+        values.ToDictionary(value => value.Name, value => value.Label);
+
+    private static List<(string, string)> Sorted(IReadOnlyDictionary<string, string> types) =>
+        types.OrderBy(pair => pair.Key, StringComparer.Ordinal).Select(pair => (pair.Key, pair.Value)).ToList();
+
+    [Fact]
+    public void 시험에_쓰는_소리의_기본_종류()
+    {
+        Assert.Equal(SoundType.Ambient, YamnetThreeClassMapper.MapDisplayNameToCoarse("Doorbell"));
+        Assert.Equal(SoundType.Danger, YamnetThreeClassMapper.MapDisplayNameToCoarse("Siren"));
+    }
+
+    [Fact]
+    public void 바꾼_소리_종류와_고급_모드는_저장한_뒤_다시_읽힌다()
+    {
+        AppSettings.SoundTypes = Types(("Doorbell", SoundTypeLabels.Danger), ("Siren", SoundTypeLabels.Ambient));
+        AppSettings.ClassifyAdvanced = true;
+        AppSettings.SaveNow();
+
+        ClearSoundTab();
+        AppSettings.Load();
+
+        Assert.Equal(new List<(string, string)> { ("Doorbell", "danger"), ("Siren", "ambient") }, Sorted(AppSettings.SoundTypes));
+        Assert.True(AppSettings.ClassifyAdvanced);
+    }
+
+    [Fact]
+    public void 소리_종류는_이름_순서의_JSON_객체로_저장한다()
+    {
+        AppSettings.SoundTypes = Types(("Siren", SoundTypeLabels.Ambient), ("Doorbell", SoundTypeLabels.Danger));
+        AppSettings.SaveNow();
+
+        using var doc = JsonDocument.Parse(File.ReadAllText(_path));
+        var types = doc.RootElement.GetProperty("SoundTypes");
+        Assert.Equal(JsonValueKind.Object, types.ValueKind);
+        Assert.Equal(new[] { "Doorbell", "Siren" }, types.EnumerateObject().Select(property => property.Name));
+        Assert.Equal("danger", types.GetProperty("Doorbell").GetString());
+        Assert.False(doc.RootElement.GetProperty("ClassifyAdvanced").GetBoolean());
+    }
+
+    [Fact]
+    public void 바꾼_소리가_없으면_빈_객체로_저장한다()
+    {
+        AppSettings.SaveNow();
+
+        using var doc = JsonDocument.Parse(File.ReadAllText(_path));
+        Assert.Empty(doc.RootElement.GetProperty("SoundTypes").EnumerateObject());
+    }
+
+    [Fact]
+    public void 소리_종류는_읽을_때_거른다()
+    {
+        File.WriteAllText(_path, """
+            { "SoundTypes": { "Doorbell": "danger", "Siren": "danger", "Speech": "loud", "Dog": 3, "Old model name": "speech" },
+              "ClassifyAdvanced": false }
+            """);
+
+        AppSettings.Load();
+
+        // 기본 종류와 같은 값(사이렌 = 위협음), 세 라벨이 아닌 값, 문자열이 아닌 값은 버리고, 모르는 이름은 모바일처럼 남긴다.
+        Assert.Equal(new List<(string, string)> { ("Doorbell", "danger"), ("Old model name", "speech") }, Sorted(AppSettings.SoundTypes));
+    }
+
+    [Fact]
+    public void 소리_탭_항목이_없는_예전_설정은_바꾼_소리_없이_기본_모드로_읽는다()
+    {
+        // 앞에서 들고 있던 값이 남지 않는지도 본다.
+        AppSettings.SoundTypes = Types(("Doorbell", SoundTypeLabels.Danger));
+        AppSettings.ClassifyAdvanced = true;
+        File.WriteAllText(_path, """{ "VisualMode": 1, "Language": "ko" }""");
+
+        AppSettings.Load();
+
+        Assert.Empty(AppSettings.SoundTypes);
+        Assert.False(AppSettings.ClassifyAdvanced);
+        Assert.Equal(1, AppSettings.VisualMode);
+    }
+
+    [Fact]
+    public void 고급_모드를_저장한_적이_없으면_바꾼_소리가_있을_때만_고급_모드로_연다()
+    {
+        File.WriteAllText(_path, """{ "SoundTypes": { "Doorbell": "danger" } }""");
+        AppSettings.Load();
+        Assert.True(AppSettings.ClassifyAdvanced);
+
+        // 거르고 나서 남은 것이 없으면 바꾼 소리가 없는 것이다.
+        File.WriteAllText(_path, """{ "SoundTypes": { "Siren": "danger" } }""");
+        AppSettings.Load();
+        Assert.False(AppSettings.ClassifyAdvanced);
+
+        // 저장한 값이 있으면 그것을 따른다.
+        File.WriteAllText(_path, """{ "SoundTypes": { "Doorbell": "danger" }, "ClassifyAdvanced": false }""");
+        AppSettings.Load();
+        Assert.False(AppSettings.ClassifyAdvanced);
+    }
+
+    [Theory]
+    [InlineData("\"danger\"")]
+    [InlineData("""[ "Doorbell", "danger" ]""")]
+    [InlineData("null")]
+    public void 소리_종류를_읽지_못해도_다른_설정은_읽는다(string stored)
+    {
+        File.WriteAllText(_path, "{ \"VisualMode\": 2, \"SoundTypes\": " + stored + " }");
+
+        AppSettings.Load();
+
+        Assert.Equal(2, AppSettings.VisualMode);
+        Assert.Empty(AppSettings.SoundTypes);
+    }
+
+    [Fact]
+    public void 전체_초기화는_바꾼_소리_종류와_고급_모드를_건드리지_않는다()
+    {
+        AppSettings.SoundTypes = Types(("Doorbell", SoundTypeLabels.Danger));
+        AppSettings.ClassifyAdvanced = true;
+
+        AppSettings.ResetToDefaults();
+
+        Assert.Equal(SoundTypeLabels.Danger, AppSettings.SoundTypes["Doorbell"]);
+        Assert.True(AppSettings.ClassifyAdvanced);
+    }
+
+    [Fact]
+    public void 넣은_소리_종류_맵은_얼려_두어_넘긴_쪽이_고쳐도_바뀌지_않는다()
+    {
+        var types = Types(("Doorbell", SoundTypeLabels.Danger));
+        AppSettings.SoundTypes = types;
+        types["Siren"] = SoundTypeLabels.Ambient;
+        types.Remove("Doorbell");
+
+        Assert.Equal(new[] { "Doorbell" }, AppSettings.SoundTypes.Keys);
+
+        // AI 가 앞서 읽어 둔 맵도 바꿔 끼운 뒤에 그대로다.
+        var before = AppSettings.SoundTypes;
+        AppSettings.SoundTypes = Types(("Siren", SoundTypeLabels.Ambient));
+        Assert.Equal(new[] { "Doorbell" }, before.Keys);
+        Assert.Equal(new[] { "Siren" }, AppSettings.SoundTypes.Keys);
     }
 }

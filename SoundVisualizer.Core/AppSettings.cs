@@ -4,8 +4,10 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using SoundVisualizer.Localization;
+using SoundVisualizer.Sounds;
 
 namespace SoundVisualizer
 {
@@ -144,6 +146,21 @@ namespace SoundVisualizer
         public static string ColorSpeech { get; set; } = DefaultColorSpeech;
         public static string ColorDanger { get; set; } = DefaultColorDanger;
 
+        // 11. 소리 탭에서 바꾼 소리 종류(모바일 sound_types). 키는 모델의 영어 소리 이름, 값은 SoundTypeLabels 의 문자열이고
+        // 기본 종류와 같은 값은 두지 않는다(SoundTypeOverrides). 오버레이의 AI 가 틱마다 다른 스레드에서 읽으므로 고치지 않는 맵을
+        // 통째로 바꿔 끼운다. 넣을 때 얼려 두어, 넘긴 쪽이 나중에 맵을 고쳐도 AI 가 반쯤 바뀐 맵을 읽는 일이 없다.
+        private static readonly IReadOnlyDictionary<string, string> NoSoundTypes = FrozenDictionary<string, string>.Empty;
+        private static IReadOnlyDictionary<string, string> _soundTypes = NoSoundTypes;
+
+        public static IReadOnlyDictionary<string, string> SoundTypes
+        {
+            get => Volatile.Read(ref _soundTypes);
+            set => Volatile.Write(ref _soundTypes, Freeze(value ?? throw new ArgumentNullException(nameof(value))));
+        }
+
+        // 12. 소리 탭을 고급 모드(소리를 하나씩 바꾸는 화면)로 볼지(모바일 classify_advanced). 바꾼 종류와 따로 두는 화면 설정이다.
+        public static bool ClassifyAdvanced { get; set; } = false;
+
         /// <summary>설정 파일 위치. 포터블 배포라 실행 파일 옆에 둔다. 테스트는 임시 파일로 바꾼다.</summary>
         public static string SettingsFilePath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
@@ -198,6 +215,10 @@ namespace SoundVisualizer
                         ColorAmbient = data.ColorAmbient ?? DefaultColorAmbient;
                         ColorSpeech = data.ColorSpeech ?? DefaultColorSpeech;
                         ColorDanger = data.ColorDanger ?? DefaultColorDanger;
+
+                        // 소리 탭이 생기기 전의 설정 파일에는 둘 다 없다. 그때는 바꾼 소리가 없고 기본 모드로 연다.
+                        SoundTypes = ReadSoundTypes(data.SoundTypes);
+                        ClassifyAdvanced = data.ClassifyAdvanced ?? DefaultClassifyAdvanced(SoundTypes);
 
                         // 하이브리드 모드 로드 (모드별 설정이 없는 구버전 호환)
                         if (data.WaveMode != null) WaveMode = data.WaveMode;
@@ -280,6 +301,10 @@ namespace SoundVisualizer
         /// <summary>
         /// 언어를 뺀 모든 설정을 기본값으로 되돌린다(전체 초기화 버튼). 단축키는 실제로 쓰는 키 목록까지 되돌린다.
         /// 저장은 부르는 쪽이 한다.
+        ///
+        /// 소리 탭에서 바꾼 소리 종류와 고급 모드도 건드리지 않는다(모바일과 같다). 모바일에서 바꾼 종류를 지우는 것은 소리 탭의
+        /// 모두 되돌리기뿐이고(바꾼 수를 보이고 한 번 더 묻는다), 고급 모드는 어느 되돌리기도 건드리지 않는 화면 설정이다.
+        /// 소리를 하나씩 골라 둔 것을 모양 설정을 되돌리다 함께 잃지 않게 한다.
         /// </summary>
         public static void ResetToDefaults()
         {
@@ -332,6 +357,8 @@ namespace SoundVisualizer
                     ColorAmbient = ColorAmbient,
                     ColorSpeech = ColorSpeech,
                     ColorDanger = ColorDanger,
+                    SoundTypes = WriteSoundTypes(SoundTypes),
+                    ClassifyAdvanced = ClassifyAdvanced,
 
                     WaveMode = WaveMode,
                     PadMode = PadMode,
@@ -357,6 +384,45 @@ namespace SoundVisualizer
                 AppLog.Warn("settings", $"설정을 저장하지 못했습니다: {SettingsFilePath}", ex);
             }
         }
+
+        /// <summary>바꿔 끼울 맵. 이미 얼린 맵(글자 그대로 비교)이면 그대로 쓰고, 아니면 얼린 복사본을 만든다.</summary>
+        private static IReadOnlyDictionary<string, string> Freeze(IReadOnlyDictionary<string, string> types)
+        {
+            if (types.Count == 0) return NoSoundTypes;
+            if (types is FrozenDictionary<string, string> frozen && ReferenceEquals(frozen.Comparer, StringComparer.Ordinal)) return frozen;
+            return types.ToFrozenDictionary(StringComparer.Ordinal);
+        }
+
+        /// <summary>
+        /// 저장된 소리 종류(이름 → 라벨 JSON 객체). 문자열이 아닌 값은 버리고, 남은 것은 <see cref="SoundTypeOverrides.Sanitize"/> 로
+        /// 거른다(세 라벨이 아닌 값과 지금 기본 종류와 같은 값을 버린다). 객체가 아니면 바꾼 것이 없는 것으로 본다(모바일 loadSoundTypes).
+        /// 항목을 JSON 그대로 받는 것은 이 값 하나가 깨졌다고 다른 설정까지 기본값으로 시작하지 않게 하려는 것이다.
+        /// </summary>
+        private static IReadOnlyDictionary<string, string> ReadSoundTypes(JsonElement? stored)
+        {
+            if (stored is not { ValueKind: JsonValueKind.Object } json) return NoSoundTypes;
+            var pairs = new List<KeyValuePair<string, string>>();
+            foreach (var property in json.EnumerateObject())
+            {
+                if (property.Value.ValueKind == JsonValueKind.String) pairs.Add(new(property.Name, property.Value.GetString()!));
+            }
+            return SoundTypeOverrides.Sanitize(pairs);
+        }
+
+        /// <summary>이름 순서로 적는다. 얼린 맵은 순서가 정해져 있지 않아, 그대로 적으면 같은 값도 저장할 때마다 줄이 뒤섞인다.</summary>
+        private static JsonElement WriteSoundTypes(IReadOnlyDictionary<string, string> types)
+        {
+            var sorted = new SortedDictionary<string, string>(StringComparer.Ordinal);
+            foreach (var (name, label) in types) sorted[name] = label;
+            return JsonSerializer.SerializeToElement(sorted);
+        }
+
+        /// <summary>
+        /// 고급 모드를 저장한 적이 없을 때의 값(모바일 loadClassifyAdvanced). 이미 소리를 하나씩 바꿔 둔 사람이면 고급 모드로 연다.
+        /// 기본 모드에서 묶음을 고르면 하나씩 바꾼 것이 먼저 묻지 않고 덮어써질 수 있어서다. 기본 모드로 돌아갈 때는 탭이 먼저 알린다.
+        /// 모바일은 정한 값을 곧바로 저장하지만 PC 는 저장할 때마다 모든 항목을 쓰므로, 다음 저장에서 함께 남는다.
+        /// </summary>
+        private static bool DefaultClassifyAdvanced(IReadOnlyDictionary<string, string> soundTypes) => soundTypes.Count > 0;
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern IntPtr GetDC(IntPtr hWnd);
@@ -419,6 +485,10 @@ namespace SoundVisualizer
             public string ColorAmbient { get; set; } = "#FFFFFFFF";
             public string ColorSpeech { get; set; } = "#FFFFFF00";
             public string ColorDanger { get; set; } = "#FFFF0000";
+
+            // 소리 탭. 예전 설정 파일에는 없어 null 로 읽힌다. 소리 종류는 JSON 그대로 받아 ReadSoundTypes 가 거른다.
+            public JsonElement? SoundTypes { get; set; }
+            public bool? ClassifyAdvanced { get; set; }
 
             public VisualModeSettings WaveMode { get; set; } = new VisualModeSettings();
             public VisualModeSettings PadMode { get; set; } = new VisualModeSettings();
