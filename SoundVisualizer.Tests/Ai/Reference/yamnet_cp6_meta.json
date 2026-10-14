@@ -1,0 +1,1148 @@
+{
+  "A_stable_ambient": {
+    "name": "A_stable_ambient",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.41,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.41,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.41
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "ambient",
+          "display": "Noise",
+          "confidence": 0.39,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Noise",
+        "confirmed_confidence": 0.39,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Noise",
+        "ui_confidence": 0.39
+      }
+    ]
+  },
+  "B_ambient_to_speech": {
+    "name": "B_ambient_to_speech",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "speech",
+        "candidate_streak": 1,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.41,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "speech",
+        "confirmed_display": "Speech",
+        "confirmed_confidence": 0.41,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "speech",
+        "ui_display": "Speech",
+        "ui_confidence": 0.41
+      }
+    ]
+  },
+  "C_ambient_to_danger_streak1": {
+    "name": "C_ambient_to_danger_streak1",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.22,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.22,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.22
+      }
+    ]
+  },
+  "D_immediate_danger_conf": {
+    "name": "D_immediate_danger_conf",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.28,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.28,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.28
+      }
+    ]
+  },
+  "E_critical_danger": {
+    "name": "E_critical_danger",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.19,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.19,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.19
+      }
+    ]
+  },
+  "F_low_confidence": {
+    "name": "F_low_confidence",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.1,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": false,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.1,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": false,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 3,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "speech",
+        "candidate_streak": 1,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      }
+    ]
+  },
+  "G_candidate_reset": {
+    "name": "G_candidate_reset",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "speech",
+        "candidate_streak": 1,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.22,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.22,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.22
+      }
+    ]
+  },
+  "H_danger_exit": {
+    "name": "H_danger_exit",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": true,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.27,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.27,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.27
+      }
+    ]
+  },
+  "H2_danger_exit_needs_two": {
+    "name": "H2_danger_exit_needs_two",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": true,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.26,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "ambient",
+        "candidate_streak": 1,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.26,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.26,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.26
+      }
+    ]
+  },
+  "I_booster_accepted": {
+    "name": "I_booster_accepted",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Ding",
+          "confidence": 0.3,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Ding",
+        "confirmed_confidence": 0.3,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Ding",
+        "ui_confidence": 0.3
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.19,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.19,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.19
+      }
+    ]
+  },
+  "J_booster_preview_same_frame_confirm": {
+    "name": "J_booster_preview_same_frame_confirm",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Ding",
+          "confidence": 0.35,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Ding",
+        "confirmed_confidence": 0.35,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Ding",
+        "ui_confidence": 0.35
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.22,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.22,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.22
+      }
+    ]
+  },
+  "J2_booster_siren_confirm": {
+    "name": "J2_booster_siren_confirm",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "ambient",
+          "display": "Music",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Music",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Music",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.22,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.22,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.22
+      }
+    ]
+  },
+  "K_threshold_boundaries": {
+    "name": "K_threshold_boundaries",
+    "frames": [
+      {
+        "frame": 0,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.2499,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": false,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "",
+        "confirmed_confidence": 0.0,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "",
+        "ui_confidence": 0.0
+      },
+      {
+        "frame": 1,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.25,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "speech",
+        "candidate_streak": 1,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "",
+        "confirmed_confidence": 0.0,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "",
+        "ui_confidence": 0.0
+      },
+      {
+        "frame": 2,
+        "input": {
+          "coarse": "speech",
+          "display": "Speech",
+          "confidence": 0.25,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "speech",
+        "confirmed_display": "Speech",
+        "confirmed_confidence": 0.25,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "speech",
+        "ui_display": "Speech",
+        "ui_confidence": 0.25
+      },
+      {
+        "frame": 3,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.1999,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": false,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "speech",
+        "confirmed_display": "Speech",
+        "confirmed_confidence": 0.25,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "speech",
+        "ui_display": "Speech",
+        "ui_confidence": 0.25
+      },
+      {
+        "frame": 4,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.2,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.2,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.2
+      },
+      {
+        "frame": 5,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 6,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.1799,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": false,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 7,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.18,
+          "adopted_danger_from_booster": true,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.18,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.18,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.18
+      },
+      {
+        "frame": 8,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 9,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.2799,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.2799,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.2799
+      },
+      {
+        "frame": 10,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 11,
+        "input": {
+          "coarse": "danger",
+          "display": "Siren",
+          "confidence": 0.28,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": true,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Siren",
+        "confirmed_confidence": 0.28,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Siren",
+        "ui_confidence": 0.28
+      },
+      {
+        "frame": 12,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": true,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 13,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.2699,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "ambient",
+        "candidate_streak": 1,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 14,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.2699,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.2699,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.2699
+      },
+      {
+        "frame": 15,
+        "input": {
+          "coarse": "danger",
+          "display": "Gunshot, gunfire",
+          "confidence": 0.4,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": true,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.2,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "danger",
+        "confirmed_display": "Gunshot, gunfire",
+        "confirmed_confidence": 0.4,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "danger",
+        "ui_display": "Gunshot, gunfire",
+        "ui_confidence": 0.4
+      },
+      {
+        "frame": 16,
+        "input": {
+          "coarse": "ambient",
+          "display": "Wind",
+          "confidence": 0.27,
+          "adopted_danger_from_booster": false,
+          "has_strong_danger_cue": false,
+          "has_critical_danger_cue": false,
+          "top_k_summary": ""
+        },
+        "effective_threshold": 0.25,
+        "meets_threshold": true,
+        "candidate_coarse": "",
+        "candidate_streak": 0,
+        "confirmed_coarse": "ambient",
+        "confirmed_display": "Wind",
+        "confirmed_confidence": 0.27,
+        "use_booster_danger_preview": false,
+        "ui_coarse": "ambient",
+        "ui_display": "Wind",
+        "ui_confidence": 0.27
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "signal": "LCG seeded noise + 300-7500Hz chirp + impulse",
+  "cases": {
+    "44100": {
+      "capture": "resample_parity_44100_capture.bin",
+      "mono16k": "resample_parity_44100_mono16k.bin",
+      "source_samples": 2919,
+      "output_samples": 1024
+    },
+    "48000": {
+      "capture": "resample_parity_48000_capture.bin",
+      "mono16k": "resample_parity_48000_mono16k.bin",
+      "source_samples": 3168,
+      "output_samples": 1024
+    }
+  }
+}
