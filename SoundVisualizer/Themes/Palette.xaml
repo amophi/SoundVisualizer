@@ -1,0 +1,33 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 화면 색. 값은 Core 의 UiColors 와 같아야 하고(이름 + Brush), ThemePaletteXamlTests 가 이 파일을 읽어 맞춰 본다.
+         대비 근거는 UiColors 의 주석과 UiColorsContrastTests 에 있다. 여기에는 단색 붓만 둔다. -->
+
+    <!-- 안드로이드 판과 같은 여덟 색 -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#2A2C31"/>
+    <SolidColorBrush x:Key="CardBrush" Color="#1E2024"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F2F4F6"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#8B95A1"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#5B9BFF"/>
+    <SolidColorBrush x:Key="AccentFillBrush" Color="#2563EB"/>
+    <SolidColorBrush x:Key="StopBrush" Color="#D32F2F"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#FFB74D"/>
+
+    <!-- 강조 바탕 위의 글자 -->
+    <SolidColorBrush x:Key="OnFillBrush" Color="#FFFFFF"/>
+
+    <!-- 조작 요소 바탕과 마우스 올림·누름 -->
+    <SolidColorBrush x:Key="ControlBrush" Color="#333A44"/>
+    <SolidColorBrush x:Key="ControlHoverBrush" Color="#3D4654"/>
+    <SolidColorBrush x:Key="ControlPressedBrush" Color="#2B313A"/>
+    <SolidColorBrush x:Key="AccentFillHoverBrush" Color="#1D4ED8"/>
+    <SolidColorBrush x:Key="AccentFillPressedBrush" Color="#1E40AF"/>
+    <SolidColorBrush x:Key="StopHoverBrush" Color="#B71C1C"/>
+    <SolidColorBrush x:Key="StopPressedBrush" Color="#9A1A1A"/>
+
+    <!-- 쓸 수 없는 스위치·슬라이더 -->
+    <SolidColorBrush x:Key="DisabledThumbBrush" Color="#6B7684"/>
+    <SolidColorBrush x:Key="DisabledCheckedThumbBrush" Color="#B0B8C1"/>
+    <SolidColorBrush x:Key="DisabledActiveTrackBrush" Color="#3A4351"/>
+    <SolidColorBrush x:Key="DisabledTrackBrush" Color="#2A3038"/>
+</ResourceDictionary>
