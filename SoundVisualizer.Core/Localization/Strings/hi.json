@@ -1,6 +1,8 @@
 {
   "common.language": "भाषा",
   "common.reset_defaults": "डिफ़ॉल्ट पर रीसेट करें",
+  "common.minimize": "छोटा करें",
+  "common.close": "बंद करें",
   "language.system": "सिस्टम डिफ़ॉल्ट",
 
   "launcher.window_title": "Sound Visualizer लॉन्चर",
@@ -76,6 +78,7 @@
   "settings.show_speech": "बातचीत दिखाएं",
   "settings.show_danger": "खतरे की आवाज़ें दिखाएं",
   "settings.set_color": "रंग सेट करें",
+  "settings.set_color_for": "रंग सेट करें: {0}",
   "settings.section.hotkeys": "शॉर्टकट कुंजियां",
   "settings.hotkey.visual.title": "विज़ुअल मोड बदलें",
   "settings.hotkey.visual.desc": "चलते समय आकार को तुरंत बदलने वाली शॉर्टकट कुंजी।",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "हर आवाज़ को उसके समूह में दिखाता है, ताकि आप आवाज़ें एक-एक करके बदल सकें।",
   "sounds.search.hint": "आवाज़ें खोजें",
   "sounds.search.clear": "खोज मिटाएं",
+  "sounds.filter.title": "फ़िल्टर",
   "sounds.filter.all": "सभी",
   "sounds.filter.changed": "बदली गई",
   "sounds.type.ambient": "माहौल की आवाज़ें",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "कोई कुंजी दबाएं (रद्द करने के लिए Esc)",
   "hotkey.none": "कोई नहीं",
+  "hotkey.button_name": "{0}, शॉर्टकट कुंजी: {1}",
 
   "help.start.title": "शुरुआत कैसे करें",
   "help.start.1": "इस विंडो में ऊपर भाषा चुनें, और चाहें तो “सेटिंग” टैब में ग्राफ़िक्स का रूप बदलें।",

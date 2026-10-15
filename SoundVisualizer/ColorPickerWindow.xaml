@@ -23,7 +23,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Style="{StaticResource Text.Section}" Margin="0" VerticalAlignment="Center" Text="{l:Loc color_picker.title}"/>
                 <Button Grid.Column="1" Style="{StaticResource Button.Chrome}" Width="36" Height="36" Tag="18" Margin="12,0,0,0" Content="&#xE8BB;"
-                        AutomationProperties.Name="{l:Loc color_picker.cancel}" Click="BtnCancel_Click"/>
+                        AutomationProperties.Name="{l:Loc common.close}" Click="BtnCancel_Click"/>
             </Grid>
 
             <!-- 채도 x 밝기. 누르거나 끌어서 고른다. 초점이 있으면 화살표 키로도 옮긴다(Shift 는 크게). -->

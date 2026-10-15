@@ -1,6 +1,8 @@
 {
   "common.language": "言語",
   "common.reset_defaults": "初期設定に戻す",
+  "common.minimize": "最小化",
+  "common.close": "閉じる",
   "language.system": "システムのデフォルト",
 
   "launcher.window_title": "Sound Visualizer ランチャー",
@@ -76,6 +78,7 @@
   "settings.show_speech": "話し声を表示",
   "settings.show_danger": "危険音を表示",
   "settings.set_color": "色を設定",
+  "settings.set_color_for": "色を設定：{0}",
   "settings.section.hotkeys": "ショートカットキー",
   "settings.hotkey.visual.title": "表示モードの切り替え",
   "settings.hotkey.visual.desc": "実行中に形をリアルタイムで切り替えるショートカットキーです。",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "すべての音をグループごとに表示し、個別に変更できます。",
   "sounds.search.hint": "音の名前で検索",
   "sounds.search.clear": "検索語を消去",
+  "sounds.filter.title": "絞り込み",
   "sounds.filter.all": "すべて",
   "sounds.filter.changed": "変更した音",
   "sounds.type.ambient": "環境音",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "キーを押してください（Esc でキャンセル）",
   "hotkey.none": "なし",
+  "hotkey.button_name": "{0}、ショートカットキー：{1}",
 
   "help.start.title": "はじめに",
   "help.start.1": "このウィンドウの上で言語を選び、必要に応じて「設定」タブでグラフィックの見た目を変更します。",

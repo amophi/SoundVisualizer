@@ -1,6 +1,8 @@
 {
   "common.language": "Sprache",
   "common.reset_defaults": "Auf Standardwerte zurücksetzen",
+  "common.minimize": "Minimieren",
+  "common.close": "Schließen",
   "language.system": "Systemstandard",
 
   "launcher.window_title": "Sound Visualizer Launcher",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Stimmen",
   "settings.show_danger": "Gefahrengeräusche",
   "settings.set_color": "Farbe wählen",
+  "settings.set_color_for": "Farbe wählen: {0}",
   "settings.section.hotkeys": "Tastenkürzel",
   "settings.hotkey.visual.title": "Darstellungsmodus wechseln",
   "settings.hotkey.visual.desc": "Tastenkürzel, das die Form während der Ausführung in Echtzeit ändert.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Zeigt jedes Geräusch in seiner Gruppe, damit Sie Geräusche einzeln ändern können.",
   "sounds.search.hint": "Geräusche suchen",
   "sounds.search.clear": "Suchbegriff löschen",
+  "sounds.filter.title": "Filter",
   "sounds.filter.all": "Alle",
   "sounds.filter.changed": "Geändert",
   "sounds.type.ambient": "Umgebungsgeräusche",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Drücken Sie eine Taste (Esc zum Abbrechen)",
   "hotkey.none": "Keine",
+  "hotkey.button_name": "{0}, Tastenkürzel: {1}",
 
   "help.start.title": "Erste Schritte",
   "help.start.1": "Wählen Sie oben in diesem Fenster die Sprache aus, und ändern Sie bei Bedarf im Tab „Einstellungen“ das Aussehen der Grafik.",

@@ -1,6 +1,8 @@
 {
   "common.language": "اللغة",
   "common.reset_defaults": "استعادة الإعدادات التلقائية",
+  "common.minimize": "تصغير",
+  "common.close": "إغلاق",
   "language.system": "الإعداد التلقائي للنظام",
 
   "launcher.window_title": "نافذة تشغيل Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "إظهار الكلام",
   "settings.show_danger": "إظهار أصوات الخطر",
   "settings.set_color": "تعيين اللون",
+  "settings.set_color_for": "تعيين اللون: {0}",
   "settings.section.hotkeys": "مفاتيح الاختصار",
   "settings.hotkey.visual.title": "تبديل وضع العرض",
   "settings.hotkey.visual.desc": "مفتاح اختصار يغيّر الشكل فورًا أثناء التشغيل.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "يعرض كل صوت ضمن مجموعته، لتتمكن من تغيير الأصوات بشكل فردي.",
   "sounds.search.hint": "البحث عن صوت",
   "sounds.search.clear": "محو نص البحث",
+  "sounds.filter.title": "تصفية",
   "sounds.filter.all": "الكل",
   "sounds.filter.changed": "المعدّلة",
   "sounds.type.ambient": "الأصوات المحيطة",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "اضغط على مفتاح (Esc للإلغاء)",
   "hotkey.none": "لا يوجد",
+  "hotkey.button_name": "{0}، مفتاح الاختصار: {1}",
 
   "help.start.title": "بدء الاستخدام",
   "help.start.1": "اختر اللغة في أعلى هذه النافذة، وغيّر شكل الرسومات من علامة تبويب «الإعدادات» إن أردت.",

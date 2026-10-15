@@ -1,6 +1,8 @@
 {
   "common.language": "언어",
   "common.reset_defaults": "기본값으로 되돌리기",
+  "common.minimize": "최소화",
+  "common.close": "닫기",
   "language.system": "시스템 기본값",
 
   "launcher.window_title": "Sound Visualizer 런처",
@@ -76,6 +78,7 @@
   "settings.show_speech": "대화음 표시",
   "settings.show_danger": "위협음 표시",
   "settings.set_color": "색상 설정",
+  "settings.set_color_for": "색상 설정: {0}",
   "settings.section.hotkeys": "단축키",
   "settings.hotkey.visual.title": "표현 모드 전환",
   "settings.hotkey.visual.desc": "실행 중 형태를 실시간으로 변경할 단축키입니다.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "모든 소리를 묶음별로 보여 주고, 하나씩 바꿀 수 있습니다.",
   "sounds.search.hint": "소리 이름으로 찾기",
   "sounds.search.clear": "검색어 지우기",
+  "sounds.filter.title": "필터",
   "sounds.filter.all": "전체",
   "sounds.filter.changed": "바꾼 소리",
   "sounds.type.ambient": "환경음",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "키를 누르세요 (ESC 취소)",
   "hotkey.none": "없음",
+  "hotkey.button_name": "{0}, 단축키: {1}",
 
   "help.start.title": "시작하기",
   "help.start.1": "이 창 위쪽에서 언어를 선택하고, 원하면 설정 탭에서 그래픽 모양을 바꿉니다.",

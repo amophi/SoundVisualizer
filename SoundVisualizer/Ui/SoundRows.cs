@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using SoundVisualizer.Ai;
+using SoundVisualizer.Localization;
 using SoundVisualizer.Sounds;
 
 namespace SoundVisualizer.Ui
@@ -11,6 +12,10 @@ namespace SoundVisualizer.Ui
     // 소리 탭 목록의 줄. Core 의 SoundListItem 하나에 하나이고, 키가 같으면 같은 줄을 고쳐 쓴다(KeyedList.Sync).
     // 줄의 모양은 SoundsTab.xaml 의 DataTemplate 이 형식마다 정한다. 글은 소리 탭이 문자열 표에서 만들어 넣고,
     // 바뀐 값만 알린다. 그래서 종류를 하나 고르면 그 카드와 바꾼 수 줄만 다시 그려진다.
+    //
+    // 화면 읽어주기는 목록(ItemsControl)의 줄마다 데이터 항목을 하나 두고, 그 이름을 줄 객체의 ToString 으로 정한다.
+    // 그대로 두면 형식 이름("SoundVisualizer.Ui.TypeRow")을 읽었다. 스크롤해 아직 그리지 않은 줄은 이 이름이 전부라
+    // 줄마다 화면에서 읽히는 글을 돌려준다.
 
     /// <summary>목록의 줄. <see cref="Key"/> 는 <see cref="SoundListItem.Key"/> 와 같다.</summary>
     public abstract class SoundRow : INotifyPropertyChanged
@@ -52,6 +57,8 @@ namespace SoundVisualizer.Ui
 
         /// <summary>묻고 나서 그대로 두기로 한 스위치를 저장값으로 되돌린다.</summary>
         public void RestoreSwitch() => Notify(nameof(IsAdvanced));
+
+        public override string ToString() => Loc.Get("sounds.title");
     }
 
     /// <summary>"바꾼 소리: N" 과 모두 되돌리기.</summary>
@@ -76,6 +83,8 @@ namespace SoundVisualizer.Ui
             get => _canReset;
             set => Set(ref _canReset, value);
         }
+
+        public override string ToString() => _countText;
     }
 
     /// <summary>맞는 소리가 없다. 글은 XAML 이 문자열 표에 바인딩한다.</summary>
@@ -84,6 +93,8 @@ namespace SoundVisualizer.Ui
         public EmptyRow(string key) : base(key)
         {
         }
+
+        public override string ToString() => Loc.Get("sounds.empty");
     }
 
     /// <summary>목록 끝 여백.</summary>
@@ -92,6 +103,9 @@ namespace SoundVisualizer.Ui
         public EndRow(string key) : base(key)
         {
         }
+
+        /// <summary>읽을 것이 없는 여백이다.</summary>
+        public override string ToString() => "";
     }
 
     /// <summary>구역 머리(그 아래 카드들의 기본 종류).</summary>
@@ -112,6 +126,8 @@ namespace SoundVisualizer.Ui
             get => _title;
             set => Set(ref _title, value);
         }
+
+        public override string ToString() => _title;
     }
 
     /// <summary>고급 모드의 묶음 머리: 이름과 소리 수.</summary>
@@ -143,6 +159,8 @@ namespace SoundVisualizer.Ui
             get => _automationName;
             set => Set(ref _automationName, value);
         }
+
+        public override string ToString() => _automationName;
     }
 
     /// <summary>
@@ -226,5 +244,7 @@ namespace SoundVisualizer.Ui
             get => _automationName;
             set => Set(ref _automationName, value);
         }
+
+        public override string ToString() => _automationName;
     }
 }

@@ -1,6 +1,8 @@
 {
   "common.language": "Język",
   "common.reset_defaults": "Przywróć domyślne",
+  "common.minimize": "Minimalizuj",
+  "common.close": "Zamknij",
   "language.system": "Domyślny język systemu",
 
   "launcher.window_title": "Launcher Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Pokaż mowę",
   "settings.show_danger": "Pokaż dźwięki zagrożenia",
   "settings.set_color": "Ustaw kolor",
+  "settings.set_color_for": "Ustaw kolor: {0}",
   "settings.section.hotkeys": "Skróty klawiszowe",
   "settings.hotkey.visual.title": "Zmiana trybu wizualizacji",
   "settings.hotkey.visual.desc": "Skrót, który zmienia kształt grafiki na bieżąco podczas działania.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Pokazuje każdy dźwięk w jego grupie, aby można było zmieniać dźwięki pojedynczo.",
   "sounds.search.hint": "Szukaj dźwięków",
   "sounds.search.clear": "Wyczyść wyszukiwanie",
+  "sounds.filter.title": "Filtr",
   "sounds.filter.all": "Wszystkie",
   "sounds.filter.changed": "Zmienione",
   "sounds.type.ambient": "Dźwięki otoczenia",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Naciśnij klawisz (Esc – anuluj)",
   "hotkey.none": "Brak",
+  "hotkey.button_name": "{0}, skrót: {1}",
 
   "help.start.title": "Pierwsze kroki",
   "help.start.1": "Wybierz język u góry tego okna i w razie potrzeby zmień wygląd grafiki na karcie „Ustawienia”.",

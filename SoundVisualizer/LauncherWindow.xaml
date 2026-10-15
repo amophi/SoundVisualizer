@@ -28,8 +28,8 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-24,-24,0">
-                    <Button Style="{StaticResource Button.Chrome}" Content="&#xE921;" Click="BtnMinimize_Click"/>
-                    <Button Style="{StaticResource Button.ChromeClose}" Content="&#xE8BB;" Click="BtnClose_Click"/>
+                    <Button Style="{StaticResource Button.Chrome}" Content="&#xE921;" AutomationProperties.Name="{l:Loc common.minimize}" Click="BtnMinimize_Click"/>
+                    <Button Style="{StaticResource Button.ChromeClose}" Content="&#xE8BB;" AutomationProperties.Name="{l:Loc common.close}" Click="BtnClose_Click"/>
                 </StackPanel>
             </Grid>
 
@@ -186,7 +186,8 @@
                                 </Expander>
                             </StackPanel>
 
-                            <!-- 소리 종류마다 표시 스위치 줄과 색 버튼. 색 버튼은 스위치 줄 밖에 둔다(안에 두면 함께 눌린다). -->
+                            <!-- 소리 종류마다 표시 스위치 줄과 색 버튼. 색 버튼은 스위치 줄 밖에 둔다(안에 두면 함께 눌린다).
+                                 색 버튼 셋은 글자가 같아 화면 읽어주기 이름에 종류를 넣는다("색상 설정: 환경음", ColorButtonNames). -->
                             <TextBlock Style="{StaticResource Text.Section}" Text="{l:Loc settings.section.sound_types}"/>
                             <Border Style="{StaticResource Card}">
                                 <StackPanel>
@@ -197,7 +198,7 @@
                                         </Grid.ColumnDefinitions>
                                         <CheckBox x:Name="ChkShowAmbient" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_ambient}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                         <Button x:Name="BtnColorAmbient" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Ambient"
-                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_ambient}" Click="BtnColor_Click"/>
+                                                Content="{l:Loc settings.set_color}" Click="BtnColor_Click"/>
                                     </Grid>
                                     <Grid Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>
@@ -206,7 +207,7 @@
                                         </Grid.ColumnDefinitions>
                                         <CheckBox x:Name="ChkShowSpeech" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_speech}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                         <Button x:Name="BtnColorSpeech" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Speech"
-                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_speech}" Click="BtnColor_Click"/>
+                                                Content="{l:Loc settings.set_color}" Click="BtnColor_Click"/>
                                     </Grid>
                                     <Grid Margin="0,0,0,16">
                                         <Grid.ColumnDefinitions>
@@ -215,7 +216,7 @@
                                         </Grid.ColumnDefinitions>
                                         <CheckBox x:Name="ChkShowDanger" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_danger}" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                                         <Button x:Name="BtnColorDanger" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="24,0,0,0" Tag="Danger"
-                                                Content="{l:Loc settings.set_color}" AutomationProperties.HelpText="{l:Loc settings.show_danger}" Click="BtnColor_Click"/>
+                                                Content="{l:Loc settings.set_color}" Click="BtnColor_Click"/>
                                     </Grid>
                                     <Button x:Name="BtnResetSoundClassification" Style="{StaticResource Button.Secondary}" Content="{l:Loc common.reset_defaults}" Click="BtnResetSoundClassification_Click"/>
                                 </StackPanel>
@@ -235,8 +236,8 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
-                                            <Button x:Name="BtnVisualHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F3"
-                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.visual.title}" Click="BtnVisualHotkey_Click"/>
+                                            <Button x:Name="BtnVisualHotkey" Style="{StaticResource Button.Hotkey}" MinWidth="120" Content="F3"
+                                                    ui:SettingRow.Label="{l:Loc settings.hotkey.visual.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.visual.desc}" Click="BtnVisualHotkey_Click"/>
                                         </StackPanel>
                                     </Grid>
                                     <Grid Margin="0,0,0,24">
@@ -250,8 +251,8 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
-                                            <Button x:Name="BtnSoundModeHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F2"
-                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.sound.title}" Click="BtnSoundModeHotkey_Click"/>
+                                            <Button x:Name="BtnSoundModeHotkey" Style="{StaticResource Button.Hotkey}" MinWidth="120" Content="F2"
+                                                    ui:SettingRow.Label="{l:Loc settings.hotkey.sound.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.sound.desc}" Click="BtnSoundModeHotkey_Click"/>
                                         </StackPanel>
                                     </Grid>
                                     <Grid>
@@ -265,8 +266,8 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc settings.hotkey.set}"/>
-                                            <Button x:Name="BtnEditHotkey" Style="{StaticResource Button.Secondary}" MinWidth="120" Content="F4"
-                                                    AutomationProperties.HelpText="{l:Loc settings.hotkey.edit.title}" Click="BtnEditHotkey_Click"/>
+                                            <Button x:Name="BtnEditHotkey" Style="{StaticResource Button.Hotkey}" MinWidth="120" Content="F4"
+                                                    ui:SettingRow.Label="{l:Loc settings.hotkey.edit.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.edit.desc}" Click="BtnEditHotkey_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>

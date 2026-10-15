@@ -1,6 +1,8 @@
 {
   "common.language": "Dil",
   "common.reset_defaults": "Varsayılanlara sıfırla",
+  "common.minimize": "Simge durumuna küçült",
+  "common.close": "Kapat",
   "language.system": "Sistem varsayılanı",
 
   "launcher.window_title": "Sound Visualizer Başlatıcısı",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Konuşmayı göster",
   "settings.show_danger": "Tehlike seslerini göster",
   "settings.set_color": "Renk ayarla",
+  "settings.set_color_for": "Renk ayarla: {0}",
   "settings.section.hotkeys": "Kısayol tuşları",
   "settings.hotkey.visual.title": "Görsel modu değiştir",
   "settings.hotkey.visual.desc": "Çalışırken şekli anında değiştiren kısayol tuşu.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Tüm sesleri gruplarıyla birlikte gösterir; böylece her sesi ayrı olarak değiştirebilirsiniz.",
   "sounds.search.hint": "Seslerde ara",
   "sounds.search.clear": "Aramayı temizle",
+  "sounds.filter.title": "Filtre",
   "sounds.filter.all": "Tümü",
   "sounds.filter.changed": "Değiştirilenler",
   "sounds.type.ambient": "Ortam sesi",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Bir tuşa basın (iptal için Esc)",
   "hotkey.none": "Yok",
+  "hotkey.button_name": "{0}, kısayol: {1}",
 
   "help.start.title": "Başlarken",
   "help.start.1": "Bu pencerenin üst kısmından dili seçin ve isterseniz “Ayarlar” sekmesinde grafiklerin görünümünü değiştirin.",

@@ -1,6 +1,8 @@
 {
   "common.language": "Language",
   "common.reset_defaults": "Reset to defaults",
+  "common.minimize": "Minimize",
+  "common.close": "Close",
   "language.system": "System default",
 
   "launcher.window_title": "Sound Visualizer Launcher",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Show speech",
   "settings.show_danger": "Show danger sounds",
   "settings.set_color": "Set color",
+  "settings.set_color_for": "Set color: {0}",
   "settings.section.hotkeys": "Hotkeys",
   "settings.hotkey.visual.title": "Switch visual mode",
   "settings.hotkey.visual.desc": "Hotkey that changes the shape in real time while running.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Shows every sound in its group, so you can change sounds one by one.",
   "sounds.search.hint": "Search sounds",
   "sounds.search.clear": "Clear search",
+  "sounds.filter.title": "Filter",
   "sounds.filter.all": "All",
   "sounds.filter.changed": "Changed",
   "sounds.type.ambient": "Ambient",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Press a key (Esc to cancel)",
   "hotkey.none": "None",
+  "hotkey.button_name": "{0}, hotkey: {1}",
 
   "help.start.title": "Getting started",
   "help.start.1": "Pick your language at the top of this window, and change how the graphics look in the Settings tab if you like.",

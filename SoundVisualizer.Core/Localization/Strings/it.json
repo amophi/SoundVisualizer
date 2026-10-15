@@ -1,6 +1,8 @@
 {
   "common.language": "Lingua",
   "common.reset_defaults": "Ripristina valori predefiniti",
+  "common.minimize": "Riduci a icona",
+  "common.close": "Chiudi",
   "language.system": "Predefinita di sistema",
 
   "launcher.window_title": "Launcher di Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Voci",
   "settings.show_danger": "Suoni di pericolo",
   "settings.set_color": "Scegli colore",
+  "settings.set_color_for": "Scegli colore: {0}",
   "settings.section.hotkeys": "Scorciatoie da tastiera",
   "settings.hotkey.visual.title": "Cambia modalità visiva",
   "settings.hotkey.visual.desc": "Scorciatoia che cambia la forma in tempo reale durante l'esecuzione.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Mostra ogni suono nel suo gruppo, così puoi cambiare i suoni uno per uno.",
   "sounds.search.hint": "Cerca suoni",
   "sounds.search.clear": "Cancella ricerca",
+  "sounds.filter.title": "Filtro",
   "sounds.filter.all": "Tutti",
   "sounds.filter.changed": "Modificati",
   "sounds.type.ambient": "Suoni ambientali",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Premi un tasto (Esc per annullare)",
   "hotkey.none": "Nessuna",
+  "hotkey.button_name": "{0}, scorciatoia: {1}",
 
   "help.start.title": "Per iniziare",
   "help.start.1": "Scegli la lingua in alto in questa finestra e, se vuoi, cambia l'aspetto della grafica nella scheda Impostazioni.",

@@ -489,7 +489,8 @@
                         AutomationProperties.Name="{l:Loc sounds.search.clear}" Click="BtnClearSearch_Click"/>
             </Grid>
             <!-- 칸의 차례는 SoundFilter 의 차례(전체, 환경음, 대화음, 위협음, 바꾼 소리)와 같다. 고른 번호가 곧 거르기다. -->
-            <ui:ChoiceChipList x:Name="FilterChips" Style="{StaticResource FilterChips}" Margin="0,12,0,0" SelectionChanged="FilterChips_SelectionChanged">
+            <ui:ChoiceChipList x:Name="FilterChips" Style="{StaticResource FilterChips}" Margin="0,12,0,0" AutomationProperties.Name="{l:Loc sounds.filter.title}"
+                               SelectionChanged="FilterChips_SelectionChanged">
                 <ListBoxItem Content="{l:Loc sounds.filter.all}"/>
                 <ListBoxItem Content="{l:Loc sounds.type.ambient}" Tag="{x:Static ai:SoundType.Ambient}"/>
                 <ListBoxItem Content="{l:Loc sounds.type.speech}" Tag="{x:Static ai:SoundType.Speech}"/>
@@ -498,8 +499,9 @@
             </ui:ChoiceChipList>
         </StackPanel>
 
-        <!-- 목록. 보이는 줄과 그 위아래 한 화면만 만든다(가상화). 줄을 다시 쓰고(Recycling) 픽셀 단위로 부드럽게 스크롤한다. -->
-        <ItemsControl x:Name="List" Grid.Row="1" Focusable="False"
+        <!-- 목록. 보이는 줄과 그 위아래 한 화면만 만든다(가상화). 줄을 다시 쓰고(Recycling) 픽셀 단위로 부드럽게 스크롤한다.
+             화면 읽어주기는 줄마다 데이터 항목 하나를 두고, 그 이름은 줄 객체의 ToString 이다(SoundRows.cs). -->
+        <ItemsControl x:Name="List" Grid.Row="1" Focusable="False" AutomationProperties.Name="{l:Loc launcher.tab.sounds}"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.VirtualizationMode="Recycling"
                       VirtualizingPanel.ScrollUnit="Pixel"

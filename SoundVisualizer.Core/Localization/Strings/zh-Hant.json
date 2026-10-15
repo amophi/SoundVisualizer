@@ -1,6 +1,8 @@
 {
   "common.language": "語言",
   "common.reset_defaults": "重設為預設值",
+  "common.minimize": "最小化",
+  "common.close": "關閉",
   "language.system": "系統預設",
 
   "launcher.window_title": "Sound Visualizer 啟動器",
@@ -76,6 +78,7 @@
   "settings.show_speech": "顯示人聲",
   "settings.show_danger": "顯示危險音",
   "settings.set_color": "設定顏色",
+  "settings.set_color_for": "設定顏色：{0}",
   "settings.section.hotkeys": "快速鍵",
   "settings.hotkey.visual.title": "切換視覺模式",
   "settings.hotkey.visual.desc": "執行時即時切換圖形形狀的快速鍵。",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "依群組顯示所有聲音，可以逐一變更。",
   "sounds.search.hint": "搜尋聲音",
   "sounds.search.clear": "清除搜尋內容",
+  "sounds.filter.title": "篩選",
   "sounds.filter.all": "全部",
   "sounds.filter.changed": "已變更",
   "sounds.type.ambient": "環境音",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "請按下按鍵 (按 Esc 取消)",
   "hotkey.none": "無",
+  "hotkey.button_name": "{0}，快速鍵：{1}",
 
   "help.start.title": "開始使用",
   "help.start.1": "在此視窗頂端選擇語言，如有需要，可以在「設定」分頁中變更圖形的外觀。",

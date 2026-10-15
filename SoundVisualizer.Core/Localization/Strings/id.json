@@ -1,6 +1,8 @@
 {
   "common.language": "Bahasa",
   "common.reset_defaults": "Reset ke default",
+  "common.minimize": "Minimalkan",
+  "common.close": "Tutup",
   "language.system": "Default sistem",
 
   "launcher.window_title": "Peluncur Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Tampilkan percakapan",
   "settings.show_danger": "Tampilkan suara bahaya",
   "settings.set_color": "Atur warna",
+  "settings.set_color_for": "Atur warna: {0}",
   "settings.section.hotkeys": "Tombol pintasan",
   "settings.hotkey.visual.title": "Ganti mode visual",
   "settings.hotkey.visual.desc": "Tombol pintasan untuk mengganti bentuk secara langsung saat berjalan.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Menampilkan setiap suara dalam grupnya agar Anda dapat mengubah suara satu per satu.",
   "sounds.search.hint": "Cari suara",
   "sounds.search.clear": "Hapus pencarian",
+  "sounds.filter.title": "Filter",
   "sounds.filter.all": "Semua",
   "sounds.filter.changed": "Diubah",
   "sounds.type.ambient": "Suara latar",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Tekan tombol (Esc untuk batal)",
   "hotkey.none": "Tidak ada",
+  "hotkey.button_name": "{0}, tombol pintasan: {1}",
 
   "help.start.title": "Memulai",
   "help.start.1": "Pilih bahasa di bagian atas jendela ini, lalu ubah tampilan grafik di tab Setelan jika Anda mau.",

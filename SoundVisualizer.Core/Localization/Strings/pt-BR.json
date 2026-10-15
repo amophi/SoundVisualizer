@@ -1,6 +1,8 @@
 {
   "common.language": "Idioma",
   "common.reset_defaults": "Redefinir para o padrão",
+  "common.minimize": "Minimizar",
+  "common.close": "Fechar",
   "language.system": "Padrão do sistema",
 
   "launcher.window_title": "Inicializador do Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Mostrar vozes",
   "settings.show_danger": "Mostrar sons de perigo",
   "settings.set_color": "Escolher cor",
+  "settings.set_color_for": "Escolher cor: {0}",
   "settings.section.hotkeys": "Teclas de atalho",
   "settings.hotkey.visual.title": "Alternar modo visual",
   "settings.hotkey.visual.desc": "Atalho que muda a forma em tempo real durante a execução.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Mostra cada som dentro do grupo para você mudar os sons um a um.",
   "sounds.search.hint": "Pesquisar sons",
   "sounds.search.clear": "Limpar pesquisa",
+  "sounds.filter.title": "Filtro",
   "sounds.filter.all": "Todos",
   "sounds.filter.changed": "Alterados",
   "sounds.type.ambient": "Som ambiente",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Pressione uma tecla (Esc para cancelar)",
   "hotkey.none": "Nenhum",
+  "hotkey.button_name": "{0}, atalho: {1}",
 
   "help.start.title": "Primeiros passos",
   "help.start.1": "Escolha o idioma no topo desta janela e, se quiser, mude a aparência dos gráficos na aba Ajustes.",

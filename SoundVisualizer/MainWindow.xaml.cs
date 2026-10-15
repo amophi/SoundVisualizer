@@ -122,6 +122,7 @@ namespace SoundVisualizer
             _idleTimer.Tick += (s, e) => PollIdle();
             InitializeComponent();
             LanguagePicker.Fill(CmbLanguage);
+            ColorButtonNames.Apply(EditPanelAmbientColorBtn, EditPanelSpeechColorBtn, EditPanelDangerColorBtn);
             Loc.Instance.LanguageChanged += OnLanguageChanged;
             LoadSettingsToEditPanel(); // UI 초기화 직후 설정값을 미리 반영하여, 지연된 레이아웃 패스에서 기본값(50)이 이벤트를 발생시켜도 올바른 값이 유지되도록 함
             _isUpdatingEditPanelSliders = false;
@@ -1485,6 +1486,7 @@ namespace SoundVisualizer
             if (_bindingTarget != "Sound") BtnEditPanelSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
             if (_bindingTarget != "Edit") BtnEditPanelEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
             EditPanelHotkeyText.Text = GetKeysName(AppSettings.EditModeKeyBind);
+            ColorButtonNames.Apply(EditPanelAmbientColorBtn, EditPanelSpeechColorBtn, EditPanelDangerColorBtn);
 
             _forceUpdateHUDTexts = true; // HUD 는 다음 프레임에 새 언어로 그린다
             UpdateGuidelinePositions();

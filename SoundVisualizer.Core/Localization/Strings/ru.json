@@ -1,6 +1,8 @@
 {
   "common.language": "Язык",
   "common.reset_defaults": "Сбросить настройки",
+  "common.minimize": "Свернуть",
+  "common.close": "Закрыть",
   "language.system": "Язык системы",
 
   "launcher.window_title": "Лаунчер Sound Visualizer",
@@ -76,6 +78,7 @@
   "settings.show_speech": "Показывать речь",
   "settings.show_danger": "Показывать опасные звуки",
   "settings.set_color": "Задать цвет",
+  "settings.set_color_for": "Задать цвет: {0}",
   "settings.section.hotkeys": "Горячие клавиши",
   "settings.hotkey.visual.title": "Смена режима отображения",
   "settings.hotkey.visual.desc": "Горячая клавиша, которая меняет форму графики прямо во время работы.",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "Показывает каждый звук в его группе, чтобы можно было менять звуки по одному.",
   "sounds.search.hint": "Поиск звуков",
   "sounds.search.clear": "Очистить поиск",
+  "sounds.filter.title": "Фильтр",
   "sounds.filter.all": "Все",
   "sounds.filter.changed": "Изменённые",
   "sounds.type.ambient": "Фоновые звуки",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "Нажмите клавишу (Esc — отмена)",
   "hotkey.none": "Нет",
+  "hotkey.button_name": "{0}, горячая клавиша: {1}",
 
   "help.start.title": "Начало работы",
   "help.start.1": "Выберите язык в верхней части этого окна и при желании измените вид графики на вкладке «Настройки».",

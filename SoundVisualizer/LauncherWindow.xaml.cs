@@ -154,13 +154,17 @@ namespace SoundVisualizer
             ApplyCodeTexts();
         }
 
-        /// <summary>바인딩이 아니라 코드가 넣는 글자: 실행 상태와 홈 안내(트레이 포함), 단축키 이름(키가 없을 때의 표시도 언어를 따른다).</summary>
+        /// <summary>
+        /// 바인딩이 아니라 코드가 넣는 글자: 실행 상태와 홈 안내(트레이 포함), 단축키 이름(키가 없을 때의 표시도 언어를 따른다),
+        /// 소리 종류 색 버튼의 화면 읽어주기 이름.
+        /// </summary>
         private void ApplyCodeTexts()
         {
             SetStatusUI(_overlayWindow != null);
             if (_bindingTarget != "Visual") BtnVisualHotkey.Content = GetKeysName(AppSettings.VisualModeKeyBind);
             if (_bindingTarget != "Sound") BtnSoundModeHotkey.Content = GetKeysName(AppSettings.StereoUpmixKeyBind);
             if (_bindingTarget != "Edit") BtnEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
+            Ui.ColorButtonNames.Apply(BtnColorAmbient, BtnColorSpeech, BtnColorDanger);
         }
 
         private void SetStatusUI(bool isRunning)

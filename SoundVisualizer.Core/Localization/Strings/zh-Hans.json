@@ -1,6 +1,8 @@
 {
   "common.language": "语言",
   "common.reset_defaults": "恢复默认设置",
+  "common.minimize": "最小化",
+  "common.close": "关闭",
   "language.system": "系统默认",
 
   "launcher.window_title": "Sound Visualizer 启动器",
@@ -76,6 +78,7 @@
   "settings.show_speech": "显示人声",
   "settings.show_danger": "显示危险音",
   "settings.set_color": "设置颜色",
+  "settings.set_color_for": "设置颜色：{0}",
   "settings.section.hotkeys": "快捷键",
   "settings.hotkey.visual.title": "切换显示模式",
   "settings.hotkey.visual.desc": "运行时实时切换图形形状的快捷键。",
@@ -99,6 +102,7 @@
   "sounds.advanced.desc": "按组显示所有声音，可以逐个更改。",
   "sounds.search.hint": "搜索声音",
   "sounds.search.clear": "清除搜索内容",
+  "sounds.filter.title": "筛选",
   "sounds.filter.all": "全部",
   "sounds.filter.changed": "已更改",
   "sounds.type.ambient": "环境音",
@@ -132,6 +136,7 @@
 
   "hotkey.prompt": "请按下按键（按 Esc 取消）",
   "hotkey.none": "无",
+  "hotkey.button_name": "{0}，快捷键：{1}",
 
   "help.start.title": "开始使用",
   "help.start.1": "在此窗口顶部选择语言，如有需要，可在“设置”标签页中更改图形的外观。",

@@ -10,6 +10,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <ui:ValueFormatConverter x:Key="ValueFormatConverter"/>
+    <ui:HotkeyNameConverter x:Key="HotkeyNameConverter"/>
 
     <!-- ===== 키보드 초점 ===== -->
     <!-- 2px 강조색 테두리. 카드 위 5.9:1, 바탕 위 5.0:1 이라 그림 요소 기준(3:1)을 넘는다.
@@ -302,6 +303,21 @@
         </Style.Triggers>
     </Style>
 
+    <!-- 단축키 버튼(설정 탭, 편집 패널). 글자는 지금 키("F3")뿐이라 화면 읽어주기에는 무엇의 단축키인지(ui:SettingRow.Label)와
+         지금 키를 함께 읽힌다("표현 모드 전환, 단축키: F3", HotkeyNameConverter). 키를 받는 중에는 안내 글이 키 자리에 들어가고,
+         버튼 글자가 바뀌면 이름도 따라 바뀐다. 설명(ui:SettingRow.Description)은 도움말로 읽힌다. -->
+    <Style x:Key="Button.Hotkey" TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+        <Setter Property="AutomationProperties.Name">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource HotkeyNameConverter}">
+                    <Binding Path="(ui:SettingRow.Label)" RelativeSource="{RelativeSource Self}"/>
+                    <Binding Path="Content" RelativeSource="{RelativeSource Self}"/>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="AutomationProperties.HelpText" Value="{Binding (ui:SettingRow.Description), RelativeSource={RelativeSource Self}}"/>
+    </Style>
+
     <!-- 멈춤 버튼(실행 종료, 오버레이 종료): 흰 글자 5.0:1 -->
     <Style x:Key="Button.Stop" TargetType="Button" BasedOn="{StaticResource ButtonBase}">
         <Setter Property="Background" Value="{StaticResource StopBrush}"/>
@@ -447,7 +463,10 @@
         </Setter>
     </Style>
 
-    <!-- 창 제목줄의 최소화·닫기(아이콘 글꼴). 닫기는 창 오른쪽 위 모서리에 맞춰 둥글린다. -->
+    <!-- 창 제목줄의 최소화·닫기(아이콘 글꼴). 닫기는 창 오른쪽 위 모서리에 맞춰 둥글린다.
+         아이콘 글자는 화면 읽어주기가 읽을 수 없으므로 버튼마다 AutomationProperties.Name(최소화, 닫기)을 준다.
+         아이콘은 ContentPresenter 대신 서식 안의 TextBlock 으로 그린다. 서식 안의 글자는 자동화 요소가 되지 않아, 이름 밑에 아이콘 글자가
+         따로 읽히지 않는다. 툴팁은 두지 않는다. 툴팁은 도움말로도 읽혀 이름을 두 번 듣게 된다. -->
     <Style x:Key="Button.Chrome" TargetType="Button">
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
         <Setter Property="FontSize" Value="10"/>
@@ -462,7 +481,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}" CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

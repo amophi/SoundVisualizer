@@ -4,6 +4,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -390,6 +391,8 @@ namespace SoundVisualizer.Ui
                 },
                 FlowDirection = Loc.Instance.FlowDirection,
             };
+            // 화면 읽어주기가 목록이 열릴 때 무엇의 종류 목록인지 읽는다(카드나 소리의 이름).
+            AutomationProperties.SetName(menu, row.Title);
             var itemStyle = (Style)FindResource("TypeMenuItem");
             var dotStyle = (Style)FindResource("TypeDot");
             MenuItem? focus = null;

@@ -242,7 +242,8 @@
                             </Border>
 
                             <!-- 소리 분류 표시와 색. 패널이 좁아 색 버튼마다 이름을 붙이지 않고 동그라미 열 위에 "색상"을 한 번 둔다.
-                                 그만큼 스위치 이름이 넓어져 긴 번역이 단어 가운데서 끊기지 않는다. -->
+                                 그만큼 스위치 이름이 넓어져 긴 번역이 단어 가운데서 끊기지 않는다.
+                                 화면 읽어주기 이름은 코드가 종류를 넣어 준다("색상 설정: 환경음", ColorButtonNames). -->
                             <Border Style="{StaticResource Card}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -260,15 +261,15 @@
 
                                     <CheckBox x:Name="EditPanelShowAmbientCheckBox" Grid.Row="1" Style="{StaticResource SwitchRow}" Margin="0,0,0,4" Content="{l:Loc settings.show_ambient}" Checked="EditPanelShowAmbient_Changed" Unchecked="EditPanelShowAmbient_Changed"/>
                                     <Button x:Name="EditPanelAmbientColorBtn" Grid.Row="1" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="8,0,0,4" Tag="Ambient"
-                                            AutomationProperties.Name="{l:Loc editor.color}" AutomationProperties.HelpText="{l:Loc settings.show_ambient}" Click="EditPanelColorBtn_Click"/>
+                                            Click="EditPanelColorBtn_Click"/>
 
                                     <CheckBox x:Name="EditPanelShowSpeechCheckBox" Grid.Row="2" Style="{StaticResource SwitchRow}" Margin="0,0,0,4" Content="{l:Loc settings.show_speech}" Checked="EditPanelShowSpeech_Changed" Unchecked="EditPanelShowSpeech_Changed"/>
                                     <Button x:Name="EditPanelSpeechColorBtn" Grid.Row="2" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="8,0,0,4" Tag="Speech"
-                                            AutomationProperties.Name="{l:Loc editor.color}" AutomationProperties.HelpText="{l:Loc settings.show_speech}" Click="EditPanelColorBtn_Click"/>
+                                            Click="EditPanelColorBtn_Click"/>
 
                                     <CheckBox x:Name="EditPanelShowDangerCheckBox" Grid.Row="3" Style="{StaticResource SwitchRow}" Margin="0" Content="{l:Loc settings.show_danger}" Checked="EditPanelShowDanger_Changed" Unchecked="EditPanelShowDanger_Changed"/>
                                     <Button x:Name="EditPanelDangerColorBtn" Grid.Row="3" Grid.Column="1" Style="{StaticResource Button.Swatch}" Margin="8,0,0,0" Tag="Danger"
-                                            AutomationProperties.Name="{l:Loc editor.color}" AutomationProperties.HelpText="{l:Loc settings.show_danger}" Click="EditPanelColorBtn_Click"/>
+                                            Click="EditPanelColorBtn_Click"/>
                                 </Grid>
                             </Border>
 
@@ -277,14 +278,14 @@
                                 <StackPanel>
                                     <TextBlock x:Name="EditPanelHotkeySettingsLabel" Style="{StaticResource Text.CardTitle}" Margin="0,0,0,16" Text="{l:Loc editor.hotkeys}"/>
                                     <TextBlock Style="{StaticResource Text.Label}" Margin="0,0,0,8" Text="{l:Loc settings.hotkey.visual.title}"/>
-                                    <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource Button.Secondary}" Margin="0,0,0,16" Content="F3"
-                                            AutomationProperties.HelpText="{l:Loc settings.hotkey.visual.title}" Click="BtnEditPanelHotkey_Click"/>
+                                    <Button x:Name="BtnEditPanelVisualHotkey" Style="{StaticResource Button.Hotkey}" Margin="0,0,0,16" Content="F3"
+                                            ui:SettingRow.Label="{l:Loc settings.hotkey.visual.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.visual.desc}" Click="BtnEditPanelHotkey_Click"/>
                                     <TextBlock Style="{StaticResource Text.Label}" Margin="0,0,0,8" Text="{l:Loc settings.hotkey.sound.title}"/>
-                                    <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource Button.Secondary}" Margin="0,0,0,16" Content="F2"
-                                            AutomationProperties.HelpText="{l:Loc settings.hotkey.sound.title}" Click="BtnEditPanelHotkey_Click"/>
+                                    <Button x:Name="BtnEditPanelSoundModeHotkey" Style="{StaticResource Button.Hotkey}" Margin="0,0,0,16" Content="F2"
+                                            ui:SettingRow.Label="{l:Loc settings.hotkey.sound.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.sound.desc}" Click="BtnEditPanelHotkey_Click"/>
                                     <TextBlock Style="{StaticResource Text.Label}" Margin="0,0,0,8" Text="{l:Loc settings.hotkey.edit.title}"/>
-                                    <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource Button.Secondary}" Content="F4"
-                                            AutomationProperties.HelpText="{l:Loc settings.hotkey.edit.title}" Click="BtnEditPanelHotkey_Click"/>
+                                    <Button x:Name="BtnEditPanelEditHotkey" Style="{StaticResource Button.Hotkey}" Content="F4"
+                                            ui:SettingRow.Label="{l:Loc settings.hotkey.edit.title}" ui:SettingRow.Description="{l:Loc settings.hotkey.edit.desc}" Click="BtnEditPanelHotkey_Click"/>
                                 </StackPanel>
                             </Border>
 
