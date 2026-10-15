@@ -5,7 +5,7 @@
   "common.close": "Fechar",
   "language.system": "Padrão do sistema",
 
-  "launcher.window_title": "Inicializador do Sound Visualizer",
+  "launcher.window_title": "Inicializador do SoundVisualizer",
   "launcher.tab.home": "Início",
   "launcher.tab.settings": "Ajustes",
   "launcher.tab.sounds": "Sons",
@@ -142,7 +142,7 @@
   "help.start.1": "Escolha o idioma no topo desta janela e, se quiser, mude a aparência dos gráficos na aba Ajustes.",
   "help.start.2": "Na aba Início, clique em “{0}”.",
   "help.start.3": "Os gráficos são desenhados nas bordas da tela, por cima de outras janelas, como jogos e vídeos. Os cliques atravessam os gráficos, então você pode continuar usando a janela que está embaixo.",
-  "help.start.4": "Para desligar, clique em “{0}” na aba Início ou clique com o botão direito no ícone do Sound Visualizer na área de notificação da barra de tarefas e escolha “{0}”.",
+  "help.start.4": "Para desligar, clique em “{0}” na aba Início ou clique com o botão direito no ícone do SoundVisualizer na área de notificação da barra de tarefas e escolha “{0}”.",
   "help.modes.title": "Modos visuais",
   "help.mode.wave": "Toda a borda da tela avança para dentro de acordo com o volume do som. O lado de onde vem o som avança ainda mais.",
   "help.mode.pad": "Barras se acendem em 8 pontos ao redor da borda da tela. É o modo que mostra a direção com mais clareza.",
@@ -212,7 +212,7 @@
   "tray.exit": "Sair",
 
   "more_info.title": "Repositório no GitHub e contribuições",
-  "more_info.body": "O Sound Visualizer é um projeto de código aberto, e o código-fonte é público no GitHub. Você pode participar relatando bugs, sugerindo recursos ou contribuindo com o desenvolvimento. Clique no botão abaixo para visitar o repositório oficial no GitHub! Você também pode conferir e baixar a versão mais recente na aba Releases do GitHub.",
+  "more_info.body": "O SoundVisualizer é um projeto de código aberto, e o código-fonte é público no GitHub. Você pode participar relatando bugs, sugerindo recursos ou contribuindo com o desenvolvimento. Clique no botão abaixo para visitar o repositório oficial no GitHub! Você também pode conferir e baixar a versão mais recente na aba Releases do GitHub.",
   "more_info.github_button": "Visitar o repositório no GitHub",
 
   "dialog.notice_title": "Aviso",

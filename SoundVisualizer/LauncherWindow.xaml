@@ -38,7 +38,7 @@
                 <!-- 홈 (실행) 탭 -->
                 <TabItem x:Name="TabHome" Header="{l:Loc launcher.tab.home}">
                     <StackPanel VerticalAlignment="Center" Margin="20,0">
-                        <TextBlock Style="{StaticResource Text.Title}" Margin="0,0,0,12" Text="Sound Visualizer"/>
+                        <TextBlock Style="{StaticResource Text.Title}" Margin="0,0,0,12" Text="SoundVisualizer"/>
                         <TextBlock Style="{StaticResource Text.Lead}" Margin="0,0,0,24" Text="{l:Loc launcher.home.desc}"/>
 
                         <StackPanel Margin="0,0,0,24">

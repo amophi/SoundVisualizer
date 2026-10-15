@@ -5,7 +5,7 @@
   "common.close": "닫기",
   "language.system": "시스템 기본값",
 
-  "launcher.window_title": "Sound Visualizer 런처",
+  "launcher.window_title": "SoundVisualizer 런처",
   "launcher.tab.home": "홈",
   "launcher.tab.settings": "설정",
   "launcher.tab.sounds": "분류",
@@ -142,7 +142,7 @@
   "help.start.1": "이 창 위쪽에서 언어를 선택하고, 원하면 설정 탭에서 그래픽 모양을 바꿉니다.",
   "help.start.2": "홈에서 ‘{0}’ 버튼을 누릅니다.",
   "help.start.3": "그래픽은 게임이나 영상 같은 다른 창 위에 화면 테두리를 따라 그려집니다. 마우스 클릭은 그래픽을 지나가므로 아래 창을 그대로 쓸 수 있습니다.",
-  "help.start.4": "끌 때는 홈에서 ‘{0}’ 버튼을 누르거나, 작업 표시줄 알림 영역의 Sound Visualizer 아이콘을 마우스 오른쪽 버튼으로 눌러 ‘{0}’ 메뉴를 선택합니다.",
+  "help.start.4": "끌 때는 홈에서 ‘{0}’ 버튼을 누르거나, 작업 표시줄 알림 영역의 SoundVisualizer 아이콘을 마우스 오른쪽 버튼으로 눌러 ‘{0}’ 메뉴를 선택합니다.",
   "help.modes.title": "표현 모드",
   "help.mode.wave": "화면 테두리 전체가 소리 세기만큼 안쪽으로 밀려듭니다. 소리가 나는 쪽이 더 깊게 밀려옵니다.",
   "help.mode.pad": "화면 가장자리 8곳에 막대가 떠오릅니다. 방향을 가장 또렷하게 볼 수 있습니다.",
@@ -212,7 +212,7 @@
   "tray.exit": "프로그램 종료",
 
   "more_info.title": "GitHub 저장소 및 프로젝트 기여",
-  "more_info.body": "Sound Visualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다.",
+  "more_info.body": "SoundVisualizer는 오픈소스 프로젝트로, GitHub를 통해 소스 코드가 공개되어 있습니다. 버그 제보, 기능 건의 및 개발 기여를 통해 프로젝트에 동참하실 수 있습니다. 아래 버튼을 클릭하여 공식 GitHub 저장소로 이동해 보세요! 또한, GitHub의 Releases 탭에서 최신 버전 업데이트를 확인하고 다운로드할 수 있습니다.",
   "more_info.github_button": "GitHub 저장소 방문하기",
 
   "dialog.notice_title": "알림",

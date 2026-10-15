@@ -5,7 +5,7 @@
   "common.close": "閉じる",
   "language.system": "システムのデフォルト",
 
-  "launcher.window_title": "Sound Visualizer ランチャー",
+  "launcher.window_title": "SoundVisualizer ランチャー",
   "launcher.tab.home": "ホーム",
   "launcher.tab.settings": "設定",
   "launcher.tab.sounds": "分類",
@@ -142,7 +142,7 @@
   "help.start.1": "このウィンドウの上で言語を選び、必要に応じて「設定」タブでグラフィックの見た目を変更します。",
   "help.start.2": "「ホーム」タブで「{0}」をクリックします。",
   "help.start.3": "グラフィックは、ゲームや動画などほかのウィンドウの上に、画面の端に沿って描かれます。クリックはグラフィックを通り抜けるので、下にあるウィンドウをそのまま操作できます。",
-  "help.start.4": "オフにするには、「ホーム」タブで「{0}」をクリックするか、タスクバーの通知領域にある Sound Visualizer のアイコンを右クリックして「{0}」を選びます。",
+  "help.start.4": "オフにするには、「ホーム」タブで「{0}」をクリックするか、タスクバーの通知領域にある SoundVisualizer のアイコンを右クリックして「{0}」を選びます。",
   "help.modes.title": "表示モード",
   "help.mode.wave": "画面の端全体が、音の大きさに合わせて内側へ押し寄せます。音のする側は、さらに深く押し寄せます。",
   "help.mode.pad": "画面の端の8か所にバーが浮かび上がります。方向が最もはっきり分かるモードです。",
@@ -212,7 +212,7 @@
   "tray.exit": "終了",
 
   "more_info.title": "GitHub リポジトリとプロジェクトへの貢献",
-  "more_info.body": "Sound Visualizer はオープンソースのプロジェクトで、ソースコードは GitHub で公開されています。バグの報告や機能の提案、開発への貢献を通じてプロジェクトに参加できます。下のボタンをクリックして、公式の GitHub リポジトリにアクセスしてみてください！GitHub の Releases タブでは、最新バージョンを確認してダウンロードすることもできます。",
+  "more_info.body": "SoundVisualizer はオープンソースのプロジェクトで、ソースコードは GitHub で公開されています。バグの報告や機能の提案、開発への貢献を通じてプロジェクトに参加できます。下のボタンをクリックして、公式の GitHub リポジトリにアクセスしてみてください！GitHub の Releases タブでは、最新バージョンを確認してダウンロードすることもできます。",
   "more_info.github_button": "GitHub リポジトリにアクセス",
 
   "dialog.notice_title": "お知らせ",

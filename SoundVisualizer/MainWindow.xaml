@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:SoundVisualizer.Localization"
         xmlns:ui="clr-namespace:SoundVisualizer.Ui"
-        Title="Sound Visualizer" Height="1080" Width="1920"
+        Title="SoundVisualizer" Height="1080" Width="1920"
         WindowStyle="None" Background="Transparent" AllowsTransparency="True"
         Topmost="True" WindowState="Maximized" ShowInTaskbar="False"
         PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp"
@@ -159,7 +159,7 @@
 
                     <!-- 머리: 앱 이름, 제목, 언어 -->
                     <StackPanel Grid.Row="0">
-                        <TextBlock Text="Sound Visualizer" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold"/>
+                        <TextBlock Text="SoundVisualizer" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold"/>
                         <TextBlock x:Name="EditPanelTitle" Style="{StaticResource Text.Section}" Margin="0,4,0,16" Text="{l:Loc editor.title}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>

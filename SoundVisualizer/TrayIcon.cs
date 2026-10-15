@@ -17,7 +17,7 @@ namespace SoundVisualizer
     /// </summary>
     internal sealed class TrayIcon : IDisposable
     {
-        private const string AppName = "Sound Visualizer";
+        private const string AppName = "SoundVisualizer";
 
         // Windows 가 받는 길이(NOTIFYICONDATA): 툴팁 128, 풍선 제목 64, 풍선 글 256 (끝의 \0 포함)
         private const int TooltipLimit = 127;

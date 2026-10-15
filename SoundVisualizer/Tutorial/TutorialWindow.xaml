@@ -187,7 +187,7 @@
                                           Background="{StaticResource CardBrush}" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
                                           CornerRadius="16" Padding="24,0">
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock FontSize="17" FontWeight="Black" Foreground="{StaticResource PrimaryTextBrush}" Text="Sound Visualizer"/>
+                        <TextBlock FontSize="17" FontWeight="Black" Foreground="{StaticResource PrimaryTextBrush}" Text="SoundVisualizer"/>
                         <Border Style="{StaticResource Tutorial.MockLine}" Width="200" Margin="0,8,0,0"/>
                         <Border Style="{StaticResource Tutorial.MockLine}" Width="150" Margin="0,6,0,0"/>
                         <StackPanel Orientation="Horizontal" Margin="0,12,0,0">

@@ -5,7 +5,7 @@
   "common.close": "Fermer",
   "language.system": "Langue du système",
 
-  "launcher.window_title": "Lanceur Sound Visualizer",
+  "launcher.window_title": "Lanceur SoundVisualizer",
   "launcher.tab.home": "Accueil",
   "launcher.tab.settings": "Paramètres",
   "launcher.tab.sounds": "Sons",
@@ -142,7 +142,7 @@
   "help.start.1": "Choisissez la langue en haut de cette fenêtre et, si vous le souhaitez, modifiez l'apparence des graphismes dans l'onglet Paramètres.",
   "help.start.2": "Dans l'onglet Accueil, cliquez sur « {0} ».",
   "help.start.3": "Les graphismes s'affichent le long des bords de l'écran, par-dessus les autres fenêtres comme les jeux et les vidéos. Les clics les traversent : vous pouvez donc continuer à utiliser la fenêtre en dessous.",
-  "help.start.4": "Pour désactiver la visualisation, cliquez sur « {0} » dans l'onglet Accueil, ou faites un clic droit sur l'icône Sound Visualizer dans la zone de notification de la barre des tâches et choisissez « {0} ».",
+  "help.start.4": "Pour désactiver la visualisation, cliquez sur « {0} » dans l'onglet Accueil, ou faites un clic droit sur l'icône SoundVisualizer dans la zone de notification de la barre des tâches et choisissez « {0} ».",
   "help.modes.title": "Modes visuels",
   "help.mode.wave": "Tous les bords de l'écran se resserrent vers l'intérieur en fonction du volume sonore, et davantage du côté d'où vient le son.",
   "help.mode.pad": "Des barres s'allument à 8 endroits sur le bord de l'écran. C'est le mode qui montre la direction le plus clairement.",
@@ -212,7 +212,7 @@
   "tray.exit": "Quitter",
 
   "more_info.title": "Dépôt GitHub et contributions",
-  "more_info.body": "Sound Visualizer est un projet open source dont le code source est public sur GitHub. Vous pouvez y participer en signalant des bugs, en suggérant des fonctionnalités ou en contribuant au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel ! Vous pouvez aussi vérifier et télécharger la dernière version dans l'onglet Releases de GitHub.",
+  "more_info.body": "SoundVisualizer est un projet open source dont le code source est public sur GitHub. Vous pouvez y participer en signalant des bugs, en suggérant des fonctionnalités ou en contribuant au développement. Cliquez sur le bouton ci-dessous pour visiter le dépôt GitHub officiel ! Vous pouvez aussi vérifier et télécharger la dernière version dans l'onglet Releases de GitHub.",
   "more_info.github_button": "Visiter le dépôt GitHub",
 
   "dialog.notice_title": "Information",

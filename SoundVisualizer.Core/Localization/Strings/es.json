@@ -5,7 +5,7 @@
   "common.close": "Cerrar",
   "language.system": "Idioma del sistema",
 
-  "launcher.window_title": "Lanzador de Sound Visualizer",
+  "launcher.window_title": "Lanzador de SoundVisualizer",
   "launcher.tab.home": "Inicio",
   "launcher.tab.settings": "Ajustes",
   "launcher.tab.sounds": "Sonidos",
@@ -142,7 +142,7 @@
   "help.start.1": "Elige el idioma en la parte superior de esta ventana y, si quieres, cambia el aspecto de los gráficos en la pestaña Ajustes.",
   "help.start.2": "En la pestaña Inicio, haz clic en “{0}”.",
   "help.start.3": "Los gráficos se dibujan en los bordes de la pantalla, por encima de otras ventanas, como juegos y videos. Los clics atraviesan los gráficos, así que puedes seguir usando la ventana que está debajo.",
-  "help.start.4": "Para apagarlo, haz clic en “{0}” en la pestaña Inicio, o haz clic con el botón derecho en el icono de Sound Visualizer del área de notificación de la barra de tareas y elige “{0}”.",
+  "help.start.4": "Para apagarlo, haz clic en “{0}” en la pestaña Inicio, o haz clic con el botón derecho en el icono de SoundVisualizer del área de notificación de la barra de tareas y elige “{0}”.",
   "help.modes.title": "Modos visuales",
   "help.mode.wave": "Todo el borde de la pantalla avanza hacia dentro según el volumen. El lado del que viene el sonido avanza más.",
   "help.mode.pad": "Se iluminan barras en 8 puntos del borde de la pantalla. Es el modo que muestra la dirección con más claridad.",
@@ -212,7 +212,7 @@
   "tray.exit": "Salir",
 
   "more_info.title": "Repositorio de GitHub y cómo contribuir",
-  "more_info.body": "Sound Visualizer es un proyecto de código abierto y su código fuente es público en GitHub. Puedes participar informando de errores, sugiriendo funciones o contribuyendo al desarrollo. ¡Haz clic en el botón de abajo para visitar el repositorio oficial de GitHub! También puedes buscar y descargar la versión más reciente en la pestaña Releases de GitHub.",
+  "more_info.body": "SoundVisualizer es un proyecto de código abierto y su código fuente es público en GitHub. Puedes participar informando de errores, sugiriendo funciones o contribuyendo al desarrollo. ¡Haz clic en el botón de abajo para visitar el repositorio oficial de GitHub! También puedes buscar y descargar la versión más reciente en la pestaña Releases de GitHub.",
   "more_info.github_button": "Visitar el repositorio de GitHub",
 
   "dialog.notice_title": "Aviso",

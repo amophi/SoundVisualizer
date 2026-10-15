@@ -4,7 +4,7 @@
 
 <br/>
 
-# Sound Visualizer
+# SoundVisualizer
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
 
@@ -20,7 +20,7 @@
 
 <br/>
 
-> **Sound Visualizer**는 컴퓨터의 시스템 오디오를 실시간으로 캡처하여 방향·크기·의미를 그래픽 오버레이로 변환하는 데스크톱 애플리케이션입니다. 
+> **SoundVisualizer**는 컴퓨터의 시스템 오디오를 실시간으로 캡처하여 방향·크기·의미를 그래픽 오버레이로 변환하는 데스크톱 애플리케이션입니다. 
 단순한 파형 시각화를 넘어, **YAMNet**과 **ONNX Runtime** 기반의 AI 사운드 분류기를 내장하여 현재 재생 중인 소리의 종류(배경음, 대화음, 위협음 등)를 실시간으로 인지하고 피드백을 제공합니다.
 
 > 📱 안드로이드 버전도 있습니다: [SoundVisualizer for Android](https://github.com/bibibic76/SoundVisualizer)
@@ -107,7 +107,7 @@
 
 ## 🚀 설치 및 실행 방법
 
-Sound Visualizer는 설치가 필요 없는 가벼운 **포터블(Portable)** 패키지로 제공됩니다. Windows 10/11 (64비트)에서 돌아가며, .NET 을 따로 설치하지 않아도 됩니다.
+SoundVisualizer는 설치가 필요 없는 가벼운 **포터블(Portable)** 패키지로 제공됩니다. Windows 10/11 (64비트)에서 돌아가며, .NET 을 따로 설치하지 않아도 됩니다.
 
 1. **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** 페이지에 접속합니다.
 2. 최신 버전의 `SoundVisualizer_vX.Y.zip` 파일을 다운로드해 원하는 곳에 압축 해제합니다.

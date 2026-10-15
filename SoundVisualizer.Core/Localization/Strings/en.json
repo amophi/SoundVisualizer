@@ -5,7 +5,7 @@
   "common.close": "Close",
   "language.system": "System default",
 
-  "launcher.window_title": "Sound Visualizer Launcher",
+  "launcher.window_title": "SoundVisualizer Launcher",
   "launcher.tab.home": "Home",
   "launcher.tab.settings": "Settings",
   "launcher.tab.sounds": "Sounds",
@@ -142,7 +142,7 @@
   "help.start.1": "Pick your language at the top of this window, and change how the graphics look in the Settings tab if you like.",
   "help.start.2": "On Home, click “{0}”.",
   "help.start.3": "The graphics are drawn along the edges of the screen, on top of other windows such as games and videos. Clicks pass through them, so you can keep using the window underneath.",
-  "help.start.4": "To turn it off, click “{0}” on Home, or right-click the Sound Visualizer icon in the notification area of the taskbar and choose “{0}”.",
+  "help.start.4": "To turn it off, click “{0}” on Home, or right-click the SoundVisualizer icon in the notification area of the taskbar and choose “{0}”.",
   "help.modes.title": "Visual modes",
   "help.mode.wave": "The whole edge of the screen pushes inward with the loudness. The side the sound comes from pushes in deeper.",
   "help.mode.pad": "Bars light up at 8 spots around the edge of the screen. Shows direction most clearly.",
@@ -203,7 +203,7 @@
 
   "notice.ai_unavailable": "Sound type detection isn't working, so every sound is shown in the ambient color. Try turning the visualizer off and on again.",
   "notice.ai_unavailable_hidden": "Sound type detection isn't working, so every sound counts as ambient, and ambient sounds are turned off, so nothing is shown. Turn on “{0}” in the Settings tab, or try turning the visualizer off and on again.",
-  "notice.stopped.title": "Sound visualizer turned off",
+  "notice.stopped.title": "SoundVisualizer turned off",
   "notice.stopped.no_device": "No playback device could be opened, so sound can't be captured. Connect speakers or headphones, or set a default playback device in the Windows sound settings, then start again.",
   "notice.stopped.capture_error": "Sound capture stopped because of an error, so the graphics are off.",
   "notice.dismiss": "Dismiss notice",
@@ -212,7 +212,7 @@
   "tray.exit": "Exit",
 
   "more_info.title": "GitHub repository and contributing",
-  "more_info.body": "Sound Visualizer is an open-source project, and its source code is public on GitHub. You can take part by reporting bugs, suggesting features, or contributing to development. Click the button below to visit the official GitHub repository! You can also check for and download the latest version on the Releases tab on GitHub.",
+  "more_info.body": "SoundVisualizer is an open-source project, and its source code is public on GitHub. You can take part by reporting bugs, suggesting features, or contributing to development. Click the button below to visit the official GitHub repository! You can also check for and download the latest version on the Releases tab on GitHub.",
   "more_info.github_button": "Visit the GitHub repository",
 
   "dialog.notice_title": "Notice",

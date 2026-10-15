@@ -22,7 +22,7 @@ public class AppSourceGuardTests
     // (언어 이름은 Core 의 UiLanguages 에, Pretendard 같은 글꼴 이름은 UiFontChain 에 있어 여기에 없다.)
     private static readonly HashSet<string> AllowedXamlTexts = new(StringComparer.Ordinal)
     {
-        "Sound Visualizer", // 앱 이름. 어느 언어에서나 같다
+        "SoundVisualizer", // 앱 이름. 어느 언어에서나 같다
         "FPS: --",          // 개발자 모드 FPS 표시의 처음 값. 렌더 루프가 숫자로 바꾼다
         "144 FPS",          // 편집 패널 최대 프레임 값의 처음 값. 설정을 읽으며 바꾼다
         "#FF0000",          // 색 선택 창 16진 코드의 처음 값. 창을 열며 바꾼다

@@ -5,7 +5,7 @@
   "common.close": "Chiudi",
   "language.system": "Predefinita di sistema",
 
-  "launcher.window_title": "Launcher di Sound Visualizer",
+  "launcher.window_title": "Launcher di SoundVisualizer",
   "launcher.tab.home": "Home",
   "launcher.tab.settings": "Impostazioni",
   "launcher.tab.sounds": "Suoni",
@@ -142,7 +142,7 @@
   "help.start.1": "Scegli la lingua in alto in questa finestra e, se vuoi, cambia l'aspetto della grafica nella scheda Impostazioni.",
   "help.start.2": "Nella scheda Home, fai clic su “{0}”.",
   "help.start.3": "La grafica viene disegnata lungo i bordi dello schermo, sopra le altre finestre come giochi e video. I clic la attraversano, così puoi continuare a usare la finestra sottostante.",
-  "help.start.4": "Per disattivare la visualizzazione, fai clic su “{0}” nella scheda Home, oppure fai clic con il pulsante destro sull'icona di Sound Visualizer nell'area di notifica della barra delle applicazioni e scegli “{0}”.",
+  "help.start.4": "Per disattivare la visualizzazione, fai clic su “{0}” nella scheda Home, oppure fai clic con il pulsante destro sull'icona di SoundVisualizer nell'area di notifica della barra delle applicazioni e scegli “{0}”.",
   "help.modes.title": "Modalità visive",
   "help.mode.wave": "L'intero bordo dello schermo avanza verso l'interno in base al volume. Il lato da cui proviene il suono avanza di più.",
   "help.mode.pad": "Lungo il bordo dello schermo si illuminano barre in 8 punti. È la modalità che mostra la direzione in modo più chiaro.",
@@ -212,7 +212,7 @@
   "tray.exit": "Esci",
 
   "more_info.title": "Repository GitHub e contributi",
-  "more_info.body": "Sound Visualizer è un progetto open source e il suo codice sorgente è pubblico su GitHub. Puoi partecipare segnalando bug, suggerendo funzionalità o contribuendo allo sviluppo. Fai clic sul pulsante qui sotto per visitare il repository ufficiale su GitHub! Nella scheda Releases di GitHub puoi anche controllare e scaricare l'ultima versione.",
+  "more_info.body": "SoundVisualizer è un progetto open source e il suo codice sorgente è pubblico su GitHub. Puoi partecipare segnalando bug, suggerendo funzionalità o contribuendo allo sviluppo. Fai clic sul pulsante qui sotto per visitare il repository ufficiale su GitHub! Nella scheda Releases di GitHub puoi anche controllare e scaricare l'ultima versione.",
   "more_info.github_button": "Visita il repository GitHub",
 
   "dialog.notice_title": "Avviso",

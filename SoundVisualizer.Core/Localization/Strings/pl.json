@@ -5,7 +5,7 @@
   "common.close": "Zamknij",
   "language.system": "Domyślny język systemu",
 
-  "launcher.window_title": "Launcher Sound Visualizer",
+  "launcher.window_title": "Launcher SoundVisualizer",
   "launcher.tab.home": "Główna",
   "launcher.tab.settings": "Ustawienia",
   "launcher.tab.sounds": "Dźwięki",
@@ -142,7 +142,7 @@
   "help.start.1": "Wybierz język u góry tego okna i w razie potrzeby zmień wygląd grafiki na karcie „Ustawienia”.",
   "help.start.2": "Na karcie „Główna” kliknij „{0}”.",
   "help.start.3": "Grafika jest rysowana wzdłuż krawędzi ekranu, nad innymi oknami, takimi jak gry i filmy. Kliknięcia przechodzą przez nią, więc możesz dalej korzystać z okna pod spodem.",
-  "help.start.4": "Aby wyłączyć, kliknij „{0}” na karcie „Główna” albo kliknij prawym przyciskiem myszy ikonę Sound Visualizer w obszarze powiadomień na pasku zadań i wybierz „{0}”.",
+  "help.start.4": "Aby wyłączyć, kliknij „{0}” na karcie „Główna” albo kliknij prawym przyciskiem myszy ikonę SoundVisualizer w obszarze powiadomień na pasku zadań i wybierz „{0}”.",
   "help.modes.title": "Tryby wizualizacji",
   "help.mode.wave": "Cała krawędź ekranu przesuwa się do środka – tym dalej, im głośniejszy dźwięk. Po stronie, z której dochodzi dźwięk, sięga głębiej.",
   "help.mode.pad": "W 8 miejscach wzdłuż krawędzi ekranu podświetlają się paski. Ten tryb najwyraźniej pokazuje kierunek.",
@@ -212,7 +212,7 @@
   "tray.exit": "Zakończ",
 
   "more_info.title": "Repozytorium GitHub i współtworzenie",
-  "more_info.body": "Sound Visualizer to projekt open source, którego kod źródłowy jest publicznie dostępny na GitHubie. Możesz wziąć w nim udział, zgłaszając błędy, proponując nowe funkcje lub pomagając w rozwoju. Kliknij przycisk poniżej, aby przejść do oficjalnego repozytorium na GitHubie! Na karcie Releases na GitHubie możesz też sprawdzić i pobrać najnowszą wersję.",
+  "more_info.body": "SoundVisualizer to projekt open source, którego kod źródłowy jest publicznie dostępny na GitHubie. Możesz wziąć w nim udział, zgłaszając błędy, proponując nowe funkcje lub pomagając w rozwoju. Kliknij przycisk poniżej, aby przejść do oficjalnego repozytorium na GitHubie! Na karcie Releases na GitHubie możesz też sprawdzić i pobrać najnowszą wersję.",
   "more_info.github_button": "Odwiedź repozytorium GitHub",
 
   "dialog.notice_title": "Informacja",

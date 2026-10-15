@@ -5,7 +5,7 @@
   "common.close": "Schließen",
   "language.system": "Systemstandard",
 
-  "launcher.window_title": "Sound Visualizer Launcher",
+  "launcher.window_title": "SoundVisualizer Launcher",
   "launcher.tab.home": "Startseite",
   "launcher.tab.settings": "Einstellungen",
   "launcher.tab.sounds": "Geräusche",
@@ -212,7 +212,7 @@
   "tray.exit": "Programm beenden",
 
   "more_info.title": "GitHub-Repository und Mitwirkung",
-  "more_info.body": "Sound Visualizer ist ein Open-Source-Projekt, dessen Quellcode öffentlich auf GitHub verfügbar ist. Sie können mitmachen, indem Sie Fehler melden, Funktionen vorschlagen oder zur Entwicklung beitragen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen! Im Tab „Releases“ auf GitHub können Sie außerdem nach der neuesten Version suchen und sie herunterladen.",
+  "more_info.body": "SoundVisualizer ist ein Open-Source-Projekt, dessen Quellcode öffentlich auf GitHub verfügbar ist. Sie können mitmachen, indem Sie Fehler melden, Funktionen vorschlagen oder zur Entwicklung beitragen. Klicken Sie auf die Schaltfläche unten, um das offizielle GitHub-Repository zu besuchen! Im Tab „Releases“ auf GitHub können Sie außerdem nach der neuesten Version suchen und sie herunterladen.",
   "more_info.github_button": "GitHub-Repository besuchen",
 
   "dialog.notice_title": "Hinweis",

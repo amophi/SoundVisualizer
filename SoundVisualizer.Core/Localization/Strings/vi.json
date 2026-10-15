@@ -5,7 +5,7 @@
   "common.close": "Đóng",
   "language.system": "Mặc định của hệ thống",
 
-  "launcher.window_title": "Trình khởi chạy Sound Visualizer",
+  "launcher.window_title": "Trình khởi chạy SoundVisualizer",
   "launcher.tab.home": "Trang chủ",
   "launcher.tab.settings": "Cài đặt",
   "launcher.tab.sounds": "Phân loại",
@@ -142,7 +142,7 @@
   "help.start.1": "Chọn ngôn ngữ ở đầu cửa sổ này, và nếu muốn, hãy đổi giao diện đồ họa trong thẻ Cài đặt.",
   "help.start.2": "Ở thẻ Trang chủ, nhấp “{0}”.",
   "help.start.3": "Đồ họa được vẽ dọc theo các cạnh màn hình, phía trên các cửa sổ khác như trò chơi và video. Thao tác nhấp chuột đi xuyên qua đồ họa, nên bạn vẫn dùng được cửa sổ bên dưới.",
-  "help.start.4": "Để tắt, hãy nhấp “{0}” ở thẻ Trang chủ, hoặc nhấp chuột phải vào biểu tượng Sound Visualizer trong vùng thông báo của thanh tác vụ rồi chọn “{0}”.",
+  "help.start.4": "Để tắt, hãy nhấp “{0}” ở thẻ Trang chủ, hoặc nhấp chuột phải vào biểu tượng SoundVisualizer trong vùng thông báo của thanh tác vụ rồi chọn “{0}”.",
   "help.modes.title": "Chế độ hiển thị",
   "help.mode.wave": "Toàn bộ cạnh màn hình dâng vào trong theo độ lớn âm thanh. Phía có âm thanh phát ra sẽ dâng vào sâu hơn.",
   "help.mode.pad": "Các vạch sáng lên ở 8 vị trí quanh cạnh màn hình. Thể hiện hướng âm thanh rõ ràng nhất.",
@@ -212,7 +212,7 @@
   "tray.exit": "Thoát",
 
   "more_info.title": "Kho lưu trữ GitHub và đóng góp",
-  "more_info.body": "Sound Visualizer là dự án nguồn mở, mã nguồn được công khai trên GitHub. Bạn có thể tham gia bằng cách báo lỗi, đề xuất tính năng hoặc đóng góp vào việc phát triển. Hãy nhấp vào nút bên dưới để truy cập kho lưu trữ GitHub chính thức! Bạn cũng có thể xem và tải phiên bản mới nhất trong thẻ Releases trên GitHub.",
+  "more_info.body": "SoundVisualizer là dự án nguồn mở, mã nguồn được công khai trên GitHub. Bạn có thể tham gia bằng cách báo lỗi, đề xuất tính năng hoặc đóng góp vào việc phát triển. Hãy nhấp vào nút bên dưới để truy cập kho lưu trữ GitHub chính thức! Bạn cũng có thể xem và tải phiên bản mới nhất trong thẻ Releases trên GitHub.",
   "more_info.github_button": "Truy cập kho lưu trữ GitHub",
 
   "dialog.notice_title": "Thông báo",

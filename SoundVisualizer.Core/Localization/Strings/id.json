@@ -5,7 +5,7 @@
   "common.close": "Tutup",
   "language.system": "Default sistem",
 
-  "launcher.window_title": "Peluncur Sound Visualizer",
+  "launcher.window_title": "Peluncur SoundVisualizer",
   "launcher.tab.home": "Beranda",
   "launcher.tab.settings": "Setelan",
   "launcher.tab.sounds": "Suara",
@@ -142,7 +142,7 @@
   "help.start.1": "Pilih bahasa di bagian atas jendela ini, lalu ubah tampilan grafik di tab Setelan jika Anda mau.",
   "help.start.2": "Di Beranda, klik “{0}”.",
   "help.start.3": "Grafik digambar di sepanjang tepi layar, di atas jendela lain seperti game dan video. Klik mouse menembus grafik, jadi Anda tetap bisa menggunakan jendela di bawahnya.",
-  "help.start.4": "Untuk mematikannya, klik “{0}” di Beranda, atau klik kanan ikon Sound Visualizer di area notifikasi taskbar lalu pilih “{0}”.",
+  "help.start.4": "Untuk mematikannya, klik “{0}” di Beranda, atau klik kanan ikon SoundVisualizer di area notifikasi taskbar lalu pilih “{0}”.",
   "help.modes.title": "Mode visual",
   "help.mode.wave": "Seluruh tepi layar terdorong ke dalam sesuai kerasnya suara. Sisi asal suara terdorong lebih dalam.",
   "help.mode.pad": "Bilah menyala di 8 titik di sekeliling tepi layar. Mode ini paling jelas menunjukkan arah.",
@@ -212,7 +212,7 @@
   "tray.exit": "Keluar",
 
   "more_info.title": "Repositori GitHub dan kontribusi",
-  "more_info.body": "Sound Visualizer adalah proyek open source, dan kode sumbernya terbuka untuk umum di GitHub. Anda dapat ikut serta dengan melaporkan bug, menyarankan fitur, atau berkontribusi dalam pengembangan. Klik tombol di bawah untuk mengunjungi repositori GitHub resmi! Anda juga dapat memeriksa dan mengunduh versi terbaru di tab Releases di GitHub.",
+  "more_info.body": "SoundVisualizer adalah proyek open source, dan kode sumbernya terbuka untuk umum di GitHub. Anda dapat ikut serta dengan melaporkan bug, menyarankan fitur, atau berkontribusi dalam pengembangan. Klik tombol di bawah untuk mengunjungi repositori GitHub resmi! Anda juga dapat memeriksa dan mengunduh versi terbaru di tab Releases di GitHub.",
   "more_info.github_button": "Kunjungi repositori GitHub",
 
   "dialog.notice_title": "Pemberitahuan",

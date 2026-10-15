@@ -5,7 +5,7 @@
   "common.close": "關閉",
   "language.system": "系統預設",
 
-  "launcher.window_title": "Sound Visualizer 啟動器",
+  "launcher.window_title": "SoundVisualizer 啟動器",
   "launcher.tab.home": "首頁",
   "launcher.tab.settings": "設定",
   "launcher.tab.sounds": "分類",
@@ -142,7 +142,7 @@
   "help.start.1": "在此視窗頂端選擇語言，如有需要，可以在「設定」分頁中變更圖形的外觀。",
   "help.start.2": "在「首頁」按一下「{0}」。",
   "help.start.3": "圖形會沿著螢幕邊緣，繪製在遊戲、影片等其他視窗之上。滑鼠點按會穿過圖形，因此可以繼續操作下方的視窗。",
-  "help.start.4": "如要關閉，請在「首頁」按一下「{0}」，或以滑鼠右鍵按一下工作列通知區域中的 Sound Visualizer 圖示，然後選擇「{0}」。",
+  "help.start.4": "如要關閉，請在「首頁」按一下「{0}」，或以滑鼠右鍵按一下工作列通知區域中的 SoundVisualizer 圖示，然後選擇「{0}」。",
   "help.modes.title": "視覺模式",
   "help.mode.wave": "整個螢幕邊緣會隨著音量向內推進，聲音來源那一側會推進得更深。",
   "help.mode.pad": "螢幕邊緣的 8 個位置會亮起光條，最容易看出聲音的方向。",
@@ -212,7 +212,7 @@
   "tray.exit": "結束",
 
   "more_info.title": "GitHub 存放庫與專案貢獻",
-  "more_info.body": "Sound Visualizer 是開放原始碼專案，原始碼公開在 GitHub 上。你可以透過回報錯誤、建議功能或參與開發來加入這個專案。按一下下方按鈕，前往官方 GitHub 存放庫吧！你也可以在 GitHub 的 Releases 頁面查看並下載最新版本。",
+  "more_info.body": "SoundVisualizer 是開放原始碼專案，原始碼公開在 GitHub 上。你可以透過回報錯誤、建議功能或參與開發來加入這個專案。按一下下方按鈕，前往官方 GitHub 存放庫吧！你也可以在 GitHub 的 Releases 頁面查看並下載最新版本。",
   "more_info.github_button": "前往 GitHub 存放庫",
 
   "dialog.notice_title": "提示",

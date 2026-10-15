@@ -5,7 +5,7 @@
   "common.close": "Kapat",
   "language.system": "Sistem varsayılanı",
 
-  "launcher.window_title": "Sound Visualizer Başlatıcısı",
+  "launcher.window_title": "SoundVisualizer Başlatıcısı",
   "launcher.tab.home": "Ana sayfa",
   "launcher.tab.settings": "Ayarlar",
   "launcher.tab.sounds": "Sesler",
@@ -142,7 +142,7 @@
   "help.start.1": "Bu pencerenin üst kısmından dili seçin ve isterseniz “Ayarlar” sekmesinde grafiklerin görünümünü değiştirin.",
   "help.start.2": "“Ana sayfa” sekmesinde “{0}” düğmesine tıklayın.",
   "help.start.3": "Grafikler, oyun ve video gibi diğer pencerelerin üzerinde, ekranın kenarları boyunca çizilir. Tıklamalar grafiklerin içinden geçer; böylece alttaki pencereyi kullanmaya devam edebilirsiniz.",
-  "help.start.4": "Kapatmak için “Ana sayfa” sekmesindeki “{0}” düğmesine tıklayın ya da görev çubuğunun bildirim alanındaki Sound Visualizer simgesine sağ tıklayıp “{0}” seçeneğini seçin.",
+  "help.start.4": "Kapatmak için “Ana sayfa” sekmesindeki “{0}” düğmesine tıklayın ya da görev çubuğunun bildirim alanındaki SoundVisualizer simgesine sağ tıklayıp “{0}” seçeneğini seçin.",
   "help.modes.title": "Görsel modlar",
   "help.mode.wave": "Ekranın tüm kenarları ses yüksekliğine göre içeri doğru ilerler. Sesin geldiği taraf daha derine uzanır.",
   "help.mode.pad": "Ekran kenarındaki 8 noktada çubuklar yanar. Yönü en net gösteren moddur.",
@@ -212,7 +212,7 @@
   "tray.exit": "Çıkış",
 
   "more_info.title": "GitHub deposu ve katkıda bulunma",
-  "more_info.body": "Sound Visualizer açık kaynaklı bir projedir ve kaynak kodu GitHub'da herkese açıktır. Hata bildirerek, özellik önererek veya geliştirmeye katkıda bulunarak projeye dahil olabilirsiniz. Resmî GitHub deposunu ziyaret etmek için aşağıdaki düğmeye tıklayın! Ayrıca GitHub'daki Releases sekmesinden en son sürümü kontrol edip indirebilirsiniz.",
+  "more_info.body": "SoundVisualizer açık kaynaklı bir projedir ve kaynak kodu GitHub'da herkese açıktır. Hata bildirerek, özellik önererek veya geliştirmeye katkıda bulunarak projeye dahil olabilirsiniz. Resmî GitHub deposunu ziyaret etmek için aşağıdaki düğmeye tıklayın! Ayrıca GitHub'daki Releases sekmesinden en son sürümü kontrol edip indirebilirsiniz.",
   "more_info.github_button": "GitHub deposunu ziyaret et",
 
   "dialog.notice_title": "Bilgi",

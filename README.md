@@ -4,7 +4,7 @@
 
 <br/>
 
-# Sound Visualizer
+# SoundVisualizer
 
 <img width="1024" height="818" alt="SoundVisualizer" src="https://github.com/user-attachments/assets/b11aa5b3-c995-4e36-8ff6-3e2f2c2b2388" />
 
@@ -20,7 +20,7 @@
 
 <br/>
 
-> **Sound Visualizer** is a desktop application that captures real-time system audio and translates its direction, intensity, and meaning into a graphical overlay. 
+> **SoundVisualizer** is a desktop application that captures real-time system audio and translates its direction, intensity, and meaning into a graphical overlay. 
 Going beyond simple waveform rendering, it integrates an AI sound classifier powered by **YAMNet** and **ONNX Runtime** to instantly identify the type of sound playing (ambient, speech, danger) and provide adaptive visual feedback.
 
 > 📱 There is also an Android version: [SoundVisualizer for Android](https://github.com/bibibic76/SoundVisualizer).
@@ -41,7 +41,7 @@ Going beyond simple waveform rendering, it integrates an AI sound classifier pow
 
 ### Enhancing Media Accessibility for the Deaf and Hard of Hearing
 Modern media content, including YouTube, OTT, and gaming, relies heavily on spatial audio to maximize immersion. However, this creates a severe barrier for the deaf and hard of hearing. Traditional subtitle systems only deliver dialogue, completely omitting crucial acoustic information such as **sound direction, footsteps, or urgent sound effects (e.g., gunshots).**
-Sound Visualizer was created to break down these barriers by **visualizing the intensity, classification, and spatial direction of invisible sounds.** Our primary goal is to resolve this information asymmetry and guarantee an equal, fully accessible media consumption environment for everyone.
+SoundVisualizer was created to break down these barriers by **visualizing the intensity, classification, and spatial direction of invisible sounds.** Our primary goal is to resolve this information asymmetry and guarantee an equal, fully accessible media consumption environment for everyone.
 
 ### Expanding Utility for All Users
 This overlay technology is also highly beneficial for gamers, providing a **tactical visual indicator (situational awareness)** in competitive environments. Additionally, it serves as a perfect alternative for users consuming media in public or silent environments where audio output is restricted.
@@ -107,7 +107,7 @@ The project is rigorously engineered for high-performance, real-time background 
 
 ## 🚀 Installation & Quick Start
 
-Sound Visualizer is provided as a lightweight, **portable (no-install)** open-source package for Windows 10/11 (64-bit). You don't need to install .NET.
+SoundVisualizer is provided as a lightweight, **portable (no-install)** open-source package for Windows 10/11 (64-bit). You don't need to install .NET.
 
 1. Go to the **[GitHub Releases](https://github.com/amophi/SoundVisualizer/releases)** page.
 2. Download the latest `SoundVisualizer_vX.Y.zip` file and extract it to any location on your PC.
@@ -140,7 +140,7 @@ The solution has three projects: `SoundVisualizer` (the WPF app), `SoundVisualiz
 
 ## 📄 License
 
-Sound Visualizer is distributed under the **AGPL v3** license to encourage a virtuous cycle in the open-source community. Anyone is welcome to modify the code and share custom UI themes or streaming plugins. See the [LICENSE](LICENSE) file for more information.
+SoundVisualizer is distributed under the **AGPL v3** license to encourage a virtuous cycle in the open-source community. Anyone is welcome to modify the code and share custom UI themes or streaming plugins. See the [LICENSE](LICENSE) file for more information.
 
 For licensing and copyright information regarding third-party libraries (NAudio, ONNX Runtime, etc.) and AI models used in this project, please refer to the [THIRD_PARTY.md](THIRD_PARTY.md) file.
 
