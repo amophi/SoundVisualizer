@@ -927,8 +927,9 @@ namespace SoundVisualizer
             AppSettings.VisualMode = EditPanelVisualModeChips.SelectedIndex;
             AppSettings.Save();
 
-            SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
-            ShowCircleRadius();
+            // 크기·진하기·속도 같은 값은 모드마다 따로 저장된다. 새 모드의 값으로 패널을 다시 채운다(F3 단축키로 바꿀 때와 같다).
+            // 고정 크기 이름과 원형 모드의 반지름 줄도 여기서 함께 바뀐다.
+            LoadSettingsToEditPanel();
 
             // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
             UpdateGuidelinePositions();
