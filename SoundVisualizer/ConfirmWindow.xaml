@@ -15,7 +15,8 @@
     <Border Background="{StaticResource CardBrush}" CornerRadius="20" BorderBrush="{StaticResource ControlBrush}" BorderThickness="1"
             FlowDirection="{Binding FlowDirection, Source={x:Static l:Loc.Instance}}">
         <StackPanel Margin="24">
-            <TextBlock x:Name="TxtTitle" Style="{StaticResource Text.CardTitle}" FontSize="20" Margin="0,0,0,12"/>
+            <!-- 창의 맨 위 제목이라 카드 제목 서식이어도 1단계 제목이다. -->
+            <TextBlock x:Name="TxtTitle" Style="{StaticResource Text.CardTitle}" FontSize="20" Margin="0,0,0,12" AutomationProperties.HeadingLevel="Level1"/>
             <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
                 <TextBlock x:Name="TxtMessage" Style="{StaticResource Text.Body}"/>
             </ScrollViewer>

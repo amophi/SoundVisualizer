@@ -70,7 +70,11 @@
     </Style>
 
     <!-- ===== 글자 ===== -->
+    <!-- 제목 서식은 화면 읽어주기에도 제목(HeadingLevel)으로 알려, 제목으로 건너뛰며 훑을 수 있다.
+         창·탭의 맨 위 제목(Text.Title, Text.Section)은 1단계, 카드 제목(Text.CardTitle)은 그 밑의 2단계다.
+         다른 단계가 맞는 곳(확인 창 제목, 더 알아보기 카드)은 그 자리에서 고쳐 적는다. -->
     <Style x:Key="Text.Title" TargetType="TextBlock">
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level1"/>
         <Setter Property="FontSize" Value="36"/>
         <Setter Property="FontWeight" Value="Black"/>
         <Setter Property="LineHeight" Value="48"/>
@@ -80,6 +84,7 @@
 
     <!-- 설정의 구역 제목 -->
     <Style x:Key="Text.Section" TargetType="TextBlock">
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level1"/>
         <Setter Property="FontSize" Value="22"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
@@ -88,6 +93,7 @@
     </Style>
 
     <Style x:Key="Text.CardTitle" TargetType="TextBlock">
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level2"/>
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
@@ -171,8 +177,10 @@
         <Setter Property="Padding" Value="24,24,24,0"/>
     </Style>
 
-    <!-- 제목을 누르면 펼쳐지는 카드(설정의 모드 카드). 누르는 자리는 제목 줄만이 아니라 카드 위쪽 여백까지 머리 전체다. -->
+    <!-- 제목을 누르면 펼쳐지는 카드(설정의 모드 카드). 누르는 자리는 제목 줄만이 아니라 카드 위쪽 여백까지 머리 전체다.
+         머리 버튼은 화면 읽어주기에 제목으로도 알린다. 단계는 카드의 ui:CardHeading.Level 이다(설정의 모드 카드는 구역 제목 밑의 2단계). -->
     <Style x:Key="ExpanderCard" TargetType="Expander">
+        <Setter Property="ui:CardHeading.Level" Value="Level2"/>
         <Setter Property="Background" Value="{StaticResource CardBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,16"/>
@@ -184,6 +192,7 @@
                         <DockPanel>
                             <ToggleButton x:Name="HeaderButton" DockPanel.Dock="Top" Content="{TemplateBinding Header}"
                                           IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          AutomationProperties.HeadingLevel="{Binding (ui:CardHeading.Level), RelativeSource={RelativeSource TemplatedParent}}"
                                           Cursor="Hand" FocusVisualStyle="{StaticResource FocusRingInset}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">

@@ -306,7 +306,8 @@
                         <StackPanel>
                             <Border Style="{StaticResource Card}">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" Text="{l:Loc more_info.title}"/>
+                                    <!-- 이 탭의 하나뿐인 제목이라 1단계다. -->
+                                    <TextBlock Style="{StaticResource Text.CardTitle}" Margin="0,0,0,8" AutomationProperties.HeadingLevel="Level1" Text="{l:Loc more_info.title}"/>
                                     <TextBlock Style="{StaticResource Text.Body}" Margin="0,0,0,24" Text="{l:Loc more_info.body}"/>
                                     <Button x:Name="BtnMoreInfoGithub" Style="{StaticResource Button.Primary}" HorizontalAlignment="Left" Content="{l:Loc more_info.github_button}" Click="BtnMoreInfoGithub_Click"/>
                                 </StackPanel>
