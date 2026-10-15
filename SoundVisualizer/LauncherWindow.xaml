@@ -60,8 +60,9 @@
                                        AutomationProperties.LiveSetting="Polite"/>
                             <StackPanel x:Name="PanelStopped" Margin="20,8,0,0" Visibility="Collapsed">
                                 <TextBlock Style="{StaticResource Text.Warning}" FontWeight="SemiBold" Text="{l:Loc notice.stopped.title}"/>
-                                <!-- 제목과 내용을 한 번에 읽도록 이 글의 이름에 제목을 함께 넣는다(UpdateNotices). -->
-                                <TextBlock x:Name="TxtStoppedText" Style="{StaticResource Text.Warning}" AutomationProperties.LiveSetting="Polite"/>
+                                <!-- 제목과 내용을 한 번에 읽도록 이 글의 이름에 제목을 함께 넣는다(UpdateNotices).
+                                     사용자가 끄지 않았는데 꺼진 것이라 읽던 것을 끊고 바로 읽는다(Assertive). -->
+                                <TextBlock x:Name="TxtStoppedText" Style="{StaticResource Text.Warning}" AutomationProperties.LiveSetting="Assertive"/>
                                 <!-- 다시 켜는 버튼은 따로 두지 않는다. 바로 아래 실행 버튼이 같은 일을 한다. -->
                                 <Button x:Name="BtnDismissNotice" Style="{StaticResource Button.Text}" HorizontalAlignment="Right" Margin="0,4,0,0"
                                         Content="{l:Loc notice.dismiss}" Click="BtnDismissNotice_Click"/>

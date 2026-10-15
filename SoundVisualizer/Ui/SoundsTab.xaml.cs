@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -58,6 +59,9 @@ namespace SoundVisualizer.Ui
         private SoundFilter _filter = SoundFilter.All;
         private KeptSounds _kept = KeptSounds.Empty;
         private Window? _window;
+
+        /// <summary>화면 읽어주기에 마지막으로 알린 바꾼 소리 수. 처음 그리기 전에는 null 이다.</summary>
+        private int? _announcedChangedCount;
 
         public SoundsTab()
         {
@@ -143,6 +147,47 @@ namespace SoundVisualizer.Ui
             var items = SoundList.Build(_index, AppSettings.SoundTypes, _query, _filter, _kept, AppSettings.ClassifyAdvanced);
             KeyedList.Sync(_rows, items, item => item.Key, row => row.Key, CreateRow, UpdateRow);
             if (scrollToResults) ScrollToResults();
+            AnnounceChangedCount(items.OfType<SoundListItem.Changed>().FirstOrDefault()?.Count);
+        }
+
+        /// <summary>
+        /// 바꾼 소리 수가 달라졌으면(종류를 고르거나 모두 되돌린 뒤) 화면 읽어주기가 새 수를 읽고 지나가게 한다. 처음 그릴 때, 언어나 거르기만
+        /// 바뀐 때, 다른 탭을 보는 동안(설정 탭의 전체 초기화)에는 알리지 않는다.
+        /// 수를 적은 줄이 만들어져 있으면 그 글(살아 있는 영역)을 읽힌다. 목록을 멀리 내려가 그 줄을 아직 그리지 않았으면 탭이 같은 글을
+        /// 알림으로 읽힌다(그리지 않은 줄에는 읽힐 글이 없다).
+        /// </summary>
+        private void AnnounceChangedCount(int? count)
+        {
+            int? previous = _announcedChangedCount;
+            _announcedChangedCount = count;
+            if (previous is null || count is null || count == previous || !IsVisible) return;
+
+            var row = _rows.OfType<ChangedRow>().FirstOrDefault();
+            if (row is null) return;
+            if (ContainerOf(row) is { } container && FindLiveText(container) is { IsVisible: true } text)
+            {
+                if (AutomationPeer.ListenerExists(AutomationEvents.LiveRegionChanged))
+                {
+                    UIElementAutomationPeer.CreatePeerForElement(text)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+                }
+                return;
+            }
+            UIElementAutomationPeer.CreatePeerForElement(this)?.RaiseNotificationEvent(
+                AutomationNotificationKind.ActionCompleted, AutomationNotificationProcessing.MostRecent, row.CountText, "SoundsChangedCount");
+        }
+
+        private FrameworkElement? ContainerOf(SoundRow row) => List.ItemContainerGenerator.ContainerFromItem(row) as FrameworkElement;
+
+        /// <summary>줄 안에서 살아 있는 영역(AutomationProperties.LiveSetting)인 글을 찾는다.</summary>
+        private static TextBlock? FindLiveText(DependencyObject root)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(root, i);
+                if (child is TextBlock text && AutomationProperties.GetLiveSetting(text) != AutomationLiveSetting.Off) return text;
+                if (FindLiveText(child) is { } deeper) return deeper;
+            }
+            return null;
         }
 
         private SoundRow CreateRow(SoundListItem item)

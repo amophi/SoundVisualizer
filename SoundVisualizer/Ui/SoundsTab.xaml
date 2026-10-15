@@ -418,14 +418,16 @@
             </StackPanel>
         </DataTemplate>
 
-        <!-- 바꾼 소리 수와 모두 되돌리기. 소리를 센다(묶음 하나를 바꾸면 그 소리 수만큼 는다). -->
+        <!-- 바꾼 소리 수와 모두 되돌리기. 소리를 센다(묶음 하나를 바꾸면 그 소리 수만큼 는다).
+             수가 바뀌면 화면 읽어주기가 읽고 지나간다(SoundsTab.AnnounceChangedCount). -->
         <DataTemplate DataType="{x:Type ui:ChangedRow}">
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{Binding CountText}"/>
+                <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{Binding CountText}"
+                           AutomationProperties.LiveSetting="Polite"/>
                 <Button Grid.Column="1" Margin="12,0,0,0" Style="{StaticResource TextButton}" Content="{l:Loc sounds.reset.button}"
                         IsEnabled="{Binding CanReset}" Click="ResetAll_Click"/>
             </Grid>
