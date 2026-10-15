@@ -9,6 +9,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer
 {
@@ -18,8 +19,21 @@ namespace SoundVisualizer
     /// </summary>
     public partial class ColorPickerWindow : Window
     {
-        // 미리 담긴 색(흰, 빨강, 주황, 노랑, 초록, 청록, 파랑, 자홍). 안드로이드 색 선택 창과 같은 여덟 색이다.
-        private static readonly uint[] PresetColors = { 0xFFFFFF, 0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0080FF, 0xFF00FF };
+        // 미리 담긴 색(흰, 빨강, 주황, 노랑, 초록, 청록, 파랑, 자홍)과 그 이름. 안드로이드 색 선택 창과 같은 여덟 색, 같은 이름(cd_preset_*)이다.
+        private static readonly (uint Rgb, string NameKey)[] PresetColors =
+        {
+            (0xFFFFFF, "color_picker.preset.white"),
+            (0xFF0000, "color_picker.preset.red"),
+            (0xFF7F00, "color_picker.preset.orange"),
+            (0xFFFF00, "color_picker.preset.yellow"),
+            (0x00FF00, "color_picker.preset.green"),
+            (0x00FFFF, "color_picker.preset.cyan"),
+            (0x0080FF, "color_picker.preset.blue"),
+            (0xFF00FF, "color_picker.preset.magenta"),
+        };
+
+        // 색상 막대 값을 읽을 때 붙이는 도 기호. 앱 소스의 문자열에는 ASCII 만 쓰므로 글자 코드로 적는다.
+        private const char Degree = (char)0xB0;
 
         // 사각형 손잡이(지름 22)와 색상 막대 손잡이(지름 22, 막대 높이 28 에서 3 씩 안쪽)의 반지름
         private const double ThumbRadius = 11;
@@ -52,7 +66,7 @@ namespace SoundVisualizer
 
         private void BuildPresets()
         {
-            foreach (uint rgb in PresetColors)
+            foreach (var (rgb, nameKey) in PresetColors)
             {
                 var color = FromRgb(rgb);
                 var button = new RadioButton
@@ -62,8 +76,9 @@ namespace SoundVisualizer
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Tag = color,
                 };
-                // 화면 읽어주기용 이름. 색 이름 표가 없어 어느 언어에서나 같은 16진 코드로 읽는다.
-                AutomationProperties.SetName(button, ToDisplayHex(color));
+                // 화면 읽어주기는 색 이름("빨간색")을 읽고, 16진 코드는 도움말로 덧붙인다. 이름은 툴팁으로도 보인다(PresetChoice).
+                button.SetBinding(AutomationProperties.NameProperty, Loc.BindingFor(nameKey));
+                AutomationProperties.SetHelpText(button, ToDisplayHex(color));
                 // Click 이 아니라 Checked 로 받는다. 화면 읽어주기의 "선택"은 IsChecked 만 바꾸고 Click 을 일으키지 않는다.
                 button.Checked += Preset_Checked;
                 _presetButtons.Add(button);
@@ -210,6 +225,10 @@ namespace SoundVisualizer
             SVHue.Background = new SolidColorBrush(HsvToColor(_hue, 1, 1));
             ColorPreview.Background = new SolidColorBrush(_color);
 
+            // 화면 읽어주기가 읽는 값. 화살표로 옮길 때마다 바뀐 값을 다시 읽는다.
+            SVBorder.ValueText = Loc.Format("color_picker.area_value", Percent(_saturation), Percent(_brightness));
+            HueBorder.ValueText = Math.Round(_hue).ToString(CultureInfo.InvariantCulture) + Degree;
+
             double width = SVBorder.ActualWidth, height = SVBorder.ActualHeight;
             if (width > 0 && height > 0)
             {
@@ -290,5 +309,7 @@ namespace SoundVisualizer
         }
 
         private static byte ToByte(double unit) => (byte)Math.Clamp(Math.Round(unit * 255, MidpointRounding.AwayFromZero), 0, 255);
+
+        private static int Percent(double unit) => (int)Math.Round(unit * 100, MidpointRounding.AwayFromZero);
     }
 }

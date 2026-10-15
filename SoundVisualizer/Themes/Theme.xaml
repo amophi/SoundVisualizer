@@ -436,12 +436,14 @@
     </Style>
 
     <!-- 색 선택 창의 미리 담긴 색. 동그라미는 30px, 누르는 칸은 48px 이다(안드로이드와 같다). 지금 색과 같은 칸은 흰 고리로 보인다.
-         라디오 버튼이라 화면 읽어주기가 고른 칸을 "선택됨"으로 읽는다. -->
+         라디오 버튼이라 화면 읽어주기가 고른 칸을 "선택됨"으로 읽는다. 색 이름(AutomationProperties.Name)을 툴팁으로도 보여,
+         색을 가려 보기 어려운 사람도 마우스를 올려 무슨 색인지 안다. -->
     <Style x:Key="PresetChoice" TargetType="RadioButton">
         <Setter Property="Width" Value="48"/>
         <Setter Property="Height" Value="48"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingRound}"/>
+        <Setter Property="ToolTip" Value="{Binding (AutomationProperties.Name), RelativeSource={RelativeSource Self}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
