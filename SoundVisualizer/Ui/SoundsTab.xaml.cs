@@ -544,10 +544,15 @@ namespace SoundVisualizer.Ui
         /// 찾는 말·거르기와 상관없이 모든 묶음을 저장값으로 보고, 있으면 먼저 알린다. 모드만 바꾸고 바꾼 종류는 그대로다.
         /// Click 이 아니라 켜짐·꺼짐으로 받는다. 화면 읽어주기의 전환(Toggle)은 IsChecked 만 바꾸고 Click 을 일으키지 않는다.
         /// 저장값과 같아진 것(바인딩이 넣은 값, 되돌린 값)은 그냥 넘긴다.
+        ///
+        /// 스위치의 줄이 IntroRow 가 아니면 사용자가 바꾼 것이 아니다. 목록은 줄을 다시 쓰므로(Recycling), 스크롤해 화면 밖으로 나간 소개
+        /// 줄의 칸이 다른 줄(카드, 소리)에 쓰일 때 새 줄이 먼저 칸의 DataContext 로 들어가고 서식은 그 뒤에 바뀐다. 그 사이 남아 있던
+        /// 스위치의 바인딩이 IsAdvanced 를 찾지 못해 꺼짐이 되어, 스크롤만 해도 고급 모드가 꺼지거나(하나씩 바꾼 묶음이 있으면 묻는 창이
+        /// 뜨거나) 목록을 그리는 도중에 목록을 다시 만들어 앱이 예외로 끝났다.
         /// </summary>
         private void AdvancedSwitch_Changed(object sender, RoutedEventArgs e)
         {
-            if (sender is not CheckBox box) return;
+            if (sender is not CheckBox { DataContext: IntroRow } box) return;
             bool on = box.IsChecked == true;
             if (on == AppSettings.ClassifyAdvanced) return;
 
