@@ -83,7 +83,7 @@
 
         <!-- 실시간 오버레이 편집 모드 패널 (F4) -->
         <Grid x:Name="EditOverlayGrid" Visibility="Collapsed" Background="#F22A2C31">
-            <!-- 가이드라인 인터랙션 영역 -->
+            <!-- 가이드라인 인터랙션 영역. 마우스로 끄는 값(크기, 원형 모드의 반지름)은 모두 왼쪽 패널의 슬라이더로도 바꿀 수 있다. -->
             <Canvas x:Name="GuidelineCanvas" Background="Transparent" MouseDown="GuidelineCanvas_MouseDown" MouseMove="GuidelineCanvas_MouseMove" MouseUp="GuidelineCanvas_MouseUp">
                 <!-- 사각형 가이드라인 (파도 / 패드 / 외곽선 모드) -->
                 <Border x:Name="RectGuideline" BorderBrush="{StaticResource GuideRedBrush}" BorderThickness="2" CornerRadius="10" Background="Transparent" Visibility="Collapsed">
@@ -92,7 +92,7 @@
                     </Border.Effect>
                     <Grid>
                         <Grid.Resources>
-                            <Style TargetType="Thumb">
+                            <Style TargetType="ui:MouseOnlyThumb">
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Thumb">
@@ -104,11 +104,12 @@
                         </Grid.Resources>
                         <!-- 영역 명칭 및 크기값 제거 (화면 상단으로 이동됨) -->
                         
-                        <!-- 크기 조절용 4개 모서리 Thumb (드래그 감지) -->
-                        <Thumb x:Name="ResizeHandle_NW" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
-                        <Thumb x:Name="ResizeHandle_NE" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
-                        <Thumb x:Name="ResizeHandle_SW" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
-                        <Thumb x:Name="ResizeHandle_SE" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                        <!-- 크기 조절용 4개 모서리 Thumb (드래그 감지). 마우스로만 끈다. 같은 값(크기, 크기 고정이면 고정 크기)을 왼쪽 패널의
+                             슬라이더가 바꾸므로, 키보드와 화면 읽어주기는 그 슬라이더를 쓰고 손잡이는 화면 읽어주기에서 숨긴다(MouseOnlyThumb). -->
+                        <ui:MouseOnlyThumb x:Name="ResizeHandle_NW" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
+                        <ui:MouseOnlyThumb x:Name="ResizeHandle_NE" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <ui:MouseOnlyThumb x:Name="ResizeHandle_SW" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNESW" DragDelta="ResizeHandle_DragDelta"/>
+                        <ui:MouseOnlyThumb x:Name="ResizeHandle_SE" Width="14" Height="14" Background="{StaticResource GuideBlueBrush}" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-7" Cursor="SizeNWSE" DragDelta="ResizeHandle_DragDelta"/>
                     </Grid>
                 </Border>
 
@@ -225,6 +226,10 @@
                                         <Slider x:Name="EditPanelOpacitySlider" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100"
                                                 ui:SettingRow.Label="{l:Loc settings.opacity.title}" ui:SettingRow.ValueFormat="{}{0:F0}%" ValueChanged="EditPanelSlider_ValueChanged"/>
                                     </StackPanel>
+                                    <!-- 원형 모드의 반지름(가운데 점선 고리). 화면에서 고리를 마우스로 끄는 것과 같은 값이라, 키보드로도 바꿀 수 있게
+                                         둔다. 원형 모드에서만 보인다(런처의 원형 모드 카드와 같은 범위). -->
+                                    <Slider x:Name="EditPanelCircleRadiusSlider" Style="{StaticResource SliderRow}" Minimum="10" Maximum="100" Visibility="Collapsed"
+                                            ui:SettingRow.Label="{l:Loc settings.radius.title}" ValueChanged="EditPanelSlider_ValueChanged"/>
                                     <Slider x:Name="EditPanelSpeedSlider" Style="{StaticResource SliderRow}" Minimum="1" Maximum="100"
                                             ui:SettingRow.Label="{l:Loc settings.speed.title}" ValueChanged="EditPanelSlider_ValueChanged"/>
                                     <Slider x:Name="EditPanelSensitivitySlider" Style="{StaticResource SliderRow}" Minimum="0" Maximum="100"

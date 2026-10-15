@@ -860,6 +860,7 @@ namespace SoundVisualizer
 
             EditPanelIntensityAsOpacityCheckBox.IsChecked = AppSettings.IntensityAsOpacity;
             ShowSizeRows(AppSettings.IntensityAsOpacity);
+            ShowCircleRadius();
             SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
             EditPanelOpacityFixedSizeSlider.Value = AppSettings.OpacityFixedSize;
             EditPanelOpacityFixedMaxOpacitySlider.Value = AppSettings.OpacityFixedMaxOpacity;
@@ -904,6 +905,21 @@ namespace SoundVisualizer
             EditPanelSizeFreeRows.Visibility = sizeLocked ? Visibility.Collapsed : Visibility.Visible;
         }
 
+        /// <summary>
+        /// 원형 모드면 반지름 슬라이더를 보이고 지금 값을 넣는다. 화면의 점선 고리를 마우스로 끄는 것과 같은 값을 키보드로도 바꾸게 한다.
+        /// 값을 넣는 동안은 슬라이더 처리기가 설정에 다시 쓰지 않는다.
+        /// </summary>
+        private void ShowCircleRadius()
+        {
+            bool circle = AppSettings.VisualMode == 2;
+            EditPanelCircleRadiusSlider.Visibility = circle ? Visibility.Visible : Visibility.Collapsed;
+            if (!circle) return;
+            bool wasUpdating = _isUpdatingEditPanelSliders;
+            _isUpdatingEditPanelSliders = true;
+            EditPanelCircleRadiusSlider.Value = AppSettings.CircleRadius;
+            _isUpdatingEditPanelSliders = wasUpdating;
+        }
+
         private void EditPanelVisualMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isUpdatingEditPanelSliders) return;
@@ -912,6 +928,7 @@ namespace SoundVisualizer
             AppSettings.Save();
 
             SettingRow.SetLabel(EditPanelOpacityFixedSizeSlider, Loc.Get(FixedSizeKeys[AppSettings.VisualMode]));
+            ShowCircleRadius();
 
             // 모드가 변경되면 그에 맞추어 UI 정보와 가이드라인 형태도 리셋
             UpdateGuidelinePositions();
@@ -968,6 +985,11 @@ namespace SoundVisualizer
             else if (sender == EditPanelTargetFpsSlider)
             {
                 AppSettings.TargetFps = EditPanelTargetFpsSlider.Value;
+            }
+            else if (sender == EditPanelCircleRadiusSlider)
+            {
+                AppSettings.CircleRadius = EditPanelCircleRadiusSlider.Value;
+                UpdateGuidelinePositions();
             }
 
             AppSettings.Save();
@@ -1366,6 +1388,7 @@ namespace SoundVisualizer
                         if (circleRadius > 100.0) circleRadius = 100.0;
 
                         AppSettings.CircleRadius = circleRadius;
+                        EditPanelCircleRadiusSlider.Value = AppSettings.CircleRadius;
                     }
                 }
                 else if (_isDraggingCircleIntensity)
