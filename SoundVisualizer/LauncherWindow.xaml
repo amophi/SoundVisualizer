@@ -33,7 +33,7 @@
                 </StackPanel>
             </Grid>
 
-            <TabControl Grid.Row="1" Style="{StaticResource LauncherTabs}" Margin="24,20,24,0">
+            <TabControl x:Name="Tabs" Grid.Row="1" Style="{StaticResource LauncherTabs}" Margin="24,20,24,0">
 
                 <!-- 홈 (실행) 탭 -->
                 <TabItem x:Name="TabHome" Header="{l:Loc launcher.tab.home}">

@@ -450,6 +450,27 @@ namespace SoundVisualizer
             }
         }
 
+        /// <summary>
+        /// Ctrl+Tab · Ctrl+Shift+Tab 으로 다음·이전 탭으로 간다. 초점이 탭 안에 있으면 TabControl 이 먼저 옮기므로, 여기에는 제목줄(언어 콤보,
+        /// 최소화·닫기)에 초점이 있을 때만 온다. 그대로 두면 Ctrl+Tab 이 Tab 처럼 다음 칸으로만 간다.
+        /// </summary>
+        protected override void OnKeyDown(System.Windows.Input.KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            var modifiers = System.Windows.Input.Keyboard.Modifiers;
+            if (e.Handled || e.Key != System.Windows.Input.Key.Tab || (modifiers & System.Windows.Input.ModifierKeys.Control) == 0) return;
+
+            int count = Tabs.Items.Count;
+            bool back = (modifiers & System.Windows.Input.ModifierKeys.Shift) != 0;
+            int next = (Math.Max(0, Tabs.SelectedIndex) + (back ? count - 1 : 1)) % count;
+            if (Tabs.ItemContainerGenerator.ContainerFromIndex(next) is TabItem tab)
+            {
+                tab.IsSelected = true;
+                tab.Focus();
+                e.Handled = true;
+            }
+        }
+
         private void Setting_Changed(object sender, RoutedEventArgs e)
         {
             if (_isInitializing) return;

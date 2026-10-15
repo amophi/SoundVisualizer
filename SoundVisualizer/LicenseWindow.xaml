@@ -89,11 +89,17 @@
                      SelectionBrush="{StaticResource AccentFillBrush}" CaretBrush="{StaticResource PrimaryTextBrush}"
                      TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"
                      AutomationProperties.Name="{l:Loc help.licenses.title}" SizeChanged="TxtLicenses_SizeChanged">
+                <!-- 키보드 초점은 테두리 색으로 보인다(색 코드 입력칸과 같다). 테두리 두께만큼 안쪽 여백을 줄여 글자 자리는 그대로다. -->
                 <TextBox.Template>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{StaticResource BackgroundBrush}" CornerRadius="12" Padding="16,12,8,12">
+                        <Border x:Name="Frame" Background="{StaticResource BackgroundBrush}" BorderBrush="Transparent" BorderThickness="2" CornerRadius="12" Padding="14,10,6,10">
                             <ScrollViewer x:Name="PART_ContentHost" Focusable="False"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </TextBox.Template>
             </TextBox>

@@ -1134,6 +1134,18 @@ namespace SoundVisualizer
             }
         }
 
+        /// <summary>
+        /// 편집 패널에서 Esc 는 단축키(기본 F4)와 같이 저장하고 닫는다. 화면 전체를 덮는 패널이라 키보드로 쓰는 사람에게 닫는 키가 하나 더
+        /// 있어야 한다(단축키는 바꿀 수 있어 무엇인지 기억해야 한다). 언어 목록이 열려 있거나 단축키를 받는 중이면 그쪽이 Esc 를 먼저 가져간다.
+        /// </summary>
+        protected override void OnKeyDown(System.Windows.Input.KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.Handled || !_isEditMode || e.Key != System.Windows.Input.Key.Escape) return;
+            ToggleEditMode(false);
+            e.Handled = true;
+        }
+
         private void EditPanelAdmin_Changed(object sender, RoutedEventArgs e)
         {
             if (_isUpdatingEditPanelSliders) return;

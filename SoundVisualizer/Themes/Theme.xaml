@@ -917,8 +917,11 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <!-- TabPanel 은 탭의 Margin 을 무시하고 탭 안으로 밀어 넣어 글자가 잘린다. WrapPanel 은 간격을 지키고,
-                             이름이 길면 순서대로 다음 줄로 넘긴다(TabPanel 은 고른 탭의 줄을 맨 아래로 옮긴다). -->
-                        <WrapPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1"/>
+                             이름이 길면 순서대로 다음 줄로 넘긴다(TabPanel 은 고른 탭의 줄을 맨 아래로 옮긴다).
+                             키보드는 TabPanel 처럼 둔다: 탭 줄에서는 Tab 이 한 번만 멈추고(지금 탭), 탭끼리는 화살표로 옮긴다.
+                             탭마다 멈추면 탭에 초점이 갈 때마다 그 탭이 골라져, Tab 만으로는 마지막 탭(더 알아보기)의 내용에만 닿는다. -->
+                        <WrapPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1"
+                                   KeyboardNavigation.TabNavigation="Once" KeyboardNavigation.DirectionalNavigation="Cycle"/>
                         <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1" ContentSource="SelectedContent" KeyboardNavigation.TabIndex="2"/>
                     </Grid>
                 </ControlTemplate>
