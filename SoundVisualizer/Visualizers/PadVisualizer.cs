@@ -10,10 +10,7 @@ namespace SoundVisualizer.Visualizers
     public class PadVisualizer : IVisualizerMode
     {
         private const int N = 16; // 폴리곤 해상도 최적화 (기존 30 -> 16)
-        
-        // 8개 채널 각각의 패드 두께를 독립적으로 저장하여 부드러운 애니메이션 적용
-        private readonly double[] _padThicknesses = new double[8];
-        
+
         // 매 프레임 가비지 할당을 차단하기 위해 셰이프 지오메트리 계산용 포인트 배열 캐싱 (GC Free)
         private readonly Point[] _outerPts = new Point[N + 1];
         private readonly Point[] _innerPts = new Point[N + 1];
@@ -24,10 +21,10 @@ namespace SoundVisualizer.Visualizers
             double w = context.Width;
             double h = context.Height;
             double P = 2 * (w + h);
-            
-            // 0번 모드(Wave)와 동일하게 매핑된 소리 깊이(Volume) 배열을 사용
+
+            // 파도와 같은 자리 순서의 패드 두께. 깊이를 부드럽게 따라가는 움직임은 엔진(VisualizerEngine)이 시간에 맞춰 계산한다.
             // 0:FC, 1:FR, 2:SR, 3:BR, 4:BC(Phantom), 5:BL, 6:SL, 7:FL
-            double[] depths = context.ChannelDepths;
+            double[] thicknesses = context.PadThickness;
 
             // 각 채널이 모니터 테두리 상에서 위치할 중심점(Distance)
             _centerDists[0] = 0;                             // 0: 상단 중앙 (FC)
@@ -48,18 +45,11 @@ namespace SoundVisualizer.Visualizers
             {
                 for (int c = 0; c < 8; c++)
                 {
-                    // 파도(Wave) 모드용으로 크게 스케일된 깊이를 패드 두께에 맞게 조정 (크기 상향)
-                    double targetThickness = depths[c] * 0.25; 
-                    if (targetThickness > 55) targetThickness = 55; // 최대 두께 제한
-                    
-                    // 부드러운 애니메이션 (Lerp)
-                    _padThicknesses[c] += (targetThickness - _padThicknesses[c]) * 0.3;
-
-                    if (_padThicknesses[c] < 0.5) continue; // 소리가 거의 없으면 그리지 않음
+                    if (thicknesses[c] < 0.5) continue; // 소리가 거의 없으면 그리지 않음
 
                     isAnyVisible = true;
                     double centerDist = _centerDists[c];
-                    double maxThickness = _padThicknesses[c];
+                    double maxThickness = thicknesses[c];
                     
                     // 패드 길이 설정 (디스플레이 높이의 1/4 정도)
                     double barLen = h / 4.0; 

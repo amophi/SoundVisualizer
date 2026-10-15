@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundVisualizer.Core\SoundVisualizer.Core.csproj" />
+  </ItemGroup>
+
+  <!-- AI 이식 검증용 기준 데이터(Python 기준 구현에서 만든 float32 리틀엔디언 배열)와 앱이 쓰는 YAMNet 모델 -->
+  <ItemGroup>
+    <None Include="Ai\Reference\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\SoundVisualizer\AIModel\yamnet.onnx" Link="Models\yamnet.onnx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\SoundVisualizer\AIModel\yamnet.data" Link="Models\yamnet.data" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\SoundVisualizer\AIModel\yamnet_class_map.csv" Link="Models\yamnet_class_map.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

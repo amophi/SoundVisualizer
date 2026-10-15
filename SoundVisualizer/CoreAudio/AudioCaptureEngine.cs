@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer.CoreAudio
 {
@@ -31,9 +32,13 @@ namespace SoundVisualizer.CoreAudio
         private WasapiLoopbackCapture? _captureDevice;
         private MMDeviceEnumerator? _notificationEnumerator;
         private CancellationTokenSource? _restartCts;
-        private bool _isCapturing;
+        private volatile bool _isCapturing;
         private bool _firstDataLogged;
-        private bool _isDisposed;
+        private volatile bool _isDisposed;
+
+        // 장치 열기·닫기를 한 번에 하나만 한다. 장치 변경 알림으로 다시 여는 스레드(스레드 풀)와 멈추는 UI 스레드가
+        // 엇갈리면 이미 닫은 장치를 다시 열거나 같은 장치를 두 번 닫을 수 있었다.
+        private readonly object _deviceLock = new();
 
         // Latency 측정용
         private readonly Stopwatch _latencyWatch = new();
@@ -63,89 +68,95 @@ namespace SoundVisualizer.CoreAudio
 
         private void StartCaptureDevice()
         {
-            if (_isDisposed) return;
-
-            try
+            lock (_deviceLock)
             {
-                using var enumerator = new MMDeviceEnumerator();
-                var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                if (_isDisposed) return;
 
-                if (devices.Count == 0)
+                try
                 {
-                    string msg = "출력 장치를 찾을 수 없습니다.";
-                    OnCaptureError?.Invoke(this, msg);
-                    return;
+                    using var enumerator = new MMDeviceEnumerator();
+                    var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+
+                    if (devices.Count == 0)
+                    {
+                        string msg = Loc.Get("audio.error.no_device");
+                        OnCaptureError?.Invoke(this, msg);
+                        return;
+                    }
+
+                    // 실제 소리가 나오는 기본 출력 장치에서 캡처
+                    // CABLE Input 등 가상 장치를 우선하면 해당 장치가 기본 출력이 아닐 때 소리가 안 잡힘
+                    var targetDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+
+                    int currentChannels = targetDevice.AudioClient.MixFormat.Channels;
+                    OnChannelsChanged?.Invoke(this, currentChannels);
+
+
+                    _captureDevice = new WasapiLoopbackCapture(targetDevice);
+                    var format = _captureDevice.WaveFormat;
+                    int channels = format.Channels;
+
+                    _captureDevice.DataAvailable += (sender, args) =>
+                    {
+                        if (args.BytesRecorded == 0) return;
+
+                        if (!_firstDataLogged)
+                        {
+                            _firstDataLogged = true;
+                        }
+
+                        _latencyWatch.Restart();
+
+                        var eventArgs = new AudioDataAvailableEventArgs(args.Buffer, args.BytesRecorded, channels);
+                        OnAudioDataAvailable?.Invoke(this, eventArgs);
+
+                        _latencyWatch.Stop();
+                        LastLatencyMs = _latencyWatch.Elapsed.TotalMilliseconds;
+                        _totalLatencyMs += LastLatencyMs;
+                        _latencySampleCount++;
+
+                        if (_latencySampleCount % _logInterval == 0)
+                        {
+                        }
+                    };
+
+                    _captureDevice.RecordingStopped += (sender, args) =>
+                    {
+                        _isCapturing = false;
+
+                        if (args.Exception != null)
+                        {
+                            string msg = Loc.Format("audio.error.capture_stopped", args.Exception.Message);
+                            OnCaptureError?.Invoke(this, msg);
+                        }
+                        else
+                        {
+                        }
+                    };
+
+                    _captureDevice.StartRecording();
+                    _isCapturing = true;
                 }
-
-                // 실제 소리가 나오는 기본 출력 장치에서 캡처
-                // CABLE Input 등 가상 장치를 우선하면 해당 장치가 기본 출력이 아닐 때 소리가 안 잡힘
-                var targetDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-
-                int currentChannels = targetDevice.AudioClient.MixFormat.Channels;
-                OnChannelsChanged?.Invoke(this, currentChannels);
-
-
-                _captureDevice = new WasapiLoopbackCapture(targetDevice);
-                var format = _captureDevice.WaveFormat;
-                int channels = format.Channels;
-
-                _captureDevice.DataAvailable += (sender, args) =>
-                {
-                    if (args.BytesRecorded == 0) return;
-
-                    if (!_firstDataLogged)
-                    {
-                        _firstDataLogged = true;
-                    }
-
-                    _latencyWatch.Restart();
-
-                    var eventArgs = new AudioDataAvailableEventArgs(args.Buffer, args.BytesRecorded, channels);
-                    OnAudioDataAvailable?.Invoke(this, eventArgs);
-
-                    _latencyWatch.Stop();
-                    LastLatencyMs = _latencyWatch.Elapsed.TotalMilliseconds;
-                    _totalLatencyMs += LastLatencyMs;
-                    _latencySampleCount++;
-
-                    if (_latencySampleCount % _logInterval == 0)
-                    {
-                    }
-                };
-
-                _captureDevice.RecordingStopped += (sender, args) =>
+                catch (Exception ex)
                 {
                     _isCapturing = false;
-
-                    if (args.Exception != null)
-                    {
-                        string msg = $"캡처 비정상 종료: {args.Exception.Message}";
-                        OnCaptureError?.Invoke(this, msg);
-                    }
-                    else
-                    {
-                    }
-                };
-
-                _captureDevice.StartRecording();
-                _isCapturing = true;
-            }
-            catch (Exception ex)
-            {
-                _isCapturing = false;
-                string msg = $"캡처 엔진 시작 실패: {ex.Message}";
-                OnCaptureError?.Invoke(this, msg);
+                    string msg = Loc.Format("audio.error.capture_start_failed", ex.Message);
+                    AppLog.Warn("capture", "캡처 장치를 열지 못했습니다.", ex);
+                    OnCaptureError?.Invoke(this, msg);
+                }
             }
         }
 
         public void StopCapture()
         {
-            if (_isDisposed) return;
-            _isDisposed = true;
+            lock (_deviceLock)
+            {
+                if (_isDisposed) return;
+                _isDisposed = true;
 
-            _restartCts?.Cancel();
-            _restartCts?.Dispose();
-            _restartCts = null;
+                _restartCts?.Cancel();
+                _restartCts = null;
+            }
 
             if (_notificationEnumerator != null)
             {
@@ -167,48 +178,62 @@ namespace SoundVisualizer.CoreAudio
 
         private void StopCaptureDevice()
         {
-            try
+            lock (_deviceLock)
             {
-                if (_captureDevice != null)
+                try
                 {
-                    _captureDevice.StopRecording();
-                    _captureDevice.Dispose();
+                    if (_captureDevice != null)
+                    {
+                        _captureDevice.StopRecording();
+                        _captureDevice.Dispose();
+                        _captureDevice = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Warn("capture", "캡처 장치를 닫다가 실패했습니다.", ex);
                     _captureDevice = null;
                 }
-            }
-            catch (Exception)
-            {
-            }
-            finally
-            {
-                _isCapturing = false;
+                finally
+                {
+                    _isCapturing = false;
+                }
             }
         }
 
         // 장치 변경 또는 속성 변경(스피커 구성 등) 감지 시 캡처 장치 재시작
         private void TriggerRestart()
         {
-            if (_isDisposed) return;
+            CancellationToken token;
+            lock (_deviceLock)
+            {
+                if (_isDisposed) return;
 
-            _restartCts?.Cancel();
-            _restartCts = new CancellationTokenSource();
-            var token = _restartCts.Token;
+                // 알림은 여러 스레드에서 연달아 온다. 앞선 예약은 취소하고 마지막 것만 남긴다.
+                _restartCts?.Cancel();
+                _restartCts = new CancellationTokenSource();
+                token = _restartCts.Token;
+            }
 
             Task.Run(async () =>
             {
                 try
                 {
                     await Task.Delay(500, token); // 장치 초기화 안정화 대기
-                    if (token.IsCancellationRequested || _isDisposed) return;
+                    lock (_deviceLock)
+                    {
+                        if (token.IsCancellationRequested || _isDisposed) return;
 
-                    StopCaptureDevice();
-                    if (_isDisposed) return;
-                    _firstDataLogged = false;
-                    StartCaptureDevice();
+                        StopCaptureDevice();
+                        _firstDataLogged = false;
+                        StartCaptureDevice();
+                    }
                 }
                 catch (OperationCanceledException) { }
-                catch (Exception)
+                catch (ObjectDisposedException) { }
+                catch (Exception ex)
                 {
+                    AppLog.Warn("capture", "장치가 바뀐 뒤 캡처를 다시 열지 못했습니다.", ex);
                 }
             });
         }

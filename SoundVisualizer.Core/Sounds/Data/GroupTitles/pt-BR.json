@@ -1,0 +1,17 @@
+{
+  "horns": "Buzinas e alarmes de carro",
+  "vehicle_warnings": "Sinais de alerta de veículos",
+  "breaking": "Vidro quebrado e pancadas",
+  "talking": "Fala e sussurros",
+  "distress": "Gritos e choro",
+  "signals": "Despertadores, bipes e apitos",
+  "voices": "Aplausos, cantarolar e assobios",
+  "water": "Torneiras e água corrente",
+  "kitchen": "Cozinha e comida",
+  "appliances": "Eletrodomésticos e relógios",
+  "tools": "Ferramentas e máquinas",
+  "nature": "Natureza e clima",
+  "body": "Tosse, respiração e sons do corpo",
+  "objects": "Objetos e sons curtos",
+  "background": "TV, rádio e som de fundo"
+}

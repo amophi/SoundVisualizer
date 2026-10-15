@@ -1,0 +1,76 @@
+{
+  "description": "Semantic realtime E2E: 44.1k stereo -> FIR resample -> YAMNet + Booster",
+  "capture_sample_rate": 44100,
+  "required_mono_16k": 15600,
+  "capture_window_samples": 42998,
+  "cases": {
+    "silence": {
+      "source": {
+        "type": "procedural_silence",
+        "sample_rate": 44100,
+        "sha256": null
+      },
+      "pre_booster_coarse": "ambient",
+      "gunshot_score": 0.5055228471755981,
+      "booster_accepted": false,
+      "ui_coarse": "ambient",
+      "ui_display": "Silence"
+    },
+    "gunshot": {
+      "source": {
+        "type": "wav",
+        "title": "8-bit explosion gun",
+        "provider": "Mixkit",
+        "asset_id": 2779,
+        "download_filename": "mixkit-8-bit-explosion-gun-2779.wav",
+        "fixture_filename": "Gunshot, gunfire_8-bit-explosion-gun-2779.wav",
+        "catalog_url": "https://mixkit.co/free-sound-effects/explosion/",
+        "license": "Mixkit Sound Effects Free License",
+        "license_url": "https://mixkit.co/license/#sfxFree",
+        "sample_rate": 44100,
+        "channels": 2,
+        "sha256": "5b76ee075ae48fa2ee26a4099a0c643855a4d66c477f7e99966edd835ca64b8a",
+        "capture_resampler": {
+          "taps": 192,
+          "window": "Kaiser",
+          "beta": 12.0,
+          "cutoff_hz": 7800.0
+        }
+      },
+      "pre_booster_coarse": "ambient",
+      "gunshot_score": 0.5068124532699585,
+      "booster_accepted": true,
+      "ui_coarse": "danger",
+      "ui_display": "Gunshot, gunfire"
+    },
+    "alarm": {
+      "source": {
+        "type": "wav",
+        "title": "Classic alarm",
+        "provider": "Mixkit",
+        "asset_id": 995,
+        "download_filename": "mixkit-classic-alarm-995.wav",
+        "fixture_filename": "Alarm_classic-alarm-995.wav",
+        "catalog_url": "https://mixkit.co/free-sound-effects/alarm/",
+        "license": "Mixkit Sound Effects Free License",
+        "license_url": "https://mixkit.co/license/#sfxFree",
+        "sample_rate": 44100,
+        "channels": 2,
+        "sha256": "5c0302cd06e7eb3c19a4c17e4f4ec60e869a2840e555947bed3422a47bb92d7c",
+        "capture_resampler": {
+          "taps": 192,
+          "window": "Kaiser",
+          "beta": 12.0,
+          "cutoff_hz": 7800.0
+        }
+      },
+      "pre_booster_coarse": "ambient",
+      "gunshot_score": 0.5055438280105591,
+      "booster_accepted": true,
+      "ui_coarse": "danger",
+      "ui_display": "Gunshot, gunfire",
+      "assert_ui_display": false,
+      "ui_display_follow_up_issue": 116
+    }
+  }
+}

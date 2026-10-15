@@ -1,0 +1,34 @@
+================================================================================
+AudioSet 온톨로지 (분류 탭의 소리 묶음·소리 이름 번역)
+================================================================================
+SoundVisualizer.Core/Sounds/Data/sound_groups.tsv
+SoundVisualizer.Core/Sounds/Data/SoundNames/*.json
+
+분류 탭의 소리 묶음 표(sound_groups.tsv)와 소리 이름(SoundNames/*.json)은
+AudioSet 온톨로지를 바탕으로 만든 각색물입니다. 소리 이름은 온톨로지의
+클래스 이름과 그 번역이고, 묶음은 온톨로지의 갈래를 읽고 사람이 정했습니다.
+소리 이름을 그대로 쓴 묶음 이름(사이렌, 초인종 등)도 여기에 해당합니다.
+이 자료는 원본과 같은 CC BY-SA 4.0 으로 배포하며, 표 파일 맨 위에도 같은
+고지를 적어 두었습니다. JSON 은 주석을 달 수 없어 이 파일로 고지합니다.
+앱의 코드와 새로 지은 묶음 이름(GroupTitles/*.json)은 이 저장소의 라이선스
+(GNU AGPL v3)를 따릅니다.
+
+"AudioSet Ontology" by Google Inc.
+https://github.com/audioset/ontology (commit d417d32)
+Licensed under the Creative Commons Attribution-ShareAlike 4.0
+International License (CC BY-SA 4.0).
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Changes: the 521 YAMNet sound names were regrouped into everyday groups by
+SoundVisualizer contributors (sound_groups.tsv), and the class names were
+translated into the app's languages (SoundNames/*.json).
+
+이 자료는 있는 그대로 제공되며 어떠한 보증도 하지 않습니다. 자세한 내용은
+CC BY-SA 4.0 의 5조(보증의 부인과 책임의 제한)를 따릅니다.
+
+--------------------------------------------------------------------------------
+모바일 판(app/src/main/assets/sound_groups.tsv, app/src/main/res/values*/
+sound_names.xml, strings.xml 의 sound_group_* 문구)에서 옮겼습니다. 표는 글자
+그대로이고, 이름은 안드로이드 이스케이프(\' 와 &amp;)를 푼 뒤 언어마다 YAMNet
+번호 순서의 배열로 적었습니다. 언어 코드는 PC 판의 것입니다(values-in → id,
+values-zh-rCN → zh-Hans, values-zh-rTW → zh-Hant, values-pt-rBR → pt-BR).

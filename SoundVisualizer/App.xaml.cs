@@ -4,6 +4,7 @@
 using System.Configuration;
 using System.Data;
 using System.Windows;
+using SoundVisualizer.Localization;
 
 namespace SoundVisualizer
 {
@@ -13,7 +14,27 @@ namespace SoundVisualizer
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // 개발용: 환경 변수 SOUNDVISUALIZER_TRACE 에 파일 경로를 주면 AppLog 기록을 그 파일에도 남긴다.
+            var tracePath = Environment.GetEnvironmentVariable("SOUNDVISUALIZER_TRACE");
+            if (!string.IsNullOrWhiteSpace(tracePath))
+            {
+                System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(tracePath));
+                System.Diagnostics.Trace.AutoFlush = true;
+                AppLog.Info("app", $"시작합니다({DateTime.Now:yyyy-MM-dd HH:mm:ss}).");
+            }
+
             AppSettings.Load();
+
+            // 첫 창을 띄우기 전에 화면 언어와 그 글꼴을 정한다. 창의 {l:Loc} 바인딩이 처음부터 이 언어로 읽힌다.
+            Loc.Apply(AppSettings.Language);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // 슬라이더를 움직인 직후에 닫아도 마지막 값이 남게, 미뤄 둔 저장을 지금 쓴다.
+            AppSettings.Flush();
+            base.OnExit(e);
         }
     }
 }

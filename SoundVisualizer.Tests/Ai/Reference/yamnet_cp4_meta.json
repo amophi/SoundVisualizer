@@ -1,0 +1,460 @@
+{
+  "num_classes": 521,
+  "mapping_checks": {
+    "Gunshot, gunfire": "danger",
+    "Speech": "speech",
+    "Wind": "ambient",
+    "Noise": "ambient",
+    "Plop": "ambient",
+    "Sound effect": "ambient",
+    "Alarm": "danger",
+    "Rain": "ambient",
+    "Train": "ambient",
+    "Gargling": "ambient",
+    "Music": "ambient",
+    "Silence": "ambient",
+    "Footsteps": "ambient",
+    "Vehicle horn, car horn, honking": "danger",
+    "Air horn, truck horn": "danger",
+    "Burst, pop": "danger",
+    "Boom": "danger",
+    "Bang": "danger",
+    "Smash, crash": "danger",
+    "Breaking": "danger",
+    "Shatter": "danger"
+  },
+  "handcrafted": {
+    "ambient": {
+      "coarse": "ambient",
+      "display": "Wind",
+      "confidence": 0.6470588445663452,
+      "yamnet_class_index": 277,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 1.0000000223517418,
+        "speech": 0.0,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 277,
+          "name": "Wind",
+          "prob": 0.6470588445663452
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.23529411852359772
+        },
+        {
+          "index": 507,
+          "name": "Noise",
+          "prob": 0.11764705926179886
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.0
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        }
+      ]
+    },
+    "speech": {
+      "coarse": "speech",
+      "display": "Speech",
+      "confidence": 0.75,
+      "yamnet_class_index": 0,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.0625,
+        "speech": 0.9375,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.75
+        },
+        {
+          "index": 2,
+          "name": "Conversation",
+          "prob": 0.1875
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.0625
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        },
+        {
+          "index": 3,
+          "name": "Narration, monologue",
+          "prob": 0.0
+        }
+      ]
+    },
+    "danger": {
+      "coarse": "danger",
+      "display": "Gunshot, gunfire",
+      "confidence": 0.6666666865348816,
+      "yamnet_class_index": 421,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.06666667014360428,
+        "speech": 0.0,
+        "danger": 0.9333333671092987
+      },
+      "top5": [
+        {
+          "index": 421,
+          "name": "Gunshot, gunfire",
+          "prob": 0.6666666865348816
+        },
+        {
+          "index": 420,
+          "name": "Explosion",
+          "prob": 0.2666666805744171
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.06666667014360428
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.0
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        }
+      ]
+    },
+    "default_ambient": {
+      "coarse": "ambient",
+      "display": "Noise",
+      "confidence": 0.875,
+      "yamnet_class_index": 507,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 1.0,
+        "speech": 0.0,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 507,
+          "name": "Noise",
+          "prob": 0.875
+        },
+        {
+          "index": 508,
+          "name": "Environmental noise",
+          "prob": 0.125
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.0
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        },
+        {
+          "index": 2,
+          "name": "Conversation",
+          "prob": 0.0
+        }
+      ]
+    },
+    "vote_over_top1": {
+      "coarse": "speech",
+      "display": "Music",
+      "confidence": 0.3571428656578064,
+      "yamnet_class_index": 132,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.3571428656578064,
+        "speech": 0.5833333134651184,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.3571428656578064
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.2976190447807312
+        },
+        {
+          "index": 2,
+          "name": "Conversation",
+          "prob": 0.2857142686843872
+        },
+        {
+          "index": 507,
+          "name": "Noise",
+          "prob": 0.0595238097012043
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        }
+      ]
+    },
+    "priority_tie": {
+      "coarse": "danger",
+      "display": "Speech",
+      "confidence": 0.3076923191547394,
+      "yamnet_class_index": 0,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.3076923191547394,
+        "speech": 0.3076923191547394,
+        "danger": 0.3076923191547394
+      },
+      "top5": [
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.3076923191547394
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.3076923191547394
+        },
+        {
+          "index": 421,
+          "name": "Gunshot, gunfire",
+          "prob": 0.3076923191547394
+        },
+        {
+          "index": 507,
+          "name": "Noise",
+          "prob": 0.07692307978868484
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        }
+      ]
+    },
+    "proxy_plop": {
+      "coarse": "ambient",
+      "display": "Plop",
+      "confidence": 0.8461537957191467,
+      "yamnet_class_index": 488,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.9999999403953552,
+        "speech": 0.0,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 488,
+          "name": "Plop",
+          "prob": 0.8461537957191467
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.1538461446762085
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.0
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        },
+        {
+          "index": 2,
+          "name": "Conversation",
+          "prob": 0.0
+        }
+      ]
+    },
+    "game_mix": {
+      "coarse": "ambient",
+      "display": "Gunshot, gunfire",
+      "confidence": 0.1666666567325592,
+      "yamnet_class_index": 421,
+      "game_mix_preference_applied": true,
+      "vote_scores": {
+        "ambient": 0.7499999552965164,
+        "speech": 0.0,
+        "danger": 0.1666666567325592
+      },
+      "top5": [
+        {
+          "index": 498,
+          "name": "Sound effect",
+          "prob": 0.6666666269302368
+        },
+        {
+          "index": 421,
+          "name": "Gunshot, gunfire",
+          "prob": 0.1666666567325592
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 0.0833333283662796
+        },
+        {
+          "index": 507,
+          "name": "Noise",
+          "prob": 0.0833333283662796
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 0.0
+        }
+      ]
+    }
+  },
+  "samples": {
+    "silence": {
+      "coarse": "ambient",
+      "display": "Silence",
+      "confidence": 1.0,
+      "yamnet_class_index": 494,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 1.0,
+        "speech": 7.855638786658255e-30,
+        "danger": 0.0
+      },
+      "top5": [
+        {
+          "index": 494,
+          "name": "Silence",
+          "prob": 1.0
+        },
+        {
+          "index": 0,
+          "name": "Speech",
+          "prob": 7.855638786658255e-30
+        },
+        {
+          "index": 132,
+          "name": "Music",
+          "prob": 6.4286941411018935e-37
+        },
+        {
+          "index": 1,
+          "name": "Child speech, kid speaking",
+          "prob": 0.0
+        },
+        {
+          "index": 2,
+          "name": "Conversation",
+          "prob": 0.0
+        }
+      ]
+    },
+    "gunshot": {
+      "coarse": "ambient",
+      "display": "Ding",
+      "confidence": 0.12252969294786453,
+      "yamnet_class_index": 477,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.23073964565992355,
+        "speech": 0.0,
+        "danger": 0.07261022925376892
+      },
+      "top5": [
+        {
+          "index": 477,
+          "name": "Ding",
+          "prob": 0.12252969294786453
+        },
+        {
+          "index": 498,
+          "name": "Sound effect",
+          "prob": 0.10820995271205902
+        },
+        {
+          "index": 382,
+          "name": "Alarm",
+          "prob": 0.07261022925376892
+        },
+        {
+          "index": 54,
+          "name": "Hiccup",
+          "prob": 0.06038668751716614
+        },
+        {
+          "index": 500,
+          "name": "Inside, small room",
+          "prob": 0.05509820953011513
+        }
+      ]
+    },
+    "alarm": {
+      "coarse": "danger",
+      "display": "Air horn, truck horn",
+      "confidence": 0.13773442804813385,
+      "yamnet_class_index": 312,
+      "game_mix_preference_applied": false,
+      "vote_scores": {
+        "ambient": 0.09391622245311737,
+        "speech": 0.0,
+        "danger": 0.2389892339706421
+      },
+      "top5": [
+        {
+          "index": 312,
+          "name": "Air horn, truck horn",
+          "prob": 0.13773442804813385
+        },
+        {
+          "index": 302,
+          "name": "Vehicle horn, car horn, honking",
+          "prob": 0.10125480592250824
+        },
+        {
+          "index": 153,
+          "name": "Synthesizer",
+          "prob": 0.09391622245311737
+        },
+        {
+          "index": 498,
+          "name": "Sound effect",
+          "prob": 0.07539236545562744
+        },
+        {
+          "index": 392,
+          "name": "Buzzer",
+          "prob": 0.06290934979915619
+        }
+      ]
+    }
+  },
+  "class_map_filled": 521
+}

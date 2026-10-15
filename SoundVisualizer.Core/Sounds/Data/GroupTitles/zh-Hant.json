@@ -1,0 +1,17 @@
+{
+  "horns": "汽車喇叭與防盜警報",
+  "vehicle_warnings": "車輛警示音",
+  "breaking": "玻璃碎裂與撞擊聲",
+  "talking": "說話聲與悄悄話",
+  "distress": "大喊、尖叫與哭泣聲",
+  "signals": "鬧鐘、嗶聲與哨子聲",
+  "voices": "拍手聲、哼歌與吹口哨",
+  "water": "水龍頭與流水",
+  "kitchen": "廚房與烹飪",
+  "appliances": "家電與時鐘",
+  "tools": "工具與機器",
+  "nature": "自然與天氣",
+  "body": "咳嗽、呼吸與身體聲音",
+  "objects": "物品與短促聲音",
+  "background": "電視、收音機與背景聲"
+}

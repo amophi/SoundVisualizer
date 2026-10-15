@@ -1,0 +1,262 @@
+<UserControl x:Class="SoundVisualizer.HelpTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:SoundVisualizer.Localization"
+             xmlns:ui="clr-namespace:SoundVisualizer.Ui"
+             Loaded="HelpTab_Loaded" Unloaded="HelpTab_Unloaded">
+
+    <!-- 도움말 탭. 안드로이드 도움말 탭(help/HelpTab.kt)처럼 주제별 펼치기 카드로 두고, 처음 쓰는 사람이 먼저 볼 "시작하기"만 펼쳐 둔다.
+         PC 에 없는 것(진동, 마이크·외부 사운드 모드, 권한, 빠른 설정 타일, 잠금 화면, 화면 꺼짐)은 옮기지 않았다.
+         글자는 모두 문자열 표의 help.* 이고, {0} 자리(버튼·설정 이름, 버전)가 있는 글은 코드(ApplyTexts)가 채운다. -->
+    <UserControl.Resources>
+        <!-- 안드로이드 도움말과 같은 크기: 문단 15/23(본 글자색), 항목 설명 14/21(보조 글자색).
+             굵기는 꼭 적는다. 적지 않으면 탭 이름의 굵은 글꼴(LauncherTab)을 물려받는다. -->
+        <Style x:Key="Help.Paragraph" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="LineHeight" Value="23"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <!-- 카드 안의 항목 제목(모드 이름, 자주 묻는 질문). 카드 머리(1단계) 밑의 2단계 제목으로 알린다. -->
+        <Style x:Key="Help.ItemTitle" TargetType="TextBlock">
+            <Setter Property="AutomationProperties.HeadingLevel" Value="Level2"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LineHeight" Value="23"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="Help.ItemText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="LineHeight" Value="21"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <!-- 제목 한 줄 + 설명(모드, PC 설정, 자주 묻는 질문). 항목 사이 16 -->
+        <Style x:Key="Help.Item" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+        <!-- 시작하기의 번호. 동그라미 안에 숫자만 두어 오른쪽에서 왼쪽으로 쓰는 화면에서도 "1." 의 점이 앞으로 가지 않는다. -->
+        <Style x:Key="Help.StepBadge" TargetType="Border">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{StaticResource ControlBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style x:Key="Help.StepNumber" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!-- 알아두세요의 점. 글자(•)가 아니라 그림이라 화면 읽어주기가 줄마다 점에서 멈추지 않는다. 첫 줄 가운데에 맞춘다. -->
+        <Style x:Key="Help.BulletDot" TargetType="Ellipse">
+            <Setter Property="Width" Value="5"/>
+            <Setter Property="Height" Value="5"/>
+            <Setter Property="Fill" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="4,9,12,0"/>
+        </Style>
+        <!-- 카드 안 마지막 내용 아래 여백. ExpanderCard 의 본문은 아래 안쪽 여백이 없다(설정 줄이 저마다 24 를 가진다). -->
+        <Style x:Key="Help.CardBody" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,24"/>
+        </Style>
+        <!-- 도움말 카드. 탭에 따로 제목이 없어 카드 머리가 1단계 제목이다. -->
+        <Style x:Key="Help.Card" TargetType="Expander" BasedOn="{StaticResource ExpanderCard}">
+            <Setter Property="ui:CardHeading.Level" Value="Level1"/>
+        </Style>
+        <!-- 제보·앱 정보의 버튼. 카드 폭을 채운다. -->
+        <Style x:Key="Help.Button" TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False" Margin="0,16,0,0">
+        <StackPanel Margin="0,0,0,24">
+
+            <!-- 시작하기 -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.start.title}" IsExpanded="True">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource Help.StepBadge}"><TextBlock Style="{StaticResource Help.StepNumber}" Text="1"/></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.start.1}"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource Help.StepBadge}"><TextBlock Style="{StaticResource Help.StepNumber}" Text="2"/></Border>
+                        <TextBlock x:Name="TxtStart2" Grid.Column="1" Style="{StaticResource Help.Paragraph}"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource Help.StepBadge}"><TextBlock Style="{StaticResource Help.StepNumber}" Text="3"/></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.start.3}"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource Help.StepBadge}"><TextBlock Style="{StaticResource Help.StepNumber}" Text="4"/></Border>
+                        <TextBlock x:Name="TxtStart4" Grid.Column="1" Style="{StaticResource Help.Paragraph}"/>
+                    </Grid>
+                </StackPanel>
+            </Expander>
+
+            <!-- 표현 모드. 순서는 설정 탭의 선택지와 같다. -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.modes.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc settings.mode.wave}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.mode.wave}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc settings.mode.pad}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.mode.pad}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc settings.mode.circle}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.mode.circle}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc settings.mode.outline}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.mode.outline}"/>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.modes.note}"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- 소리 종류. 안드로이드의 진동 문단은 PC 에 진동이 없어 옮기지 않았다. -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.sound.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Margin="0,0,0,12" Text="{l:Loc help.sound.kinds}"/>
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Margin="0,0,0,12" Text="{l:Loc help.sound.groups}"/>
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Margin="0,0,0,12" Text="{l:Loc help.sound.advanced}"/>
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.sound.danger}"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- PC 에만 있는 것: 사운드 모드(5.1·7.1, VB-CABLE), 단축키, 오버레이 편집, 크기 고정, 개발자 모드. 글은 예전 도움말 카드 그대로다. -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.pc.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.sound_mode.title}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.sound_mode.body}"/>
+                        <!-- help.sound_mode.tip 의 {0} 자리에 링크가 온다. 앞뒤 글은 ApplyTexts 가 넣는다. 요소 사이 공백이 글자가 되지 않게 붙여 쓴다. -->
+                        <TextBlock Style="{StaticResource Text.Warning}" Margin="0,8,0,0"><Run x:Name="TxtTipPrefix"/><Hyperlink Style="{StaticResource Link}" NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="{l:Loc help.sound_mode.tip_link}"/></Hyperlink><Run x:Name="TxtTipSuffix"/></TextBlock>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.hotkeys.title}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.hotkeys.body}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.hotkeys.defaults}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.size_lock.title}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.size_lock.body}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.editor.title}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.editor.body}"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.developer.title}"/>
+                        <!-- 결과 기록 스위치의 이름이 들어가 코드가 채운다(ApplyTexts). -->
+                        <TextBlock x:Name="TxtDeveloper" Style="{StaticResource Help.ItemText}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+
+            <!-- 알아두세요. PC 는 5.1·7.1 출력이면 앞뒤도 가린다(안드로이드는 좌우만). -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.notes.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <DockPanel Margin="0,0,0,12">
+                        <Ellipse Style="{StaticResource Help.BulletDot}"/>
+                        <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.note.direction_surround}"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,12">
+                        <Ellipse Style="{StaticResource Help.BulletDot}"/>
+                        <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.note.direction_stereo}"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,12">
+                        <Ellipse Style="{StaticResource Help.BulletDot}"/>
+                        <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.note.sources}"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,12">
+                        <Ellipse Style="{StaticResource Help.BulletDot}"/>
+                        <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.note.volume}"/>
+                    </DockPanel>
+                    <DockPanel>
+                        <Ellipse Style="{StaticResource Help.BulletDot}"/>
+                        <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.note.ai}"/>
+                    </DockPanel>
+                </StackPanel>
+            </Expander>
+
+            <!-- 자주 묻는 질문. 직접 끄지 않았는데 꺼진 경우를 맨 위에 둔다. 홈 안내를 못 봤으면 여기서 찾게 된다. -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.faq.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.faq.stopped_q}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.faq.stopped_a}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.faq.no_graphic_q}"/>
+                        <TextBlock Style="{StaticResource Help.ItemText}" Text="{l:Loc help.faq.no_graphic_a}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Help.Item}">
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.faq.performance_q}"/>
+                        <TextBlock x:Name="TxtFaqPerformance" Style="{StaticResource Help.ItemText}"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Help.ItemTitle}" Text="{l:Loc help.faq.language_q}"/>
+                        <TextBlock x:Name="TxtFaqLanguage" Style="{StaticResource Help.ItemText}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+
+            <!-- 제보하기. 브라우저와 메일 앱이 보내고, 앱은 주소만 넘긴다. 보내는 환경 정보를 그대로 보인다. -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.report.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <TextBlock Style="{StaticResource Help.Paragraph}" Text="{l:Loc help.report.desc}"/>
+                    <!-- 환경 정보의 이름표는 번역하지 않으므로 아랍어 화면에서도 왼쪽에서 오른쪽으로 둔다. -->
+                    <Border Background="{StaticResource BackgroundBrush}" CornerRadius="12" Padding="16,12" Margin="0,12,0,0" FlowDirection="LeftToRight">
+                        <TextBlock x:Name="TxtEnvironment" FontFamily="{StaticResource MonoFontFamily}" FontSize="13" FontWeight="Normal" LineHeight="19"
+                                   Foreground="{StaticResource SecondaryTextBrush}" TextWrapping="Wrap"/>
+                    </Border>
+                    <Button Style="{StaticResource Help.Button}" Content="{l:Loc help.report.github}" Click="BtnReportGithub_Click"/>
+                    <Button Style="{StaticResource Help.Button}" Content="{l:Loc help.report.mail}" Click="BtnReportMail_Click"/>
+                    <Button Style="{StaticResource Help.Button}" Content="{l:Loc help.report.copy}" Click="BtnCopyEnvironment_Click"/>
+                    <!-- 누른 결과(복사했다, 브라우저를 열지 못했다). 화면 읽어주기가 읽고 지나간다. -->
+                    <TextBlock x:Name="TxtReportResult" Style="{StaticResource Text.Warning}" Margin="0,12,0,0" Visibility="Collapsed"
+                               AutomationProperties.LiveSetting="Polite"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- 앱 정보. 버전은 실행 파일에서 읽는다. PC 판은 AGPL-3.0 이다(안드로이드 판의 라이선스·팀 이름 문장은 옮기지 않았다). -->
+            <Expander Style="{StaticResource Help.Card}" Header="{l:Loc help.about.title}">
+                <StackPanel Style="{StaticResource Help.CardBody}">
+                    <!-- 굵게 보이지만 제목이 아니라 버전 글이다. -->
+                    <TextBlock x:Name="TxtVersion" Style="{StaticResource Help.ItemTitle}" AutomationProperties.HeadingLevel="None"/>
+                    <TextBlock Style="{StaticResource Help.ItemText}" Margin="0,8,0,0" Text="{l:Loc help.about.license}"/>
+                    <Button Style="{StaticResource Help.Button}" Margin="0,16,0,0" Content="{l:Loc help.licenses.button}" Click="BtnLicenses_Click"/>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

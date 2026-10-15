@@ -1,0 +1,528 @@
+<UserControl x:Class="SoundVisualizer.Ui.SoundsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:ai="clr-namespace:SoundVisualizer.Ai;assembly=SoundVisualizer.Core"
+             xmlns:l="clr-namespace:SoundVisualizer.Localization"
+             xmlns:ui="clr-namespace:SoundVisualizer.Ui"
+             FontSize="14" FontWeight="Normal" Foreground="{StaticResource PrimaryTextBrush}">
+
+    <!-- 소리 탭(안드로이드 ClassifyTab). 위에 찾기 칸과 거르기 칸을 붙박아 두고, 그 아래 목록만 스크롤한다(안드로이드의 붙는 머리).
+         목록은 고급 모드에서 521줄이라 가상화한다. 줄의 모양은 줄 형식(Ui/SoundRows.cs)마다 아래 DataTemplate 이 정한다.
+         색과 공통 서식은 Themes/Theme.xaml 에 있고, 여기에는 이 탭에만 쓰는 서식을 둔다. 왼쪽·오른쪽을 못 박지 않아
+         아랍어에서는 런처가 뒤집는 대로 함께 뒤집힌다.
+         탭 머리 서식(20 굵게, 보조 글자색)이 탭 내용까지 물려 내려오므로 맨 위에서 본문 글자(14, 보통, 본 글자색)로 되돌린다. -->
+    <UserControl.Resources>
+        <!-- 소리 종류의 색. 설정에서 고른 색을 코드가 넣는다(ApplyTypeColors). 점·거르기 칸·구역 머리가 이것을 따른다. -->
+        <SolidColorBrush x:Key="SoundsTab.AmbientBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SoundsTab.SpeechBrush" Color="#FFFF00"/>
+        <SolidColorBrush x:Key="SoundsTab.DangerBrush" Color="#FF0000"/>
+
+        <!-- 종류 단추의 너비. 화면 언어의 가장 긴 종류 이름에 맞춰 코드가 정해(UpdatePillWidth) 줄마다 단추 끝이 맞는다. -->
+        <sys:Double x:Key="SoundsTab.PillWidth">150</sys:Double>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <ui:ThumbViewportConverter x:Key="ThumbViewport"/>
+
+        <!-- 종류의 점. Tag 에 종류를 주면 그 색이고, null 이면 그리지 않는다. 흰색·검은색도 보이게 옅은 테두리를 두른다(안드로이드 TypeDot). -->
+        <Style x:Key="TypeDot" TargetType="Ellipse">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Stroke" Value="#40FFFFFF"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="{x:Static ai:SoundType.Ambient}">
+                    <Setter Property="Fill" Value="{DynamicResource SoundsTab.AmbientBrush}"/>
+                </Trigger>
+                <Trigger Property="Tag" Value="{x:Static ai:SoundType.Speech}">
+                    <Setter Property="Fill" Value="{DynamicResource SoundsTab.SpeechBrush}"/>
+                </Trigger>
+                <Trigger Property="Tag" Value="{x:Static ai:SoundType.Danger}">
+                    <Setter Property="Fill" Value="{DynamicResource SoundsTab.DangerBrush}"/>
+                </Trigger>
+                <Trigger Property="Tag" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 카드·줄처럼 목록 가장자리에 붙은 것은 초점 테두리를 안쪽에 그린다. 바깥에 그리면 목록이 잘라 먹는다. -->
+        <Style x:Key="FocusRingRow">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="1" RadiusX="15" RadiusY="15" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" SnapsToDevicePixels="True"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FocusRingSmall">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="-3" RadiusX="12" RadiusY="12" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" SnapsToDevicePixels="True"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 글자 단추(모두 되돌리기). 안드로이드 TextButton: 강조색 굵은 글자, 쓸 수 없으면 보조 글자색을 흐리게. -->
+        <Style x:Key="TextButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingSmall}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="False">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- 강조 글자는 카드 바탕 위에서 5.9:1 이라 마우스를 올리면 카드 바탕을 깐다 -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource CardBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 찾기 칸: 입력칸 서식(TextField)에 돋보기와 안내 글을 더한다. 안내 글은 Tag 로 받는다. 오른쪽은 지우기 단추 자리다. -->
+        <Style x:Key="SearchField" TargetType="TextBox" BasedOn="{StaticResource TextField}">
+            <Setter Property="Padding" Value="38,9,44,9"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2" CornerRadius="12">
+                            <Grid>
+                                <TextBlock Margin="14,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False"
+                                           FontFamily="Segoe MDL2 Assets" FontSize="14" FontWeight="Normal" Foreground="{StaticResource SecondaryTextBrush}" Text="&#xE721;"/>
+                                <TextBlock x:Name="Hint" Margin="{TemplateBinding Padding}" Padding="2,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed"
+                                           FontWeight="Normal" Foreground="{StaticResource SecondaryTextBrush}" TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <!-- 입력칸은 Padding 을 스스로 안쪽에 둔다. 여기서 또 띄우면 글자가 안내 글보다 그만큼 밀린다. -->
+                                <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="Hint" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 찾기 칸 안의 지우기 단추 -->
+        <Style x:Key="ClearButton" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingRound}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="Transparent">
+                            <Ellipse x:Name="Bg" Fill="Transparent"/>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                                       Foreground="{TemplateBinding Foreground}" Text="&#xE711;"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Fill" Value="{StaticResource ControlBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 거르기 칸(안드로이드 FilterRow). 종류 칸은 종류의 점을 앞에 둔다(Tag 가 종류). 한 줄에 다 들어가지 않으면 다음 줄로 넘긴다.
+             고른 칸은 강조 바탕에 흰 글자(5.2:1), 나머지는 조작 요소 바탕에 본 글자(10.4:1). -->
+        <Style x:Key="FilterChip" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Chip" Background="{StaticResource ControlBrush}" CornerRadius="10" Padding="14,8" MinHeight="36">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Style="{StaticResource TypeDot}" Margin="0,0,6,0" Tag="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chip" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Chip" Property="Background" Value="{StaticResource AccentFillBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource OnFillBrush}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Chip" Property="Background" Value="{StaticResource AccentFillHoverBrush}"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FilterChips" TargetType="ListBox" BasedOn="{StaticResource ChoiceChips}">
+            <Setter Property="ItemContainerStyle" Value="{StaticResource FilterChip}"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 카드와 소리 줄(안드로이드 dropdownRow + TypeChooser). 줄 어디를 눌러도 종류 목록이 줄 끝의 종류 단추(Pill) 밑에 열린다.
+             종류 단추는 따로 누르는 단추가 아니라 줄의 일부라, 키보드로는 줄 하나에 한 번 멈춘다. -->
+        <Style x:Key="TypeRowButton" TargetType="ui:TypeMenuButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingRow}"/>
+            <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:TypeMenuButton">
+                        <Border Background="{StaticResource CardBrush}" CornerRadius="16" Padding="16,12" MinHeight="48">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="False"/>
+                                <Border x:Name="Pill" Grid.Column="1" Margin="12,0,0,0" Width="{DynamicResource SoundsTab.PillWidth}" VerticalAlignment="Center"
+                                        Background="{StaticResource ControlBrush}" CornerRadius="10" Padding="12,6,10,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Style="{StaticResource TypeDot}" Margin="0,0,6,0" Tag="{Binding DotType}"/>
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource PrimaryTextBrush}" Text="{Binding TypeLabel}"/>
+                                        <Path Grid.Column="2" Margin="8,0,0,0" VerticalAlignment="Center" Data="M 0,0 L 5,5 L 10,0"
+                                              Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMenuOpen" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource ControlPressedBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 종류 목록(안드로이드 DropdownMenu). 종류 셋을 색 점과 함께 두고, 지금 종류에 체크 표시를 한다. 코드가 그때그때 만든다. -->
+        <Style x:Key="TypeMenu" TargetType="ContextMenu">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="HasDropShadow" Value="False"/>
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{StaticResource ControlBrush}" BorderBrush="{StaticResource ControlHoverBrush}" BorderThickness="1" CornerRadius="12" Padding="6" MinWidth="200">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FocusRingMenuItem">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="1" RadiusX="8" RadiusY="8" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" SnapsToDevicePixels="True"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TypeMenuItem" TargetType="MenuItem">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingMenuItem}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="8" Padding="12,10" MinHeight="44">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter ContentSource="Icon" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <ContentPresenter x:Name="HeaderHost" Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="False"/>
+                                <Path x:Name="Check" Grid.Column="2" Margin="16,0,0,0" VerticalAlignment="Center" Visibility="Hidden" Data="M 0,5 L 4,9 L 12,1"
+                                      Stroke="{StaticResource AccentBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 목록의 얇은 스크롤 막대. 521줄을 끌어 옮길 수 있게 둔다. 막대 자리를 늘 비워 두어 막대가 나타나고 사라질 때 줄이 다시 접히지 않는다. -->
+        <Style x:Key="SlimThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="Bar" CornerRadius="4" Background="{StaticResource SecondaryTextBrush}" Opacity="0.55"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bar" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Bar" Property="Opacity" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SlimPage" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SlimScrollBar" TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="MinWidth" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <!-- 줄이 많아도 손잡이가 32px 보다 짧아지지 않게 보이는 비율을 키워 넘긴다 -->
+                            <Track.ViewportSize>
+                                <MultiBinding Converter="{StaticResource ThumbViewport}" ConverterParameter="32">
+                                    <Binding Path="ViewportSize" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                    <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}"/>
+                                </MultiBinding>
+                            </Track.ViewportSize>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource SlimPage}" Command="ScrollBar.PageUpCommand"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource SlimPage}" Command="ScrollBar.PageDownCommand"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource SlimThumb}" MinHeight="32"/>
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ListScroller" TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid Background="Transparent">
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Margin="0,0,16,0" CanContentScroll="{TemplateBinding CanContentScroll}"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar" Style="{StaticResource SlimScrollBar}" HorizontalAlignment="Right" Orientation="Vertical"
+                                       Minimum="0" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Value="{TemplateBinding VerticalOffset}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== 목록의 줄 ===== -->
+
+        <!-- 제목·설명·고급 모드 스위치. 스위치는 다른 스위치처럼 카드 위에 둔다(켜진 막대가 탭 바탕 위에서는 대비가 모자란다). -->
+        <DataTemplate DataType="{x:Type ui:IntroRow}">
+            <StackPanel Margin="0,4,0,0">
+                <TextBlock Style="{StaticResource Text.Section}" Margin="0,0,0,8" AutomationProperties.HeadingLevel="Level1" Text="{l:Loc sounds.title}"/>
+                <TextBlock FontSize="14" LineHeight="21" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{l:Loc sounds.desc}"/>
+                <TextBlock Style="{StaticResource Text.Description}" Margin="0,8,0,16" Text="{l:Loc sounds.sibling_note}"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <CheckBox Style="{StaticResource SwitchRow}" Content="{l:Loc sounds.advanced.title}" ui:SettingRow.Description="{l:Loc sounds.advanced.desc}"
+                              IsChecked="{Binding IsAdvanced, Mode=OneWay}" Checked="AdvancedSwitch_Changed" Unchecked="AdvancedSwitch_Changed"/>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- 바꾼 소리 수와 모두 되돌리기. 소리를 센다(묶음 하나를 바꾸면 그 소리 수만큼 는다).
+             수가 바뀌면 화면 읽어주기가 읽고 지나간다(SoundsTab.AnnounceChangedCount). -->
+        <DataTemplate DataType="{x:Type ui:ChangedRow}">
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{Binding CountText}"
+                           AutomationProperties.LiveSetting="Polite"/>
+                <Button Grid.Column="1" Margin="12,0,0,0" Style="{StaticResource TextButton}" Content="{l:Loc sounds.reset.button}"
+                        IsEnabled="{Binding CanReset}" Click="ResetAll_Click"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type ui:EmptyRow}">
+            <TextBlock Margin="0,32" FontSize="15" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{l:Loc sounds.empty}"/>
+        </DataTemplate>
+
+        <!-- 구역 머리: 그 아래 카드들의 기본 종류. 바꾼 카드도 제 구역에 그대로 있다. -->
+        <DataTemplate DataType="{x:Type ui:SectionRow}">
+            <Grid Margin="0,16,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Ellipse Style="{StaticResource TypeDot}" Tag="{Binding Type}"/>
+                <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" TextWrapping="Wrap"
+                           Foreground="{StaticResource PrimaryTextBrush}" AutomationProperties.HeadingLevel="Level2" Text="{Binding Title}"/>
+            </Grid>
+        </DataTemplate>
+
+        <!-- 고급 모드의 묶음 머리: 이름과 소리 수. 누르는 칸이 아니라 제목이다. -->
+        <DataTemplate DataType="{x:Type ui:GroupRow}">
+            <TextBlock Margin="0,8" TextWrapping="Wrap" AutomationProperties.HeadingLevel="Level3" AutomationProperties.Name="{Binding AutomationName}">
+                <Run FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}" Text="{Binding Title, Mode=OneWay}"/><Run Text="  "/><Run
+                     FontSize="13" Foreground="{StaticResource SecondaryTextBrush}" Text="{Binding CountText, Mode=OneWay}"/>
+            </TextBlock>
+        </DataTemplate>
+
+        <!-- 카드와 소리 줄. 이름, (바꿨으면) 강조색 한 줄, (카드면) 미리보기. 글은 모두 줄을 바꿔 긴 번역도 잘리지 않는다. -->
+        <DataTemplate DataType="{x:Type ui:TypeRow}">
+            <ui:TypeMenuButton Style="{StaticResource TypeRowButton}" Click="TypeRow_Click">
+                <StackPanel>
+                    <TextBlock FontSize="16" TextWrapping="Wrap" Foreground="{StaticResource PrimaryTextBrush}" Text="{Binding Title}"/>
+                    <TextBlock Margin="0,2,0,0" FontSize="13" TextWrapping="Wrap" Foreground="{StaticResource AccentBrush}" Text="{Binding Note}"
+                               Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibility}}"/>
+                    <TextBlock Margin="0,2,0,0" FontSize="13" LineHeight="18" TextWrapping="Wrap" Foreground="{StaticResource SecondaryTextBrush}" Text="{Binding Preview}"
+                               Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+            </ui:TypeMenuButton>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type ui:EndRow}">
+            <Border Height="24"/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="0,16,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 붙박이 머리: 찾기 칸과 거르기 칸. 긴 목록을 내려가도 늘 손 닿는 곳에 있다. 끝 쪽 여백은 목록의 스크롤 막대 자리와 맞춘다. -->
+        <StackPanel Margin="0,0,16,4">
+            <Grid>
+                <TextBox x:Name="SearchBox" Style="{StaticResource SearchField}" Tag="{l:Loc sounds.search.hint}" AutomationProperties.Name="{l:Loc sounds.search.hint}"
+                         TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_PreviewKeyDown"/>
+                <Button x:Name="BtnClearSearch" Style="{StaticResource ClearButton}" HorizontalAlignment="Right" Margin="0,0,8,0" Visibility="Collapsed"
+                        AutomationProperties.Name="{l:Loc sounds.search.clear}" Click="BtnClearSearch_Click"/>
+            </Grid>
+            <!-- 칸의 차례는 SoundFilter 의 차례(전체, 환경음, 대화음, 위협음, 바꾼 소리)와 같다. 고른 번호가 곧 거르기다. -->
+            <ui:ChoiceChipList x:Name="FilterChips" Style="{StaticResource FilterChips}" Margin="0,12,0,0" AutomationProperties.Name="{l:Loc sounds.filter.title}"
+                               SelectionChanged="FilterChips_SelectionChanged">
+                <ListBoxItem Content="{l:Loc sounds.filter.all}"/>
+                <ListBoxItem Content="{l:Loc sounds.type.ambient}" Tag="{x:Static ai:SoundType.Ambient}"/>
+                <ListBoxItem Content="{l:Loc sounds.type.speech}" Tag="{x:Static ai:SoundType.Speech}"/>
+                <ListBoxItem Content="{l:Loc sounds.type.danger}" Tag="{x:Static ai:SoundType.Danger}"/>
+                <ListBoxItem Content="{l:Loc sounds.filter.changed}"/>
+            </ui:ChoiceChipList>
+        </StackPanel>
+
+        <!-- 목록. 보이는 줄과 그 위아래 한 화면만 만든다(가상화). 줄을 다시 쓰고(Recycling) 픽셀 단위로 부드럽게 스크롤한다.
+             화면 읽어주기는 줄마다 데이터 항목 하나를 두고, 그 이름은 줄 객체의 ToString 이다(SoundRows.cs). -->
+        <ItemsControl x:Name="List" Grid.Row="1" Focusable="False" AutomationProperties.Name="{l:Loc launcher.tab.sounds}"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.CacheLengthUnit="Page"
+                      VirtualizingPanel.CacheLength="1"
+                      ScrollViewer.CanContentScroll="True">
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <ScrollViewer x:Name="Scroller" Style="{StaticResource ListScroller}" Focusable="False" CanContentScroll="True"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</UserControl>

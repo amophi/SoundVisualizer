@@ -1,0 +1,17 @@
+{
+  "horns": "Klaxons et alarmes de voiture",
+  "vehicle_warnings": "Signaux d'alerte des véhicules",
+  "breaking": "Bris de verre et fracas",
+  "talking": "Parole et chuchotements",
+  "distress": "Cris et pleurs",
+  "signals": "Réveils, bips et sifflets",
+  "voices": "Applaudissements, fredonnements et sifflements",
+  "water": "Robinets et eau qui coule",
+  "kitchen": "Cuisine et cuisson",
+  "appliances": "Électroménager et horloges",
+  "tools": "Outils et machines",
+  "nature": "Nature et météo",
+  "body": "Toux, respiration et bruits du corps",
+  "objects": "Objets et sons brefs",
+  "background": "Télé, radio et fond sonore"
+}

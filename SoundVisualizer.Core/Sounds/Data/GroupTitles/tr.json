@@ -1,0 +1,17 @@
+{
+  "horns": "Kornalar ve araba alarmları",
+  "vehicle_warnings": "Araç uyarı sesleri",
+  "breaking": "Cam kırılması ve parçalanma",
+  "talking": "Sohbet ve fısıltı",
+  "distress": "Bağırma, çığlık ve ağlama",
+  "signals": "Çalar saatler, bip sesleri ve düdükler",
+  "voices": "Alkış, mırıldanma ve ıslık",
+  "water": "Musluklar ve akan su",
+  "kitchen": "Mutfak ve yemek pişirme",
+  "appliances": "Ev aletleri ve saatler",
+  "tools": "Aletler ve makineler",
+  "nature": "Doğa ve hava durumu",
+  "body": "Öksürük, nefes ve vücut sesleri",
+  "objects": "Eşyalar ve kısa sesler",
+  "background": "TV, radyo ve arka plan sesi"
+}

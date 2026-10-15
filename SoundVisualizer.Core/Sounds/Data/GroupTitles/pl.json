@@ -1,0 +1,17 @@
+{
+  "horns": "Klaksony i alarmy samochodowe",
+  "vehicle_warnings": "Sygnały ostrzegawcze pojazdów",
+  "breaking": "Tłuczenie szkła i łoskot",
+  "talking": "Mówienie i szept",
+  "distress": "Krzyki i płacz",
+  "signals": "Budziki, piknięcia i gwizdki",
+  "voices": "Oklaski, nucenie i gwizdanie",
+  "water": "Krany i płynąca woda",
+  "kitchen": "Kuchnia i gotowanie",
+  "appliances": "Sprzęty domowe i zegary",
+  "tools": "Narzędzia i maszyny",
+  "nature": "Przyroda i pogoda",
+  "body": "Kaszel, oddech i odgłosy ciała",
+  "objects": "Przedmioty i krótkie dźwięki",
+  "background": "Telewizor, radio i dźwięki w tle"
+}

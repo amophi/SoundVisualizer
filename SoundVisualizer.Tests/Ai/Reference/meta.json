@@ -1,0 +1,29 @@
+{
+  "description": "Golden fixtures from tools/ai_reference/preprocess.py",
+  "sample_rate": 16000,
+  "mono": {
+    "path": "mono16k_golden.bin",
+    "count": 15600,
+    "min": -0.601978600025177,
+    "max": 0.601969838142395,
+    "mean": 0.00022190845629666,
+    "std": 0.3061859905719757,
+    "sha256": "9093ef7afd41a1c5cfe9ebb26756d34780d3aa43d39f06e834b96170cc3cb472"
+  },
+  "logmel": {
+    "path": "logmel_golden.bin",
+    "count": 6144,
+    "min": -6.907755374908447,
+    "max": 7.109968662261963,
+    "mean": -3.967583417892456,
+    "std": 4.519693851470947,
+    "sha256": "679007c2eabb22849c54f2ae9465bcfc556e917b42aace67ed7fdb4f8fb37eaf"
+  },
+  "shape_logical": [
+    1,
+    1,
+    96,
+    64
+  ],
+  "layout": "time * 64 + mel"
+}

@@ -1,0 +1,17 @@
+{
+  "horns": "クラクション・車の警報音",
+  "vehicle_warnings": "乗り物の警告音",
+  "breaking": "ガラスが割れる音・物が壊れる音",
+  "talking": "会話・ささやき声",
+  "distress": "大声・悲鳴・泣き声",
+  "signals": "目覚まし時計・電子音・ホイッスル",
+  "voices": "拍手・鼻歌・口笛",
+  "water": "蛇口・流れる水",
+  "kitchen": "台所・料理",
+  "appliances": "家電・時計",
+  "tools": "工具・機械",
+  "nature": "自然・天気",
+  "body": "せき・呼吸・体の音",
+  "objects": "物の音・短い音",
+  "background": "テレビ・ラジオ・背景音"
+}

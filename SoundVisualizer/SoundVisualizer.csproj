@@ -8,16 +8,29 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>SoundVisualizer.ico</ApplicationIcon>
+    <!-- 도움말의 앱 정보와 제보의 환경 정보가 이 값을 읽는다. 배포할 때마다 올린다. -->
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UI\" />
     <Using Remove="System.Drawing" />
     <Using Remove="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="SoundVisualizer.ico" />
+  </ItemGroup>
+
+  <!-- Pretendard (SIL OFL 1.1). 글꼴은 실행 파일에 넣고, OFL 은 글꼴과 함께 배포해야 하므로 라이선스 파일을 출력 폴더에 둔다. -->
+  <ItemGroup>
+    <Resource Include="Fonts\Pretendard-*.otf" />
+    <None Include="Fonts\Pretendard-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- 튜토리얼 소리(CC0·퍼블릭 도메인, 출처는 THIRD_PARTY.md 의 Tutorial sounds). 안드로이드의 Ogg 조각을 한 번 풀어 둔 PCM WAV 다.
+       Ogg 를 앱에서 풀려면 디코더 라이브러리가 더 필요해, 풀어 둔 파일(모노 16비트, 넷 합쳐 약 470KB)을 실행 파일에 넣는다. -->
+  <ItemGroup>
+    <Resource Include="Tutorial\Sounds\*.wav" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,18 +42,16 @@
     <None Update="AIModel\yamnet.onnx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="AIModel\three_class_score_head.onnx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AIModel\gunshot_booster.onnx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="AIModel\yamnet.data">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="AIModel\yamnet_class_map.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundVisualizer.Core\SoundVisualizer.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,65 @@
+{
+  "description": "Kotlin parity fixtures from the pinned Qualcomm-recipe source frontend NumPy port",
+  "source_provenance": {
+    "qai_hub_models_commit": "7925bdd04586a87b09914164903f51b3f889c4aa",
+    "torch_audioset_commit": "e8852c53becef811784754a2de9c4617d8db2156",
+    "upstream_parity_check": "tools/ai_reference/verify_torchaudio_logmel_parity.py"
+  },
+  "shape_logical": [
+    1,
+    1,
+    96,
+    64
+  ],
+  "layout": "time * 64 + mel",
+  "cases": {
+    "golden": {
+      "input": "mono16k_golden.bin",
+      "output": {
+        "path": "qualcomm_source_golden_logmel.bin",
+        "count": 6144,
+        "min": -6.5995588302612305,
+        "max": 3.733264446258545,
+        "mean": -3.047597885131836,
+        "std": 3.3511555194854736,
+        "sha256": "3d6e4e822358c1aee08ea6fec843af3901eb02d7c5c51e091482eda865848db0"
+      }
+    },
+    "silence": {
+      "input": "e2e_silence_mono16k.bin",
+      "output": {
+        "path": "qualcomm_source_silence_logmel.bin",
+        "count": 6144,
+        "min": -6.907755374908447,
+        "max": -6.907755374908447,
+        "mean": -6.907755374908447,
+        "std": 0.0,
+        "sha256": "07bf9c6bb402c2ab2f32504e488114d5003a5c6ddc115032be92341d474281c8"
+      }
+    },
+    "gunshot": {
+      "input": "e2e_gunshot_mono16k.bin",
+      "output": {
+        "path": "qualcomm_source_gunshot_logmel.bin",
+        "count": 6144,
+        "min": -6.907755374908447,
+        "max": 3.703829765319824,
+        "mean": 1.3086820840835571,
+        "std": 2.004591226577759,
+        "sha256": "8812fd0cc9ee134e92245f751ff9b0dec5c151f171c7be4a759fd16421ade84e"
+      }
+    },
+    "alarm": {
+      "input": "e2e_alarm_mono16k.bin",
+      "output": {
+        "path": "qualcomm_source_alarm_logmel.bin",
+        "count": 6144,
+        "min": -5.538531303405762,
+        "max": 2.0881121158599854,
+        "mean": -0.3528178632259369,
+        "std": 1.6606378555297852,
+        "sha256": "c70425b671969432d26f39127e31dd062f066d572c027bbdfddc1824d4d55417"
+      }
+    }
+  }
+}

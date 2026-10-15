@@ -5,3 +5,4 @@ obj/
 *.suo
 *.sln.docstates
 .agents/mcp_config.json
+*.lscache
