@@ -163,14 +163,6 @@ namespace SoundVisualizer
             if (_bindingTarget != "Edit") BtnEditHotkey.Content = GetKeysName(AppSettings.EditModeKeyBind);
         }
 
-        private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-        {
-            if (sender is System.Windows.Controls.ComboBox comboBox && !comboBox.IsDropDownOpen)
-            {
-                e.Handled = true;
-            }
-        }
-
         private void SetStatusUI(bool isRunning)
         {
             TxtStatus.Text = isRunning ? Loc.Get("launcher.status.running") : Loc.Get("launcher.status.idle");

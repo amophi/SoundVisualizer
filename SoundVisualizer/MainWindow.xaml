@@ -166,9 +166,10 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock x:Name="EditPanelLanguageLabel" Style="{StaticResource Text.Caption}" Margin="0,0,12,0" Text="{l:Loc common.language}"/>
-                            <ComboBox x:Name="CmbLanguage" Grid.Column="1" Style="{StaticResource ComboField}"
-                                      AutomationProperties.LabeledBy="{Binding ElementName=EditPanelLanguageLabel}"
-                                      SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel"/>
+                            <!-- 키보드로 둘러보는 동안에는 언어가 바뀌지 않는다(런처와 같은 CommitOnCloseComboBox). -->
+                            <ui:CommitOnCloseComboBox x:Name="CmbLanguage" Grid.Column="1" Style="{StaticResource ComboField}"
+                                                      AutomationProperties.LabeledBy="{Binding ElementName=EditPanelLanguageLabel}"
+                                                      SelectionChanged="CmbLanguage_SelectionChanged"/>
                         </Grid>
                         <Border Height="1" Margin="0,16,0,0" Background="{StaticResource ControlBrush}"/>
                     </StackPanel>

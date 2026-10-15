@@ -21,10 +21,10 @@
             <Grid Grid.Row="0" Margin="24,24,24,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,100,0">
                     <TextBlock x:Name="TxtLanguageLabel" Style="{StaticResource Text.Caption}" FontSize="14" Margin="0,0,10,0" Text="{l:Loc common.language}"/>
-                    <!-- 항목(시스템 기본값 + 18개 언어)은 LanguagePicker 가 채운다 -->
-                    <ComboBox x:Name="CmbLanguage" Style="{StaticResource ComboField}" Width="200"
-                              AutomationProperties.LabeledBy="{Binding ElementName=TxtLanguageLabel}"
-                              SelectionChanged="CmbLanguage_SelectionChanged" PreviewMouseWheel="ComboBox_PreviewMouseWheel"/>
+                    <!-- 항목(시스템 기본값 + 18개 언어)은 LanguagePicker 가 채운다. 키보드로 둘러보는 동안에는 언어가 바뀌지 않는다(CommitOnCloseComboBox). -->
+                    <ui:CommitOnCloseComboBox x:Name="CmbLanguage" Style="{StaticResource ComboField}" Width="200"
+                                              AutomationProperties.LabeledBy="{Binding ElementName=TxtLanguageLabel}"
+                                              SelectionChanged="CmbLanguage_SelectionChanged"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-24,-24,0">

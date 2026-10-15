@@ -1461,14 +1461,6 @@ namespace SoundVisualizer
                 OnSettingsChangedFromHotkey?.Invoke();
             }
         }
-        private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-        {
-            if (sender is System.Windows.Controls.ComboBox comboBox && !comboBox.IsDropDownOpen)
-            {
-                e.Handled = true;
-            }
-        }
-
         private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isUpdatingEditPanelSliders) return;
